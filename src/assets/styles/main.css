@@ -1,0 +1,190 @@
+/*
+  main.css – Vollständig modernisiertes Layout
+  -----------------------------------------------------------------------
+  • Glassmorphism, Micro-Animationen und moderne Designsprache
+  • Performance-optimiert mit Hardware-Beschleunigung
+*/
+
+/* =============================
+   Farbvariablen (erweitert)
+   ============================= */
+:root {
+  /* Platzhalter für die Höhe der globalen Navigation */
+  --global-nav-height: 0px;
+
+  /* Basis-Farben */
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+
+  /* Light Theme (Standard) */
+  --bg: #F0F0F0;
+  --panel: #FFFFFF;
+  --text: #1a1a1a;
+  --muted: #555555;
+  --accent: #005cda;
+  --accent-text: #FFFFFF;
+  --btn: #E8E8E8;
+  --btn-hover: #D4D4D4;
+  --ring: #3e66d3;
+  --border-color: #C0C0C0;
+  --shadow-color: rgb(0 0 0 / 10%);
+  --canvas-bg: #000;
+
+  /* Neue moderne Variablen */
+  --glass-bg: color-mix(in oklab, var(--panel) 80%, transparent);
+  --glass-border: color-mix(in oklab, var(--border-color) 40%, transparent);
+  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 15%, transparent);
+  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 25%, transparent);
+  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 20%, transparent);
+
+  /* Dynamische Hintergründe */
+  --body-gradient: 
+    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--accent) 4%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--green) 3%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 97%, var(--accent)) 100%);
+
+  /* Layout-Variablen */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Animation Curves */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Dark Theme Overrides */
+:root[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --panel: #161616;
+  --text: #f0f0f0;
+  --muted: #888888;
+  --accent: #6ea8fe;
+  --accent-text: #0a0a0a;
+  --btn: #222222;
+  --btn-hover: #333333;
+  --ring: #3e66d3;
+  --border-color: rgb(255 255 255 / 15%);
+  --shadow-color: rgb(0 0 0 / 50%);
+
+  --glass-bg: color-mix(in oklab, var(--panel) 70%, transparent);
+  --glass-border: color-mix(in oklab, var(--border-color) 60%, transparent);
+
+  --body-gradient: 
+    radial-gradient(circle at 20% 80%, color-mix(in oklab, var(--accent) 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--purple) 6%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, color-mix(in oklab, var(--cyan) 4%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 95%, #1a1a2e) 100%);
+}
+
+/* =============================
+   Base / Reset (verbessert)
+   ============================= */
+* { 
+  box-sizing: border-box; 
+}
+
+html, body { 
+  height: auto;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--body-gradient);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.5s var(--ease-smooth), color 0.3s var(--ease-smooth);
+  overflow-x: hidden;
+}
+
+img, canvas, svg, video { 
+  display: block; 
+  max-width: 100%; 
+}
+
+button { 
+  font: inherit; 
+  cursor: pointer; 
+  border: none;
+  background: none;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 3px var(--bg), 
+    0 0 0 6px var(--accent),
+    0 8px 20px color-mix(in oklab, var(--accent) 20%, transparent);
+  border-radius: var(--radius-sm);
+  transition: box-shadow 200ms var(--ease-smooth);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { 
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =============================
+   Dark Mode Specific Enhancements
+   ============================= */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-elevation: 0 8px 32px color-mix(in oklab, black 40%, transparent);
+    --surface-hover: 0 16px 48px color-mix(in oklab, black 60%, transparent);
+  }
+}
+
+/* =============================
+   Utility Classes
+   ============================= */
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* =============================
+   Print Styles
+   ============================= */
+@media print {
+  .app-header, .app-footer, .status-bar, .image-actions {
+    display: none !important;
+  }
+  
+  .image-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  body {
+    background: white !important;
+  }
+}

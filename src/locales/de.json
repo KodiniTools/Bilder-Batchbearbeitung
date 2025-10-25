@@ -1,0 +1,353 @@
+{
+  "head": {
+    "title": "Moderne Bild-Bearbeitung",
+    "description": "Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern."
+  },
+  "header": {
+    "title": "Moderne Bild-Bearbeitung"
+  },
+  "statusBar": {
+    "images": "Bilder",
+    "selected": "ausgewählt",
+    "buttons": {
+      "selectAll": "Alle umschalten",
+      "delete": "Löschen",
+      "exportSelectedPdf": "Auswahl → PDF",
+      "exportAllPdf": "Alle → PDF",
+      "save": "Speichern…"
+    },
+    "tooltips": {
+      "selectAll": "Alle auswählen/abwählen",
+      "deleteSelected": "Auswahl löschen",
+      "exportSelectedPdf": "Auswahl als PDF exportieren",
+      "exportAllPdf": "Alle Bilder als PDF exportieren",
+      "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
+      "downloadZip": "Originale der Auswahl als ZIP herunterladen"
+    }
+  },
+  "upload": {
+    "text": "Bilder hierher ziehen oder klicken",
+    "button": "Dateien auswählen"
+  },
+  "emptyState": {
+    "title": "Noch keine Bilder.",
+    "text": "Ziehe Dateien hierher oder wähle sie über den Button aus."
+  },
+  "pdfModal": {
+    "title": "PDF-Export",
+    "confirm": "Export starten"
+  },
+  "buttons": {
+    "cancel": "Abbrechen"
+  },
+  "loading": {
+    "text": "Bitte warten…",
+    "images": "Bilder werden geladen...",
+    "zip": "Bereite ZIP-Datei vor...",
+    "pdf": "Erstelle PDF...",
+    "pdfMulti": "Erstelle PDF mit {count} Bildern..."
+  },
+  "alerts": {
+    "imageOnly": "Nur Bilddateien werden unterstützt.",
+    "canvasError": "Canvas 2D Kontext nicht verfügbar.",
+    "fileLoadError": "Die Datei {fileName} konnte nicht geladen werden.",
+    "fileReadError": "Die Datei {fileName} konnte nicht gelesen werden.",
+    "noSelection": "Keine Bilder ausgewählt."
+  },
+  "consent": {
+    "text": "Wir nutzen anonyme Nutzungsstatistiken, um die App zu verbessern. Dürfen wir diese Daten erheben?",
+    "decline": "Ablehnen",
+    "accept": "Akzeptieren"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung",
+    "contact": "Kontakt",
+    "copyright": "© 2025 KodiniTools"
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen (FAQ)",
+    "privacy": {
+      "title": "Ihre Privatsphäre ist uns wichtig.",
+      "text": "Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet. Es werden keine Dateien auf einen Server hochgeladen. Ihre Daten verlassen niemals Ihr Gerät."
+    },
+    "q1": {
+      "question": "Wie füge ich Bilder hinzu?",
+      "answer": "Sie können Bilder einfach per Drag & Drop in den markierten Bereich ziehen oder auf den Button \"Dateien auswählen\" klicken, um sie von Ihrem Gerät hochzuladen."
+    },
+    "q2": {
+      "question": "Wie kann ich ein einzelnes Bild bearbeiten?",
+      "answer": "Klicken Sie auf den Zauberstab-Button (<i class=\"fa-solid fa-wand-magic-sparkles\"></i>) auf einer Bildkarte. Es öffnet sich ein Fenster mit allen Bearbeitungsoptionen wie Drehen, Spiegeln, Größe ändern oder Filter anwenden."
+    },
+    "q3": {
+      "question": "Wie speichere ich die bearbeiteten Bilder?",
+      "answer": "Wählen Sie die gewünschten Bilder durch einen Klick auf die Karten aus und klicken Sie dann in der oberen Leiste auf \"Speichern...\". Sie können auch mehrere Formate gleichzeitig oder eine ZIP-Datei herunterladen."
+    },
+    "q4": {
+      "question": "Welche Bildformate werden unterstützt?",
+      "answer": "Die Anwendung unterstützt die gängigsten Formate wie PNG, JPEG, WebP, BMP und GIF, abhängig von der Unterstützung Ihres Browsers."
+    },
+    "q5": {
+      "question": "Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?",
+      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf den \"ZIP\"-Button in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
+    },
+    "q6": {
+      "question": "Wie erstelle ich eine PDF-Datei aus meinen Bildern?",
+      "answer": "Sie können entweder alle Bilder (\"Alle → PDF\") oder nur die ausgewählten Bilder (\"Auswahl → PDF\") als PDF exportieren. In den PDF-Einstellungen können Sie das Layout weiter anpassen."
+    },
+    "q7": {
+      "question": "Was passiert, wenn ich das Browserfenster schließe?",
+      "answer": "Da alle Bilder nur lokal im Browser gehalten werden, gehen sie verloren, wenn Sie die Seite neu laden oder das Fenster schließen. Speichern Sie Ihre bearbeiteten Bilder rechtzeitig."
+    },
+    "q8": {
+      "question": "Wie entferne ich Bilder aus der Liste?",
+      "answer": "Um ein einzelnes Bild zu entfernen, klicken Sie auf das rote X-Symbol auf der Bildkarte. Um mehrere Bilder zu löschen, wählen Sie diese aus und klicken Sie auf den \"Löschen\"-Button in der Werkzeugleiste."
+    }
+  },
+  "exportModal": {
+    "close": "Schließen",
+    "title": {
+      "pdfAll": "PDF exportieren (Alle Bilder)",
+      "pdfSelected": "PDF exportieren (Ausgewählte)",
+      "zip": "Als ZIP exportieren",
+      "save": "Bilder speichern",
+      "export": "Export"
+    },
+    "imageCount": {
+      "singular": "Bild",
+      "plural": "Bilder"
+    },
+    "pdf": {
+      "title": "PDF-Einstellungen",
+      "documentTitle": "Dokumenttitel",
+      "documentTitlePlaceholder": "z.B. Urlaubsfotos 2025",
+      "author": "Autor (optional)",
+      "authorPlaceholder": "Ihr Name",
+      "orientation": {
+        "label": "Ausrichtung",
+        "portrait": "Hochformat",
+        "landscape": "Querformat"
+      },
+      "titlePage": {
+        "label": "Titelseite hinzufügen",
+        "description": "Erste Seite mit Titel und Datum"
+      },
+      "showFileName": {
+        "label": "Dateinamen anzeigen",
+        "description": "Unter jedem Bild"
+      },
+      "optimizeSize": {
+        "label": "Dateigröße optimieren",
+        "description": "Komprimierung für kleinere PDFs"
+      },
+      "frontPage": {
+        "label": "Eigene Startseite gestalten",
+        "description": "Erstellen Sie eine individuelle Startseite mit Texten und Bildern",
+        "designButton": "Startseite gestalten",
+        "elementsAdded": "Element(e) hinzugefügt",
+        "clearButton": "Löschen",
+        "confirmClear": "Alle Elemente von der Startseite löschen?"
+      },
+      "commentPage": {
+        "label": "Kommentarseite hinzufügen",
+        "description": "Letzte Seite mit Text und Bild",
+        "designButton": "Kommentarseite gestalten",
+        "elementsAdded": "Element(e) hinzugefügt",
+        "clearButton": "Löschen",
+        "confirmClear": "Alle Elemente von der Kommentarseite löschen?"
+      },
+      "commentText": {
+        "label": "Kommentartext",
+        "placeholder": "Ihre Notizen oder Kommentare..."
+      },
+      "commentImage": {
+        "label": "Kommentarbild (optional)"
+      }
+    },
+    "zip": {
+      "title": "ZIP-Einstellungen",
+      "fileName": "Dateiname",
+      "fileNamePlaceholder": "bilder",
+      "fileNameHint": "Automatisch mit Datum: {name}_2025-10-14.zip"
+    },
+    "format": {
+      "title": "Bildformat",
+      "png": "Verlustfrei, hohe Qualität",
+      "jpg": "Komprimiert, kleinere Dateien",
+      "webp": "Modern, beste Kompression",
+      "quality": {
+        "label": "Qualität",
+        "smaller": "Kleiner",
+        "better": "Besser"
+      }
+    },
+    "buttons": {
+      "cancel": "Abbrechen",
+      "export": "Exportieren"
+    }
+  },
+  "frontPageDesigner": {
+    "title": "Startseite gestalten",
+    "subtitle": "Erstellen Sie Ihre individuelle Startseite mit Texten und Bildern",
+    "close": "Schließen",
+    "toolbar": {
+      "title": "Werkzeuge",
+      "addText": "Text hinzufügen",
+      "addTextTooltip": "Text hinzufügen",
+      "addImage": "Bild hinzufügen",
+      "addImageTooltip": "Bild hochladen",
+      "clearAll": "Löschen",
+      "clearAllTooltip": "Alle löschen",
+      "confirmClearAll": "Alle Elemente löschen?"
+    },
+    "canvas": {
+      "pageInfo": "A4 Hochformat",
+      "emptyText": "Doppelklick zum Bearbeiten"
+    },
+    "properties": {
+      "title": "Eigenschaften",
+      "elementType": "Element-Typ:",
+      "typeText": "Text",
+      "typeImage": "Bild",
+      "fontSize": "Schriftgröße:",
+      "fontWeight": "Schriftstärke:",
+      "fontWeightNormal": "Normal",
+      "fontWeightBold": "Fett",
+      "textAlign": "Ausrichtung:",
+      "textAlignLeft": "Linksbündig",
+      "textAlignCenter": "Zentriert",
+      "textAlignRight": "Rechtsbündig",
+      "textColor": "Textfarbe:",
+      "imageSize": "Bildgröße:",
+      "position": "Position:",
+      "noSelection": "Wählen Sie ein Element aus, um es zu bearbeiten"
+    },
+    "footer": {
+      "elementCount": "{count} Element",
+      "elementCount_plural": "{count} Elemente",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    },
+    "element": {
+      "text": {
+        "default": "Neuer Text"
+      }
+    }
+  },
+  "commentPageDesigner": {
+    "title": "Kommentarseite Designer (Multi-Page)",
+    "close": "Schließen",
+    "pageManagement": {
+      "title": "Seiten verwalten",
+      "pageOf": "Seite {current} von {total}",
+      "elementCount": "{count} Element",
+      "elementCount_plural": "{count} Elemente",
+      "previousPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "pageTitle": "Seite {number}",
+      "addPageTooltip": "Neue Seite hinzufügen",
+      "addPageButton": "Neue Seite",
+      "deletePageTooltip": "Aktuelle Seite löschen",
+      "deletePageButton": "Seite löschen"
+    },
+    "tools": {
+      "title": "Werkzeuge",
+      "addText": "Text hinzufügen",
+      "addImage": "Bild hinzufügen",
+      "clearPage": "Seite leeren"
+    },
+    "properties": {
+      "title": "Eigenschaften",
+      "elementType": "Element-Typ:",
+      "typeText": "Text",
+      "typeImage": "Bild",
+      "textLabel": "Text:",
+      "textPlaceholder": "Text eingeben...",
+      "fontSize": "Schriftgröße: {size}px",
+      "textColor": "Textfarbe:",
+      "textAlignment": "Text-Ausrichtung:",
+      "alignLeft": "Linksbündig",
+      "alignCenter": "Zentriert",
+      "alignRight": "Rechtsbündig",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "width": "Breite: {width}px",
+      "opacity": "Deckkraft: {opacity}%",
+      "position": "Position:",
+      "layer": "Ebene:",
+      "toFrontTooltip": "Nach vorne",
+      "toFrontButton": "Vorne",
+      "toBackTooltip": "Nach hinten",
+      "toBackButton": "Hinten",
+      "deleteElement": "Element löschen",
+      "noSelection": "Klicke auf ein Element, um es zu bearbeiten"
+    },
+    "zoom": {
+      "zoomOut": "Verkleinern",
+      "zoomIn": "Vergrößern",
+      "reset": "Zoom zurücksetzen"
+    },
+    "footer": {
+      "info": "Seite {current} / {total} • {count} Element(e) gesamt",
+      "cancel": "Abbrechen",
+      "save": "Speichern ({count} {elements})"
+    },
+    "page": {
+      "singular": "Seite",
+      "plural": "Seiten"
+    },
+    "element": {
+      "singular": "Element",
+      "plural": "Elemente"
+    }
+  },
+  "imageEditor": {
+    "title": "Bild bearbeiten",
+    "close": "Schließen",
+    "sections": {
+      "preview": "Vorschau",
+      "fileName": "Dateiname",
+      "transformations": "Transformationen",
+      "resize": "Größe ändern",
+      "export": "Exportieren"
+    },
+    "fileName": {
+      "label": "Neuer Name:",
+      "placeholder": "Dateiname ohne Erweiterung",
+      "helpText": "Der Name wird beim Speichern verwendet"
+    },
+    "transformations": {
+      "rotate": {
+        "label": "Drehen:",
+        "left90": "90° nach links",
+        "rotate180": "180°",
+        "right90": "90° nach rechts"
+      },
+      "flip": {
+        "label": "Spiegeln:",
+        "horizontal": "Horizontal",
+        "horizontalTitle": "Horizontal spiegeln",
+        "vertical": "Vertikal",
+        "verticalTitle": "Vertikal spiegeln"
+      }
+    },
+    "resize": {
+      "width": "Breite:",
+      "height": "Höhe:",
+      "keepAspectRatio": "Seitenverhältnis beibehalten",
+      "resetSize": "Ursprungsgröße",
+      "applyResize": "Größe ändern",
+      "unit": "px"
+    },
+    "export": {
+      "format": "Format:",
+      "downloading": "Erstelle...",
+      "downloadButton": "Als Datei herunterladen"
+    },
+    "footer": {
+      "cancel": "Abbrechen",
+      "reset": "Zurücksetzen",
+      "save": "Änderungen übernehmen"
+    }
+  }
+}

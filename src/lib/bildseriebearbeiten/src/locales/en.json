@@ -1,0 +1,107 @@
+{
+  "head": {
+    "title": "Modern Image Editor",
+    "description": "Edit, convert, and export your images directly in the browser. Fast, private, and modern."
+  },
+  "header": {
+    "title": "Modern Image Editor"
+  },
+  "statusBar": {
+    "images": "Images",
+    "selected": "selected",
+    "buttons": {
+      "selectAll": "Toggle All",
+      "delete": "Delete",
+      "exportSelectedPdf": "Selection → PDF",
+      "exportAllPdf": "All → PDF",
+      "save": "Save As…"
+    },
+    "tooltips": {
+      "selectAll": "Select/Deselect all",
+      "deleteSelected": "Delete selection",
+      "exportSelectedPdf": "Export selection as PDF",
+      "exportAllPdf": "Export all images as PDF",
+      "saveSelected": "Save selected images in multiple formats",
+      "downloadZip": "Download originals of selection as ZIP"
+    }
+  },
+  "upload": {
+    "text": "Drag and drop images here or click",
+    "button": "Select Files"
+  },
+  "emptyState": {
+    "title": "No images yet.",
+    "text": "Drag files here or select them using the button."
+  },
+  "pdfModal": {
+    "title": "PDF Export",
+    "confirm": "Start Export"
+  },
+  "buttons": {
+    "cancel": "Cancel"
+  },
+  "loading": {
+    "text": "Please wait…",
+    "images": "Loading images...",
+    "zip": "Preparing ZIP file...",
+    "pdf": "Creating PDF...",
+    "pdfMulti": "Creating PDF with {{count}} images..."
+  },
+  "alerts": {
+    "imageOnly": "Only image files are supported.",
+    "canvasError": "Canvas 2D context not available.",
+    "fileLoadError": "Could not load the file {{fileName}}.",
+    "fileReadError": "Could not read the file {{fileName}}.",
+    "noSelection": "No images selected."
+  },
+  "consent": {
+    "text": "We use anonymous usage statistics to improve the app. May we collect this data?",
+    "decline": "Decline",
+    "accept": "Accept"
+  },
+  "footer": {
+    "imprint": "Legal Notice",
+    "privacy": "Privacy Policy",
+    "contact": "Contact",
+    "copyright": "© 2025 KodiniTools"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions (FAQ)",
+    "privacy": {
+      "title": "Your privacy is important to us.",
+      "text": "All your images are processed exclusively locally in your browser. No files are uploaded to any server. Your data never leaves your device."
+    },
+    "q1": {
+      "question": "How do I add images?",
+      "answer": "You can simply drag and drop images into the designated area or click the \"Select Files\" button to upload them from your device."
+    },
+    "q2": {
+      "question": "How can I edit a single image?",
+      "answer": "Click the magic wand button (<i class=\"fa-solid fa-wand-magic-sparkles\"></i>) on an image card. A window will open with all editing options."
+    },
+    "q3": {
+      "question": "How do I save the edited images?",
+      "answer": "Select the desired images by clicking on their cards, then click \"Save As…\" in the top bar."
+    },
+    "q4": {
+      "question": "Which image formats are supported?",
+      "answer": "The application supports PNG, JPEG, WebP, BMP, and GIF, depending on your browser's capabilities."
+    },
+    "q5": {
+      "question": "Can I download multiple images as a ZIP file?",
+      "answer": "Yes. Select the images and click the \"ZIP\" button in the toolbar."
+    },
+    "q6": {
+      "question": "How do I create a PDF file from my images?",
+      "answer": "You can export either all images or selected ones as PDF using the respective buttons."
+    },
+    "q7": {
+      "question": "What happens if I close the browser window?",
+      "answer": "All images are stored locally, so they will be lost if you close the window. Save your work regularly."
+    },
+    "q8": {
+      "question": "How do I remove images from the list?",
+      "answer": "Click the red X icon on individual cards or use the \"Delete\" button for multiple selections."
+    }
+  }
+}

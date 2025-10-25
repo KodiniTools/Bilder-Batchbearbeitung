@@ -1,0 +1,107 @@
+{
+  "head": {
+    "title": "Moderne Bild-Bearbeitung",
+    "description": "Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern."
+  },
+  "header": {
+    "title": "Moderne Bild-Bearbeitung"
+  },
+  "statusBar": {
+    "images": "Bilder",
+    "selected": "ausgewählt",
+    "buttons": {
+      "selectAll": "Alle umschalten",
+      "delete": "Löschen",
+      "exportSelectedPdf": "Auswahl → PDF",
+      "exportAllPdf": "Alle → PDF",
+      "save": "Speichern…"
+    },
+    "tooltips": {
+      "selectAll": "Alle auswählen/abwählen",
+      "deleteSelected": "Auswahl löschen",
+      "exportSelectedPdf": "Auswahl als PDF exportieren",
+      "exportAllPdf": "Alle Bilder als PDF exportieren",
+      "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
+      "downloadZip": "Originale der Auswahl als ZIP herunterladen"
+    }
+  },
+  "upload": {
+    "text": "Bilder hierher ziehen oder klicken",
+    "button": "Dateien auswählen"
+  },
+  "emptyState": {
+    "title": "Noch keine Bilder.",
+    "text": "Ziehe Dateien hierher oder wähle sie über den Button aus."
+  },
+  "pdfModal": {
+    "title": "PDF-Export",
+    "confirm": "Export starten"
+  },
+  "buttons": {
+    "cancel": "Abbrechen"
+  },
+  "loading": {
+    "text": "Bitte warten…",
+    "images": "Bilder werden geladen...",
+    "zip": "Bereite ZIP-Datei vor...",
+    "pdf": "Erstelle PDF...",
+    "pdfMulti": "Erstelle PDF mit {{count}} Bildern..."
+  },
+  "alerts": {
+    "imageOnly": "Nur Bilddateien werden unterstützt.",
+    "canvasError": "Canvas 2D Kontext nicht verfügbar.",
+    "fileLoadError": "Die Datei {{fileName}} konnte nicht geladen werden.",
+    "fileReadError": "Die Datei {{fileName}} konnte nicht gelesen werden.",
+    "noSelection": "Keine Bilder ausgewählt."
+  },
+  "consent": {
+    "text": "Wir nutzen anonyme Nutzungsstatistiken, um die App zu verbessern. Dürfen wir diese Daten erheben?",
+    "decline": "Ablehnen",
+    "accept": "Akzeptieren"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung",
+    "contact": "Kontakt",
+    "copyright": "© 2025 KodiniTools"
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen (FAQ)",
+    "privacy": {
+      "title": "Ihre Privatsphäre ist uns wichtig.",
+      "text": "Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet. Es werden keine Dateien auf einen Server hochgeladen. Ihre Daten verlassen niemals Ihr Gerät."
+    },
+    "q1": {
+      "question": "Wie füge ich Bilder hinzu?",
+      "answer": "Sie können Bilder einfach per Drag & Drop in den markierten Bereich ziehen oder auf den Button \"Dateien auswählen\" klicken, um sie von Ihrem Gerät hochzuladen."
+    },
+    "q2": {
+      "question": "Wie kann ich ein einzelnes Bild bearbeiten?",
+      "answer": "Klicken Sie auf den Zauberstab-Button (<i class=\"fa-solid fa-wand-magic-sparkles\"></i>) auf einer Bildkarte. Es öffnet sich ein Fenster mit allen Bearbeitungsoptionen wie Drehen, Spiegeln, Größe ändern oder Filter anwenden."
+    },
+    "q3": {
+      "question": "Wie speichere ich die bearbeiteten Bilder?",
+      "answer": "Wählen Sie die gewünschten Bilder durch einen Klick auf die Karten aus und klicken Sie dann in der oberen Leiste auf \"Speichern...\". Sie können auch mehrere Formate gleichzeitig oder eine ZIP-Datei herunterladen."
+    },
+    "q4": {
+      "question": "Welche Bildformate werden unterstützt?",
+      "answer": "Die Anwendung unterstützt die gängigsten Formate wie PNG, JPEG, WebP, BMP und GIF, abhängig von der Unterstützung Ihres Browsers."
+    },
+    "q5": {
+      "question": "Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?",
+      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf den \"ZIP\"-Button in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
+    },
+    "q6": {
+      "question": "Wie erstelle ich eine PDF-Datei aus meinen Bildern?",
+      "answer": "Sie können entweder alle Bilder (\"Alle → PDF\") oder nur die ausgewählten Bilder (\"Auswahl → PDF\") als PDF exportieren. In den PDF-Einstellungen können Sie das Layout weiter anpassen."
+    },
+    "q7": {
+      "question": "Was passiert, wenn ich das Browserfenster schließe?",
+      "answer": "Da alle Bilder nur lokal im Browser gehalten werden, gehen sie verloren, wenn Sie die Seite neu laden oder das Fenster schließen. Speichern Sie Ihre bearbeiteten Bilder rechtzeitig."
+    },
+    "q8": {
+      "question": "Wie entferne ich Bilder aus der Liste?",
+      "answer": "Um ein einzelnes Bild zu entfernen, klicken Sie auf das rote X-Symbol auf der Bildkarte. Um mehrere Bilder zu löschen, wählen Sie diese aus und klicken Sie auf den \"Löschen\"-Button in der Werkzeugleiste."
+    }
+  }
+}

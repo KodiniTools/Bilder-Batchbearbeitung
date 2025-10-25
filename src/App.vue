@@ -1,0 +1,496 @@
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import AppHeader from '@/components/AppHeader.vue'
+import StatusBar from '@/components/StatusBar.vue'
+import DropZone from '@/components/DropZone.vue'
+import ImageGrid from '@/components/ImageGrid.vue'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import ImageEditor from '@/components/ImageEditor.vue'
+import ImagePreview from '@/components/ImagePreview.vue'
+import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
+import { useImageStore } from '@/stores/imageStore'
+import type { ImageObject } from '@/lib/core/types'
+
+// ✨ VEREINFACHT: Verwende nur noch export-pdf.ts als einziges Export-Modul!
+import { 
+  exportMultipleImagesAsPdf,
+  exportImagesWithComments,
+  type ExportSettings,
+  type ImageData,
+  type CanvasElement
+} from '@/lib/features/export-pdf'
+
+// ZIP-Export (bleibt unverändert)
+import { exportImagesAsZip } from '@/lib/features/export-zip'
+
+const imageStore = useImageStore()
+const theme = ref<'light' | 'dark'>('light')
+
+const isEditorOpen = ref(false)
+const editingImage = ref<ImageObject | null>(null)
+
+const isPreviewOpen = ref(false)
+const previewImage = ref<ImageObject | null>(null)
+
+const isExportModalOpen = ref(false)
+const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null>(null)
+
+const exportImageCount = computed(() => {
+  if (exportMode.value === 'pdf-all' || exportMode.value === 'zip') {
+    return imageStore.imageCount
+  } else if (exportMode.value === 'pdf-selected' || exportMode.value === 'save') {
+    return imageStore.selectedCount
+  }
+  return 0
+})
+
+function openEditor(image: ImageObject) {
+  editingImage.value = image
+  isEditorOpen.value = true
+}
+
+function closeEditor() {
+  isEditorOpen.value = false
+  editingImage.value = null
+}
+
+function openPreview(image: ImageObject) {
+  previewImage.value = image
+  isPreviewOpen.value = true
+}
+
+function closePreview() {
+  isPreviewOpen.value = false
+  previewImage.value = null
+}
+
+function saveEditorChanges(image: ImageObject) {
+  // Update the image in store which triggers re-render
+  imageStore.updateImage(image)
+}
+
+// Export-Funktionen
+function handleExportPdf(mode: 'all' | 'selected') {
+  const images = mode === 'all' 
+    ? imageStore.images 
+    : imageStore.images.filter(img => img.selected)
+  
+  if (images.length === 0) {
+    alert('Keine Bilder zum Exportieren ausgewählt')
+    return
+  }
+
+  exportMode.value = mode === 'all' ? 'pdf-all' : 'pdf-selected'
+  isExportModalOpen.value = true
+}
+
+function handleExportZip() {
+  if (imageStore.imageCount === 0) {
+    alert('Keine Bilder zum Exportieren vorhanden')
+    return
+  }
+
+  exportMode.value = 'zip'
+  isExportModalOpen.value = true
+}
+
+function closeExportModal() {
+  isExportModalOpen.value = false
+  exportMode.value = null
+}
+
+// ✨ VEREINFACHTE Export-Funktion - verwendet nur noch export-pdf.ts!
+async function handleExportConfirm(settings: ExportSettings) {
+  // Export-Modus speichern bevor Modal geschlossen wird
+  const currentMode = exportMode.value
+  
+  closeExportModal()
+
+  try {
+    if (currentMode === 'pdf-all' || currentMode === 'pdf-selected') {
+      // Bilder auswählen basierend auf Modus
+      const images = currentMode === 'pdf-all'
+        ? imageStore.images
+        : imageStore.images.filter(img => img.selected)
+
+      // Bilder in ImageData Format konvertieren
+      const imageDataArray: ImageData[] = await Promise.all(
+        images.map(async (img) => {
+          // Canvas zu Base64 konvertieren
+          const dataUrl = img.canvas.toDataURL('image/png', 0.92)
+          
+          return {
+            dataUrl: dataUrl,
+            originalName: img.outputName || img.file.name
+          }
+        })
+      )
+
+      // 🎯 VEREINFACHT: Verwende exportMultipleImagesAsPdf (die Hauptfunktion)
+      // Diese Funktion kann ALLES: Custom Front Page, Titelseite, Kommentarseiten, Bilder
+      
+      // ✨ Prüfe Custom Front Page (sicher mit allen Checks)
+      const useCustomFrontPage = Boolean(
+        settings.includeCustomFrontPage === true && 
+        settings.frontPageElements && 
+        Array.isArray(settings.frontPageElements) && 
+        settings.frontPageElements.length > 0
+      )
+      
+      await exportMultipleImagesAsPdf(
+        imageDataArray,
+        {
+          title: 'Bildersammlung',
+          author: settings.author || '',
+          // Custom Front Page nur wenn explizit aktiviert UND Elemente vorhanden
+          includeCustomFrontPage: useCustomFrontPage,
+          frontPageElements: useCustomFrontPage ? settings.frontPageElements : [],
+          // Automatische Titelseite nur wenn KEINE Custom Front Page
+          includeTitlePage: !useCustomFrontPage,
+          includeCommentPages: settings.includeCommentPages || false,
+          commentPageElements: settings.commentPageElements || [],
+          includeFileName: true,
+          includeImages: true,
+          orientation: settings.orientation || 'portrait'
+        },
+        'bilder-export.pdf'
+      )
+
+      console.log(`✅ PDF-Export erfolgreich: ${images.length} Bilder`)
+      console.log(`📄 Custom Front Page: ${useCustomFrontPage ? 'Ja' : 'Nein'}`)
+      if (useCustomFrontPage && settings.frontPageElements) {
+        console.log(`🎨 Front Page Elemente: ${settings.frontPageElements.length}`)
+      }
+      console.log(`📄 Kommentarseiten: ${settings.includeCommentPages ? 'Ja' : 'Nein'}`)
+      if (settings.includeCommentPages) {
+        console.log(`🎨 Kommentar-Elemente: ${settings.commentPageElements?.length || 0}`)
+        
+        // Zeige Seiten-Verteilung
+        const pageCount = new Set(settings.commentPageElements?.map(el => el.page || 1)).size
+        console.log(`📄 Anzahl Kommentarseiten: ${pageCount}`)
+      }
+      
+    } else if (currentMode === 'zip') {
+      await exportImagesAsZip(
+        imageStore.images, 
+        settings.zipName,
+        settings.format,
+        settings.quality
+      )
+      console.log(`✅ ZIP-Export erfolgreich: ${imageStore.imageCount} Bilder`)
+      
+    } else if (currentMode === 'save') {
+      const images = imageStore.images.filter(img => img.selected)
+      
+      // Einzelne Bilder nacheinander downloaden mit Einstellungen
+      for (const image of images) {
+        await downloadSingleImage(image, settings.format, settings.quality / 100)
+        // Kleine Verzögerung zwischen Downloads
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
+      
+      console.log(`✅ ${images.length} Bilder erfolgreich gespeichert`)
+    }
+  } catch (error) {
+    console.error('❌ Export fehlgeschlagen:', error)
+    alert('Fehler beim Exportieren. Bitte versuchen Sie es erneut.')
+  }
+}
+
+function downloadSingleImage(image: ImageObject, format?: string, quality?: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      const exportFormat = format || image.exportFormat || 'png'
+      const exportQuality = quality !== undefined ? quality : (image.quality || 0.92)
+      const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
+      
+      image.canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Blob-Konvertierung fehlgeschlagen'))
+          return
+        }
+        
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        
+        // Dateiname mit richtiger Endung
+        let fileName = image.outputName || `bild_${Date.now()}`
+        if (!fileName.includes('.')) {
+          fileName += `.${exportFormat}`
+        } else {
+          // Endung ersetzen
+          fileName = fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
+        }
+        
+        link.download = fileName
+        link.style.display = 'none'
+        
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+        setTimeout(() => {
+          URL.revokeObjectURL(url)
+          resolve()
+        }, 100)
+      }, mimeType, exportQuality)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+async function handleSaveImages() {
+  const images = imageStore.images.filter(img => img.selected)
+  
+  if (images.length === 0) {
+    alert('Keine Bilder zum Speichern ausgewählt')
+    return
+  }
+
+  exportMode.value = 'save'
+  isExportModalOpen.value = true
+}
+
+const applyTheme = (newTheme: 'light' | 'dark') => {
+  theme.value = newTheme
+  document.documentElement.dataset.theme = newTheme
+  localStorage.setItem('theme', newTheme)
+}
+
+const toggleTheme = () => {
+  applyTheme(theme.value === 'dark' ? 'light' : 'dark')
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'))
+})
+</script>
+
+<template>
+  <div class="app">
+    <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
+    
+    <main class="container">
+      <StatusBar 
+        v-if="imageStore.hasImages"
+        @export-pdf="handleExportPdf"
+        @export-zip="handleExportZip"
+        @save-images="handleSaveImages"
+      />
+      
+      <DropZone />
+      
+      <div v-if="!imageStore.hasImages" class="empty-state">
+        <div style="font-size:34px">
+          <i class="fa-regular fa-image"></i>
+        </div>
+        <div>
+          <strong>Keine Bilder geladen</strong>
+          <span>Ziehen Sie Bilder hierher oder klicken Sie zum Hochladen</span>
+        </div>
+      </div>
+      
+      <ImageGrid v-else @open-editor="openEditor" @open-preview="openPreview" />
+      
+      <section class="faq-section">
+        <h2>{{ $t('faq.title') }}</h2>
+        
+        <div class="privacy-notice">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div>
+            <strong>{{ $t('faq.privacy.title') }}</strong>
+            <p>{{ $t('faq.privacy.text') }}</p>
+          </div>
+        </div>
+        
+        <div class="faq-list">
+          <details v-for="i in 8" :key="i">
+            <summary>{{ $t(`faq.q${i}.question`) }}</summary>
+            <p v-html="$t(`faq.q${i}.answer`)"></p>
+          </details>
+        </div>
+      </section>
+    </main>
+    
+    <LoadingIndicator />
+    
+    <ImageEditor
+      :image="editingImage"
+      :is-open="isEditorOpen"
+      @close="closeEditor"
+      @save="saveEditorChanges"
+    />
+
+    <ImagePreview
+      :image="previewImage"
+      :is-open="isPreviewOpen"
+      @close="closePreview"
+    />
+
+    <!-- ✨ ExportSettingsModal mit Comment Page Designer Support -->
+    <ExportSettingsModal
+      :is-open="isExportModalOpen"
+      :mode="exportMode"
+      :image-count="exportImageCount"
+      @close="closeExportModal"
+      @confirm="handleExportConfirm"
+    />
+  </div>
+</template>
+
+<style scoped>
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  margin-top: var(--space-7);
+  flex: 1;
+  width: 100%;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  color: var(--muted);
+  padding: var(--space-6);
+  border: 2px dashed color-mix(in oklab, var(--border-color) 40%, transparent);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(135deg, 
+    color-mix(in oklab, var(--panel) 30%, transparent) 0%,
+    color-mix(in oklab, var(--panel) 10%, transparent) 100%);
+  margin-bottom: var(--space-7);
+}
+
+.faq-section {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.faq-section h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: var(--space-5);
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.privacy-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: linear-gradient(135deg, 
+    color-mix(in oklab, var(--accent) 8%, transparent) 0%,
+    color-mix(in oklab, var(--green) 6%, transparent) 100%);
+  border-radius: var(--radius-2xl);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  margin-bottom: var(--space-5);
+}
+
+.privacy-notice i {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.privacy-notice strong {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.privacy-notice p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.faq-list details {
+  border-bottom: 1px solid var(--glass-border);
+  padding: var(--space-4) 0;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.faq-list details:first-of-type {
+  border-top: 1px solid var(--glass-border);
+}
+
+.faq-list summary {
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.faq-list summary::after {
+  content: '+';
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--accent);
+  transition: all 0.3s var(--ease-spring);
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+
+.faq-list details[open] summary::after {
+  transform: rotate(45deg);
+  background: var(--accent);
+  color: white;
+}
+
+.faq-list p {
+  margin-top: var(--space-4);
+  color: var(--muted);
+  line-height: 1.7;
+  padding-left: var(--space-4);
+  border-left: 3px solid color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-4) var(--space-3);
+  }
+  
+  .faq-section {
+    padding: var(--space-4);
+  }
+  
+  .privacy-notice {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>

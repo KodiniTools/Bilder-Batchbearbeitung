@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern." data-i18n="head.description" />
+    <meta name="keywords" content="Bildbearbeitung, Bilder konvertieren, online Bildeditor, Foto-Editor, privat, offline, Browser-Tool, PNG, JPEG, WEBP" />
+    <meta name="author" content="KodiniTools" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kodinitools.com/bilderseriebearbeiten/" />
+    <meta property="og:title" content="Moderne Bild-Bearbeitung - KodiniTools" />
+    <meta property="og:description" content="Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern." />
+    <meta property="og:image" content="https://kodinitools.com/assets/og-image.png" /> 
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://kodinitools.com/bilderseriebearbeiten/" />
+    <meta property="twitter:title" content="Moderne Bild-Bearbeitung - KodiniTools" />
+    <meta property="twitter:description" content="Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern." />
+    <meta property="twitter:image" content="https://kodinitools.com/assets/og-image.png" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://kodinitools.com/bilderseriebearbeiten/" /> 
+    
+    <!-- Favicon (Corrected with absolute paths) -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link rel="stylesheet" href="./style.css" />
+	<!-- JSON-LD Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Bilderseriebearbeiten",
+      "operatingSystem": "All",
+      "applicationCategory": "MultimediaApplication",
+      "offers": { "@type": "Offer", "price": "0" },
+      "description": "Ein Online-Tool zum Erstellen von M3U-, XSPF- und JSON-Audio-Playlists aus lokalen Dateien."
+    }
+    </script>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <!-- Editor Overlay Styles -->
+    <style>
+      .editor-container {
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .editor-body {
+        padding: 20px;
+      }
+
+      .editor-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .editor-section {
+        border: 1px solid var(--border-color, #e0e0e0);
+        border-radius: 8px;
+        padding: 15px;
+      }
+
+      .editor-section h3 {
+        margin: 0 0 15px 0;
+        color: var(--text-primary, #333);
+        font-size: 16px;
+      }
+
+      .preview-container {
+        text-align: center;
+        padding: 10px;
+        background: var(--bg-secondary, #f8f9fa);
+        border-radius: 6px;
+      }
+
+      .editor-preview-canvas {
+        max-width: 100%;
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 4px;
+      }
+
+      .image-info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--text-secondary, #666);
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .help-text {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--text-secondary, #666);
+      }
+
+      .transform-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .control-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .control-group label {
+        min-width: 80px;
+        font-weight: 500;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .resize-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 15px;
+      }
+
+      .input-row .input-group {
+        flex: 1;
+        margin-bottom: 0;
+      }
+
+      .unit {
+        margin-left: 5px;
+        color: var(--text-secondary, #666);
+        font-size: 14px;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: auto;
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      /* Canvas Styles for Image Manipulation */
+      #pdfCommentImageCanvasContainer {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 4px;
+        background: var(--bg-secondary, #f8f9fa);
+      }
+
+      #pdfCommentImageCanvas {
+        border: 1px solid var(--border-color, #ddd);
+        max-width: 100%;
+        cursor: move;
+        background: white;
+      }
+
+      .canvas-controls {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      
+      /* Image Picker Modal */
+      #imagePickerModal .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+      #imagePickerGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+      }
+      .picker-image-item {
+        cursor: pointer;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        overflow: hidden;
+        transition: all 0.2s ease-in-out;
+      }
+      .picker-image-item:hover {
+        border-color: var(--accent, #007bff);
+        transform: scale(1.05);
+      }
+      .picker-image-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      @media (max-width: 768px) {
+        .editor-container {
+          max-width: 95vw;
+          margin: 10px;
+        }
+
+        .input-row {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .control-group {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .control-group label {
+          min-width: unset;
+        }
+      }
+    </style>
+	<style>
+  /* Overlay darf ggf. scrollen */
+  #pdfSettingsModal {
+    position: fixed; inset: 0;
+    overflow: auto;          /* wichtig: gesamtes Overlay scrollbar */
+    display: none;           /* wird per .active/.hidden getoggelt */
+    align-items: center;     /* zentriert den Dialog */
+    justify-content: center;
+    padding: 16px;           /* etwas Rand, damit der Dialog nicht klebt */
+    background: rgba(0,0,0,.35); /* abgedunkelter Hintergrund */
+  }
+  #pdfSettingsModal.active { display: flex; }
+  #pdfSettingsModal.hidden { display: none; }
+
+  /* Dialog-Container begrenzen und strukturieren */
+  #pdfSettingsModal .modal-container {
+    max-height: 90vh;        /* Kern: nicht höher als Viewport */
+    width: min(720px, 100%); /* passt auf schmale Screens */
+    display: flex;
+    flex-direction: column;  /* Header, Body, Footer untereinander */
+    overflow: hidden;        /* Body scrollt, nicht der gesamte Container */
+    background: var(--panel, #fff);
+    border-radius: 12px;
+  }
+
+  /* Body scrollt intern */
+  #pdfSettingsModal .modal-body {
+    overflow: auto;          /* hier findet das Scrollen statt */
+    padding-right: 8px;      /* Platz fürs Scrollbar overlay/avoid jump */
+  }
+
+  /* Footer fix am unteren Rand des Containers */
+  #pdfSettingsModal .modal-footer {
+    position: sticky; bottom: 0;
+    background: var(--panel, #fff);
+    border-top: 1px solid rgba(0,0,0,.1);
+  }
+</style>
+
+  </head>
+   <body>
+   <!--#include virtual="/partials/nav.html" -->
+  <header class="app-header">
+    <div class="app-header__limiter">
+      <div class="app-header__leading">
+        </div>
+      <div class="app-header__title-container">
+        <h1 class="app-title" data-i18n="header.title">Moderne Bild-Bearbeitung</h1>
+      </div>
+      <div class="header-actions">
+        <button id="langDE" class="lang-toggle active" title="Sprache auf Deutsch ändern">DE</button>
+        <button id="langEN" class="lang-toggle" title="Switch language to English">EN</button>
+        <button id="themeToggle" class="theme-toggle" title="Theme umschalten" aria-label="Theme umschalten">🌓</button>
+      </div>
+    </div>
+  </header>
+
+    <main class="container">
+      <div id="statusBar">
+        <span class="stat"><i class="fa-solid fa-images"></i> <strong id="imageCount">0</strong> <span data-i18n="statusBar.images">Bilder</span></span>
+        <span class="stat"><i class="fa-solid fa-check-double"></i> <strong id="selectedCount">0</strong> <span data-i18n="statusBar.selected">ausgewählt</span></span>
+        <div class="header-spacer"></div>
+        <button id="selectAllButton" class="btn" data-i18n="[title]statusBar.tooltips.selectAll"><i class="fa-solid fa-border-all"></i> <span data-i18n="statusBar.buttons.selectAll">Alle umschalten</span></button>
+        <button id="deleteSelectedButton" class="btn" data-i18n="[title]statusBar.tooltips.deleteSelected" disabled><i class="fa-solid fa-trash-can"></i> <span data-i18n="statusBar.buttons.delete">Löschen</span></button>
+        <button id="exportSelectedPdfButton" class="btn" data-i18n="[title]statusBar.tooltips.exportSelectedPdf" disabled><i class="fa-solid fa-file-pdf"></i> <span data-i18n="statusBar.buttons.exportSelectedPdf">Auswahl → PDF</span></button>
+        <button id="exportPdfButton" class="btn" data-i18n="[title]statusBar.tooltips.exportAllPdf"><i class="fa-solid fa-file-pdf"></i> <span data-i18n="statusBar.buttons.exportAllPdf">Alle → PDF</span></button>
+        <button id="saveAllButton" class="btn btn-primary" data-i18n="[title]statusBar.tooltips.saveSelected"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="statusBar.buttons.save">Speichern…</span></button>
+        <button id="downloadZipButton" class="btn" data-i18n="[title]statusBar.tooltips.downloadZip"><i class="fa-solid fa-file-zipper"></i> ZIP</button>
+      </div>
+
+      <div id="browserWarning" role="status" aria-live="polite"></div>
+
+      <section id="dropArea" aria-label="Dateien hierher ziehen oder klicken um Bilder auszuwählen">
+        <div class="upload-icon" aria-hidden="true" style="font-size:40px"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+        <div class="upload-text" data-i18n="upload.text">Bilder hierher ziehen oder klicken</div>
+        <button id="uploadBtn" class="btn" type="button"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="upload.button">Dateien auswählen</span></button>
+        <input id="upload" type="file" accept="image/*" multiple hidden />
+      </section>
+
+      <div id="emptyState">
+        <div style="font-size:34px"><i class="fa-regular fa-image"></i></div>
+        <div><strong data-i18n="emptyState.title">Noch keine Bilder.</strong> <span data-i18n="emptyState.text">Ziehe Dateien hierher oder wähle sie über den Button aus.</span></div>
+      </div>
+
+      <div class="images-scroll-container">
+        <section id="imageContainer" aria-live="polite" aria-label="Bilderliste"></section>
+      </div>
+
+      <!-- FAQ Section -->
+      <section id="faqSection" class="faq-section">
+        <h2 data-i18n="faq.title">Häufig gestellte Fragen (FAQ)</h2>
+        
+        <div class="privacy-notice">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div>
+            <strong data-i18n="faq.privacy.title">Ihre Privatsphäre ist uns wichtig.</strong>
+            <p data-i18n="faq.privacy.text">Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet. Es werden keine Dateien auf einen Server hochgeladen. Ihre Daten verlassen niemals Ihr Gerät.</p>
+          </div>
+        </div>
+
+        <div class="faq-list">
+          <details>
+            <summary data-i18n="faq.q1.question">Wie füge ich Bilder hinzu?</summary>
+            <p data-i18n="faq.q1.answer">Sie können Bilder einfach per Drag & Drop in den markierten Bereich ziehen oder auf den Button "Dateien auswählen" klicken, um sie von Ihrem Gerät hochzuladen.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q2.question">Wie kann ich ein einzelnes Bild bearbeiten?</summary>
+            <p data-i18n="faq.q2.answer">Klicken Sie auf den Zauberstab-Button (<i class="fa-solid fa-wand-magic-sparkles"></i>) auf einer Bildkarte. Es öffnet sich ein Fenster mit allen Bearbeitungsoptionen wie Drehen, Spiegeln, Größe ändern oder Filter anwenden.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q3.question">Wie speichere ich die bearbeiteten Bilder?</summary>
+            <p data-i18n="faq.q3.answer">Wählen Sie die gewünschten Bilder durch einen Klick auf die Karten aus und klicken Sie dann in der oberen Leiste auf "Speichern...". Sie können auch mehrere Formate gleichzeitig oder eine ZIP-Datei herunterladen.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q4.question">Welche Bildformate werden unterstützt?</summary>
+            <p data-i18n="faq.q4.answer">Die Anwendung unterstützt die gängigsten Formate wie PNG, JPEG, WebP, BMP und GIF, abhängig von der Unterstützung Ihres Browsers.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q5.question">Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?</summary>
+            <p data-i18n="faq.q5.answer">Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf den "ZIP"-Button in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q6.question">Wie erstelle ich eine PDF-Datei aus meinen Bildern?</summary>
+            <p data-i18n="faq.q6.answer">Sie können entweder alle Bilder ("Alle → PDF") oder nur die ausgewählten Bilder ("Auswahl → PDF") als PDF exportieren. In den PDF-Einstellungen können Sie das Layout weiter anpassen.</p>
+          </details>
+           <details>
+            <summary data-i18n="faq.q7.question">Was passiert, wenn ich das Browserfenster schließe?</summary>
+            <p data-i18n="faq.q7.answer">Da alle Bilder nur lokal im Browser gehalten werden, gehen sie verloren, wenn Sie die Seite neu laden oder das Fenster schließen. Speichern Sie Ihre bearbeiteten Bilder rechtzeitig.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q8.question">Wie entferne ich Bilder aus der Liste?</summary>
+            <p data-i18n="faq.q8.answer">Um ein einzelnes Bild zu entfernen, klicken Sie auf das rote X-Symbol auf der Bildkarte. Um mehrere Bilder zu löschen, wählen Sie diese aus und klicken Sie auf den "Löschen"-Button in der Werkzeugleiste.</p>
+          </details>
+        </div>
+      </section>
+
+    </main>
+
+  <div id="pdfSettingsModal" role="dialog" aria-modal="true" aria-labelledby="pdfSettingsTitle" class="hidden">
+  <div class="modal-container">
+    <div class="modal-header">
+      <div id="pdfSettingsTitle" class="modal-title" data-i18n="pdfModal.title">PDF-Export</div>
+      <button id="modalClose" class="image-action-btn" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div>
+          <label for="pdfTitle">Titel:</label>
+          <input type="text" id="pdfTitle" value="Bilder-Sammlung" />
+        </div>
+        <div>
+          <label for="pdfAuthor">Autor:</label>
+          <input type="text" id="pdfAuthor" value="" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="pdfOrientation">Orientierung:</label>
+          <select id="pdfOrientation">
+            <option value="auto">Automatisch</option>
+            <option value="portrait">Hochformat</option>
+            <option value="landscape">Querformat</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <div class="check">
+        <input type="checkbox" id="includeTitlePage" checked />
+        <label for="includeTitlePage">Titelseite einschließen</label>
+      </div>
+      
+      <div class="check">
+        <input type="checkbox" id="includeCommentPage" />
+        <label for="includeCommentPage">Kommentarseite hinzufügen</label>
+      </div>
+      
+      <!-- ERWEITERT: Kommentarbereich mit Bild-Upload und Canvas -->
+      <div id="commentContainer" class="hidden" style="margin-top: 10px; margin-left: 25px;">
+        <label for="pdfComment" style="display: block; margin-bottom: 5px;">Ihr Kommentar:</label>
+        <textarea id="pdfComment" rows="4" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Geben Sie hier Ihre Kommentare ein..."></textarea>
+
+        <div style="margin-top:10px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <input id="pdfCommentImage" type="file" accept="image/*" hidden/>
+          <button type="button" id="pdfCommentImageUploadBtn" class="btn btn-sm"><i class="fa-solid fa-upload"></i> Eigenes Bild hochladen</button>
+          <button type="button" id="pdfCommentImageSelectBtn" class="btn btn-sm"><i class="fa-solid fa-photo-film"></i> Bild aus Galerie</button>
+        </div>
+
+        <!-- Canvas-Container für Bildbearbeitung -->
+        <div id="pdfCommentImageCanvasContainer" style="display:none;">
+          <label style="display:block; margin-bottom:5px; margin-top:10px;">Bildvorschau und Bearbeitung:</label>
+          <canvas id="pdfCommentImageCanvas" width="400" height="400"></canvas>
+          <div class="canvas-controls">
+            <button type="button" id="pdfCommentImageClear" class="btn btn-sm">
+              <i class="fa-solid fa-trash"></i> Bild entfernen
+            </button>
+            <span style="font-size: 12px; color: #666;">
+              Tipp: Ziehen Sie das Bild mit der Maus. Scrollen zum Zoomen.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="check">
+        <input type="checkbox" id="includeFileName" checked />
+        <label for="includeFileName">Dateinamen anzeigen</label>
+      </div>
+      <div class="check">
+        <input type="checkbox" id="optimizeSize" checked />
+        <label for="optimizeSize">Dateigröße optimieren</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancelPdfExport" class="btn" type="button" data-i18n="buttons.cancel">Abbrechen</button>
+      <button id="confirmPdfExport" class="btn btn-primary" type="button"><i class="fa-solid fa-file-export"></i> <span data-i18n="pdfModal.confirm">Export starten</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- NEU: Image Picker Modal -->
+<div id="imagePickerModal" class="hidden modal-overlay" role="dialog" aria-modal="true" aria-labelledby="imagePickerTitle">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 id="imagePickerTitle" class="modal-title">Bild für Kommentar auswählen</h2>
+      <button id="imagePickerCloseBtn" class="image-action-btn" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="imagePickerGrid">
+        <!-- Images will be injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+<div id="formatSelectionModal" class="hidden modal-overlay" role="dialog" aria-modal="true" aria-labelledby="formatSelectionTitle">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 id="formatSelectionTitle" class="modal-title">Formate zum Speichern auswählen</h2>
+      <button id="formatModalClose" class="image-action-btn" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Wählen Sie ein oder mehrere Formate aus, in denen die Bilder gespeichert werden sollen.</p>
+      <div id="formatCheckboxes" class="format-checkbox-container">
+        </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancelFormatSelection" class="btn" type="button">Abbrechen</button>
+      <button id="confirmFormatSelection" class="btn btn-primary" type="button">
+        <i class="fa-solid fa-download"></i> Ausgewählte Formate herunterladen
+      </button>
+    </div>
+  </div>
+</div>
+    
+    <div id="loadingIndicator" role="status" aria-live="assertive">
+      <div class="box">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loading-text" data-i18n="loading.text">Bitte warten…</div>
+      </div>
+    </div>
+    <!-- External libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js" defer></script>
+
+    <!-- Application scripts -->
+    <script type="module" src="./src/i18n.js"></script>
+    <script type="module" src="./src/main.js"></script>
+
+    <script>
+      // Self-executing function for theme management
+      (function(){
+        const root = document.documentElement;
+        const btn = document.getElementById('themeToggle');
+        function applyTheme(theme) {
+          root.dataset.theme = theme;
+          localStorage.setItem('theme', theme);
+        }
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+        btn && btn.addEventListener('click', () => {
+          applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
+        });
+      })();
+    </script>
+
+    <!-- Comment page and canvas interaction logic -->
+    <script>
+    (function() {
+      // Canvas-Verwaltung für Bildbearbeitung
+      let canvasImage = null;
+      let imageX = 0, imageY = 0;
+      let imageScale = 1;
+      let isDragging = false;
+      let lastMouseX = 0, lastMouseY = 0;
+      let canvas, ctx;
+
+      function drawCanvas() {
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        if (canvasImage) {
+          ctx.save();
+          ctx.translate(imageX, imageY);
+          ctx.scale(imageScale, imageScale);
+          ctx.drawImage(canvasImage, 0, 0);
+          ctx.restore();
+        }
+      }
+
+      function loadImageOnCanvas(imageSource) {
+        const img = new Image();
+        img.onload = function() {
+          canvasImage = img;
+          
+          const maxDim = Math.max(img.width, img.height);
+          imageScale = Math.min(1, 400 / maxDim);
+          imageX = (canvas.width - img.width * imageScale) / 2;
+          imageY = (canvas.height - img.height * imageScale) / 2;
+          
+          drawCanvas();
+          document.getElementById('pdfCommentImageCanvasContainer').style.display = 'block';
+        };
+        img.src = imageSource;
+      }
+      
+      // Setup für alle Kommentar-Elemente
+      function setupCommentSection() {
+        const checkbox = document.getElementById('includeCommentPage');
+        const container = document.getElementById('commentContainer');
+        const fileInput = document.getElementById('pdfCommentImage');
+        const uploadBtn = document.getElementById('pdfCommentImageUploadBtn');
+        const selectBtn = document.getElementById('pdfCommentImageSelectBtn');
+        const canvasContainer = document.getElementById('pdfCommentImageCanvasContainer');
+        const clearButton = document.getElementById('pdfCommentImageClear');
+        canvas = document.getElementById('pdfCommentImageCanvas');
+        
+        if (!checkbox || !container || !fileInput || !uploadBtn || !selectBtn || !canvas || !clearButton) return;
+
+        ctx = canvas.getContext('2d');
+
+        // Checkbox-Logik
+        checkbox.addEventListener('change', function() {
+          container.classList.toggle('hidden', !this.checked);
+        });
+        
+        // "Eigenes Bild" Button
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        // Datei-Input Logik
+        fileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (event) => loadImageOnCanvas(event.target.result);
+          reader.readAsDataURL(file);
+        });
+
+        // "Bild aus Galerie" Button
+        selectBtn.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent('openImagePicker'));
+        });
+
+        // Bild entfernen
+        clearButton.addEventListener('click', function() {
+          canvasImage = null;
+          fileInput.value = '';
+          canvasContainer.style.display = 'none';
+          drawCanvas();
+        });
+
+        // Event-Listener für ausgewähltes Galerie-Bild
+        window.addEventListener('commentImageSelected', (e) => {
+            const imageObject = e.detail;
+            if (imageObject && imageObject.canvas) {
+                loadImageOnCanvas(imageObject.canvas.toDataURL());
+            }
+        });
+
+        // Maus-Events
+        canvas.addEventListener('mousedown', function(e) {
+          if (!canvasImage) return;
+          isDragging = true;
+          const rect = canvas.getBoundingClientRect();
+          lastMouseX = e.clientX - rect.left;
+          lastMouseY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+          if (!isDragging || !canvasImage) return;
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+          
+          imageX += mouseX - lastMouseX;
+          imageY += mouseY - lastMouseY;
+          
+          lastMouseX = mouseX;
+          lastMouseY = mouseY;
+          drawCanvas();
+        });
+
+        canvas.addEventListener('mouseup', () => { isDragging = false; });
+        canvas.addEventListener('mouseleave', () => { isDragging = false; });
+
+        // Zoom-Event
+        canvas.addEventListener('wheel', function(e) {
+          e.preventDefault();
+          if (!canvasImage) return;
+          const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+          const newScale = imageScale * scaleFactor;
+          if (newScale > 0.1 && newScale < 5) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            imageX = mouseX - (mouseX - imageX) * (newScale / imageScale);
+            imageY = mouseY - (mouseY - imageY) * (newScale / imageScale);
+            imageScale = newScale;
+            drawCanvas();
+          }
+        });
+      }
+
+      // Initialisierung
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCommentSection);
+      } else {
+        setupCommentSection();
+      }
+
+      // Export-Funktion
+      window.getPdfCommentData = function() {
+        return {
+          comment: document.getElementById('pdfComment')?.value || '',
+          hasImage: canvasImage !== null,
+          imageData: canvasImage ? canvas.toDataURL('image/png') : null
+        };
+      };
+    })();
+    </script>
+
+    <!--#include virtual="/partials/footer.html" -->
+  </body>
+</html>
+
