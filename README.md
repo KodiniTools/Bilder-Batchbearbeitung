@@ -8,7 +8,7 @@ Eine moderne, leistungsstarke Bildbearbeitungsanwendung, die vollständig im Bro
 - 🔄 Transformationen (Drehen, Spiegeln, Umbennenen, Größe ändern)
 - 📄 PDF-Export (einzeln oder als Sammlung)
 - 🗜️ ZIP-Download
-- 🎨 Multiple Export-Formate (PNG, JPEG, WebP, BMP, GIF)
+- 🎨 Multiple Export-Formate (PNG, JPEG, WebP)
 - 🌓 Dark/Light Mode
 - 🌍 Mehrsprachig (Deutsch/Englisch)
 - 🔒 Vollständig im Browser, keine Server, alle Daten bleiben lokal
