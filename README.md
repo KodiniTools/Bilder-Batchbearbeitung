@@ -1,17 +1,17 @@
-# Vue 3 Bildbearbeitungs-App
+# Batch-Bildbearbeitungs-App
 
 Eine moderne, leistungsstarke Bildbearbeitungsanwendung, die vollständig im Browser läuft. Gebaut mit Vue 3, TypeScript, Pinia und Vite.
 
 ## ✨ Features
 
 - 🖼️ Mehrere Bilder gleichzeitig bearbeiten
-- 🔄 Transformationen (Drehen, Spiegeln, Größe ändern)
+- 🔄 Transformationen (Drehen, Spiegeln, Umbennenen, Größe ändern)
 - 📄 PDF-Export (einzeln oder als Sammlung)
 - 🗜️ ZIP-Download
 - 🎨 Multiple Export-Formate (PNG, JPEG, WebP, BMP, GIF)
 - 🌓 Dark/Light Mode
 - 🌍 Mehrsprachig (Deutsch/Englisch)
-- 🔒 Vollständig offline - keine Server, alle Daten bleiben lokal
+- 🔒 Vollständig im Browser, keine Server, alle Daten bleiben lokal
 - ⚡ Schnell und performant
 
 ## 🏗️ Projektstruktur
@@ -275,3 +275,6 @@ MIT License
 ---
 
 Entwickelt mit ❤️ und Vue 3
+
+---
+Autor: Dinko Ramić - Kodini Tools - kodinitools.com
