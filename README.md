@@ -1,4 +1,4 @@
-# Batch-Bildbearbeitungs-App
+# Batch-Bildbearbeitungs-App JPEG, PNG, WEBp, ZIP, PDF
 
 Eine moderne, leistungsstarke Bildbearbeitungsanwendung, die vollständig im Browser läuft. Gebaut mit Vue 3, TypeScript, Pinia und Vite.
 
