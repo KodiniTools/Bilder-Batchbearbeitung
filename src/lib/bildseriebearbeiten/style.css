@@ -177,27 +177,26 @@ button {
 */
 
 /* Globale Navigation (via SSI Include /partials/nav.html) */
-nav,
-[class*="nav"]:not(.app-header):not([class*="canvas"]),
-[class*="navigation"]:not(.app-header),
-[id*="nav"]:not(#canvas),
-[id*="navigation"] {
-  position: relative;
-  z-index: 200;
+/* Erhöhe z-index nur für Dropdown-Menüs, nicht für die Navigation selbst */
+/* Dropdown-Menüs sind normalerweise bereits positioniert (absolute/fixed) */
+
+/* Dropdown-Menüs innerhalb von <nav> Elementen */
+nav [class*="dropdown"],
+nav [class*="menu"]:not(.app-header),
+nav [role="menu"],
+nav ul[class*="sub"],
+nav ul.submenu,
+nav .submenu {
+  z-index: 500 !important;
 }
 
-/* Dropdown-Menüs innerhalb der globalen Navigation */
-nav [class*="dropdown"],
-nav [class*="menu"],
-nav [role="menu"],
-nav ul,
-nav .submenu,
-[class*="nav"] [class*="dropdown"],
-[class*="nav"] [class*="menu"],
-[class*="nav"] [role="menu"],
-[class*="navigation"] [class*="dropdown"],
-[class*="navigation"] [class*="menu"],
-[class*="navigation"] [role="menu"] {
+/* Dropdown-Menüs innerhalb von Elementen mit nav/navigation im Klassennamen */
+[class*="nav"]:not(.app-header):not([class*="canvas"]) [class*="dropdown"],
+[class*="nav"]:not(.app-header):not([class*="canvas"]) [class*="menu"],
+[class*="nav"]:not(.app-header):not([class*="canvas"]) [role="menu"],
+[class*="navigation"]:not(.app-header) [class*="dropdown"],
+[class*="navigation"]:not(.app-header) [class*="menu"],
+[class*="navigation"]:not(.app-header) [role="menu"] {
   z-index: 500 !important;
 }
 
