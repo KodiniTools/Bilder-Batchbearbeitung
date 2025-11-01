@@ -163,8 +163,46 @@ button {
   flex: 1;
 }
 
+/* =============================
+   Globale Navigation Z-Index
+   ============================= */
+/*
+  Z-Index Hierarchie:
+  - Modals/Overlays: 1000
+  - Globale Navigation Dropdowns: 500
+  - Globale Navigation: 200
+  - App-Header (Toggle-Leiste): 100
+  - Format-Dropdown: 10
+  - Content-Elemente: 2
+*/
+
+/* Globale Navigation (via SSI Include /partials/nav.html) */
+nav,
+[class*="nav"]:not(.app-header):not([class*="canvas"]),
+[class*="navigation"]:not(.app-header),
+[id*="nav"]:not(#canvas),
+[id*="navigation"] {
+  position: relative;
+  z-index: 200;
+}
+
+/* Dropdown-Menüs innerhalb der globalen Navigation */
+nav [class*="dropdown"],
+nav [class*="menu"],
+nav [role="menu"],
+nav ul,
+nav .submenu,
+[class*="nav"] [class*="dropdown"],
+[class*="nav"] [class*="menu"],
+[class*="nav"] [role="menu"],
+[class*="navigation"] [class*="dropdown"],
+[class*="navigation"] [class*="menu"],
+[class*="navigation"] [role="menu"] {
+  z-index: 500 !important;
+}
+
 .app-header {
-  position: sticky; 
+  position: sticky;
   top: var(--global-nav-height);
   z-index: 100;
   padding: var(--space-3) var(--space-5);
