@@ -65,6 +65,11 @@
     "contact": "Kontakt",
     "copyright": "© 2025 KodiniTools"
   },
+  "donate": {
+    "title": "Unterstützen Sie dieses Projekt",
+    "text": "Wenn dir dieses Projekt gefällt und du die Entwicklung unterstützen möchtest, freue ich mich über eine Spende:",
+    "button": "Mit PayPal spenden"
+  },
   "faq": {
     "title": "Häufig gestellte Fragen (FAQ)",
     "privacy": {

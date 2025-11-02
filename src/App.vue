@@ -295,7 +295,19 @@ onMounted(() => {
       </div>
       
       <ImageGrid v-else @open-editor="openEditor" @open-preview="openPreview" />
-      
+
+      <section class="donate-section">
+        <h2>{{ $t('donate.title') }}</h2>
+        <p class="donate-text">{{ $t('donate.text') }}</p>
+        <form action="https://www.paypal.com/donate" method="post" target="_top" class="paypal-form">
+          <input type="hidden" name="hosted_button_id" value="8RGLGQ2BFMHU6" />
+          <button type="submit" class="paypal-button">
+            <i class="fa-brands fa-paypal"></i>
+            {{ $t('donate.button') }}
+          </button>
+        </form>
+      </section>
+
       <section class="faq-section">
         <h2>{{ $t('faq.title') }}</h2>
         
@@ -371,6 +383,71 @@ onMounted(() => {
     color-mix(in oklab, var(--panel) 30%, transparent) 0%,
     color-mix(in oklab, var(--panel) 10%, transparent) 100%);
   margin-bottom: var(--space-7);
+}
+
+.donate-section {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent) 8%, transparent) 0%,
+    color-mix(in oklab, var(--accent) 3%, transparent) 100%);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  border-radius: var(--radius-2xl);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.donate-section h2 {
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.donate-text {
+  margin-bottom: var(--space-5);
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.paypal-form {
+  display: inline-block;
+}
+
+.paypal-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #0070ba, #1f8dd6);
+  border: none;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  box-shadow: 0 4px 12px rgba(0, 112, 186, 0.3);
+}
+
+.paypal-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 112, 186, 0.4);
+  background: linear-gradient(135deg, #005a94, #1a7ab8);
+}
+
+.paypal-button:active {
+  transform: translateY(0);
+}
+
+.paypal-button i {
+  font-size: 1.4rem;
 }
 
 .faq-section {
@@ -483,11 +560,28 @@ onMounted(() => {
   .container {
     padding: var(--space-4) var(--space-3);
   }
-  
+
+  .donate-section {
+    padding: var(--space-4);
+  }
+
+  .donate-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .donate-text {
+    font-size: 0.95rem;
+  }
+
+  .paypal-button {
+    padding: var(--space-3) var(--space-5);
+    font-size: 1rem;
+  }
+
   .faq-section {
     padding: var(--space-4);
   }
-  
+
   .privacy-notice {
     flex-direction: column;
     text-align: center;
