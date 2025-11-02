@@ -101,7 +101,7 @@
   box-sizing: border-box; 
 }
 
-html, body { 
+html, body {
   height: auto;
   min-height: 100%;
 }
@@ -116,6 +116,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.5s var(--ease-smooth), color 0.3s var(--ease-smooth);
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 img, canvas, svg, video { 
@@ -168,6 +170,38 @@ button {
 .muted {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+/* =============================
+   Global Navigation & Footer Fixes
+   ============================= */
+/* Ensure global navigation from /partials/nav.html has higher z-index than app header */
+body > nav,
+body > header {
+  position: relative;
+  z-index: 1000 !important;
+}
+
+/* Ensure navigation dropdowns are above everything */
+body > nav .dropdown,
+body > nav .dropdown-menu,
+body > nav [class*="dropdown"],
+body > nav [class*="menu"] {
+  z-index: 1001 !important;
+}
+
+/* Ensure footer from /partials/footer.html is visible */
+body > footer {
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+}
+
+/* Make sure Vue app doesn't cover footer */
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: auto;
 }
 
 /* =============================
