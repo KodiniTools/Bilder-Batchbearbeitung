@@ -356,9 +356,10 @@ onMounted(() => {
 
 <style scoped>
 .app {
-  min-height: 100vh;
+  min-height: auto;
   display: flex;
   flex-direction: column;
+  padding-bottom: var(--space-6);
 }
 
 .container {
