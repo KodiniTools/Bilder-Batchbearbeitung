@@ -49,7 +49,8 @@ const setLanguage = (lang: string) => {
           :title="t('header.themeToggle')"
           :aria-label="t('header.themeToggle')"
         >
-          🌓
+          <i v-if="theme === 'dark'" class="fa-solid fa-sun"></i>
+          <i v-else class="fa-solid fa-moon"></i>
         </button>
       </div>
     </div>
@@ -150,6 +151,16 @@ const setLanguage = (lang: string) => {
 }
 
 .lang-toggle.active {
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.theme-toggle {
+  color: var(--accent);
+}
+
+.theme-toggle:hover {
   background: var(--accent);
   color: var(--accent-text);
   box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);

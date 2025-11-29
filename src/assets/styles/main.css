@@ -12,39 +12,48 @@
   /* Platzhalter für die Höhe der globalen Navigation */
   --global-nav-height: 0px;
 
-  /* Basis-Farben */
+  /* Neue Farbpalette */
+  --color-gold: #F2E28E;
+  --color-mauve: #A28680;
+  --color-gray: #5E5F69;
+  --color-silver: #AEAFB7;
+  --color-dark: #0C0C10;
+
+  /* Basis-Farben (angepasst an neue Palette) */
   --green: #22c55e;
   --red: #ef4444;
-  --yellow: #eab308;
+  --yellow: var(--color-gold);
   --purple: #8b5cf6;
   --cyan: #06b6d4;
 
   /* Light Theme (Standard) */
-  --bg: #F0F0F0;
+  --bg: #F8F7F2;
   --panel: #FFFFFF;
-  --text: #1a1a1a;
-  --muted: #555555;
-  --accent: #005cda;
-  --accent-text: #FFFFFF;
-  --btn: #E8E8E8;
-  --btn-hover: #D4D4D4;
-  --ring: #3e66d3;
-  --border-color: #C0C0C0;
-  --shadow-color: rgb(0 0 0 / 10%);
-  --canvas-bg: #000;
+  --text: var(--color-dark);
+  --muted: var(--color-gray);
+  --accent: var(--color-gold);
+  --accent-hover: #E8D87E;
+  --accent-text: var(--color-dark);
+  --secondary: var(--color-mauve);
+  --btn: #F0EFE8;
+  --btn-hover: #E5E4DC;
+  --ring: var(--color-mauve);
+  --border-color: var(--color-silver);
+  --shadow-color: rgb(12 12 16 / 12%);
+  --canvas-bg: var(--color-dark);
 
   /* Neue moderne Variablen */
-  --glass-bg: color-mix(in oklab, var(--panel) 80%, transparent);
-  --glass-border: color-mix(in oklab, var(--border-color) 40%, transparent);
-  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 15%, transparent);
-  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 25%, transparent);
-  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 20%, transparent);
+  --glass-bg: color-mix(in oklab, var(--panel) 85%, transparent);
+  --glass-border: color-mix(in oklab, var(--border-color) 50%, transparent);
+  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 20%, transparent);
+  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 30%, transparent);
+  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 25%, transparent);
 
   /* Dynamische Hintergründe */
-  --body-gradient: 
-    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--accent) 4%, transparent) 0%, transparent 60%),
-    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--green) 3%, transparent) 0%, transparent 60%),
-    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 97%, var(--accent)) 100%);
+  --body-gradient:
+    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--color-gold) 6%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--color-mauve) 5%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 96%, var(--color-gold)) 100%);
 
   /* Layout-Variablen */
   --radius-sm: 8px;
@@ -72,38 +81,57 @@
 
 /* Dark Theme Overrides */
 :root[data-theme="dark"] {
-  --bg: #0a0a0a;
-  --panel: #161616;
-  --text: #f0f0f0;
-  --muted: #888888;
-  --accent: #6ea8fe;
-  --accent-text: #0a0a0a;
-  --btn: #222222;
-  --btn-hover: #333333;
-  --ring: #3e66d3;
-  --border-color: rgb(255 255 255 / 15%);
-  --shadow-color: rgb(0 0 0 / 50%);
+  --bg: var(--color-dark);
+  --panel: #1A1A1E;
+  --text: #F5F5F2;
+  --muted: var(--color-silver);
+  --accent: var(--color-gold);
+  --accent-hover: #FFF0A0;
+  --accent-text: var(--color-dark);
+  --secondary: var(--color-mauve);
+  --btn: #2A2A30;
+  --btn-hover: var(--color-gray);
+  --ring: var(--color-mauve);
+  --border-color: rgb(174 175 183 / 25%);
+  --shadow-color: rgb(0 0 0 / 60%);
 
-  --glass-bg: color-mix(in oklab, var(--panel) 70%, transparent);
-  --glass-border: color-mix(in oklab, var(--border-color) 60%, transparent);
+  --glass-bg: color-mix(in oklab, var(--panel) 75%, transparent);
+  --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
 
-  --body-gradient: 
-    radial-gradient(circle at 20% 80%, color-mix(in oklab, var(--accent) 8%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--purple) 6%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, color-mix(in oklab, var(--cyan) 4%, transparent) 0%, transparent 70%),
+  --body-gradient:
+    radial-gradient(circle at 20% 80%, color-mix(in oklab, var(--color-gold) 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--color-mauve) 6%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, color-mix(in oklab, var(--color-gray) 5%, transparent) 0%, transparent 70%),
     linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 95%, #1a1a2e) 100%);
 }
 
 /* =============================
    Base / Reset (verbessert)
    ============================= */
-* { 
-  box-sizing: border-box; 
+* {
+  box-sizing: border-box;
 }
 
 html, body {
   height: auto;
   min-height: 100%;
+}
+
+/* =============================
+   Lowercase Styling
+   ============================= */
+h1, h2, h3, h4, h5, h6,
+button,
+.btn,
+label,
+.app-title,
+.upload-text,
+.status-bar,
+[class*="toggle"],
+[class*="action"],
+.modal-title,
+.section-title {
+  text-transform: lowercase;
 }
 
 body {
