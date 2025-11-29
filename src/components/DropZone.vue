@@ -67,9 +67,8 @@ const handleDrop = (event: DragEvent) => {
     <div class="upload-text">
       {{ t('upload.text') }}
     </div>
-    <button type="button" class="btn upload-btn" @click.stop="handleClick">
+    <button type="button" class="btn upload-btn icon-only" @click.stop="handleClick" :title="t('upload.button')" :aria-label="t('upload.button')">
       <i class="fa-solid fa-file-arrow-up"></i>
-      <span>{{ t('upload.button') }}</span>
     </button>
     <input
       ref="fileInput"
@@ -159,6 +158,24 @@ const handleDrop = (event: DragEvent) => {
 
 .upload-btn {
   margin-top: var(--space-2);
+}
+
+.upload-btn.icon-only {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+.upload-btn.icon-only:hover {
+  background: var(--accent-hover, var(--accent));
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 45%, transparent);
 }
 
 .btn {
