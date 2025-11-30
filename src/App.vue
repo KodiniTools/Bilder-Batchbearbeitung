@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
@@ -271,10 +271,57 @@ const toggleTheme = () => {
   applyTheme(theme.value === 'dark' ? 'light' : 'dark')
 }
 
+// Tastaturkürzel Handler
+function handleKeyboard(event: KeyboardEvent) {
+  // Ignoriere wenn ein Modal offen ist oder Eingabefeld fokussiert
+  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value) return
+  const target = event.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+  const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey
+
+  // Ctrl/Cmd + A: Alle auswählen
+  if (ctrlOrCmd && event.key.toLowerCase() === 'a' && imageStore.hasImages) {
+    event.preventDefault()
+    imageStore.selectAllImages()
+    return
+  }
+
+  // Delete/Backspace: Ausgewählte löschen
+  if ((event.key === 'Delete' || event.key === 'Backspace') && imageStore.hasSelection) {
+    event.preventDefault()
+    const count = imageStore.selectedCount
+    if (confirm(t('alerts.confirmDelete', { count }))) {
+      imageStore.removeSelectedImages()
+      if (count === 1) {
+        toast.success(t('toast.imageRemoved'))
+      } else {
+        toast.success(t('toast.imagesRemoved', { count }))
+      }
+    }
+    return
+  }
+
+  // Escape: Auswahl aufheben
+  if (event.key === 'Escape' && imageStore.hasSelection) {
+    event.preventDefault()
+    imageStore.deselectAllImages()
+    return
+  }
+}
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'))
+
+  // Tastaturkürzel registrieren
+  window.addEventListener('keydown', handleKeyboard)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyboard)
 })
 </script>
 

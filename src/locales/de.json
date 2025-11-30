@@ -22,7 +22,11 @@
       "exportSelectedPdf": "Auswahl als PDF exportieren",
       "exportAllPdf": "Alle Bilder als PDF exportieren",
       "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
-      "downloadZip": "Originale der Auswahl als ZIP herunterladen"
+      "downloadZip": "Originale der Auswahl als ZIP herunterladen",
+      "rotateLeft": "Ausgewählte Bilder 90° nach links drehen",
+      "rotateRight": "Ausgewählte Bilder 90° nach rechts drehen",
+      "flipH": "Ausgewählte Bilder horizontal spiegeln",
+      "flipV": "Ausgewählte Bilder vertikal spiegeln"
     }
   },
   "upload": {
@@ -56,7 +60,9 @@
     "imageAdded": "{count} Bild(er) hinzugefügt",
     "imageRemoved": "Bild entfernt",
     "imagesRemoved": "{count} Bilder entfernt",
-    "copied": "In die Zwischenablage kopiert"
+    "copied": "In die Zwischenablage kopiert",
+    "rotated": "{count} Bild(er) gedreht",
+    "flipped": "{count} Bild(er) gespiegelt"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",

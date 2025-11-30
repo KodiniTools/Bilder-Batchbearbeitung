@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, nextTick } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageStore } from '@/stores/imageStore'
@@ -16,14 +16,19 @@ const emit = defineEmits<{
 const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
 
-const displayName = computed(() => {
-  const base = ImageProcessor.resolveBaseName(props.image)
-  const ext = ImageProcessor.getFileExtension(props.image.file.name)
-  return `${base}.${ext}`
-})
+// Inline-Umbenennung
+const isEditing = ref(false)
+const editInput = ref<HTMLInputElement | null>(null)
+const editName = ref('')
+
+const baseName = computed(() => ImageProcessor.resolveBaseName(props.image))
+const fileExt = computed(() => ImageProcessor.getFileExtension(props.image.file.name))
+const displayName = computed(() => `${baseName.value}.${fileExt.value}`)
 
 const handleCardClick = () => {
-  imageStore.toggleImageSelection(props.image.id)
+  if (!isEditing.value) {
+    imageStore.toggleImageSelection(props.image.id)
+  }
 }
 
 const handleRemove = (event: Event) => {
@@ -38,6 +43,43 @@ const handleEdit = (event: Event) => {
 
 const handlePreview = () => {
   emit('open-preview', props.image)
+}
+
+// Inline-Umbenennung starten bei Doppelklick
+const startEditing = (event: Event) => {
+  event.stopPropagation()
+  editName.value = baseName.value
+  isEditing.value = true
+  nextTick(() => {
+    editInput.value?.focus()
+    editInput.value?.select()
+  })
+}
+
+// Umbenennung speichern
+const saveEdit = () => {
+  const newName = editName.value.trim()
+  if (newName && newName !== baseName.value) {
+    imageStore.updateImageName(props.image.id, newName)
+  }
+  isEditing.value = false
+}
+
+// Umbenennung abbrechen
+const cancelEdit = () => {
+  isEditing.value = false
+  editName.value = ''
+}
+
+// Tastatureingabe behandeln
+const handleEditKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    saveEdit()
+  } else if (event.key === 'Escape') {
+    event.preventDefault()
+    cancelEdit()
+  }
 }
 
 onMounted(() => {
@@ -70,8 +112,22 @@ onMounted(() => {
       <!-- Canvas wird hier von onMounted eingefügt -->
     </div>
     
-    <div class="image-info">
-      {{ displayName }}
+    <div class="image-info" @dblclick="startEditing" :title="displayName">
+      <template v-if="!isEditing">
+        <span class="file-name">{{ baseName }}</span>
+        <span class="file-ext">.{{ fileExt }}</span>
+      </template>
+      <div v-else class="inline-edit" @click.stop>
+        <input
+          ref="editInput"
+          v-model="editName"
+          type="text"
+          class="edit-input"
+          @blur="saveEdit"
+          @keydown="handleEditKeydown"
+        />
+        <span class="file-ext">.{{ fileExt }}</span>
+      </div>
     </div>
     
     <div class="image-actions">
@@ -247,6 +303,52 @@ onMounted(() => {
   white-space: nowrap;
   position: relative;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  cursor: text;
+  padding: 4px 0;
+  border-radius: var(--radius-md);
+  transition: background 0.2s;
+}
+
+.image-info:hover:not(:has(.inline-edit)) {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-ext {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.inline-edit {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 2px;
+}
+
+.edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.edit-input:focus {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent);
 }
 
 .image-actions {

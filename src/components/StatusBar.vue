@@ -41,6 +41,27 @@ const handleExportZip = () => {
 const handleSaveImages = () => {
   emit('save-images')
 }
+
+// Batch-Transformationen
+const handleRotateLeft = () => {
+  imageStore.rotateSelectedImages(-90)
+  toast.success(t('toast.rotated', { count: imageStore.selectedCount }))
+}
+
+const handleRotateRight = () => {
+  imageStore.rotateSelectedImages(90)
+  toast.success(t('toast.rotated', { count: imageStore.selectedCount }))
+}
+
+const handleFlipH = () => {
+  imageStore.flipSelectedImages('horizontal')
+  toast.success(t('toast.flipped', { count: imageStore.selectedCount }))
+}
+
+const handleFlipV = () => {
+  imageStore.flipSelectedImages('vertical')
+  toast.success(t('toast.flipped', { count: imageStore.selectedCount }))
+}
 </script>
 
 <template>
@@ -76,7 +97,39 @@ const handleSaveImages = () => {
       <i class="fa-solid fa-trash-can"></i>
       <span>{{ t('statusBar.buttons.delete') }}</span>
     </button>
-    
+
+    <!-- Batch-Transformationen Gruppe -->
+    <div class="btn-group" v-if="imageStore.hasSelection">
+      <button
+        class="btn btn-icon"
+        @click="handleRotateLeft"
+        :title="t('statusBar.tooltips.rotateLeft')"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button
+        class="btn btn-icon"
+        @click="handleRotateRight"
+        :title="t('statusBar.tooltips.rotateRight')"
+      >
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+      <button
+        class="btn btn-icon"
+        @click="handleFlipH"
+        :title="t('statusBar.tooltips.flipH')"
+      >
+        <i class="fa-solid fa-arrows-left-right"></i>
+      </button>
+      <button
+        class="btn btn-icon"
+        @click="handleFlipV"
+        :title="t('statusBar.tooltips.flipV')"
+      >
+        <i class="fa-solid fa-arrows-up-down"></i>
+      </button>
+    </div>
+
     <button
       class="btn"
       @click="handleExportPdf('selected')"
@@ -204,11 +257,32 @@ const handleSaveImages = () => {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, 
-    color-mix(in oklab, var(--accent) 90%, black) 0%, 
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent) 90%, black) 0%,
     color-mix(in oklab, var(--accent) 80%, var(--purple)) 100%);
   box-shadow: 0 8px 32px color-mix(in oklab, var(--accent) 35%, transparent);
   transform: translateY(-3px);
+}
+
+/* Button-Gruppe für Transformationen */
+.btn-group {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in oklab, var(--border-color) 20%, transparent);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+
+.btn-icon i {
+  font-size: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -218,17 +292,26 @@ const handleSaveImages = () => {
     gap: var(--space-3);
     padding: var(--space-3);
   }
-  
+
   .header-spacer {
     display: none;
   }
-  
+
   .stat {
     justify-content: center;
   }
-  
+
   .btn {
     width: 100%;
+  }
+
+  .btn-group {
+    justify-content: center;
+  }
+
+  .btn-group .btn-icon {
+    flex: 1;
+    max-width: 60px;
   }
 }
 </style>
