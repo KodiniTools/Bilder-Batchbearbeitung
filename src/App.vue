@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
 import DropZone from '@/components/DropZone.vue'
@@ -8,7 +9,9 @@ import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import ImageEditor from '@/components/ImageEditor.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
+import ToastContainer from '@/components/ToastContainer.vue'
 import { useImageStore } from '@/stores/imageStore'
+import { useToast } from '@/composables/useToast'
 import type { ImageObject } from '@/lib/core/types'
 
 // ✨ VEREINFACHT: Verwende nur noch export-pdf.ts als einziges Export-Modul!
@@ -23,7 +26,9 @@ import {
 // ZIP-Export (bleibt unverändert)
 import { exportImagesAsZip } from '@/lib/features/export-zip'
 
+const { t } = useI18n()
 const imageStore = useImageStore()
+const toast = useToast()
 const theme = ref<'light' | 'dark'>('light')
 
 const isEditorOpen = ref(false)
@@ -157,6 +162,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       )
 
       console.log(`✅ PDF-Export erfolgreich: ${images.length} Bilder`)
+      toast.success(t('toast.pdfSuccess', { count: images.length }))
       console.log(`📄 Custom Front Page: ${useCustomFrontPage ? 'Ja' : 'Nein'}`)
       if (useCustomFrontPage && settings.frontPageElements) {
         console.log(`🎨 Front Page Elemente: ${settings.frontPageElements.length}`)
@@ -164,7 +170,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       console.log(`📄 Kommentarseiten: ${settings.includeCommentPages ? 'Ja' : 'Nein'}`)
       if (settings.includeCommentPages) {
         console.log(`🎨 Kommentar-Elemente: ${settings.commentPageElements?.length || 0}`)
-        
+
         // Zeige Seiten-Verteilung
         const pageCount = new Set(settings.commentPageElements?.map(el => el.page || 1)).size
         console.log(`📄 Anzahl Kommentarseiten: ${pageCount}`)
@@ -172,12 +178,13 @@ async function handleExportConfirm(settings: ExportSettings) {
       
     } else if (currentMode === 'zip') {
       await exportImagesAsZip(
-        imageStore.images, 
+        imageStore.images,
         settings.zipName,
         settings.format,
         settings.quality
       )
       console.log(`✅ ZIP-Export erfolgreich: ${imageStore.imageCount} Bilder`)
+      toast.success(t('toast.zipSuccess', { count: imageStore.imageCount }))
       
     } else if (currentMode === 'save') {
       const images = imageStore.images.filter(img => img.selected)
@@ -190,10 +197,11 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
       
       console.log(`✅ ${images.length} Bilder erfolgreich gespeichert`)
+      toast.success(t('toast.saveSuccess', { count: images.length }))
     }
   } catch (error) {
     console.error('❌ Export fehlgeschlagen:', error)
-    alert('Fehler beim Exportieren. Bitte versuchen Sie es erneut.')
+    toast.error(t('toast.exportError'))
   }
 }
 
@@ -329,7 +337,8 @@ onMounted(() => {
     </main>
     
     <LoadingIndicator />
-    
+    <ToastContainer />
+
     <ImageEditor
       :image="editingImage"
       :is-open="isEditorOpen"

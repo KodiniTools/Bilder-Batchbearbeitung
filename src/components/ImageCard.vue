@@ -57,9 +57,14 @@ onMounted(() => {
     :class="{ selected: image.selected }"
     @click="handleCardClick"
   >
-    <div 
+    <!-- Checkbox-Overlay für bessere Sichtbarkeit des Auswahlstatus -->
+    <div class="checkbox-overlay" :class="{ checked: image.selected }">
+      <i v-if="image.selected" class="fas fa-check"></i>
+    </div>
+
+    <div
       ref="previewContainer"
-      class="image-preview" 
+      class="image-preview"
       @click.stop="handlePreview"
     >
       <!-- Canvas wird hier von onMounted eingefügt -->
@@ -94,6 +99,48 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Checkbox-Overlay Styles */
+.checkbox-overlay {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 2px solid var(--border-color);
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  transition: all 0.3s var(--ease-spring);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.checkbox-overlay:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.checkbox-overlay.checked {
+  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--green)));
+  border-color: var(--accent);
+  opacity: 1;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.checkbox-overlay.checked i {
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.image-card:hover .checkbox-overlay {
+  opacity: 1;
+}
+
 .image-card {
   position: relative;
   display: flex;
