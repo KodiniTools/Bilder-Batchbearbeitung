@@ -95,6 +95,32 @@ export const useImageStore = defineStore('images', () => {
     currentImageIndex.value = 0
   }
 
+  // Drag & Drop: Bild von einem Index zu einem anderen verschieben
+  function moveImage(fromIndex: number, toIndex: number): void {
+    if (fromIndex < 0 || fromIndex >= images.value.length) return
+    if (toIndex < 0 || toIndex >= images.value.length) return
+    if (fromIndex === toIndex) return
+
+    const [movedImage] = images.value.splice(fromIndex, 1)
+    images.value.splice(toIndex, 0, movedImage)
+  }
+
+  // Batch-Rotation für alle ausgewählten Bilder
+  function rotateSelectedImages(degrees: number): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      ImageProcessor.rotateImage(img, degrees)
+    })
+  }
+
+  // Batch-Flip für alle ausgewählten Bilder
+  function flipSelectedImages(direction: 'horizontal' | 'vertical'): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      ImageProcessor.flipImage(img, direction)
+    })
+  }
+
   // Reset store
   function $reset(): void {
     images.value = []
@@ -125,6 +151,9 @@ export const useImageStore = defineStore('images', () => {
     updateImageName,
     updateImage,
     clearAllImages,
+    moveImage,
+    rotateSelectedImages,
+    flipSelectedImages,
     $reset
   }
 })
