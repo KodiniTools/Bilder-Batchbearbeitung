@@ -489,11 +489,11 @@ function handleConfirm() {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3);
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: black;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: var(--accent-text);
   border: none;
   border-radius: var(--radius-md);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
@@ -501,7 +501,7 @@ function handleConfirm() {
 
 .designer-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .designer-btn:active {
@@ -626,13 +626,14 @@ function handleConfirm() {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: black;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: var(--accent-text);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .btn-primary:active {
