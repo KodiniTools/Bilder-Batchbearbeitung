@@ -45,14 +45,26 @@
     "images": "Loading images...",
     "zip": "Preparing ZIP file...",
     "pdf": "Creating PDF...",
-    "pdfMulti": "Creating PDF with {count} images..."
+    "pdfMulti": "Creating PDF with {count} images...",
+    "progress": "{current} of {total}"
+  },
+  "toast": {
+    "pdfSuccess": "PDF with {count} images created successfully",
+    "zipSuccess": "ZIP with {count} images created successfully",
+    "saveSuccess": "{count} images saved successfully",
+    "exportError": "Export failed. Please try again.",
+    "imageAdded": "{count} image(s) added",
+    "imageRemoved": "Image removed",
+    "imagesRemoved": "{count} images removed",
+    "copied": "Copied to clipboard"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
     "canvasError": "Canvas 2D context not available.",
     "fileLoadError": "Could not load the file {fileName}.",
     "fileReadError": "Could not read the file {fileName}.",
-    "noSelection": "No images selected."
+    "noSelection": "No images selected.",
+    "confirmDelete": "Really delete {count} image(s)?"
   },
   "consent": {
     "text": "We use anonymous usage statistics to improve the app. May we collect this data?",

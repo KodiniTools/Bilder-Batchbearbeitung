@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
+import { useToast } from '@/composables/useToast'
 
 const imageStore = useImageStore()
 const { t } = useI18n()
+const toast = useToast()
 
 const emit = defineEmits<{
   'export-pdf': ['all' | 'selected']
@@ -16,10 +18,16 @@ const handleSelectAll = () => {
 }
 
 const handleDelete = () => {
-  if (!confirm(t('alerts.confirmDelete', { count: imageStore.selectedCount }))) {
+  const count = imageStore.selectedCount
+  if (!confirm(t('alerts.confirmDelete', { count }))) {
     return
   }
   imageStore.removeSelectedImages()
+  if (count === 1) {
+    toast.success(t('toast.imageRemoved'))
+  } else {
+    toast.success(t('toast.imagesRemoved', { count }))
+  }
 }
 
 const handleExportPdf = (mode: 'all' | 'selected') => {
