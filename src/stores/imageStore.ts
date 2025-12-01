@@ -121,6 +121,25 @@ export const useImageStore = defineStore('images', () => {
     })
   }
 
+  // Batch-Umbenennung für alle ausgewählten Bilder
+  function batchRenameSelectedImages(baseName: string, startNumber: number = 1): number {
+    // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
+    const selectedInOrder = images.value.filter(img => img.selected)
+
+    if (selectedInOrder.length === 0) return 0
+
+    // Sanitize baseName
+    const safeBaseName = ImageProcessor.safeBaseName(baseName)
+
+    // Umbenennen mit fortlaufender Nummerierung
+    selectedInOrder.forEach((img, index) => {
+      const number = startNumber + index
+      img.outputName = `${safeBaseName}_${number}`
+    })
+
+    return selectedInOrder.length
+  }
+
   // Reset store
   function $reset(): void {
     images.value = []
@@ -154,6 +173,7 @@ export const useImageStore = defineStore('images', () => {
     moveImage,
     rotateSelectedImages,
     flipSelectedImages,
+    batchRenameSelectedImages,
     $reset
   }
 })
