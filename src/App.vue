@@ -9,6 +9,7 @@ import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import ImageEditor from '@/components/ImageEditor.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
+import BulkRenameModal from '@/components/BulkRenameModal.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
@@ -39,6 +40,8 @@ const previewImage = ref<ImageObject | null>(null)
 
 const isExportModalOpen = ref(false)
 const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null>(null)
+
+const isBulkRenameModalOpen = ref(false)
 
 const exportImageCount = computed(() => {
   if (exportMode.value === 'pdf-all' || exportMode.value === 'zip') {
@@ -251,7 +254,7 @@ function downloadSingleImage(image: ImageObject, format?: string, quality?: numb
 
 async function handleSaveImages() {
   const images = imageStore.images.filter(img => img.selected)
-  
+
   if (images.length === 0) {
     alert('Keine Bilder zum Speichern ausgewählt')
     return
@@ -259,6 +262,25 @@ async function handleSaveImages() {
 
   exportMode.value = 'save'
   isExportModalOpen.value = true
+}
+
+// Bulk Rename Functions
+function handleBulkRename() {
+  if (imageStore.selectedCount === 0) {
+    alert(t('alerts.noSelection'))
+    return
+  }
+  isBulkRenameModalOpen.value = true
+}
+
+function closeBulkRenameModal() {
+  isBulkRenameModalOpen.value = false
+}
+
+function handleBulkRenameConfirm(baseName: string, startNumber: number) {
+  const count = imageStore.batchRenameSelectedImages(baseName, startNumber)
+  closeBulkRenameModal()
+  toast.success(t('toast.bulkRenamed', { count }))
 }
 
 const applyTheme = (newTheme: 'light' | 'dark') => {
@@ -274,7 +296,7 @@ const toggleTheme = () => {
 // Tastaturkürzel Handler
 function handleKeyboard(event: KeyboardEvent) {
   // Ignoriere wenn ein Modal offen ist oder Eingabefeld fokussiert
-  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value) return
+  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value) return
   const target = event.target as HTMLElement
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
 
@@ -330,11 +352,12 @@ onUnmounted(() => {
     <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
     
     <main class="container">
-      <StatusBar 
+      <StatusBar
         v-if="imageStore.hasImages"
         @export-pdf="handleExportPdf"
         @export-zip="handleExportZip"
         @save-images="handleSaveImages"
+        @bulk-rename="handleBulkRename"
       />
       
       <DropZone />
@@ -406,6 +429,13 @@ onUnmounted(() => {
       :image-count="exportImageCount"
       @close="closeExportModal"
       @confirm="handleExportConfirm"
+    />
+
+    <!-- Bulk Rename Modal -->
+    <BulkRenameModal
+      :is-open="isBulkRenameModalOpen"
+      @close="closeBulkRenameModal"
+      @confirm="handleBulkRenameConfirm"
     />
   </div>
 </template>

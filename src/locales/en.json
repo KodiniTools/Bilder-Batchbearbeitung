@@ -12,6 +12,7 @@
     "buttons": {
       "selectAll": "Toggle All",
       "delete": "Delete",
+      "bulkRename": "Rename",
       "exportSelectedPdf": "Selection → PDF",
       "exportAllPdf": "All → PDF",
       "save": "Save As…"
@@ -19,6 +20,7 @@
     "tooltips": {
       "selectAll": "Select/Deselect all",
       "deleteSelected": "Delete selection",
+      "bulkRename": "Rename selected images sequentially",
       "exportSelectedPdf": "Export selection as PDF",
       "exportAllPdf": "Export all images as PDF",
       "saveSelected": "Save selected images in multiple formats",
@@ -62,7 +64,8 @@
     "imagesRemoved": "{count} images removed",
     "copied": "Copied to clipboard",
     "rotated": "{count} image(s) rotated",
-    "flipped": "{count} image(s) flipped"
+    "flipped": "{count} image(s) flipped",
+    "bulkRenamed": "{count} image(s) renamed"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
@@ -371,6 +374,29 @@
       "cancel": "Cancel",
       "reset": "Reset",
       "save": "Apply changes"
+    }
+  },
+  "bulkRename": {
+    "title": "Rename Images",
+    "close": "Close",
+    "baseName": {
+      "label": "Base Name",
+      "placeholder": "e.g. Vacation, Project, Photo",
+      "hint": "Images will be named following this pattern: BaseName_1, BaseName_2, ..."
+    },
+    "startNumber": {
+      "label": "Start Number",
+      "placeholder": "1",
+      "hint": "Numbering starts at this number"
+    },
+    "preview": {
+      "title": "Preview",
+      "more": "+{count} more..."
+    },
+    "info": "{count} image(s) will be renamed",
+    "buttons": {
+      "cancel": "Cancel",
+      "rename": "Rename"
     }
   }
 }

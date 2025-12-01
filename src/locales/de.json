@@ -12,6 +12,7 @@
     "buttons": {
       "selectAll": "Alle umschalten",
       "delete": "Löschen",
+      "bulkRename": "Umbenennen",
       "exportSelectedPdf": "Auswahl → PDF",
       "exportAllPdf": "Alle → PDF",
       "save": "Speichern…"
@@ -19,6 +20,7 @@
     "tooltips": {
       "selectAll": "Alle auswählen/abwählen",
       "deleteSelected": "Auswahl löschen",
+      "bulkRename": "Ausgewählte Bilder fortlaufend umbenennen",
       "exportSelectedPdf": "Auswahl als PDF exportieren",
       "exportAllPdf": "Alle Bilder als PDF exportieren",
       "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
@@ -62,7 +64,8 @@
     "imagesRemoved": "{count} Bilder entfernt",
     "copied": "In die Zwischenablage kopiert",
     "rotated": "{count} Bild(er) gedreht",
-    "flipped": "{count} Bild(er) gespiegelt"
+    "flipped": "{count} Bild(er) gespiegelt",
+    "bulkRenamed": "{count} Bild(er) umbenannt"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
@@ -371,6 +374,29 @@
       "cancel": "Abbrechen",
       "reset": "Zurücksetzen",
       "save": "Änderungen übernehmen"
+    }
+  },
+  "bulkRename": {
+    "title": "Bilder umbenennen",
+    "close": "Schließen",
+    "baseName": {
+      "label": "Basisname",
+      "placeholder": "z.B. Urlaub, Projekt, Foto",
+      "hint": "Die Bilder werden nach diesem Muster benannt: Basisname_1, Basisname_2, ..."
+    },
+    "startNumber": {
+      "label": "Startnummer",
+      "placeholder": "1",
+      "hint": "Die Nummerierung beginnt bei dieser Zahl"
+    },
+    "preview": {
+      "title": "Vorschau",
+      "more": "+{count} weitere..."
+    },
+    "info": "{count} Bild(er) werden umbenannt",
+    "buttons": {
+      "cancel": "Abbrechen",
+      "rename": "Umbenennen"
     }
   }
 }

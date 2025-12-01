@@ -11,6 +11,7 @@ const emit = defineEmits<{
   'export-pdf': ['all' | 'selected']
   'export-zip': []
   'save-images': []
+  'bulk-rename': []
 }>()
 
 const handleSelectAll = () => {
@@ -61,6 +62,10 @@ const handleFlipH = () => {
 const handleFlipV = () => {
   imageStore.flipSelectedImages('vertical')
   toast.success(t('toast.flipped', { count: imageStore.selectedCount }))
+}
+
+const handleBulkRename = () => {
+  emit('bulk-rename')
 }
 </script>
 
@@ -129,6 +134,17 @@ const handleFlipV = () => {
         <i class="fa-solid fa-arrows-up-down"></i>
       </button>
     </div>
+
+    <!-- Batch-Umbenennung Button -->
+    <button
+      class="btn"
+      v-if="imageStore.hasSelection"
+      @click="handleBulkRename"
+      :title="t('statusBar.tooltips.bulkRename')"
+    >
+      <i class="fa-solid fa-pen"></i>
+      <span>{{ t('statusBar.buttons.bulkRename') }}</span>
+    </button>
 
     <button
       class="btn"
