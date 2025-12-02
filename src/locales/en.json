@@ -50,6 +50,7 @@
     "text": "Please wait…",
     "images": "Loading images...",
     "zip": "Preparing ZIP file...",
+    "zipProgress": "Processing image {current} of {total}...",
     "pdf": "Creating PDF...",
     "pdfMulti": "Creating PDF with {count} images...",
     "progress": "{current} of {total}"

@@ -50,6 +50,7 @@
     "text": "Bitte warten…",
     "images": "Bilder werden geladen...",
     "zip": "Bereite ZIP-Datei vor...",
+    "zipProgress": "Verarbeite Bild {current} von {total}...",
     "pdf": "Erstelle PDF...",
     "pdfMulti": "Erstelle PDF mit {count} Bildern...",
     "progress": "{current} von {total}"

@@ -24,8 +24,8 @@ import {
   type CanvasElement
 } from '@/lib/features/export-pdf'
 
-// ZIP-Export (bleibt unverändert)
-import { exportImagesAsZip } from '@/lib/features/export-zip'
+// ZIP-Export
+import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
@@ -42,6 +42,9 @@ const isExportModalOpen = ref(false)
 const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null>(null)
 
 const isBulkRenameModalOpen = ref(false)
+
+// LoadingIndicator ref für Fortschrittsanzeige
+const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
 
 const exportImageCount = computed(() => {
   if (exportMode.value === 'pdf-all' || exportMode.value === 'zip') {
@@ -180,14 +183,35 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
       
     } else if (currentMode === 'zip') {
-      await exportImagesAsZip(
-        imageStore.images,
-        settings.zipName,
-        settings.format,
-        settings.quality
+      const total = imageStore.imageCount
+
+      // Fortschrittsanzeige starten
+      loadingIndicator.value?.showWithProgress(
+        t('loading.zipProgress', { current: 0, total }),
+        total
       )
-      console.log(`✅ ZIP-Export erfolgreich: ${imageStore.imageCount} Bilder`)
-      toast.success(t('toast.zipSuccess', { count: imageStore.imageCount }))
+
+      // Fortschritts-Callback
+      const onProgress: ZipProgressCallback = (current, total) => {
+        loadingIndicator.value?.updateProgress(
+          current,
+          t('loading.zipProgress', { current, total })
+        )
+      }
+
+      try {
+        await exportImagesAsZip(
+          imageStore.images,
+          settings.zipName,
+          settings.format,
+          settings.quality,
+          onProgress
+        )
+        console.log(`✅ ZIP-Export erfolgreich: ${total} Bilder`)
+        toast.success(t('toast.zipSuccess', { count: total }))
+      } finally {
+        loadingIndicator.value?.hide()
+      }
       
     } else if (currentMode === 'save') {
       const images = imageStore.images.filter(img => img.selected)
@@ -406,7 +430,7 @@ onUnmounted(() => {
       </section>
     </main>
     
-    <LoadingIndicator />
+    <LoadingIndicator ref="loadingIndicator" />
     <ToastContainer />
 
     <ImageEditor
