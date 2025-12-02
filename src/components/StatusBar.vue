@@ -244,22 +244,24 @@ const handleCropToAspectRatio = (ratio: number) => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
-  box-shadow: 
+  box-shadow:
     var(--surface-elevation),
     inset 0 1px 0 color-mix(in oklab, white 15%, transparent);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .status-bar::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, 
+  background: linear-gradient(135deg,
     color-mix(in oklab, var(--accent) 3%, transparent) 0%,
     transparent 50%,
     color-mix(in oklab, var(--green) 2%, transparent) 100%);
   pointer-events: none;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
 }
 
 .stat {
