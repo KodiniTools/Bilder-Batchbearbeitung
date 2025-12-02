@@ -7,6 +7,8 @@ interface ZipSettings {
   quality?: number
 }
 
+export type ZipProgressCallback = (current: number, total: number) => void
+
 async function getJSZip() {
   // @ts-ignore
   if (window.JSZip) return window.JSZip
@@ -22,10 +24,11 @@ export async function exportImagesAsZip(
   images: ImageObject[],
   zipFileName?: string,
   format: string = 'png',
-  quality: number = 0.92
+  quality: number = 0.92,
+  onProgress?: ZipProgressCallback
 ): Promise<void> {
   const JSZip = await getJSZip()
-  
+
   if (!images || images.length === 0) {
     throw new Error('Keine Bilder zum Exportieren vorhanden')
   }
@@ -37,15 +40,23 @@ export async function exportImagesAsZip(
     throw new Error('ZIP-Ordner konnte nicht erstellt werden')
   }
 
+  const total = images.length
+
   // Bilder zum ZIP hinzufügen
-  for (const image of images) {
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i]
     try {
+      // Fortschritt melden
+      if (onProgress) {
+        onProgress(i + 1, total)
+      }
+
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = format === 'png' ? 1.0 : (quality / 100) || 0.92
       const blob = await canvasToBlob(image.canvas, exportFormat, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
-      const fileNameWithExt = fileName.includes('.') 
-        ? fileName 
+      const fileNameWithExt = fileName.includes('.')
+        ? fileName
         : `${fileName}.${exportFormat}`
       folder.file(fileNameWithExt, blob)
     } catch (error) {
