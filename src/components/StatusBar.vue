@@ -86,6 +86,12 @@ const handleCropToAspectRatio = (ratio: number) => {
   toast.success(t('toast.cropped', { count: imageStore.selectedCount }))
   closeAspectRatioDropdown()
 }
+
+// Rückgängig-Funktion
+const handleReset = () => {
+  imageStore.resetSelectedImages()
+  toast.success(t('toast.reset', { count: imageStore.selectedCount }))
+}
 </script>
 
 <template>
@@ -180,6 +186,17 @@ const handleCropToAspectRatio = (ratio: number) => {
         </button>
       </div>
     </div>
+
+    <!-- Rückgängig Button -->
+    <button
+      class="btn"
+      v-if="imageStore.hasSelection"
+      @click="handleReset"
+      :title="t('statusBar.tooltips.reset')"
+    >
+      <i class="fa-solid fa-arrow-rotate-left"></i>
+      <span>{{ t('statusBar.buttons.reset') }}</span>
+    </button>
 
     <!-- Batch-Umbenennung Button -->
     <button

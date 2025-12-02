@@ -14,6 +14,7 @@
       "delete": "Delete",
       "bulkRename": "Rename",
       "aspectRatio": "Format",
+      "reset": "Undo",
       "exportSelectedPdf": "Selection → PDF",
       "exportAllPdf": "All → PDF",
       "save": "Save As…"
@@ -23,6 +24,7 @@
       "deleteSelected": "Delete selection",
       "bulkRename": "Rename selected images sequentially",
       "aspectRatio": "Adjust aspect ratio of selected images",
+      "reset": "Undo all edits of selected images",
       "exportSelectedPdf": "Export selection as PDF",
       "exportAllPdf": "Export all images as PDF",
       "saveSelected": "Save selected images in multiple formats",
@@ -69,6 +71,7 @@
     "rotated": "{count} image(s) rotated",
     "flipped": "{count} image(s) flipped",
     "cropped": "{count} image(s) cropped",
+    "reset": "{count} image(s) reset",
     "bulkRenamed": "{count} image(s) renamed"
   },
   "alerts": {

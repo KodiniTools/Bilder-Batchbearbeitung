@@ -52,7 +52,7 @@ export class ImageProcessor {
         image.onload = () => {
           const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
-          
+
           if (!ctx) {
             reject(new Error('Canvas 2D Kontext nicht verfügbar'))
             return
@@ -62,12 +62,22 @@ export class ImageProcessor {
           canvas.height = image.height
           ctx.drawImage(image, 0, 0)
 
+          // Original-Canvas für Rückgängig-Funktion erstellen
+          const originalCanvas = document.createElement('canvas')
+          originalCanvas.width = image.width
+          originalCanvas.height = image.height
+          const originalCtx = originalCanvas.getContext('2d')
+          if (originalCtx) {
+            originalCtx.drawImage(image, 0, 0)
+          }
+
           const imageObj: ImageObject = {
             id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
             file,
             image,
             canvas,
             ctx,
+            originalCanvas,
             originalWidth: image.width,
             originalHeight: image.height,
             selected: false,
@@ -314,6 +324,22 @@ export class ImageProcessor {
     canvas.height = cropHeight
     ctx.clearRect(0, 0, cropWidth, cropHeight)
     ctx.drawImage(tempCanvas, 0, 0)
+  }
+
+  /**
+   * Setzt ein Bild auf seinen ursprünglichen Zustand zurück
+   */
+  static resetToOriginal(imageObj: ImageObject): void {
+    const { canvas, ctx, originalCanvas } = imageObj
+    if (!canvas || !ctx || !originalCanvas) return
+
+    // Canvas auf Original-Größe setzen
+    canvas.width = originalCanvas.width
+    canvas.height = originalCanvas.height
+
+    // Original-Inhalt wiederherstellen
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(originalCanvas, 0, 0)
   }
 
   /**

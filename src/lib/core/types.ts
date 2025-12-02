@@ -13,6 +13,7 @@ export interface ImageObject {
   image: HTMLImageElement
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
+  originalCanvas: HTMLCanvasElement
   originalWidth: number
   originalHeight: number
   selected: boolean
