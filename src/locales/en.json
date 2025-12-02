@@ -13,6 +13,7 @@
       "selectAll": "Toggle All",
       "delete": "Delete",
       "bulkRename": "Rename",
+      "aspectRatio": "Format",
       "exportSelectedPdf": "Selection → PDF",
       "exportAllPdf": "All → PDF",
       "save": "Save As…"
@@ -21,6 +22,7 @@
       "selectAll": "Select/Deselect all",
       "deleteSelected": "Delete selection",
       "bulkRename": "Rename selected images sequentially",
+      "aspectRatio": "Adjust aspect ratio of selected images",
       "exportSelectedPdf": "Export selection as PDF",
       "exportAllPdf": "Export all images as PDF",
       "saveSelected": "Save selected images in multiple formats",
@@ -66,6 +68,7 @@
     "copied": "Copied to clipboard",
     "rotated": "{count} image(s) rotated",
     "flipped": "{count} image(s) flipped",
+    "cropped": "{count} image(s) cropped",
     "bulkRenamed": "{count} image(s) renamed"
   },
   "alerts": {

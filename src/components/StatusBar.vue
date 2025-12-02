@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
@@ -6,6 +7,9 @@ import { useToast } from '@/composables/useToast'
 const imageStore = useImageStore()
 const { t } = useI18n()
 const toast = useToast()
+
+// Dropdown für Seitenverhältnis
+const isAspectRatioDropdownOpen = ref(false)
 
 const emit = defineEmits<{
   'export-pdf': ['all' | 'selected']
@@ -66,6 +70,21 @@ const handleFlipV = () => {
 
 const handleBulkRename = () => {
   emit('bulk-rename')
+}
+
+// Seitenverhältnis-Funktionen
+const toggleAspectRatioDropdown = () => {
+  isAspectRatioDropdownOpen.value = !isAspectRatioDropdownOpen.value
+}
+
+const closeAspectRatioDropdown = () => {
+  isAspectRatioDropdownOpen.value = false
+}
+
+const handleCropToAspectRatio = (ratio: number) => {
+  imageStore.cropSelectedImagesToAspectRatio(ratio)
+  toast.success(t('toast.cropped', { count: imageStore.selectedCount }))
+  closeAspectRatioDropdown()
 }
 </script>
 
@@ -133,6 +152,33 @@ const handleBulkRename = () => {
       >
         <i class="fa-solid fa-arrows-up-down"></i>
       </button>
+    </div>
+
+    <!-- Seitenverhältnis Dropdown -->
+    <div class="dropdown-wrapper" v-if="imageStore.hasSelection">
+      <button
+        class="btn"
+        @click="toggleAspectRatioDropdown"
+        :title="t('statusBar.tooltips.aspectRatio')"
+      >
+        <i class="fa-solid fa-crop"></i>
+        <span>{{ t('statusBar.buttons.aspectRatio') }}</span>
+        <i class="fa-solid fa-chevron-down dropdown-icon" :class="{ 'dropdown-open': isAspectRatioDropdownOpen }"></i>
+      </button>
+      <div class="dropdown-menu" v-if="isAspectRatioDropdownOpen" @mouseleave="closeAspectRatioDropdown">
+        <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
+          <i class="fa-solid fa-square"></i>
+          <span>1:1</span>
+        </button>
+        <button class="dropdown-item" @click="handleCropToAspectRatio(16/9)">
+          <i class="fa-solid fa-rectangle-wide"></i>
+          <span>16:9</span>
+        </button>
+        <button class="dropdown-item" @click="handleCropToAspectRatio(2/3)">
+          <i class="fa-solid fa-rectangle-portrait"></i>
+          <span>2:3</span>
+        </button>
+      </div>
     </div>
 
     <!-- Batch-Umbenennung Button -->
@@ -301,6 +347,81 @@ const handleBulkRename = () => {
   font-size: 1rem;
 }
 
+/* Dropdown Styles */
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-icon {
+  font-size: 0.75rem;
+  margin-left: 4px;
+  transition: transform 0.2s var(--ease-smooth);
+}
+
+.dropdown-icon.dropdown-open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 140px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--surface-elevation);
+  z-index: 100;
+  overflow: hidden;
+  animation: dropdown-appear 0.2s var(--ease-smooth);
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: color-mix(in oklab, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.dropdown-item i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  color: var(--muted);
+  transition: color 0.2s var(--ease-smooth);
+}
+
+.dropdown-item:hover i {
+  color: var(--accent);
+}
+
 @media (max-width: 768px) {
   .status-bar {
     flex-direction: column;
@@ -328,6 +449,21 @@ const handleBulkRename = () => {
   .btn-group .btn-icon {
     flex: 1;
     max-width: 60px;
+  }
+
+  .dropdown-wrapper {
+    width: 100%;
+  }
+
+  .dropdown-wrapper .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dropdown-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
   }
 }
 </style>
