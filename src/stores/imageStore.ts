@@ -121,6 +121,14 @@ export const useImageStore = defineStore('images', () => {
     })
   }
 
+  // Batch-Zuschneiden auf Seitenverhältnis für alle ausgewählten Bilder
+  function cropSelectedImagesToAspectRatio(aspectRatio: number): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      ImageProcessor.cropToAspectRatio(img, aspectRatio)
+    })
+  }
+
   // Batch-Umbenennung für alle ausgewählten Bilder
   function batchRenameSelectedImages(baseName: string, startNumber: number = 1): number {
     // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
@@ -173,6 +181,7 @@ export const useImageStore = defineStore('images', () => {
     moveImage,
     rotateSelectedImages,
     flipSelectedImages,
+    cropSelectedImagesToAspectRatio,
     batchRenameSelectedImages,
     $reset
   }

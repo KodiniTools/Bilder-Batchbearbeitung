@@ -264,6 +264,59 @@ export class ImageProcessor {
   }
 
   /**
+   * Schneidet ein Bild auf ein bestimmtes Seitenverhältnis zu (zentriert)
+   * @param imageObj Das Bild-Objekt
+   * @param aspectRatio Das Seitenverhältnis als Zahl (Breite/Höhe), z.B. 1 für 1:1, 16/9 für 16:9
+   */
+  static cropToAspectRatio(imageObj: ImageObject, aspectRatio: number): void {
+    const { canvas, ctx } = imageObj
+    if (!canvas || !ctx) return
+
+    const currentWidth = canvas.width
+    const currentHeight = canvas.height
+    const currentAspect = currentWidth / currentHeight
+
+    let cropWidth: number
+    let cropHeight: number
+    let offsetX: number
+    let offsetY: number
+
+    if (currentAspect > aspectRatio) {
+      // Bild ist breiter als gewünscht -> Seiten abschneiden
+      cropHeight = currentHeight
+      cropWidth = Math.round(currentHeight * aspectRatio)
+      offsetX = Math.round((currentWidth - cropWidth) / 2)
+      offsetY = 0
+    } else {
+      // Bild ist höher als gewünscht -> Oben/Unten abschneiden
+      cropWidth = currentWidth
+      cropHeight = Math.round(currentWidth / aspectRatio)
+      offsetX = 0
+      offsetY = Math.round((currentHeight - cropHeight) / 2)
+    }
+
+    // Temporäres Canvas für den Ausschnitt erstellen
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = cropWidth
+    tempCanvas.height = cropHeight
+    const tempCtx = tempCanvas.getContext('2d')
+    if (!tempCtx) return
+
+    // Ausschnitt auf temporäres Canvas zeichnen
+    tempCtx.drawImage(
+      canvas,
+      offsetX, offsetY, cropWidth, cropHeight,  // Quellbereich
+      0, 0, cropWidth, cropHeight               // Zielbereich
+    )
+
+    // Original-Canvas auf neue Größe setzen
+    canvas.width = cropWidth
+    canvas.height = cropHeight
+    ctx.clearRect(0, 0, cropWidth, cropHeight)
+    ctx.drawImage(tempCanvas, 0, 0)
+  }
+
+  /**
    * Hilfsfunktion: Extrahiert Dateiname ohne Erweiterung
    */
   static getFileNameWithoutExtension(fileName: string): string {
