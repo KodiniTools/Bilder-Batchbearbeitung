@@ -129,6 +129,14 @@ export const useImageStore = defineStore('images', () => {
     })
   }
 
+  // Alle Bearbeitungen der ausgewählten Bilder rückgängig machen
+  function resetSelectedImages(): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      ImageProcessor.resetToOriginal(img)
+    })
+  }
+
   // Batch-Umbenennung für alle ausgewählten Bilder
   function batchRenameSelectedImages(baseName: string, startNumber: number = 1): number {
     // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
@@ -182,6 +190,7 @@ export const useImageStore = defineStore('images', () => {
     rotateSelectedImages,
     flipSelectedImages,
     cropSelectedImagesToAspectRatio,
+    resetSelectedImages,
     batchRenameSelectedImages,
     $reset
   }
