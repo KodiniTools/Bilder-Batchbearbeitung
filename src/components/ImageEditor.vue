@@ -251,7 +251,19 @@ const dimensions = computed(() => {
 
 const fileSize = computed(() => {
   if (!originalImageObj) return '0 KB'
-  return ImageProcessor.formatFileSize(originalImageObj.file.size)
+
+  const originalSize = originalImageObj.file.size
+  const originalPixels = originalImageObj.canvas.width * originalImageObj.canvas.height
+
+  // Berechne geschätzte Größe basierend auf den neuen Dimensionen
+  const newWidth = resizeWidth.value || originalImageObj.canvas.width
+  const newHeight = resizeHeight.value || originalImageObj.canvas.height
+  const newPixels = newWidth * newHeight
+
+  // Geschätzte Größe basierend auf Pixel-Verhältnis
+  const estimatedSize = Math.round(originalSize * (newPixels / originalPixels))
+
+  return ImageProcessor.formatFileSize(estimatedSize)
 })
 
 const availableFormats = computed(() => {
