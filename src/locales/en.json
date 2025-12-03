@@ -81,7 +81,15 @@
     "fileLoadError": "Could not load the file {fileName}.",
     "fileReadError": "Could not read the file {fileName}.",
     "noSelection": "No images selected.",
-    "confirmDelete": "Really delete {count} image(s)?"
+    "confirmDelete": "Really delete {count} image(s)?",
+    "noImagesToExport": "No images selected to export.",
+    "noImagesAvailable": "No images available to export.",
+    "noImagesToSave": "No images selected to save.",
+    "cannotDeleteLastPage": "You cannot delete the last page.",
+    "confirmDeletePage": "Do you really want to delete page {page}?",
+    "downloadError": "Error creating the image: {error}",
+    "unknownError": "Unknown error",
+    "confirmClearPage": "Do you really want to delete all elements from page {page}?"
   },
   "consent": {
     "text": "We use anonymous usage statistics to improve the app. May we collect this data?",
