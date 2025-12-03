@@ -90,17 +90,18 @@ const handleDrop = (event: DragEvent) => {
   padding: var(--space-6);
   border: 2px dashed color-mix(in oklab, var(--border-color) 50%, transparent);
   border-radius: var(--radius-2xl);
-  background: 
-    linear-gradient(135deg, 
+  background:
+    linear-gradient(135deg,
       color-mix(in oklab, var(--panel) 60%, transparent) 0%,
       color-mix(in oklab, var(--panel) 30%, transparent) 100%),
-    radial-gradient(circle at center, 
+    radial-gradient(circle at center,
       color-mix(in oklab, var(--accent) 4%, transparent) 0%,
       transparent 70%);
   color: var(--muted);
   transition: all 0.4s var(--ease-spring);
   cursor: pointer;
   position: relative;
+  z-index: 1;
   overflow: hidden;
   margin-bottom: var(--space-7);
 }
