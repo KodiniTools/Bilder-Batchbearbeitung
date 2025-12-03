@@ -240,19 +240,23 @@ const keepAspectRatio = ref(true)
 const selectedFormat = ref('image/png')
 const isDownloading = ref(false)
 
+// Reaktive Variablen für die aktuelle Canvas-Größe
+const currentWidth = ref(0)
+const currentHeight = ref(0)
+
 let workingCanvas: HTMLCanvasElement | null = null
 let originalCanvas: HTMLCanvasElement | null = null
 let originalImageObj: ImageObject | null = null
 let aspectRatio = 1
 
 const dimensions = computed(() => {
-  if (!workingCanvas) return '0 × 0 px'
-  return `${workingCanvas.width} × ${workingCanvas.height} px`
+  if (currentWidth.value === 0 || currentHeight.value === 0) return '0 × 0 px'
+  return `${currentWidth.value} × ${currentHeight.value} px`
 })
 
 const fileSize = computed(() => {
-  if (!workingCanvas) return '0 KB'
-  const estimatedSize = workingCanvas.width * workingCanvas.height * 4
+  if (currentWidth.value === 0 || currentHeight.value === 0) return '0 KB'
+  const estimatedSize = currentWidth.value * currentHeight.value * 4
   return ImageProcessor.formatFileSize(estimatedSize)
 })
 
@@ -321,6 +325,10 @@ function initializeEditor(image: ImageObject) {
 
 function updatePreview() {
   if (!previewCanvas.value || !workingCanvas) return
+
+  // Reaktive Größen-Variablen aktualisieren
+  currentWidth.value = workingCanvas.width
+  currentHeight.value = workingCanvas.height
 
   const container = previewCanvas.value.parentElement
   if (!container) return
@@ -563,7 +571,7 @@ function closeEditor() {
 }
 
 .modal-container {
-  background: var(--card-bg);
+  background: var(--panel);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   max-width: 900px;
@@ -619,7 +627,7 @@ function closeEditor() {
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  background: var(--card-bg);
+  background: var(--bg);
   border: 2px dashed var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
@@ -657,7 +665,7 @@ function closeEditor() {
   padding: var(--space-3);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  background: var(--card-bg);
+  background: var(--bg);
   color: var(--text);
   font-size: 1rem;
 }
@@ -728,7 +736,7 @@ function closeEditor() {
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  background: var(--card-bg);
+  background: var(--btn);
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
