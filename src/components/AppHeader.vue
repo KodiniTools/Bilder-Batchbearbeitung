@@ -31,7 +31,7 @@ const setLanguage = (lang: string) => {
           class="lang-toggle"
           :class="{ active: locale === 'de' }"
           @click="setLanguage('de')"
-          title="Sprache auf Deutsch ändern"
+          :title="t('header.langDE')"
         >
           DE
         </button>
@@ -39,7 +39,7 @@ const setLanguage = (lang: string) => {
           class="lang-toggle"
           :class="{ active: locale === 'en' }"
           @click="setLanguage('en')"
-          title="Switch language to English"
+          :title="t('header.langEN')"
         >
           EN
         </button>

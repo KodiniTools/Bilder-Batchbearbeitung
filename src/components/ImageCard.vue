@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageStore } from '@/stores/imageStore'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   image: ImageObject
@@ -135,18 +138,18 @@ onMounted(() => {
         type="button"
         class="image-action-btn remove-btn"
         @click="handleRemove"
-        title="Bild entfernen"
-        aria-label="Bild entfernen"
+        :title="t('imageCard.remove')"
+        :aria-label="t('imageCard.remove')"
       >
         <i class="fas fa-times"></i>
       </button>
-      
+
       <button
         type="button"
         class="image-action-btn edit-btn"
         @click="handleEdit"
-        title="Bearbeiten & Exportieren"
-        aria-label="Bearbeiten"
+        :title="t('imageCard.edit')"
+        :aria-label="t('imageCard.edit')"
       >
         <i class="fa-solid fa-wand-magic-sparkles"></i>
       </button>

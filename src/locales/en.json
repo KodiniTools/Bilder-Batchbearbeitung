@@ -4,7 +4,10 @@
     "description": "Edit, convert, and export your images directly in the browser. Fast, private, and modern."
   },
   "header": {
-    "title": "Modern Image Editor"
+    "title": "Modern Image Editor",
+    "langDE": "Switch language to German",
+    "langEN": "Switch language to English",
+    "themeToggle": "Toggle theme"
   },
   "statusBar": {
     "images": "Images",
@@ -40,15 +43,23 @@
     "button": "Select Files"
   },
   "emptyState": {
-    "title": "No images yet.",
-    "text": "Drag files here or select them using the button."
+    "title": "No images loaded",
+    "text": "Drag images here or click to upload"
   },
   "pdfModal": {
     "title": "PDF Export",
     "confirm": "Start Export"
   },
   "buttons": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "imageCard": {
+    "remove": "Remove image",
+    "edit": "Edit and Export"
+  },
+  "accessibility": {
+    "dropzone": "Drag files here or click to select images"
   },
   "loading": {
     "text": "Please wait…",

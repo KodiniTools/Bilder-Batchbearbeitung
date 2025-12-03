@@ -4,7 +4,10 @@
     "description": "Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern."
   },
   "header": {
-    "title": "Moderne Bild-Bearbeitung"
+    "title": "Moderne Bild-Bearbeitung",
+    "langDE": "Sprache auf Deutsch ändern",
+    "langEN": "Sprache auf Englisch ändern",
+    "themeToggle": "Design umschalten"
   },
   "statusBar": {
     "images": "Bilder",
@@ -40,15 +43,23 @@
     "button": "Dateien auswählen"
   },
   "emptyState": {
-    "title": "Noch keine Bilder.",
-    "text": "Ziehen Sie Dateien hierher oder wählen Sie diese über die Schaltfläche aus."
+    "title": "Keine Bilder geladen",
+    "text": "Ziehen Sie Bilder hierher oder klicken Sie zum Hochladen"
   },
   "pdfModal": {
     "title": "PDF-Export",
     "confirm": "Export starten"
   },
   "buttons": {
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "close": "Schließen"
+  },
+  "imageCard": {
+    "remove": "Bild entfernen",
+    "edit": "Bearbeiten und Exportieren"
+  },
+  "accessibility": {
+    "dropzone": "Dateien hierher ziehen oder klicken, um Bilder auszuwählen"
   },
   "loading": {
     "text": "Bitte warten…",

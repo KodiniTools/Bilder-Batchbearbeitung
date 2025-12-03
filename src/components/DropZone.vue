@@ -59,7 +59,7 @@ const handleDrop = (event: DragEvent) => {
     @dragover="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
-    aria-label="Dateien hierher ziehen oder klicken um Bilder auszuwählen"
+    :aria-label="t('accessibility.dropzone')"
   >
     <div class="upload-icon" aria-hidden="true">
       <i class="fa-solid fa-cloud-arrow-up"></i>
