@@ -391,8 +391,8 @@ onUnmounted(() => {
           <i class="fa-regular fa-image"></i>
         </div>
         <div>
-          <strong>Keine Bilder geladen</strong>
-          <span>Ziehen Sie Bilder hierher oder klicken Sie zum Hochladen</span>
+          <strong>{{ t('emptyState.title') }}</strong>
+          <span>{{ t('emptyState.text') }}</span>
         </div>
       </div>
       
