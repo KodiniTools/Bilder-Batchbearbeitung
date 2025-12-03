@@ -72,7 +72,8 @@
     "flipped": "{count} Bild(er) gespiegelt",
     "cropped": "{count} Bild(er) zugeschnitten",
     "reset": "{count} Bild(er) zurückgesetzt",
-    "bulkRenamed": "{count} Bild(er) umbenannt"
+    "bulkRenamed": "{count} Bild(er) umbenannt",
+    "changesApplied": "Änderungen wurden übernommen"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",

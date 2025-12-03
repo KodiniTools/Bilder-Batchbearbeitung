@@ -72,7 +72,8 @@
     "flipped": "{count} image(s) flipped",
     "cropped": "{count} image(s) cropped",
     "reset": "{count} image(s) reset",
-    "bulkRenamed": "{count} image(s) renamed"
+    "bulkRenamed": "{count} image(s) renamed",
+    "changesApplied": "Changes have been applied"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
