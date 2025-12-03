@@ -87,7 +87,7 @@ function handleExportPdf(mode: 'all' | 'selected') {
     : imageStore.images.filter(img => img.selected)
   
   if (images.length === 0) {
-    alert('Keine Bilder zum Exportieren ausgewählt')
+    alert(t('alerts.noImagesToExport'))
     return
   }
 
@@ -97,7 +97,7 @@ function handleExportPdf(mode: 'all' | 'selected') {
 
 function handleExportZip() {
   if (imageStore.imageCount === 0) {
-    alert('Keine Bilder zum Exportieren vorhanden')
+    alert(t('alerts.noImagesAvailable'))
     return
   }
 
@@ -280,7 +280,7 @@ async function handleSaveImages() {
   const images = imageStore.images.filter(img => img.selected)
 
   if (images.length === 0) {
-    alert('Keine Bilder zum Speichern ausgewählt')
+    alert(t('alerts.noImagesToSave'))
     return
   }
 

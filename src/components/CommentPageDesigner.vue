@@ -550,11 +550,11 @@ function addNewPage() {
 
 function deletePage() {
   if (pages.value.length === 1) {
-    alert('Du kannst die letzte Seite nicht löschen!');
+    alert(t('alerts.cannotDeleteLastPage'));
     return;
   }
-  
-  if (confirm(`Möchtest du Seite ${currentPageIndex.value + 1} wirklich löschen?`)) {
+
+  if (confirm(t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }))) {
     pages.value.splice(currentPageIndex.value, 1);
     
     if (currentPageIndex.value >= pages.value.length) {
@@ -634,7 +634,7 @@ function handleImageUpload(event) {
 }
 
 function clearCurrentPage() {
-  if (confirm(`Möchtest du alle Elemente von Seite ${currentPageIndex.value + 1} wirklich löschen?`)) {
+  if (confirm(t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }))) {
     currentElements.value.length = 0;
     selectedElement.value = null;
   }

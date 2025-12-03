@@ -81,7 +81,15 @@
     "fileLoadError": "Die Datei {fileName} konnte nicht geladen werden.",
     "fileReadError": "Die Datei {fileName} konnte nicht gelesen werden.",
     "noSelection": "Keine Bilder ausgewählt.",
-    "confirmDelete": "{count} Bild(er) wirklich löschen?"
+    "confirmDelete": "{count} Bild(er) wirklich löschen?",
+    "noImagesToExport": "Keine Bilder zum Exportieren ausgewählt.",
+    "noImagesAvailable": "Keine Bilder zum Exportieren vorhanden.",
+    "noImagesToSave": "Keine Bilder zum Speichern ausgewählt.",
+    "cannotDeleteLastPage": "Sie können die letzte Seite nicht löschen.",
+    "confirmDeletePage": "Möchten Sie Seite {page} wirklich löschen?",
+    "downloadError": "Fehler beim Erstellen des Bildes: {error}",
+    "unknownError": "Unbekannter Fehler",
+    "confirmClearPage": "Möchten Sie alle Elemente von Seite {page} wirklich löschen?"
   },
   "consent": {
     "text": "Wir nutzen anonyme Nutzungsstatistiken, um die App zu verbessern. Dürfen wir diese Daten erheben?",
@@ -96,7 +104,7 @@
   },
   "donate": {
     "title": "Unterstützen Sie dieses Projekt",
-    "text": "Wenn dir dieses Projekt gefällt und du die Entwicklung unterstützen möchtest, freue ich mich über eine Spende:",
+    "text": "Wenn Ihnen dieses Projekt gefällt und Sie die Entwicklung unterstützen möchten, freue ich mich über eine Spende:",
     "button": "Mit PayPal spenden"
   },
   "faq": {
@@ -154,7 +162,7 @@
     "pdf": {
       "title": "PDF-Einstellungen",
       "documentTitle": "Dokumenttitel",
-      "documentTitlePlaceholder": "z.B. Urlaubsfotos 2025",
+      "documentTitlePlaceholder": "z. B. Urlaubsfotos 2025",
       "author": "Autor (optional)",
       "authorPlaceholder": "Ihr Name",
       "orientation": {
@@ -389,7 +397,7 @@
     "close": "Schließen",
     "baseName": {
       "label": "Basisname",
-      "placeholder": "z.B. Urlaub, Projekt, Foto",
+      "placeholder": "z. B. Urlaub, Projekt, Foto",
       "hint": "Die Bilder werden nach diesem Muster benannt: Basisname_1, Basisname_2, ..."
     },
     "startNumber": {

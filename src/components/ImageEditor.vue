@@ -504,8 +504,9 @@ async function downloadImage() {
     a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (error) {
-    console.error('Download-Fehler:', error)
-    alert('Fehler beim Erstellen des Bildes: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler'))
+    console.error('Download error:', error)
+    const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
+    alert(t('alerts.downloadError', { error: errorMessage }))
   } finally {
     isDownloading.value = false
   }
