@@ -133,28 +133,21 @@
                   </div>
                   
                   <div class="checkbox-group">
-                    <input 
+                    <input
                       id="keepAspectRatio"
                       v-model="keepAspectRatio"
                       type="checkbox"
                     >
                     <label for="keepAspectRatio">{{ t('imageEditor.resize.keepAspectRatio') }}</label>
                   </div>
-                  
+
                   <div class="button-group">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       class="btn btn-sm"
                       @click="resetSize"
                     >
                       <i class="fa-solid fa-arrow-rotate-left"></i> {{ t('imageEditor.resize.resetSize') }}
-                    </button>
-                    <button 
-                      type="button" 
-                      class="btn btn-sm"
-                      @click="applyResize"
-                    >
-                      <i class="fa-solid fa-check"></i> {{ t('imageEditor.resize.applyResize') }}
                     </button>
                   </div>
                 </div>
@@ -216,8 +209,10 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { useToast } from '@/composables/useToast'
 
 const { t } = useI18n()
+const toast = useToast()
 
 interface Props {
   image: ImageObject | null
@@ -255,9 +250,8 @@ const dimensions = computed(() => {
 })
 
 const fileSize = computed(() => {
-  if (currentWidth.value === 0 || currentHeight.value === 0) return '0 KB'
-  const estimatedSize = currentWidth.value * currentHeight.value * 4
-  return ImageProcessor.formatFileSize(estimatedSize)
+  if (!originalImageObj) return '0 KB'
+  return ImageProcessor.formatFileSize(originalImageObj.file.size)
 })
 
 const availableFormats = computed(() => {
@@ -530,6 +524,29 @@ function resetToOriginal() {
 function saveChanges() {
   if (!props.image || !workingCanvas) return
 
+  // Größenänderung anwenden, falls geändert
+  const newWidth = resizeWidth.value || workingCanvas.width
+  const newHeight = resizeHeight.value || workingCanvas.height
+
+  if (newWidth > 0 && newHeight > 0 &&
+      (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)) {
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = newWidth
+    tempCanvas.height = newHeight
+    const tempCtx = tempCanvas.getContext('2d')
+    if (tempCtx) {
+      tempCtx.drawImage(workingCanvas, 0, 0, workingCanvas.width, workingCanvas.height, 0, 0, newWidth, newHeight)
+
+      workingCanvas.width = newWidth
+      workingCanvas.height = newHeight
+      const ctx = workingCanvas.getContext('2d')
+      if (ctx) {
+        ctx.clearRect(0, 0, newWidth, newHeight)
+        ctx.drawImage(tempCanvas, 0, 0)
+      }
+    }
+  }
+
   // Copy working canvas back to original image object
   props.image.canvas.width = workingCanvas.width
   props.image.canvas.height = workingCanvas.height
@@ -546,6 +563,7 @@ function saveChanges() {
   }
 
   emit('save', props.image)
+  toast.success(t('toast.changesApplied'))
   closeEditor()
 }
 
