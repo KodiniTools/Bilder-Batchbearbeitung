@@ -118,21 +118,9 @@ html, body {
 }
 
 /* =============================
-   Lowercase Styling
+   Typography - Korrekte Groß-/Kleinschreibung beibehalten
+   (text-transform: lowercase entfernt - verstößt gegen deutsche Rechtschreibung)
    ============================= */
-h1, h2, h3, h4, h5, h6,
-button,
-.btn,
-label,
-.app-title,
-.upload-text,
-.status-bar,
-[class*="toggle"],
-[class*="action"],
-.modal-title,
-.section-title {
-  text-transform: lowercase;
-}
 
 body {
   margin: 0;
