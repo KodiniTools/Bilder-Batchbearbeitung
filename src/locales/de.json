@@ -41,7 +41,7 @@
   },
   "emptyState": {
     "title": "Noch keine Bilder.",
-    "text": "Ziehe Dateien hierher oder wähle sie über den Button aus."
+    "text": "Ziehen Sie Dateien hierher oder wählen Sie diese über die Schaltfläche aus."
   },
   "pdfModal": {
     "title": "PDF-Export",
@@ -115,11 +115,11 @@
     },
     "q1": {
       "question": "Wie füge ich Bilder hinzu?",
-      "answer": "Sie können Bilder einfach per Drag & Drop in den markierten Bereich ziehen oder auf den Button \"Dateien auswählen\" klicken, um sie von Ihrem Gerät hochzuladen."
+      "answer": "Sie können Bilder einfach per Drag-and-Drop in den markierten Bereich ziehen oder auf die Schaltfläche \"Dateien auswählen\" klicken, um sie von Ihrem Gerät hochzuladen."
     },
     "q2": {
       "question": "Wie kann ich ein einzelnes Bild bearbeiten?",
-      "answer": "Klicken Sie auf den Zauberstab-Button (<i class=\"fa-solid fa-wand-magic-sparkles\"></i>) auf einer Bildkarte. Es öffnet sich ein Fenster mit allen Bearbeitungsoptionen wie Drehen, Spiegeln, Größe ändern oder Filter anwenden."
+      "answer": "Klicken Sie auf die Zauberstab-Schaltfläche (<i class=\"fa-solid fa-wand-magic-sparkles\"></i>) auf einer Bildkarte. Es öffnet sich ein Fenster mit allen Bearbeitungsoptionen wie Drehen, Spiegeln, Größe ändern oder Filter anwenden."
     },
     "q3": {
       "question": "Wie speichere ich die bearbeiteten Bilder?",
@@ -131,7 +131,7 @@
     },
     "q5": {
       "question": "Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?",
-      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf den \"ZIP\"-Button in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
+      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf die Schaltfläche \"ZIP\" in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
     },
     "q6": {
       "question": "Wie erstelle ich eine PDF-Datei aus meinen Bildern?",
@@ -143,7 +143,7 @@
     },
     "q8": {
       "question": "Wie entferne ich Bilder aus der Liste?",
-      "answer": "Um ein einzelnes Bild zu entfernen, klicken Sie auf das rote X-Symbol auf der Bildkarte. Um mehrere Bilder zu löschen, wählen Sie diese aus und klicken Sie auf den \"Löschen\"-Button in der Werkzeugleiste."
+      "answer": "Um ein einzelnes Bild zu entfernen, klicken Sie auf das rote X-Symbol auf der Bildkarte. Um mehrere Bilder zu löschen, wählen Sie diese aus und klicken Sie auf die Schaltfläche \"Löschen\" in der Werkzeugleiste."
     }
   },
   "exportModal": {
@@ -209,7 +209,7 @@
     "zip": {
       "title": "ZIP-Einstellungen",
       "fileName": "Dateiname",
-      "fileNamePlaceholder": "bilder",
+      "fileNamePlaceholder": "Bilder",
       "fileNameHint": "Automatisch mit Datum: {name}_2025-10-14.zip"
     },
     "format": {
@@ -277,7 +277,7 @@
     }
   },
   "commentPageDesigner": {
-    "title": "Kommentarseite Designer (Multi-Page)",
+    "title": "Kommentarseiten-Designer (mehrseitig)",
     "close": "Schließen",
     "pageManagement": {
       "title": "Seiten verwalten",
@@ -322,7 +322,7 @@
       "toBackTooltip": "Nach hinten",
       "toBackButton": "Hinten",
       "deleteElement": "Element löschen",
-      "noSelection": "Klicke auf ein Element, um es zu bearbeiten"
+      "noSelection": "Klicken Sie auf ein Element, um es zu bearbeiten"
     },
     "zoom": {
       "zoomOut": "Verkleinern",
