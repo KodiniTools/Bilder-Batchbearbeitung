@@ -265,6 +265,7 @@ const handleReset = () => {
     var(--surface-elevation),
     inset 0 1px 0 color-mix(in oklab, white 15%, transparent);
   position: relative;
+  z-index: 10;
   overflow: visible;
 }
 
