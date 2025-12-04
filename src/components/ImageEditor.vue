@@ -20,9 +20,10 @@
               <div class="editor-section">
                 <h3>{{ t('imageEditor.sections.preview') }}</h3>
                 <div class="preview-container">
-                  <canvas 
-                    ref="previewCanvas" 
+                  <canvas
+                    ref="previewCanvas"
                     class="editor-preview-canvas"
+                    :style="filterStyle"
                   ></canvas>
                 </div>
                 <div class="image-info">
@@ -208,6 +209,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
+import { defaultFilters } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
 
@@ -267,9 +269,25 @@ const fileSize = computed(() => {
 })
 
 const availableFormats = computed(() => {
-  return ImageProcessor.availableFormats.filter(format => 
+  return ImageProcessor.availableFormats.filter(format =>
     ImageProcessor.supportsFormat(format.mimeType)
   )
+})
+
+// Computed CSS filter string based on image filters
+const filterStyle = computed(() => {
+  if (!props.image) return {}
+  const f = props.image.filters || defaultFilters
+  return {
+    filter: `
+      brightness(${f.brightness}%)
+      contrast(${f.contrast}%)
+      saturate(${f.saturation}%)
+      hue-rotate(${f.hue}deg)
+      blur(${f.blur}px)
+    `.trim(),
+    opacity: f.opacity / 100
+  }
 })
 
 watch(() => props.image, (newImage) => {

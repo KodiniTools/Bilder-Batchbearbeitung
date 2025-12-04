@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
+import { defaultFilters } from '@/lib/core/types'
 
 const props = defineProps<{
   image: ImageObject | null
@@ -15,13 +16,29 @@ const previewCanvas = ref<HTMLCanvasElement | null>(null)
 
 const imageFormat = computed(() => {
   if (!props.image) return ''
-  
+
   // Try exportFormat first, then extract from filename
-  const format = props.image.exportFormat || 
-                 props.image.file.name.split('.').pop()?.toUpperCase() || 
+  const format = props.image.exportFormat ||
+                 props.image.file.name.split('.').pop()?.toUpperCase() ||
                  'UNKNOWN'
-  
+
   return format.toUpperCase()
+})
+
+// Computed CSS filter string based on image filters
+const filterStyle = computed(() => {
+  if (!props.image) return {}
+  const f = props.image.filters || defaultFilters
+  return {
+    filter: `
+      brightness(${f.brightness}%)
+      contrast(${f.contrast}%)
+      saturate(${f.saturation}%)
+      hue-rotate(${f.hue}deg)
+      blur(${f.blur}px)
+    `.trim(),
+    opacity: f.opacity / 100
+  }
 })
 
 function updatePreview() {
@@ -98,7 +115,7 @@ onUnmounted(() => {
         </div>
         
         <div class="preview-content">
-          <canvas ref="previewCanvas"></canvas>
+          <canvas ref="previewCanvas" :style="filterStyle"></canvas>
         </div>
         
         <div class="preview-info" v-if="image">
