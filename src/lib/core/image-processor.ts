@@ -1,7 +1,8 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageObject } from './types'
+import type { ImageFormat, ImageObject, ImageFilters } from './types'
+import { defaultFilters } from './types'
 
 /**
  * Zentrale Klasse für alle Bildverarbeitungsoperationen
@@ -385,5 +386,70 @@ export class ImageProcessor {
       ++u
     } while (bytes >= 1024 && u < units.length - 1)
     return bytes.toFixed(1) + ' ' + units[u]
+  }
+
+  /**
+   * Erstellt ein Canvas mit angewendeten Filtern für den Export
+   * @param imageObj Das Bild-Objekt
+   * @returns Canvas mit angewendeten Filtern
+   */
+  static getCanvasWithFilters(imageObj: ImageObject): HTMLCanvasElement {
+    const { canvas } = imageObj
+    const filters = imageObj.filters || defaultFilters
+
+    // Prüfen ob Filter angewendet werden müssen
+    const hasFilters =
+      filters.brightness !== 100 ||
+      filters.contrast !== 100 ||
+      filters.saturation !== 100 ||
+      filters.hue !== 0 ||
+      filters.opacity !== 100 ||
+      filters.blur !== 0
+
+    if (!hasFilters) {
+      return canvas
+    }
+
+    // Neues Canvas mit Filtern erstellen
+    const filteredCanvas = document.createElement('canvas')
+    filteredCanvas.width = canvas.width
+    filteredCanvas.height = canvas.height
+    const ctx = filteredCanvas.getContext('2d')
+
+    if (!ctx) {
+      return canvas
+    }
+
+    // CSS Filter String erstellen
+    const filterString = [
+      `brightness(${filters.brightness}%)`,
+      `contrast(${filters.contrast}%)`,
+      `saturate(${filters.saturation}%)`,
+      `hue-rotate(${filters.hue}deg)`,
+      `blur(${filters.blur}px)`
+    ].join(' ')
+
+    // Filter anwenden
+    ctx.filter = filterString
+    ctx.globalAlpha = filters.opacity / 100
+    ctx.drawImage(canvas, 0, 0)
+
+    return filteredCanvas
+  }
+
+  /**
+   * Konvertiert ein Bild mit Filtern in Data URL
+   * @param imageObj Das Bild-Objekt
+   * @param format MIME-Type (optional)
+   * @param quality Qualität 0-1 (optional)
+   * @returns Data URL des Bildes mit angewendeten Filtern
+   */
+  static getDataUrlWithFilters(
+    imageObj: ImageObject,
+    format = 'image/png',
+    quality = 0.92
+  ): string {
+    const filteredCanvas = this.getCanvasWithFilters(imageObj)
+    return filteredCanvas.toDataURL(format, quality)
   }
 }

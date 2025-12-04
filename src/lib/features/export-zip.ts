@@ -1,5 +1,6 @@
 // src/lib/features/export-zip.ts
 import type { ImageObject } from '../core/types'
+import { ImageProcessor } from '../core/image-processor'
 
 interface ZipSettings {
   zipName?: string
@@ -53,7 +54,9 @@ export async function exportImagesAsZip(
 
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = format === 'png' ? 1.0 : (quality / 100) || 0.92
-      const blob = await canvasToBlob(image.canvas, exportFormat, exportQuality)
+      // Canvas mit angewendeten Filtern holen
+      const canvasWithFilters = ImageProcessor.getCanvasWithFilters(image)
+      const blob = await canvasToBlob(canvasWithFilters, exportFormat, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
       const fileNameWithExt = fileName.includes('.')
         ? fileName
