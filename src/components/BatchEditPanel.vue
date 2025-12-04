@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
@@ -21,6 +21,9 @@ const toast = useToast()
 // Local filter state
 const filters = ref<ImageFilters>({ ...defaultFilters })
 
+// Debounce timer
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
 // Reset filters when panel opens
 watch(() => props.isOpen, (open) => {
   if (open) {
@@ -28,12 +31,29 @@ watch(() => props.isOpen, (open) => {
   }
 })
 
-// Watch for filter changes and apply immediately
-watch(filters, (newFilters) => {
-  if (props.isOpen && imageStore.hasSelection) {
-    imageStore.applyFiltersToSelectedImages(newFilters)
+// Apply filters with debounce for smooth slider movement
+function applyFiltersDebounced() {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
   }
+  debounceTimer = setTimeout(() => {
+    if (props.isOpen && imageStore.hasSelection) {
+      imageStore.applyFiltersToSelectedImages({ ...filters.value })
+    }
+  }, 16) // ~60fps
+}
+
+// Watch for filter changes and apply with debounce
+watch(filters, () => {
+  applyFiltersDebounced()
 }, { deep: true })
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+})
 
 // Computed for disabled state
 const hasSelection = computed(() => imageStore.hasSelection)

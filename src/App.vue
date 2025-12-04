@@ -15,6 +15,7 @@ import ToastContainer from '@/components/ToastContainer.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
 import type { ImageObject } from '@/lib/core/types'
+import { ImageProcessor } from '@/lib/core/image-processor'
 
 // ✨ VEREINFACHT: Verwende nur noch export-pdf.ts als einziges Export-Modul!
 import { 
@@ -126,12 +127,12 @@ async function handleExportConfirm(settings: ExportSettings) {
         ? imageStore.images
         : imageStore.images.filter(img => img.selected)
 
-      // Bilder in ImageData Format konvertieren
+      // Bilder in ImageData Format konvertieren (mit Filtern!)
       const imageDataArray: ImageData[] = await Promise.all(
         images.map(async (img) => {
-          // Canvas zu Base64 konvertieren
-          const dataUrl = img.canvas.toDataURL('image/png', 0.92)
-          
+          // Canvas zu Base64 konvertieren MIT angewendeten Filtern
+          const dataUrl = ImageProcessor.getDataUrlWithFilters(img, 'image/png', 0.92)
+
           return {
             dataUrl: dataUrl,
             originalName: img.outputName || img.file.name
@@ -240,17 +241,20 @@ function downloadSingleImage(image: ImageObject, format?: string, quality?: numb
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = quality !== undefined ? quality : (image.quality || 0.92)
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
-      
-      image.canvas.toBlob((blob) => {
+
+      // Canvas mit angewendeten Filtern holen
+      const canvasWithFilters = ImageProcessor.getCanvasWithFilters(image)
+
+      canvasWithFilters.toBlob((blob) => {
         if (!blob) {
           reject(new Error('Blob-Konvertierung fehlgeschlagen'))
           return
         }
-        
+
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        
+
         // Dateiname mit richtiger Endung
         let fileName = image.outputName || `bild_${Date.now()}`
         if (!fileName.includes('.')) {
@@ -259,14 +263,14 @@ function downloadSingleImage(image: ImageObject, format?: string, quality?: numb
           // Endung ersetzen
           fileName = fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
         }
-        
+
         link.download = fileName
         link.style.display = 'none'
-        
+
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        
+
         setTimeout(() => {
           URL.revokeObjectURL(url)
           resolve()
