@@ -96,156 +96,162 @@ const handleReset = () => {
 
 <template>
   <div class="status-bar">
-    <span class="stat">
-      <i class="fa-solid fa-images"></i>
-      <strong>{{ imageStore.imageCount }}</strong>
-      <span>{{ t('statusBar.images') }}</span>
-    </span>
-    <span class="stat">
-      <i class="fa-solid fa-check-double"></i>
-      <strong>{{ imageStore.selectedCount }}</strong>
-      <span>{{ t('statusBar.selected') }}</span>
-    </span>
-    
-    <div class="header-spacer"></div>
-    
-    <button
-      class="btn"
-      @click="handleSelectAll"
-      :title="t('statusBar.tooltips.selectAll')"
-    >
-      <i class="fa-solid fa-border-all"></i>
-      <span>{{ t('statusBar.buttons.selectAll') }}</span>
-    </button>
-    
-    <button
-      class="btn"
-      @click="handleDelete"
-      :disabled="!imageStore.hasSelection"
-      :title="t('statusBar.tooltips.deleteSelected')"
-    >
-      <i class="fa-solid fa-trash-can"></i>
-      <span>{{ t('statusBar.buttons.delete') }}</span>
-    </button>
+    <!-- Stats Section -->
+    <div class="toolbar-section stats-section">
+      <span class="stat">
+        <i class="fa-solid fa-images"></i>
+        <strong>{{ imageStore.imageCount }}</strong>
+      </span>
+      <span class="stat stat-selected" :class="{ 'has-selection': imageStore.hasSelection }">
+        <i class="fa-solid fa-check-double"></i>
+        <strong>{{ imageStore.selectedCount }}</strong>
+      </span>
+    </div>
 
-    <!-- Batch-Transformationen Gruppe -->
-    <div class="btn-group" v-if="imageStore.hasSelection">
+    <div class="toolbar-divider"></div>
+
+    <!-- Selection Actions -->
+    <div class="toolbar-section">
       <button
         class="btn btn-icon"
-        @click="handleRotateLeft"
-        :title="t('statusBar.tooltips.rotateLeft')"
+        @click="handleSelectAll"
+        :title="t('statusBar.tooltips.selectAll')"
       >
-        <i class="fa-solid fa-rotate-left"></i>
+        <i class="fa-solid fa-border-all"></i>
       </button>
+
       <button
-        class="btn btn-icon"
-        @click="handleRotateRight"
-        :title="t('statusBar.tooltips.rotateRight')"
+        class="btn btn-icon btn-danger"
+        @click="handleDelete"
+        :disabled="!imageStore.hasSelection"
+        :title="t('statusBar.tooltips.deleteSelected')"
       >
-        <i class="fa-solid fa-rotate-right"></i>
-      </button>
-      <button
-        class="btn btn-icon"
-        @click="handleFlipH"
-        :title="t('statusBar.tooltips.flipH')"
-      >
-        <i class="fa-solid fa-arrows-left-right"></i>
-      </button>
-      <button
-        class="btn btn-icon"
-        @click="handleFlipV"
-        :title="t('statusBar.tooltips.flipV')"
-      >
-        <i class="fa-solid fa-arrows-up-down"></i>
+        <i class="fa-solid fa-trash-can"></i>
       </button>
     </div>
 
-    <!-- Seitenverhältnis Dropdown -->
-    <div class="dropdown-wrapper" v-if="imageStore.hasSelection">
-      <button
-        class="btn"
-        @click="toggleAspectRatioDropdown"
-        :title="t('statusBar.tooltips.aspectRatio')"
-      >
-        <i class="fa-solid fa-crop"></i>
-        <span>{{ t('statusBar.buttons.aspectRatio') }}</span>
-        <i class="fa-solid fa-chevron-down dropdown-icon" :class="{ 'dropdown-open': isAspectRatioDropdownOpen }"></i>
-      </button>
-      <div class="dropdown-menu" v-if="isAspectRatioDropdownOpen" @mouseleave="closeAspectRatioDropdown">
-        <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
-          <i class="fa-solid fa-square"></i>
-          <span>1:1</span>
+    <!-- Transformations Section -->
+    <template v-if="imageStore.hasSelection">
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-section">
+        <div class="btn-group">
+          <button
+            class="btn btn-icon"
+            @click="handleRotateLeft"
+            :title="t('statusBar.tooltips.rotateLeft')"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+          <button
+            class="btn btn-icon"
+            @click="handleRotateRight"
+            :title="t('statusBar.tooltips.rotateRight')"
+          >
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button
+            class="btn btn-icon"
+            @click="handleFlipH"
+            :title="t('statusBar.tooltips.flipH')"
+          >
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </button>
+          <button
+            class="btn btn-icon"
+            @click="handleFlipV"
+            :title="t('statusBar.tooltips.flipV')"
+          >
+            <i class="fa-solid fa-arrows-up-down"></i>
+          </button>
+        </div>
+
+        <!-- Aspect Ratio Dropdown -->
+        <div class="dropdown-wrapper">
+          <button
+            class="btn btn-icon"
+            @click="toggleAspectRatioDropdown"
+            :title="t('statusBar.tooltips.aspectRatio')"
+          >
+            <i class="fa-solid fa-crop"></i>
+          </button>
+          <div class="dropdown-menu" v-if="isAspectRatioDropdownOpen" @mouseleave="closeAspectRatioDropdown">
+            <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
+              <i class="fa-solid fa-square"></i>
+              <span>1:1</span>
+            </button>
+            <button class="dropdown-item" @click="handleCropToAspectRatio(16/9)">
+              <i class="fa-solid fa-rectangle-wide"></i>
+              <span>16:9</span>
+            </button>
+            <button class="dropdown-item" @click="handleCropToAspectRatio(2/3)">
+              <i class="fa-solid fa-rectangle-portrait"></i>
+              <span>2:3</span>
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-icon"
+          @click="handleReset"
+          :title="t('statusBar.tooltips.reset')"
+        >
+          <i class="fa-solid fa-arrow-rotate-left"></i>
         </button>
-        <button class="dropdown-item" @click="handleCropToAspectRatio(16/9)">
-          <i class="fa-solid fa-rectangle-wide"></i>
-          <span>16:9</span>
-        </button>
-        <button class="dropdown-item" @click="handleCropToAspectRatio(2/3)">
-          <i class="fa-solid fa-rectangle-portrait"></i>
-          <span>2:3</span>
+
+        <button
+          class="btn btn-icon"
+          @click="handleBulkRename"
+          :title="t('statusBar.tooltips.bulkRename')"
+        >
+          <i class="fa-solid fa-pen"></i>
         </button>
       </div>
+    </template>
+
+    <div class="header-spacer"></div>
+
+    <!-- Export Section -->
+    <div class="toolbar-section export-section">
+      <div class="btn-group">
+        <button
+          class="btn btn-icon"
+          @click="handleExportPdf('selected')"
+          :disabled="!imageStore.hasSelection"
+          :title="t('statusBar.tooltips.exportSelectedPdf')"
+        >
+          <i class="fa-solid fa-file-pdf"></i>
+        </button>
+        <button
+          class="btn btn-icon"
+          @click="handleExportPdf('all')"
+          :title="t('statusBar.tooltips.exportAllPdf')"
+        >
+          <i class="fa-solid fa-file-pdf"></i>
+          <i class="fa-solid fa-asterisk btn-badge"></i>
+        </button>
+      </div>
+
+      <button
+        class="btn btn-icon"
+        @click="handleExportZip"
+        :title="t('statusBar.tooltips.downloadZip')"
+      >
+        <i class="fa-solid fa-file-zipper"></i>
+      </button>
+
+      <button
+        class="btn btn-icon btn-primary"
+        @click="handleSaveImages"
+        :disabled="!imageStore.hasSelection"
+        :title="t('statusBar.tooltips.saveSelected')"
+      >
+        <i class="fa-solid fa-download"></i>
+      </button>
     </div>
-
-    <!-- Rückgängig Button -->
-    <button
-      class="btn"
-      v-if="imageStore.hasSelection"
-      @click="handleReset"
-      :title="t('statusBar.tooltips.reset')"
-    >
-      <i class="fa-solid fa-arrow-rotate-left"></i>
-      <span>{{ t('statusBar.buttons.reset') }}</span>
-    </button>
-
-    <!-- Batch-Umbenennung Button -->
-    <button
-      class="btn"
-      v-if="imageStore.hasSelection"
-      @click="handleBulkRename"
-      :title="t('statusBar.tooltips.bulkRename')"
-    >
-      <i class="fa-solid fa-pen"></i>
-      <span>{{ t('statusBar.buttons.bulkRename') }}</span>
-    </button>
-
-    <button
-      class="btn"
-      @click="handleExportPdf('selected')"
-      :disabled="!imageStore.hasSelection"
-      :title="t('statusBar.tooltips.exportSelectedPdf')"
-    >
-      <i class="fa-solid fa-file-pdf"></i>
-      <span>{{ t('statusBar.buttons.exportSelectedPdf') }}</span>
-    </button>
-    
-    <button
-      class="btn"
-      @click="handleExportPdf('all')"
-      :title="t('statusBar.tooltips.exportAllPdf')"
-    >
-      <i class="fa-solid fa-file-pdf"></i>
-      <span>{{ t('statusBar.buttons.exportAllPdf') }}</span>
-    </button>
-    
-    <button
-      class="btn btn-primary"
-      @click="handleSaveImages"
-      :disabled="!imageStore.hasSelection"
-      :title="t('statusBar.tooltips.saveSelected')"
-    >
-      <i class="fa-solid fa-floppy-disk"></i>
-      <span>{{ t('statusBar.buttons.save') }}</span>
-    </button>
-    
-    <button
-      class="btn"
-      @click="handleExportZip"
-      :title="t('statusBar.tooltips.downloadZip')"
-    >
-      <i class="fa-solid fa-file-zipper"></i>
-      <span>ZIP</span>
-    </button>
   </div>
 </template>
 
@@ -254,117 +260,184 @@ const handleReset = () => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   margin: var(--space-4) 0;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-2xl);
-  box-shadow:
-    var(--surface-elevation),
-    inset 0 1px 0 color-mix(in oklab, white 15%, transparent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--surface-elevation);
   position: relative;
   z-index: 10;
   overflow: visible;
 }
 
-.status-bar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--accent) 3%, transparent) 0%,
-    transparent 50%,
-    color-mix(in oklab, var(--green) 2%, transparent) 100%);
-  pointer-events: none;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
+/* Toolbar Sections */
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border-color);
+  margin: 0 var(--space-1);
+  opacity: 0.5;
+}
+
+.header-spacer {
+  flex: 1;
+  min-width: var(--space-2);
+}
+
+/* Stats Section */
+.stats-section {
+  gap: var(--space-2);
 }
 
 .stat {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, 
-    color-mix(in oklab, var(--accent) 12%, transparent) 0%,
-    color-mix(in oklab, var(--accent) 8%, transparent) 100%);
-  border: 1px solid color-mix(in oklab, var(--accent) 20%, transparent);
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 15%, transparent);
   color: var(--text);
-  font-weight: 500;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s var(--ease-smooth);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s var(--ease-smooth);
 }
 
-.header-spacer {
-  flex: 1;
+.stat i {
+  font-size: 0.875rem;
+  color: var(--accent);
+  opacity: 0.8;
 }
 
+.stat-selected.has-selection {
+  background: color-mix(in oklab, var(--green) 12%, transparent);
+  border-color: color-mix(in oklab, var(--green) 25%, transparent);
+}
+
+.stat-selected.has-selection i {
+  color: var(--green);
+}
+
+/* Base Button Styles */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 18px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: var(--btn);
+  gap: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text);
   font-weight: 500;
-  transition: all 0.2s var(--ease-smooth);
+  transition: all 0.15s var(--ease-smooth);
   cursor: pointer;
   position: relative;
-  overflow: hidden;
 }
 
 .btn:hover:not(:disabled) {
-  transform: translateY(-2px);
   background: var(--btn-hover);
-  box-shadow: var(--surface-elevation);
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.35;
   pointer-events: none;
 }
 
+/* Icon Button */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  background: var(--btn);
+  border: 1px solid var(--border-color);
+}
+
+.btn-icon i {
+  font-size: 0.9rem;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 15%, transparent);
+}
+
+/* Danger Button */
+.btn-danger:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--red) 15%, transparent);
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--red) 15%, transparent);
+}
+
+/* Primary Button */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 90%, var(--purple)) 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 85%, var(--purple)) 100%);
   color: var(--accent-text);
   border-color: transparent;
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 25%, transparent);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 25%, transparent);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg,
     color-mix(in oklab, var(--accent) 90%, black) 0%,
-    color-mix(in oklab, var(--accent) 80%, var(--purple)) 100%);
-  box-shadow: 0 8px 32px color-mix(in oklab, var(--accent) 35%, transparent);
-  transform: translateY(-3px);
+    color-mix(in oklab, var(--accent) 75%, var(--purple)) 100%);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 35%, transparent);
+  transform: translateY(-2px);
 }
 
-/* Button-Gruppe für Transformationen */
+/* Button Group */
 .btn-group {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: color-mix(in oklab, var(--border-color) 20%, transparent);
-  border-radius: var(--radius-lg);
+  gap: 2px;
+  padding: 3px;
+  background: color-mix(in oklab, var(--border-color) 30%, transparent);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
 }
 
-.btn-icon {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border-radius: var(--radius-md);
+.btn-group .btn-icon {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
 }
 
-.btn-icon i {
-  font-size: 1rem;
+.btn-group .btn-icon:hover:not(:disabled) {
+  background: var(--btn);
+  box-shadow: none;
+}
+
+/* Badge for "All" PDF button */
+.btn-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.5rem;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* Export Section */
+.export-section {
+  gap: var(--space-2);
 }
 
 /* Dropdown Styles */
@@ -442,48 +515,73 @@ const handleReset = () => {
   color: var(--accent);
 }
 
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .status-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-3);
-    padding: var(--space-3);
+    gap: var(--space-2);
+    padding: var(--space-2);
   }
 
-  .header-spacer {
+  .toolbar-section {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .toolbar-divider {
     display: none;
   }
 
-  .stat {
-    justify-content: center;
-  }
-
-  .btn {
+  .header-spacer {
     width: 100%;
+    min-height: 0;
+    flex-basis: 100%;
   }
 
-  .btn-group {
+  .stats-section {
+    width: 100%;
     justify-content: center;
+  }
+
+  .export-section {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-icon {
+    width: 40px;
+    height: 40px;
   }
 
   .btn-group .btn-icon {
-    flex: 1;
-    max-width: 60px;
-  }
-
-  .dropdown-wrapper {
-    width: 100%;
-  }
-
-  .dropdown-wrapper .btn {
-    width: 100%;
-    justify-content: center;
+    width: 36px;
+    height: 36px;
   }
 
   .dropdown-menu {
-    width: 100%;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 480px) {
+  .status-bar {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .stat {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn-group .btn-icon {
+    width: 32px;
+    height: 32px;
   }
 }
 </style>
