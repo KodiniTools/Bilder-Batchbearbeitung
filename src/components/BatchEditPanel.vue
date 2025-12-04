@@ -31,6 +31,13 @@ watch(() => props.isOpen, (open) => {
   }
 })
 
+// Close panel when no images are selected
+watch(() => imageStore.hasSelection, (hasSelection) => {
+  if (!hasSelection && props.isOpen) {
+    emit('close')
+  }
+})
+
 // Apply filters with debounce for smooth slider movement
 function applyFiltersDebounced() {
   if (debounceTimer) {
