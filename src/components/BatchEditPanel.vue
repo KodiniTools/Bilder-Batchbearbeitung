@@ -28,14 +28,20 @@ watch(() => props.isOpen, (open) => {
   }
 })
 
+// Watch for filter changes and apply immediately
+watch(filters, (newFilters) => {
+  if (props.isOpen && imageStore.hasSelection) {
+    imageStore.applyFiltersToSelectedImages(newFilters)
+  }
+}, { deep: true })
+
 // Computed for disabled state
 const hasSelection = computed(() => imageStore.hasSelection)
 const selectedCount = computed(() => imageStore.selectedCount)
 
-// Apply filters to selected images
-function applyFilters() {
-  imageStore.applyFiltersToSelectedImages(filters.value)
-  toast.success(t('batchEdit.toast.applied', { count: selectedCount.value }))
+// Reset single slider and apply
+function resetSlider(key: keyof ImageFilters, defaultValue: number) {
+  filters.value[key] = defaultValue
 }
 
 // Reset all filters
@@ -104,7 +110,7 @@ const sliderConfig = [
               />
               <button
                 class="btn-reset-slider"
-                @click="filters[slider.key] = slider.default"
+                @click="resetSlider(slider.key, slider.default)"
                 :title="t('batchEdit.resetSlider')"
                 v-if="filters[slider.key] !== slider.default"
               >
@@ -117,20 +123,12 @@ const sliderConfig = [
 
       <div class="panel-footer">
         <button
-          class="btn btn-secondary"
+          class="btn btn-reset-all"
           @click="resetFilters"
           :disabled="!hasSelection"
         >
           <i class="fa-solid fa-arrow-rotate-left"></i>
           {{ t('batchEdit.buttons.reset') }}
-        </button>
-        <button
-          class="btn btn-primary"
-          @click="applyFilters"
-          :disabled="!hasSelection"
-        >
-          <i class="fa-solid fa-check"></i>
-          {{ t('batchEdit.buttons.apply') }}
         </button>
       </div>
     </aside>
@@ -353,25 +351,17 @@ const sliderConfig = [
   pointer-events: none;
 }
 
-.btn-secondary {
+.btn-reset-all {
+  width: 100%;
   background: var(--btn);
   color: var(--text);
   border: 1px solid var(--border-color);
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: var(--btn-hover);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 85%, var(--purple)) 100%);
-  color: var(--accent-text);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 25%, transparent);
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 35%, transparent);
+.btn-reset-all:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--red) 15%, transparent);
+  border-color: var(--red);
+  color: var(--red);
 }
 
 /* Panel slide animation */
