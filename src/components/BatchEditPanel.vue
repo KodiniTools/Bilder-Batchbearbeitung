@@ -132,7 +132,7 @@ const sliderConfig = [
                 class="btn-reset-slider"
                 @click="resetSlider(slider.key, slider.default)"
                 :title="t('batchEdit.resetSlider')"
-                v-if="filters[slider.key] !== slider.default"
+                :class="{ 'is-visible': filters[slider.key] !== slider.default }"
               >
                 <i class="fa-solid fa-rotate-left"></i>
               </button>
@@ -267,8 +267,10 @@ const sliderConfig = [
   background: color-mix(in oklab, var(--accent) 10%, transparent);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
-  min-width: 50px;
+  width: 60px;
+  min-width: 60px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .slider-wrapper {
@@ -291,7 +293,7 @@ const sliderConfig = [
     var(--border-color) 100%
   );
   cursor: pointer;
-  transition: all 0.2s var(--ease-smooth);
+  touch-action: none;
 }
 
 .slider::-webkit-slider-thumb {
@@ -303,12 +305,11 @@ const sliderConfig = [
   background: var(--accent);
   border: 3px solid var(--panel);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.2s var(--ease-smooth);
+  cursor: grab;
 }
 
-.slider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+.slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 
@@ -319,26 +320,40 @@ const sliderConfig = [
   background: var(--accent);
   border: 3px solid var(--panel);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.2s var(--ease-smooth);
+  cursor: grab;
+}
+
+.slider::-moz-range-thumb:active {
+  cursor: grabbing;
 }
 
 .btn-reset-slider {
   width: 24px;
   height: 24px;
+  min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  background: color-mix(in oklab, var(--muted) 15%, transparent);
-  color: var(--muted);
+  background: transparent;
+  color: transparent;
   border-radius: var(--radius-sm);
-  cursor: pointer;
+  cursor: default;
   font-size: 0.7rem;
-  transition: all 0.2s var(--ease-smooth);
+  pointer-events: none;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  opacity: 0;
 }
 
-.btn-reset-slider:hover {
+.btn-reset-slider.is-visible {
+  background: color-mix(in oklab, var(--muted) 15%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.btn-reset-slider.is-visible:hover {
   background: color-mix(in oklab, var(--accent) 20%, transparent);
   color: var(--accent);
 }
