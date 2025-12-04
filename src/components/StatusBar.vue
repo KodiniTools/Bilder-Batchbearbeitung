@@ -129,6 +129,15 @@ const handleReset = () => {
       >
         <i class="fa-solid fa-trash-can"></i>
       </button>
+
+      <button
+        class="btn btn-icon btn-batch-edit"
+        :class="{ 'has-selection': imageStore.hasSelection }"
+        @click="emit('batch-edit')"
+        :title="t('statusBar.tooltips.batchEdit')"
+      >
+        <i class="fa-solid fa-sliders"></i>
+      </button>
     </div>
 
     <!-- Transformations Section -->
@@ -194,14 +203,6 @@ const handleReset = () => {
             </button>
           </div>
         </div>
-
-        <button
-          class="btn btn-icon btn-accent"
-          @click="emit('batch-edit')"
-          :title="t('statusBar.tooltips.batchEdit')"
-        >
-          <i class="fa-solid fa-sliders"></i>
-        </button>
 
         <button
           class="btn btn-icon"
@@ -395,17 +396,29 @@ const handleReset = () => {
   box-shadow: 0 2px 8px color-mix(in oklab, var(--red) 15%, transparent);
 }
 
-/* Accent Button (Batch Edit) */
-.btn-accent {
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  border-color: color-mix(in oklab, var(--accent) 30%, transparent);
-  color: var(--accent);
+/* Batch Edit Button with selection indicator */
+.btn-batch-edit {
+  background: color-mix(in oklab, var(--red) 10%, transparent);
+  border: 2px solid var(--red);
+  color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--red) 15%, transparent);
 }
 
-.btn-accent:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--accent) 20%, transparent);
-  border-color: var(--accent);
-  box-shadow: 0 2px 10px color-mix(in oklab, var(--accent) 25%, transparent);
+.btn-batch-edit:hover {
+  background: color-mix(in oklab, var(--red) 20%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--red) 20%, transparent);
+}
+
+.btn-batch-edit.has-selection {
+  background: color-mix(in oklab, var(--green) 10%, transparent);
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 15%, transparent);
+}
+
+.btn-batch-edit.has-selection:hover {
+  background: color-mix(in oklab, var(--green) 20%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
 }
 
 /* Primary Button */
