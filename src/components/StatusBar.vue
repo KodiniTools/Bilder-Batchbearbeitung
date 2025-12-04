@@ -16,6 +16,7 @@ const emit = defineEmits<{
   'export-zip': []
   'save-images': []
   'bulk-rename': []
+  'batch-edit': []
 }>()
 
 const handleSelectAll = () => {
@@ -193,6 +194,14 @@ const handleReset = () => {
             </button>
           </div>
         </div>
+
+        <button
+          class="btn btn-icon btn-accent"
+          @click="emit('batch-edit')"
+          :title="t('statusBar.tooltips.batchEdit')"
+        >
+          <i class="fa-solid fa-sliders"></i>
+        </button>
 
         <button
           class="btn btn-icon"
@@ -384,6 +393,19 @@ const handleReset = () => {
   border-color: var(--red);
   color: var(--red);
   box-shadow: 0 2px 8px color-mix(in oklab, var(--red) 15%, transparent);
+}
+
+/* Accent Button (Batch Edit) */
+.btn-accent {
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+  color: var(--accent);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 20%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--accent) 25%, transparent);
 }
 
 /* Primary Button */

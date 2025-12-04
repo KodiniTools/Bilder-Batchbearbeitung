@@ -25,6 +25,7 @@
     "tooltips": {
       "selectAll": "Alle auswählen/abwählen",
       "deleteSelected": "Auswahl löschen",
+      "batchEdit": "Ausgewählte Bilder bearbeiten (Helligkeit, Kontrast, etc.)",
       "bulkRename": "Ausgewählte Bilder fortlaufend umbenennen",
       "aspectRatio": "Seitenverhältnis der ausgewählten Bilder anpassen",
       "reset": "Alle Bearbeitungen der ausgewählten Bilder rückgängig machen",
@@ -424,6 +425,27 @@
     "buttons": {
       "cancel": "Abbrechen",
       "rename": "Umbenennen"
+    }
+  },
+  "batchEdit": {
+    "title": "Stapelbearbeitung",
+    "selectedCount": "{count} Bild(er) ausgewählt",
+    "filters": {
+      "brightness": "Helligkeit",
+      "contrast": "Kontrast",
+      "saturation": "Sättigung",
+      "hue": "Farbton",
+      "opacity": "Transparenz",
+      "blur": "Weichzeichnung"
+    },
+    "buttons": {
+      "apply": "Anwenden",
+      "reset": "Zurücksetzen"
+    },
+    "resetSlider": "Zurücksetzen",
+    "toast": {
+      "applied": "Filter auf {count} Bild(er) angewendet",
+      "reset": "Filter von {count} Bild(ern) zurückgesetzt"
     }
   }
 }

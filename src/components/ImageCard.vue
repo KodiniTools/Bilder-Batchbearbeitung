@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, nextTick } from 'vue'
+import { computed, ref, onMounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
+import { defaultFilters } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageStore } from '@/stores/imageStore'
 
@@ -18,6 +19,21 @@ const emit = defineEmits<{
 
 const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
+
+// Computed CSS filter string based on image filters
+const filterStyle = computed(() => {
+  const f = props.image.filters || defaultFilters
+  return {
+    filter: `
+      brightness(${f.brightness}%)
+      contrast(${f.contrast}%)
+      saturate(${f.saturation}%)
+      hue-rotate(${f.hue}deg)
+      blur(${f.blur}px)
+    `.trim(),
+    opacity: f.opacity / 100
+  }
+})
 
 // Inline-Umbenennung
 const isEditing = ref(false)
@@ -110,6 +126,7 @@ onMounted(() => {
     <div
       ref="previewContainer"
       class="image-preview"
+      :style="filterStyle"
       @click.stop="handlePreview"
     >
       <!-- Canvas wird hier von onMounted eingefügt -->

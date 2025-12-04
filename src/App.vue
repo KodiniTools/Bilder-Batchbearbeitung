@@ -10,6 +10,7 @@ import ImageEditor from '@/components/ImageEditor.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
 import BulkRenameModal from '@/components/BulkRenameModal.vue'
+import BatchEditPanel from '@/components/BatchEditPanel.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
@@ -42,6 +43,7 @@ const isExportModalOpen = ref(false)
 const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null>(null)
 
 const isBulkRenameModalOpen = ref(false)
+const isBatchEditPanelOpen = ref(false)
 
 // LoadingIndicator ref für Fortschrittsanzeige
 const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
@@ -301,6 +303,15 @@ function closeBulkRenameModal() {
   isBulkRenameModalOpen.value = false
 }
 
+// Batch Edit Panel Functions
+function handleBatchEdit() {
+  isBatchEditPanelOpen.value = true
+}
+
+function closeBatchEditPanel() {
+  isBatchEditPanelOpen.value = false
+}
+
 function handleBulkRenameConfirm(baseName: string, startNumber: number) {
   const count = imageStore.batchRenameSelectedImages(baseName, startNumber)
   closeBulkRenameModal()
@@ -382,6 +393,7 @@ onUnmounted(() => {
         @export-zip="handleExportZip"
         @save-images="handleSaveImages"
         @bulk-rename="handleBulkRename"
+        @batch-edit="handleBatchEdit"
       />
       
       <DropZone />
@@ -460,6 +472,12 @@ onUnmounted(() => {
       :is-open="isBulkRenameModalOpen"
       @close="closeBulkRenameModal"
       @confirm="handleBulkRenameConfirm"
+    />
+
+    <!-- Batch Edit Panel -->
+    <BatchEditPanel
+      :is-open="isBatchEditPanelOpen"
+      @close="closeBatchEditPanel"
     />
   </div>
 </template>

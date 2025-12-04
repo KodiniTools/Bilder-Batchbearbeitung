@@ -7,6 +7,24 @@ export interface ImageFormat {
   ext: string
 }
 
+export interface ImageFilters {
+  brightness: number  // 0-200, default 100
+  contrast: number    // 0-200, default 100
+  saturation: number  // 0-200, default 100
+  hue: number         // 0-360, default 0
+  opacity: number     // 0-100, default 100
+  blur: number        // 0-20, default 0
+}
+
+export const defaultFilters: ImageFilters = {
+  brightness: 100,
+  contrast: 100,
+  saturation: 100,
+  hue: 0,
+  opacity: 100,
+  blur: 0
+}
+
 export interface ImageObject {
   id: string
   file: File
@@ -18,6 +36,7 @@ export interface ImageObject {
   originalHeight: number
   selected: boolean
   outputName: string
+  filters?: ImageFilters
 }
 
 export interface PdfSettings {

@@ -25,6 +25,7 @@
     "tooltips": {
       "selectAll": "Select/Deselect all",
       "deleteSelected": "Delete selection",
+      "batchEdit": "Edit selected images (brightness, contrast, etc.)",
       "bulkRename": "Rename selected images sequentially",
       "aspectRatio": "Adjust aspect ratio of selected images",
       "reset": "Undo all edits of selected images",
@@ -424,6 +425,27 @@
     "buttons": {
       "cancel": "Cancel",
       "rename": "Rename"
+    }
+  },
+  "batchEdit": {
+    "title": "Batch Edit",
+    "selectedCount": "{count} image(s) selected",
+    "filters": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "saturation": "Saturation",
+      "hue": "Hue",
+      "opacity": "Opacity",
+      "blur": "Blur"
+    },
+    "buttons": {
+      "apply": "Apply",
+      "reset": "Reset"
+    },
+    "resetSlider": "Reset",
+    "toast": {
+      "applied": "Filters applied to {count} image(s)",
+      "reset": "Filters reset for {count} image(s)"
     }
   }
 }
