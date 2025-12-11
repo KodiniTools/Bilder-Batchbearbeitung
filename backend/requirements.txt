@@ -1,0 +1,6 @@
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+python-multipart==0.0.9
+vtracer==0.6.10
+aiofiles==23.2.1
+Pillow==10.2.0

@@ -150,9 +150,9 @@
             <template v-if="mode === 'zip'">
               <div class="setting-group">
                 <label>{{ t('exportModal.zip.fileName') }}:</label>
-                <input 
-                  type="text" 
-                  v-model="settings.zipName" 
+                <input
+                  type="text"
+                  v-model="settings.zipName"
                   :placeholder="t('exportModal.zip.fileNamePlaceholder')"
                 >
               </div>
@@ -168,13 +168,52 @@
 
               <div class="setting-group">
                 <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
-                <input 
-                  type="range" 
-                  v-model.number="settings.quality" 
-                  min="1" 
+                <input
+                  type="range"
+                  v-model.number="settings.quality"
+                  min="1"
                   max="100"
                   class="quality-slider"
                 >
+              </div>
+            </template>
+
+            <!-- SVG Export Settings -->
+            <template v-if="mode === 'svg'">
+              <div class="setting-group">
+                <label>{{ t('exportModal.zip.fileName') }}:</label>
+                <input
+                  type="text"
+                  v-model="settings.zipName"
+                  :placeholder="t('exportModal.zip.fileNamePlaceholder')"
+                >
+              </div>
+
+              <div class="setting-group">
+                <label>{{ t('exportModal.svg.colormode') || 'Farbmodus' }}:</label>
+                <select v-model="settings.svgColormode">
+                  <option value="color">{{ t('exportModal.svg.colormodeColor') || 'Farbe' }}</option>
+                  <option value="binary">{{ t('exportModal.svg.colormodeBinary') || 'Schwarz-Weiß' }}</option>
+                </select>
+              </div>
+
+              <div class="setting-group">
+                <label>{{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}</label>
+                <input
+                  type="range"
+                  v-model.number="settings.svgFilterSpeckle"
+                  min="1"
+                  max="32"
+                  class="quality-slider"
+                >
+                <p class="setting-hint">{{ t('exportModal.svg.detailHint') || 'Niedriger = mehr Details, Höher = glattere Kurven' }}</p>
+              </div>
+
+              <div class="svg-info-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span>{{ t('exportModal.svg.info') || 'SVG-Vektorisierung funktioniert am besten bei Logos, Icons und einfachen Grafiken.' }}</span>
               </div>
             </template>
 
@@ -257,7 +296,7 @@ const { t } = useI18n()
 
 interface Props {
   isOpen: boolean
-  mode: 'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null
+  mode: 'pdf-all' | 'pdf-selected' | 'zip' | 'svg' | 'save' | null
   imageCount: number
 }
 
@@ -275,19 +314,23 @@ const settings = reactive({
   // PDF Settings
   orientation: 'portrait' as 'portrait' | 'landscape',
   author: '',
-  
+
   // ✨ NEU: Startseite
   includeCustomFrontPage: false,
   frontPageElements: [] as FrontPageElement[],
-  
+
   // Kommentarseite
   includeCommentPages: false,
   commentPageElements: [] as CanvasElement[],
-  
+
   // ZIP/Save Settings
   zipName: 'bilder-export',
   format: 'png',
-  quality: 92
+  quality: 92,
+
+  // SVG Settings
+  svgColormode: 'color' as 'color' | 'binary',
+  svgFilterSpeckle: 4
 })
 
 // ✨ NEU: Front Page Designer Save Handler
@@ -324,6 +367,8 @@ function getModalTitle() {
       return t('exportModal.title.pdfSelected')
     case 'zip':
       return t('exportModal.title.zip')
+    case 'svg':
+      return t('exportModal.title.svg') || 'Als SVG exportieren'
     case 'save':
       return t('exportModal.title.save')
     default:
@@ -592,6 +637,26 @@ function handleConfirm() {
 .info-box svg {
   flex-shrink: 0;
   color: var(--accent);
+}
+
+.svg-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: color-mix(in oklab, var(--orange, #f97316) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--orange, #f97316) 25%, transparent);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.85rem;
+  margin-top: var(--space-4);
+  line-height: 1.4;
+}
+
+.svg-info-box svg {
+  flex-shrink: 0;
+  color: var(--orange, #f97316);
+  margin-top: 2px;
 }
 
 .modal-footer {

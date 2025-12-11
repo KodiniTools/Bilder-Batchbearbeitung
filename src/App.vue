@@ -29,6 +29,9 @@ import {
 // ZIP-Export
 import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
 
+// SVG-Export
+import { downloadSvgBatch, checkSvgServiceAvailable, type SvgProgressCallback } from '@/lib/features/export-svg'
+
 const { t } = useI18n()
 const imageStore = useImageStore()
 const toast = useToast()
@@ -41,7 +44,7 @@ const isPreviewOpen = ref(false)
 const previewImage = ref<ImageObject | null>(null)
 
 const isExportModalOpen = ref(false)
-const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'save' | null>(null)
+const exportMode = ref<'pdf-all' | 'pdf-selected' | 'zip' | 'svg' | 'save' | null>(null)
 
 const isBulkRenameModalOpen = ref(false)
 const isBatchEditPanelOpen = ref(false)
@@ -50,7 +53,7 @@ const isBatchEditPanelOpen = ref(false)
 const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
 
 const exportImageCount = computed(() => {
-  if (exportMode.value === 'pdf-all' || exportMode.value === 'zip') {
+  if (exportMode.value === 'pdf-all' || exportMode.value === 'zip' || exportMode.value === 'svg') {
     return imageStore.imageCount
   } else if (exportMode.value === 'pdf-selected' || exportMode.value === 'save') {
     return imageStore.selectedCount
@@ -105,6 +108,23 @@ function handleExportZip() {
   }
 
   exportMode.value = 'zip'
+  isExportModalOpen.value = true
+}
+
+async function handleExportSvg() {
+  if (imageStore.imageCount === 0) {
+    alert(t('alerts.noImagesAvailable'))
+    return
+  }
+
+  // Prüfen ob der SVG-Service verfügbar ist
+  const isAvailable = await checkSvgServiceAvailable()
+  if (!isAvailable) {
+    alert(t('alerts.svgServiceUnavailable') || 'Der SVG-Konvertierungsservice ist nicht verfügbar. Bitte stellen Sie sicher, dass der Server läuft.')
+    return
+  }
+
+  exportMode.value = 'svg'
   isExportModalOpen.value = true
 }
 
@@ -215,7 +235,40 @@ async function handleExportConfirm(settings: ExportSettings) {
       } finally {
         loadingIndicator.value?.hide()
       }
-      
+
+    } else if (currentMode === 'svg') {
+      const total = imageStore.imageCount
+
+      // Fortschrittsanzeige starten
+      loadingIndicator.value?.showWithProgress(
+        t('loading.svgProgress', { current: 0, total }) || `SVG-Konvertierung: 0/${total}`,
+        total
+      )
+
+      // Fortschritts-Callback
+      const onSvgProgress: SvgProgressCallback = (current, total) => {
+        loadingIndicator.value?.updateProgress(
+          current,
+          t('loading.svgProgress', { current, total }) || `SVG-Konvertierung: ${current}/${total}`
+        )
+      }
+
+      try {
+        await downloadSvgBatch(
+          imageStore.images,
+          {
+            colormode: settings.svgColormode || 'color',
+            filter_speckle: settings.svgFilterSpeckle || 4
+          },
+          settings.zipName || 'svg_export',
+          onSvgProgress
+        )
+        console.log(`✅ SVG-Export erfolgreich: ${total} Bilder`)
+        toast.success(t('toast.svgSuccess', { count: total }) || `${total} Bilder erfolgreich als SVG exportiert`)
+      } finally {
+        loadingIndicator.value?.hide()
+      }
+
     } else if (currentMode === 'save') {
       const images = imageStore.images.filter(img => img.selected)
       
@@ -395,6 +448,7 @@ onUnmounted(() => {
         v-if="imageStore.hasImages"
         @export-pdf="handleExportPdf"
         @export-zip="handleExportZip"
+        @export-svg="handleExportSvg"
         @save-images="handleSaveImages"
         @bulk-rename="handleBulkRename"
         @batch-edit="handleBatchEdit"

@@ -14,6 +14,7 @@ const isAspectRatioDropdownOpen = ref(false)
 const emit = defineEmits<{
   'export-pdf': ['all' | 'selected']
   'export-zip': []
+  'export-svg': []
   'save-images': []
   'bulk-rename': []
   'batch-edit': []
@@ -42,6 +43,10 @@ const handleExportPdf = (mode: 'all' | 'selected') => {
 
 const handleExportZip = () => {
   emit('export-zip')
+}
+
+const handleExportSvg = () => {
+  emit('export-svg')
 }
 
 const handleSaveImages = () => {
@@ -254,6 +259,14 @@ const handleReset = () => {
       </button>
 
       <button
+        class="btn btn-icon btn-svg"
+        @click="handleExportSvg"
+        :title="t('statusBar.tooltips.exportSvg') || 'Als SVG exportieren (Vektorisierung)'"
+      >
+        <i class="fa-solid fa-bezier-curve"></i>
+      </button>
+
+      <button
         class="btn btn-icon btn-primary"
         @click="handleSaveImages"
         :disabled="!imageStore.hasSelection"
@@ -419,6 +432,19 @@ const handleReset = () => {
 .btn-batch-edit.has-selection:hover {
   background: color-mix(in oklab, var(--green) 20%, transparent);
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
+}
+
+/* SVG Button */
+.btn-svg {
+  background: color-mix(in oklab, var(--orange, #f97316) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--orange, #f97316) 40%, transparent);
+  color: var(--orange, #f97316);
+}
+
+.btn-svg:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--orange, #f97316) 20%, transparent);
+  border-color: var(--orange, #f97316);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--orange, #f97316) 25%, transparent);
 }
 
 /* Primary Button */
