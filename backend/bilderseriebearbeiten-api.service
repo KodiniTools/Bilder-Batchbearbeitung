@@ -1,0 +1,24 @@
+[Unit]
+Description=Bilder-Batchbearbeitung SVG Converter API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/kodinitools.com/bilderseriebearbeiten/backend
+ExecStart=/var/www/kodinitools.com/bilderseriebearbeiten/backend/venv/bin/uvicorn main:app --host 127.0.0.1 --port 9003 --workers 2
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
