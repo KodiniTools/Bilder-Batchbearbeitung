@@ -238,6 +238,12 @@
     "buttons": {
       "cancel": "Cancel",
       "export": "Export"
+    },
+    "info": {
+      "image": "image",
+      "images": "images",
+      "selectedImage": "selected image",
+      "selectedImages": "selected images"
     }
   },
   "frontPageDesigner": {
