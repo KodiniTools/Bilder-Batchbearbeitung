@@ -53,8 +53,11 @@ const isBatchEditPanelOpen = ref(false)
 const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
 
 const exportImageCount = computed(() => {
-  if (exportMode.value === 'pdf-all' || exportMode.value === 'zip' || exportMode.value === 'svg') {
+  if (exportMode.value === 'pdf-all') {
     return imageStore.imageCount
+  } else if (exportMode.value === 'zip' || exportMode.value === 'svg') {
+    // ZIP/SVG: Ausgewählte Bilder wenn vorhanden, sonst alle
+    return imageStore.hasSelection ? imageStore.selectedCount : imageStore.imageCount
   } else if (exportMode.value === 'pdf-selected' || exportMode.value === 'save') {
     return imageStore.selectedCount
   }
@@ -206,7 +209,11 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
       
     } else if (currentMode === 'zip') {
-      const total = imageStore.imageCount
+      // ZIP: Ausgewählte Bilder wenn vorhanden, sonst alle
+      const imagesToExport = imageStore.hasSelection
+        ? imageStore.selectedImages
+        : imageStore.images
+      const total = imagesToExport.length
 
       // Fortschrittsanzeige starten
       loadingIndicator.value?.showWithProgress(
@@ -224,7 +231,7 @@ async function handleExportConfirm(settings: ExportSettings) {
 
       try {
         await exportImagesAsZip(
-          imageStore.images,
+          imagesToExport,
           settings.zipName,
           settings.format,
           settings.quality,
@@ -237,7 +244,11 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
 
     } else if (currentMode === 'svg') {
-      const total = imageStore.imageCount
+      // SVG: Ausgewählte Bilder wenn vorhanden, sonst alle
+      const imagesToExport = imageStore.hasSelection
+        ? imageStore.selectedImages
+        : imageStore.images
+      const total = imagesToExport.length
 
       // Fortschrittsanzeige starten
       loadingIndicator.value?.showWithProgress(
@@ -255,7 +266,7 @@ async function handleExportConfirm(settings: ExportSettings) {
 
       try {
         await downloadSvgBatch(
-          imageStore.images,
+          imagesToExport,
           {
             colormode: settings.svgColormode || 'color',
             filter_speckle: settings.svgFilterSpeckle || 4
@@ -521,6 +532,7 @@ onUnmounted(() => {
       :is-open="isExportModalOpen"
       :mode="exportMode"
       :image-count="exportImageCount"
+      :has-selection="imageStore.hasSelection"
       @close="closeExportModal"
       @confirm="handleExportConfirm"
     />

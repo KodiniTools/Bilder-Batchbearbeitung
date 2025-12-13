@@ -241,13 +241,18 @@
             </template>
 
             <!-- Info Text -->
-            <div class="info-box">
+            <div class="info-box" :class="{ 'info-box-selected': hasSelection && (mode === 'zip' || mode === 'svg') }">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              <span>{{ imageCount }} {{ imageCount === 1 ? 'Bild' : 'Bilder' }}</span>
+              <span v-if="hasSelection && (mode === 'zip' || mode === 'svg')">
+                {{ imageCount }} {{ imageCount === 1 ? t('exportModal.info.selectedImage') : t('exportModal.info.selectedImages') }}
+              </span>
+              <span v-else>
+                {{ imageCount }} {{ imageCount === 1 ? t('exportModal.info.image') : t('exportModal.info.images') }}
+              </span>
             </div>
           </div>
 
@@ -298,6 +303,7 @@ interface Props {
   isOpen: boolean
   mode: 'pdf-all' | 'pdf-selected' | 'zip' | 'svg' | 'save' | null
   imageCount: number
+  hasSelection?: boolean
 }
 
 const props = defineProps<Props>()
@@ -637,6 +643,15 @@ function handleConfirm() {
 .info-box svg {
   flex-shrink: 0;
   color: var(--accent);
+}
+
+.info-box-selected {
+  background: color-mix(in oklab, var(--green) 10%, transparent);
+  border-color: color-mix(in oklab, var(--green) 25%, transparent);
+}
+
+.info-box-selected svg {
+  color: var(--green);
 }
 
 .svg-info-box {
