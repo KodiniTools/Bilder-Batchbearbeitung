@@ -1,4 +1,66 @@
 {
+  "landing": {
+    "brand": "Bild-Batchbearbeitung",
+    "hero": {
+      "title": "Professionelle Bildbearbeitung direkt im Browser",
+      "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",
+      "cta": "Jetzt starten"
+    },
+    "features": {
+      "privacy": {
+        "title": "Absolute Privatsphäre",
+        "description": "Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet. Keine Daten verlassen jemals Ihren Computer.",
+        "point1": "Keine Server-Uploads",
+        "point2": "Kein Tracking",
+        "point3": "Daten bleiben auf Ihrem Gerät"
+      },
+      "batch": {
+        "title": "Stapelverarbeitung",
+        "description": "Bearbeiten Sie Hunderte von Bildern mit wenigen Klicks. Alle Operationen können auf mehrere Bilder gleichzeitig angewendet werden.",
+        "point1": "Massenumbenennung",
+        "point2": "Batch-Filter & Effekte",
+        "point3": "Drag & Drop Sortierung"
+      },
+      "export": {
+        "title": "Flexible Exportoptionen",
+        "description": "Exportieren Sie Ihre Bilder in zahlreichen Formaten. Vom PDF mit Designer bis zur SVG-Vektorkonvertierung.",
+        "point1": "PDF mit Titelseiten-Designer",
+        "point2": "ZIP-Archive mit Komprimierung",
+        "point3": "SVG-Vektorkonvertierung"
+      }
+    },
+    "details": {
+      "title": "Alle Funktionen im Überblick",
+      "crop": {
+        "title": "Zuschneiden",
+        "text": "Schneiden Sie Bilder auf vordefinierte Seitenverhältnisse wie 1:1, 16:9 oder 4:3 zu."
+      },
+      "filters": {
+        "title": "Filter & Effekte",
+        "text": "Helligkeit, Kontrast, Sättigung, Farbton, Weichzeichner und mehr."
+      },
+      "transform": {
+        "title": "Transformationen",
+        "text": "Drehen, Spiegeln und Größe ändern mit Seitenverhältnis-Sperre."
+      },
+      "pdf": {
+        "title": "PDF-Designer",
+        "text": "Erstellen Sie PDFs mit eigenen Titelseiten, Kommentarseiten und Layouts."
+      },
+      "svg": {
+        "title": "SVG-Export",
+        "text": "Konvertieren Sie Rasterbilder in skalierbare Vektorgrafiken."
+      },
+      "i18n": {
+        "title": "Mehrsprachig",
+        "text": "Verfügbar in Deutsch und Englisch mit automatischer Spracherkennung."
+      }
+    },
+    "app": {
+      "title": "Bereit zum Starten?",
+      "subtitle": "Ziehen Sie Ihre Bilder in den Bereich unten oder klicken Sie zum Hochladen."
+    }
+  },
   "head": {
     "title": "Moderne Bild-Bearbeitung",
     "description": "Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern."

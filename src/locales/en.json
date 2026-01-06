@@ -1,4 +1,66 @@
 {
+  "landing": {
+    "brand": "Batch Image Editor",
+    "hero": {
+      "title": "Professional Image Editing Right in Your Browser",
+      "subtitle": "Edit, convert, and export as many images as you want simultaneously. Completely local, 100% private, no server uploads.",
+      "cta": "Get Started"
+    },
+    "features": {
+      "privacy": {
+        "title": "Absolute Privacy",
+        "description": "All your images are processed exclusively in your browser. No data ever leaves your computer.",
+        "point1": "No server uploads",
+        "point2": "No tracking",
+        "point3": "Data stays on your device"
+      },
+      "batch": {
+        "title": "Batch Processing",
+        "description": "Edit hundreds of images with just a few clicks. All operations can be applied to multiple images at once.",
+        "point1": "Bulk renaming",
+        "point2": "Batch filters & effects",
+        "point3": "Drag & drop sorting"
+      },
+      "export": {
+        "title": "Flexible Export Options",
+        "description": "Export your images in numerous formats. From PDFs with a designer to SVG vector conversion.",
+        "point1": "PDF with title page designer",
+        "point2": "ZIP archives with compression",
+        "point3": "SVG vector conversion"
+      }
+    },
+    "details": {
+      "title": "All Features at a Glance",
+      "crop": {
+        "title": "Cropping",
+        "text": "Crop images to predefined aspect ratios like 1:1, 16:9, or 4:3."
+      },
+      "filters": {
+        "title": "Filters & Effects",
+        "text": "Brightness, contrast, saturation, hue, blur, and more."
+      },
+      "transform": {
+        "title": "Transformations",
+        "text": "Rotate, flip, and resize with aspect ratio lock."
+      },
+      "pdf": {
+        "title": "PDF Designer",
+        "text": "Create PDFs with custom title pages, comment pages, and layouts."
+      },
+      "svg": {
+        "title": "SVG Export",
+        "text": "Convert raster images to scalable vector graphics."
+      },
+      "i18n": {
+        "title": "Multilingual",
+        "text": "Available in German and English with automatic language detection."
+      }
+    },
+    "app": {
+      "title": "Ready to Start?",
+      "subtitle": "Drag your images into the area below or click to upload."
+    }
+  },
   "head": {
     "title": "Modern Image Editor",
     "description": "Edit, convert, and export your images directly in the browser. Fast, private, and modern."
