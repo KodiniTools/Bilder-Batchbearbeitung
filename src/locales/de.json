@@ -4,6 +4,7 @@
     "nav": {
       "home": "Start",
       "app": "App starten",
+      "blog": "Funktionen",
       "faq": "FAQ"
     },
     "hero": {
@@ -64,6 +65,181 @@
     "app": {
       "title": "Bereit zum Starten?",
       "subtitle": "Ziehen Sie Ihre Bilder in den Bereich unten oder klicken Sie zum Hochladen."
+    }
+  },
+  "blog": {
+    "title": "Bilder-Batchbearbeitung: Das ultimative Werkzeug für professionelle Bildverarbeitung",
+    "subtitle": "Entdecken Sie die leistungsstarke Webanwendung, die Ihre Bildbearbeitung revolutioniert – komplett lokal, sicher und ohne Server-Upload.",
+    "toc": "Inhaltsverzeichnis",
+    "intro": {
+      "p1": "In einer Welt, in der wir täglich mit unzähligen Bildern arbeiten, wird ein effizientes Werkzeug zur Stapelverarbeitung immer wichtiger. Die Bilder-Batchbearbeitung ist eine moderne Webanwendung, die genau dieses Problem löst.",
+      "p2": "Was diese Anwendung besonders macht: Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet – keine Daten verlassen jemals Ihren Computer."
+    },
+    "sections": {
+      "upload": {
+        "title": "Bilder laden und verwalten",
+        "simple": {
+          "title": "Einfaches Hochladen",
+          "text": "Das Hinzufügen von Bildern zur Anwendung könnte nicht einfacher sein:",
+          "dragdrop": "Ziehen Sie Ihre Bilder einfach in den markierten Bereich.",
+          "clickLabel": "Klick-Upload",
+          "click": "Klicken Sie auf den Upload-Bereich, um den Datei-Dialog zu öffnen."
+        },
+        "formats": {
+          "title": "Unterstützte Bildformate",
+          "jpeg": "Ideal für Fotografien",
+          "png": "Perfekt für Grafiken mit Transparenz",
+          "webp": "Modernes Format mit hervorragender Kompression",
+          "bmp": "Bitmap-Bilder",
+          "gif": "Auch animierte GIFs werden unterstützt"
+        }
+      },
+      "transform": {
+        "title": "Bildtransformationen",
+        "rotate": {
+          "title": "Rotation",
+          "text": "Drehen Sie Ihre Bilder präzise: 90° links, 180° oder 90° rechts."
+        },
+        "flip": {
+          "title": "Spiegeln",
+          "text": "Spiegeln Sie Bilder horizontal oder vertikal."
+        },
+        "resize": {
+          "title": "Größe ändern",
+          "text": "Passen Sie Breite und Höhe an, mit optionaler Seitenverhältnis-Sperre."
+        },
+        "crop": {
+          "title": "Zuschneiden",
+          "text": "Schneiden Sie auf vordefinierte Verhältnisse zu: 1:1, 16:9, 4:3, 3:2."
+        }
+      },
+      "filters": {
+        "title": "Filter und Effekte",
+        "intro": "Verleihen Sie Ihren Bildern den perfekten Look. Alle Anpassungen werden in Echtzeit als Vorschau angezeigt.",
+        "brightness": {
+          "title": "Helligkeit",
+          "text": "Regeln Sie die Gesamthelligkeit von 0% bis 200%."
+        },
+        "contrast": {
+          "title": "Kontrast",
+          "text": "Steuern Sie den Unterschied zwischen hellen und dunklen Bereichen."
+        },
+        "saturation": {
+          "title": "Sättigung",
+          "text": "Bestimmen Sie die Farbintensität – von Schwarz-Weiß bis knallig bunt."
+        },
+        "blur": {
+          "title": "Weichzeichner",
+          "text": "Fügen Sie einen Weichzeichnungseffekt von 0px bis 20px hinzu."
+        }
+      },
+      "batch": {
+        "title": "Stapelverarbeitung",
+        "intro": "Das Herzstück der Anwendung: Bearbeiten Sie mehrere Bilder gleichzeitig.",
+        "rename": {
+          "title": "Batch-Umbenennung",
+          "text": "Benennen Sie mehrere Bilder mit einem einheitlichen Schema um. Mit automatischer Nummerierung und Live-Vorschau."
+        },
+        "panel": {
+          "title": "Batch-Bearbeitungspanel",
+          "text": "Passen Sie Filter wie Helligkeit, Kontrast und Sättigung für alle ausgewählten Bilder gleichzeitig an."
+        }
+      },
+      "editor": {
+        "title": "Der individuelle Bild-Editor",
+        "intro": "Für detaillierte Bearbeitungen einzelner Bilder steht Ihnen ein umfangreicher Editor zur Verfügung.",
+        "features": {
+          "preview": "Live-Canvas-Vorschau aller Änderungen",
+          "info": "Bildinformationen: Abmessungen, Dateigröße, Dateiname",
+          "tools": "Komplette Rotations-, Spiegelungs- und Filtersteuerung",
+          "name": "Dateiname direkt im Editor bearbeiten"
+        }
+      },
+      "pdf": {
+        "title": "PDF-Export mit Designer",
+        "intro": "Einer der leistungsstärksten Bereiche: PDF-Export mit umfangreichen Gestaltungsmöglichkeiten.",
+        "titlepage": {
+          "title": "Benutzerdefinierte Titelseite",
+          "text": "Gestalten Sie eine professionelle Titelseite mit Texten, Bildern und Logos."
+        },
+        "comments": {
+          "title": "Mehrseitige Kommentarseiten",
+          "text": "Erstellen Sie zusätzliche Seiten mit Anmerkungen und Beschreibungen."
+        },
+        "optimize": {
+          "title": "PDF-Optimierung",
+          "text": "Automatische Komprimierung für kleinere Dateien bei hoher Qualität."
+        }
+      },
+      "zip": {
+        "title": "ZIP-Archiv Export",
+        "intro": "Exportieren Sie Ihre bearbeiteten Bilder als praktisches ZIP-Archiv.",
+        "formats": "Wählen Sie zwischen PNG, JPEG und WebP mit individueller Qualitätseinstellung."
+      },
+      "svg": {
+        "title": "SVG-Vektorkonvertierung",
+        "intro": "Konvertieren Sie Ihre Rasterbilder in skalierbare Vektorgrafiken.",
+        "modes": "Wählen Sie zwischen Farbmodus und Binärmodus (Schwarz-Weiß) mit erweiterten Feineinstellungen."
+      },
+      "save": {
+        "title": "Einzelbildspeicherung",
+        "intro": "Speichern Sie einzelne Bilder in verschiedenen Formaten.",
+        "formats": "Unterstützte Formate: PNG, JPEG, WebP, BMP und GIF mit individueller Qualitätseinstellung."
+      },
+      "ui": {
+        "title": "Benutzeroberfläche",
+        "intro": "Eine intuitive und moderne Oberfläche für effizientes Arbeiten.",
+        "features": {
+          "grid": "Responsives Bildraster mit Live-Filter-Vorschau",
+          "buttons": "Schnellzugriff-Buttons auf jeder Bildkarte",
+          "statusbar": "Übersichtliche Statusleiste mit Statistiken und Aktionen",
+          "toasts": "Informative Benachrichtigungen bei allen Aktionen"
+        }
+      },
+      "i18n": {
+        "title": "Mehrsprachigkeit",
+        "intro": "Die Anwendung ist vollständig mehrsprachig verfügbar.",
+        "languages": "Unterstützte Sprachen: Deutsch und Englisch mit automatischer Sprachspeicherung."
+      },
+      "theme": {
+        "title": "Dark Mode und Themes",
+        "intro": "Arbeiten Sie in der Umgebung, die Ihren Augen am angenehmsten ist.",
+        "features": "Automatische Erkennung Ihrer Systemeinstellung mit persistenter Speicherung."
+      },
+      "shortcuts": {
+        "title": "Tastenkürzel",
+        "intro": "Praktische Tastenkürzel für schnelleres Arbeiten:",
+        "key": "Taste",
+        "action": "Funktion",
+        "selectAll": "Alle Bilder auswählen",
+        "delete": "Ausgewählte Bilder löschen",
+        "deselect": "Auswahl aufheben"
+      },
+      "privacy": {
+        "title": "Datenschutz und Sicherheit",
+        "local": {
+          "title": "Vollständige Privatsphäre",
+          "text": "Alle Bildbearbeitung findet ausschließlich in Ihrem Browser statt. Kein einziges Bild wird jemals auf einen Server hochgeladen."
+        },
+        "points": {
+          "noUpload": "Keine Server-Kommunikation – Ihre Bilder verlassen niemals Ihren Computer",
+          "noTracking": "Kein Tracking – Analysefunktionen nur mit Ihrer Zustimmung",
+          "noPersist": "Keine Datenpersistenz – Bilder existieren nur im Arbeitsspeicher",
+          "secure": "Sichere Verarbeitung über Browser-APIs mit TypeScript-Typsicherheit"
+        }
+      }
+    },
+    "conclusion": {
+      "title": "Fazit",
+      "text": "Die Bilder-Batchbearbeitung ist ein umfassendes Werkzeug für alle, die regelmäßig mit mehreren Bildern arbeiten. Die Kombination aus leistungsstarken Funktionen und vollständiger Privatsphäre macht sie zur idealen Wahl.",
+      "benefits": {
+        "local": "Vollständig lokale Verarbeitung",
+        "batch": "Umfangreiche Batch-Operationen",
+        "pdf": "Professioneller PDF-Export mit Designer",
+        "formats": "Multiple Export-Formate",
+        "ui": "Intuitive Oberfläche mit Dark Mode",
+        "free": "Komplett kostenlos nutzbar"
+      }
     }
   },
   "head": {
