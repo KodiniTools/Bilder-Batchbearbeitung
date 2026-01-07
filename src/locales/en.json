@@ -1,6 +1,11 @@
 {
   "landing": {
     "brand": "Batch Image Editor",
+    "nav": {
+      "home": "Home",
+      "app": "Launch App",
+      "faq": "FAQ"
+    },
     "hero": {
       "title": "Professional Image Editing Right in Your Browser",
       "subtitle": "Edit, convert, and export as many images as you want simultaneously. Completely local, 100% private, no server uploads.",
