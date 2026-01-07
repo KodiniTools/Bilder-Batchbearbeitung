@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 defineProps<{
   theme: 'light' | 'dark'
@@ -9,7 +10,12 @@ const emit = defineEmits<{
   'toggle-theme': []
 }>()
 
+const router = useRouter()
 const { locale, t } = useI18n()
+
+const goHome = () => {
+  router.push('/')
+}
 
 const setLanguage = (lang: string) => {
   locale.value = lang
@@ -20,7 +26,16 @@ const setLanguage = (lang: string) => {
 <template>
   <header class="app-header">
     <div class="app-header__limiter">
-      <div class="app-header__leading"></div>
+      <div class="app-header__leading">
+        <button
+          class="home-btn"
+          @click="goHome"
+          :title="t('landing.nav.home')"
+          :aria-label="t('landing.nav.home')"
+        >
+          <i class="fa-solid fa-house"></i>
+        </button>
+      </div>
       
       <div class="app-header__title-container">
         <h1 class="app-title">{{ t('header.title') }}</h1>
@@ -81,6 +96,29 @@ const setLanguage = (lang: string) => {
 
 .app-header__leading {
   flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+}
+
+.home-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  transition: all 0.3s var(--ease-spring);
+  cursor: pointer;
+}
+
+.home-btn:hover {
+  color: var(--accent);
+  transform: scale(1.1);
+  border-color: var(--border-color);
+  background: var(--btn);
 }
 
 .app-header__title-container {
@@ -171,9 +209,9 @@ const setLanguage = (lang: string) => {
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  
+
   .app-header__leading {
-    display: none;
+    flex: 0 0 auto;
   }
   
   .app-header__title-container {
