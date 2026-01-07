@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import LandingPage from '@/components/LandingPage.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
 import DropZone from '@/components/DropZone.vue'
@@ -452,9 +453,14 @@ onUnmounted(() => {
 
 <template>
   <div class="app">
-    <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
-    
-    <main class="container">
+    <!-- Landing Page with Hero Section -->
+    <LandingPage />
+
+    <!-- Main App Section -->
+    <div id="app-section" class="app-main">
+      <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
+
+      <main class="container">
       <StatusBar
         v-if="imageStore.hasImages"
         @export-pdf="handleExportPdf"
@@ -510,7 +516,9 @@ onUnmounted(() => {
         </div>
       </section>
     </main>
-    
+    </div>
+
+    <!-- Global Components (outside app-main for proper layering) -->
     <LoadingIndicator ref="loadingIndicator" />
     <ToastContainer />
 
@@ -527,7 +535,7 @@ onUnmounted(() => {
       @close="closePreview"
     />
 
-    <!-- ✨ ExportSettingsModal mit Comment Page Designer Support -->
+    <!-- ExportSettingsModal mit Comment Page Designer Support -->
     <ExportSettingsModal
       :is-open="isExportModalOpen"
       :mode="exportMode"
@@ -557,6 +565,11 @@ onUnmounted(() => {
   min-height: auto;
   display: flex;
   flex-direction: column;
+}
+
+.app-main {
+  background: var(--body-gradient);
+  background-attachment: fixed;
   padding-bottom: var(--space-6);
 }
 
