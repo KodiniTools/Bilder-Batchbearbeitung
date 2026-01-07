@@ -523,49 +523,37 @@
     }
   },
   "blog": {
-    "title": "Complete Guide to the Browser-Based Batch Image Editor",
-    "subtitle": "Everything you need to know about the features and functions of this modern image editing tool",
-    "intro": "Our browser-based batch image editor offers a comprehensive set of tools for image editing - all locally in your browser without server uploads. Here you will find everything you need to know about the various features.",
-    "toc": {
-      "title": "Table of Contents",
-      "upload": "Uploading Images",
-      "transform": "Transformations",
-      "filters": "Filters & Effects",
-      "batch": "Batch Processing",
-      "editor": "Image Editor",
-      "pdf": "PDF Export",
-      "zip": "ZIP Export",
-      "svg": "SVG Conversion",
-      "save": "Saving Images",
-      "ui": "User Interface",
-      "i18n": "Languages",
-      "theme": "Themes",
-      "shortcuts": "Keyboard Shortcuts",
-      "privacy": "Privacy"
+    "title": "Batch Image Processing: The Ultimate Tool for Professional Image Editing",
+    "subtitle": "Discover the powerful web application that revolutionizes your image editing – completely local, secure, and without server uploads.",
+    "toc": "Table of Contents",
+    "intro": {
+      "p1": "In a world where we work with countless images daily, an efficient batch processing tool becomes increasingly important. The Batch Image Editor is a modern web application that solves exactly this problem.",
+      "p2": "What makes this application special: All your images are processed exclusively locally in your browser – no data ever leaves your computer."
     },
     "sections": {
       "upload": {
-        "title": "1. Uploading Images",
-        "intro": "The application supports various methods for loading images:",
-        "dragdrop": {
-          "title": "Drag & Drop",
-          "text": "Drag image files directly from your file manager onto the drop zone."
-        },
-        "fileselect": {
-          "title": "File Selection",
-          "text": "Click the \"Select Files\" button to open the file dialog."
+        "title": "Loading and Managing Images",
+        "simple": {
+          "title": "Easy Upload",
+          "text": "Adding images to the application couldn't be easier:",
+          "dragdrop": "Simply drag your images into the designated area.",
+          "clickLabel": "Click Upload",
+          "click": "Click on the upload area to open the file dialog."
         },
         "formats": {
-          "title": "Supported Formats",
-          "text": "All common image formats are supported: PNG, JPEG, WebP, BMP, GIF, and more."
+          "title": "Supported Image Formats",
+          "jpeg": "Ideal for photographs",
+          "png": "Perfect for graphics with transparency",
+          "webp": "Modern format with excellent compression",
+          "bmp": "Bitmap images",
+          "gif": "Animated GIFs are also supported"
         }
       },
       "transform": {
-        "title": "2. Transformations",
-        "intro": "Geometric transformations for your images:",
+        "title": "Image Transformations",
         "rotate": {
-          "title": "Rotate",
-          "text": "Rotate images in 90° steps (left, right) or 180°."
+          "title": "Rotation",
+          "text": "Rotate your images precisely: 90° left, 180° or 90° right."
         },
         "flip": {
           "title": "Flip",
@@ -573,275 +561,140 @@
         },
         "resize": {
           "title": "Resize",
-          "text": "Change dimensions with optional aspect ratio lock."
+          "text": "Adjust width and height with optional aspect ratio lock."
         },
         "crop": {
-          "title": "Aspect Ratio",
-          "text": "Crop to predefined aspect ratios like 1:1, 16:9, 4:3, or custom values."
+          "title": "Crop",
+          "text": "Crop to predefined ratios: 1:1, 16:9, 4:3, 3:2."
         }
       },
       "filters": {
-        "title": "3. Filters & Effects",
-        "intro": "Comprehensive filter options for image enhancement:",
+        "title": "Filters and Effects",
+        "intro": "Give your images the perfect look. All adjustments are shown in real-time preview.",
         "brightness": {
           "title": "Brightness",
-          "text": "Adjust the image brightness from -100 to +100."
+          "text": "Adjust overall brightness from 0% to 200%."
         },
         "contrast": {
           "title": "Contrast",
-          "text": "Control the contrast for more vivid or softer images."
+          "text": "Control the difference between light and dark areas."
         },
         "saturation": {
           "title": "Saturation",
-          "text": "From grayscale (0) to intense colors (200)."
-        },
-        "hue": {
-          "title": "Hue",
-          "text": "Rotate through the full color spectrum (0° - 360°)."
+          "text": "Determine color intensity – from black and white to vibrant colors."
         },
         "blur": {
           "title": "Blur",
-          "text": "Soft blur effect from 0 to 10 pixels."
-        },
-        "opacity": {
-          "title": "Opacity",
-          "text": "Transparency from 0% (invisible) to 100% (fully visible)."
+          "text": "Add a blur effect from 0px to 20px."
         }
       },
       "batch": {
-        "title": "4. Batch Processing",
-        "intro": "The highlight of this tool - efficient batch processing:",
-        "multiselect": {
-          "title": "Multi-Selection",
-          "text": "Click on image cards to select them. Hold Ctrl/Cmd for multiple selection."
+        "title": "Batch Processing",
+        "intro": "The heart of the application: Edit multiple images simultaneously.",
+        "rename": {
+          "title": "Batch Rename",
+          "text": "Rename multiple images with a uniform scheme. With automatic numbering and live preview."
         },
-        "selectall": {
-          "title": "Select All",
-          "text": "The \"Select All\" button selects or deselects all images at once."
-        },
-        "batchfilters": {
-          "title": "Batch Filters",
-          "text": "Apply filters to all selected images simultaneously."
-        },
-        "bulkrename": {
-          "title": "Bulk Rename",
-          "text": "Rename multiple images sequentially (e.g., Vacation_1, Vacation_2, ...)."
-        },
-        "batchexport": {
-          "title": "Batch Export",
-          "text": "Export all selected images in one go as ZIP or PDF."
+        "panel": {
+          "title": "Batch Edit Panel",
+          "text": "Adjust filters like brightness, contrast, and saturation for all selected images at once."
         }
       },
       "editor": {
-        "title": "5. Detailed Image Editor",
-        "intro": "For precise individual editing, click the magic wand icon:",
-        "preview": {
-          "title": "Live Preview",
-          "text": "All changes are immediately visible in the preview."
-        },
-        "rename": {
-          "title": "Rename",
-          "text": "Change the file name directly in the editor."
-        },
-        "transform": {
-          "title": "Transformations",
-          "text": "Rotate, flip, and resize individual images."
-        },
-        "export": {
-          "title": "Direct Export",
-          "text": "Download the edited image directly in your preferred format."
+        "title": "The Individual Image Editor",
+        "intro": "For detailed editing of individual images, a comprehensive editor is available.",
+        "features": {
+          "preview": "Live canvas preview of all changes",
+          "info": "Image information: dimensions, file size, file name",
+          "tools": "Complete rotation, flip, and filter controls",
+          "name": "Edit file name directly in the editor"
         }
       },
       "pdf": {
-        "title": "6. PDF Export",
-        "intro": "Powerful PDF features for professional documents:",
-        "settings": {
-          "title": "Document Settings",
-          "text": "Title, author, orientation (portrait/landscape) and file names below images."
-        },
+        "title": "PDF Export with Designer",
+        "intro": "One of the most powerful areas: PDF export with extensive design options.",
         "titlepage": {
-          "title": "Title Page",
-          "text": "Optional title page with title and date."
-        },
-        "designer": {
-          "title": "Front Page Designer",
-          "text": "Design a custom front page with texts and images using drag & drop."
+          "title": "Custom Title Page",
+          "text": "Design a professional title page with texts, images, and logos."
         },
         "comments": {
-          "title": "Comment Pages",
-          "text": "Multi-page comment section with texts and images at the end of the PDF."
+          "title": "Multi-Page Comment Pages",
+          "text": "Create additional pages with annotations and descriptions."
         },
-        "optimization": {
-          "title": "File Size Optimization",
-          "text": "Optional compression for smaller PDF files."
+        "optimize": {
+          "title": "PDF Optimization",
+          "text": "Automatic compression for smaller files with high quality."
         }
       },
       "zip": {
-        "title": "7. ZIP Export",
-        "intro": "Simple archiving of your images:",
-        "naming": {
-          "title": "Custom File Name",
-          "text": "Choose the name for your ZIP archive."
-        },
-        "date": {
-          "title": "Automatic Date",
-          "text": "The current date is automatically appended (e.g., images_2025-01-15.zip)."
-        },
-        "progress": {
-          "title": "Progress Indicator",
-          "text": "Live progress display during ZIP creation."
-        }
+        "title": "ZIP Archive Export",
+        "intro": "Export your edited images as a convenient ZIP archive.",
+        "formats": "Choose between PNG, JPEG, and WebP with individual quality settings."
       },
       "svg": {
-        "title": "8. SVG Conversion",
-        "intro": "Convert raster images to vector graphics:",
-        "conversion": {
-          "title": "Automatic Vectorization",
-          "text": "Converts bitmap images to scalable SVG format."
-        },
-        "scalable": {
-          "title": "Infinite Scalability",
-          "text": "SVG images can be scaled to any size without quality loss."
-        },
-        "usecase": {
-          "title": "Use Cases",
-          "text": "Ideal for logos, icons, and simple graphics."
-        }
+        "title": "SVG Vector Conversion",
+        "intro": "Convert your raster images to scalable vector graphics.",
+        "modes": "Choose between color mode and binary mode (black and white) with advanced fine-tuning options."
       },
       "save": {
-        "title": "9. Saving Options",
-        "intro": "Flexible export in various formats:",
-        "formats": {
-          "title": "Image Formats",
-          "list": {
-            "png": "PNG - Lossless, high quality, ideal for graphics with transparency",
-            "jpg": "JPEG - Compressed, smaller files, ideal for photos",
-            "webp": "WebP - Modern format, best compression, supported by all current browsers"
-          }
-        },
-        "quality": {
-          "title": "Quality Setting",
-          "text": "For JPEG and WebP you can set the compression quality (1-100%)."
-        }
+        "title": "Single Image Saving",
+        "intro": "Save individual images in various formats.",
+        "formats": "Supported formats: PNG, JPEG, WebP, BMP, and GIF with individual quality settings."
       },
       "ui": {
-        "title": "10. User Interface",
-        "intro": "Intuitive and responsive design:",
-        "toolbar": {
-          "title": "Toolbar",
-          "text": "All important functions available at the top in the status bar."
-        },
-        "cards": {
-          "title": "Image Cards",
-          "text": "Each image is displayed as a card with preview and quick actions."
-        },
-        "modals": {
-          "title": "Modal Dialogs",
-          "text": "Clear dialogs for complex operations like PDF export."
-        },
-        "responsive": {
-          "title": "Responsive",
-          "text": "Optimized for desktop, tablet, and mobile devices."
+        "title": "User Interface",
+        "intro": "An intuitive and modern interface for efficient work.",
+        "features": {
+          "grid": "Responsive image grid with live filter preview",
+          "buttons": "Quick access buttons on each image card",
+          "statusbar": "Clear status bar with statistics and actions",
+          "toasts": "Informative notifications for all actions"
         }
       },
       "i18n": {
-        "title": "11. Languages",
-        "intro": "Full bilingual support:",
-        "languages": {
-          "title": "Available Languages",
-          "text": "German and English with complete translations of all texts."
-        },
-        "detection": {
-          "title": "Automatic Detection",
-          "text": "The language is automatically detected from browser settings."
-        },
-        "switch": {
-          "title": "Easy Switching",
-          "text": "One-click language switching in the header."
-        },
-        "persistence": {
-          "title": "Persistence",
-          "text": "The selected language is saved in the browser."
-        }
+        "title": "Multilingual Support",
+        "intro": "The application is fully available in multiple languages.",
+        "languages": "Supported languages: German and English with automatic language storage."
       },
       "theme": {
-        "title": "12. Light & Dark Mode",
-        "intro": "Comfortable working in any lighting condition:",
-        "modes": {
-          "title": "Two Modes",
-          "text": "Light mode for bright environments, dark mode for evening work."
-        },
-        "system": {
-          "title": "System Detection",
-          "text": "Automatic adaptation to your operating system's preferences."
-        },
-        "toggle": {
-          "title": "Easy Switching",
-          "text": "One click on the theme button in the header."
-        },
-        "persistence": {
-          "title": "Persistence",
-          "text": "Your preference is saved in the browser."
-        }
+        "title": "Dark Mode and Themes",
+        "intro": "Work in the environment that's most comfortable for your eyes.",
+        "features": "Automatic detection of your system setting with persistent storage."
       },
       "shortcuts": {
-        "title": "13. Keyboard Shortcuts",
-        "intro": "Efficient workflows with keyboard shortcuts:",
-        "selection": {
-          "title": "Selection",
-          "text": "Ctrl+A to select all images."
-        },
-        "navigation": {
-          "title": "Navigation",
-          "text": "Arrow keys for navigating between images."
-        },
-        "actions": {
-          "title": "Actions",
-          "text": "Delete key to remove selected images."
-        }
+        "title": "Keyboard Shortcuts",
+        "intro": "Practical keyboard shortcuts for faster work:",
+        "key": "Key",
+        "action": "Function",
+        "selectAll": "Select all images",
+        "delete": "Delete selected images",
+        "deselect": "Deselect all"
       },
       "privacy": {
-        "title": "14. Privacy",
-        "intro": "Your privacy is our top priority:",
+        "title": "Privacy and Security",
         "local": {
-          "title": "Local Processing",
-          "text": "All image processing happens exclusively in your browser."
+          "title": "Complete Privacy",
+          "text": "All image processing takes place exclusively in your browser. Not a single image is ever uploaded to a server."
         },
-        "noupload": {
-          "title": "No Server Uploads",
-          "text": "Your images never leave your device."
-        },
-        "notracking": {
-          "title": "No Tracking",
-          "text": "No cookies, no analytics, no data collection."
-        },
-        "opensource": {
-          "title": "Open Source",
-          "text": "The code is open and reviewable."
+        "points": {
+          "noUpload": "No server communication – your images never leave your computer",
+          "noTracking": "No tracking – analytics only with your consent",
+          "noPersist": "No data persistence – images exist only in memory",
+          "secure": "Secure processing via browser APIs with TypeScript type safety"
         }
       }
     },
     "conclusion": {
       "title": "Conclusion",
-      "text": "Our browser-based batch image editor combines powerful features with maximum privacy. Whether you want to edit a single image or process hundreds at once - everything happens locally, fast, and secure.",
+      "text": "The Batch Image Editor is a comprehensive tool for anyone who regularly works with multiple images. The combination of powerful features and complete privacy makes it the ideal choice.",
       "benefits": {
-        "title": "Key Benefits at a Glance:",
-        "list": {
-          "privacy": "100% Privacy - No server uploads",
-          "batch": "Powerful batch processing",
-          "formats": "Various export formats (PNG, JPEG, WebP, PDF, ZIP, SVG)",
-          "designer": "Professional PDF designer with front pages and comments",
-          "ui": "Intuitive user interface with drag & drop",
-          "i18n": "Full bilingual support (German/English)",
-          "theme": "Light and dark mode",
-          "free": "Completely free"
-        }
+        "local": "Completely local processing",
+        "batch": "Extensive batch operations",
+        "pdf": "Professional PDF export with designer",
+        "formats": "Multiple export formats",
+        "ui": "Intuitive interface with dark mode",
+        "free": "Completely free to use"
       }
-    },
-    "cta": {
-      "title": "Ready to start?",
-      "button": "Launch App Now"
-    },
-    "backToTop": "Back to top"
+    }
   }
 }
