@@ -410,17 +410,7 @@ onUnmounted(() => {
 
       <DropZone />
 
-      <div v-if="!imageStore.hasImages" class="empty-state">
-        <div style="font-size:34px">
-          <i class="fa-regular fa-image"></i>
-        </div>
-        <div>
-          <strong>{{ t('emptyState.title') }}</strong>
-          <span>{{ t('emptyState.text') }}</span>
-        </div>
-      </div>
-
-      <ImageGrid v-else @open-editor="openEditor" @open-preview="openPreview" />
+      <ImageGrid v-if="imageStore.hasImages" @open-editor="openEditor" @open-preview="openPreview" />
     </main>
 
     <LoadingIndicator ref="loadingIndicator" />
@@ -477,21 +467,6 @@ onUnmounted(() => {
   margin-top: var(--space-7);
   flex: 1;
   width: 100%;
-}
-
-.empty-state {
-  display: grid;
-  place-items: center;
-  gap: var(--space-4);
-  text-align: center;
-  color: var(--muted);
-  padding: var(--space-6);
-  border: 2px dashed color-mix(in oklab, var(--border-color) 40%, transparent);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--panel) 30%, transparent) 0%,
-    color-mix(in oklab, var(--panel) 10%, transparent) 100%);
-  margin-bottom: var(--space-7);
 }
 
 @media (max-width: 768px) {
