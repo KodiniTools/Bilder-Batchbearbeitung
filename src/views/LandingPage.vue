@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { locale, t } = useI18n()
+const router = useRouter()
 const theme = ref<'light' | 'dark'>('light')
 
 const setLanguage = (lang: string) => {
@@ -20,11 +22,12 @@ const toggleTheme = () => {
   applyTheme(theme.value === 'dark' ? 'light' : 'dark')
 }
 
-const scrollToApp = () => {
-  const appSection = document.getElementById('app-section')
-  if (appSection) {
-    appSection.scrollIntoView({ behavior: 'smooth' })
-  }
+const goToApp = () => {
+  router.push('/app')
+}
+
+const goToFaq = () => {
+  router.push('/faq')
 }
 
 onMounted(() => {
@@ -47,6 +50,16 @@ onMounted(() => {
         <div class="nav-brand">
           <i class="fa-solid fa-images"></i>
           <span>{{ t('landing.brand') }}</span>
+        </div>
+        <div class="nav-links">
+          <button class="nav-link" @click="goToApp">
+            <i class="fa-solid fa-rocket"></i>
+            {{ t('landing.nav.app') }}
+          </button>
+          <button class="nav-link" @click="goToFaq">
+            <i class="fa-solid fa-circle-question"></i>
+            {{ t('landing.nav.faq') }}
+          </button>
         </div>
         <div class="nav-actions">
           <button
@@ -83,7 +96,7 @@ onMounted(() => {
         <div class="hero-content">
           <h1 class="hero-title">{{ t('landing.hero.title') }}</h1>
           <p class="hero-subtitle">{{ t('landing.hero.subtitle') }}</p>
-          <button class="hero-cta" @click="scrollToApp">
+          <button class="hero-cta" @click="goToApp">
             <i class="fa-solid fa-rocket"></i>
             {{ t('landing.hero.cta') }}
           </button>
@@ -176,6 +189,32 @@ onMounted(() => {
       </div>
     </section>
 
+    <!-- Donate Section -->
+    <section class="donate-section">
+      <div class="donate-container">
+        <h2>{{ t('donate.title') }}</h2>
+        <p class="donate-text">{{ t('donate.text') }}</p>
+        <form action="https://www.paypal.com/donate" method="post" target="_top" class="paypal-form">
+          <input type="hidden" name="hosted_button_id" value="8RGLGQ2BFMHU6" />
+          <button type="submit" class="paypal-button">
+            <i class="fa-brands fa-paypal"></i>
+            {{ t('donate.button') }}
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta">
+      <div class="footer-cta-container">
+        <h2>{{ t('landing.app.title') }}</h2>
+        <p>{{ t('landing.app.subtitle') }}</p>
+        <button class="hero-cta" @click="goToApp">
+          <i class="fa-solid fa-arrow-right"></i>
+          {{ t('landing.hero.cta') }}
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -184,6 +223,8 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--body-gradient);
+  background-attachment: fixed;
 }
 
 /* Navigation */
@@ -206,6 +247,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-4);
 }
 
 .nav-brand {
@@ -220,6 +262,38 @@ onMounted(() => {
 .nav-brand i {
   color: var(--accent);
   font-size: 1.3rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-spring);
+}
+
+.nav-link:hover {
+  background: var(--btn);
+  border-color: var(--border-color);
+  transform: translateY(-1px);
+}
+
+.nav-link i {
+  font-size: 0.85rem;
+  color: var(--accent);
 }
 
 .nav-actions {
@@ -271,8 +345,6 @@ onMounted(() => {
 .hero-section {
   padding-top: calc(80px + var(--space-7));
   padding-bottom: var(--space-7);
-  background: var(--body-gradient);
-  background-attachment: fixed;
 }
 
 .hero-container {
@@ -518,10 +590,118 @@ onMounted(() => {
   line-height: 1.5;
 }
 
+/* Donate Section */
+.donate-section {
+  padding: var(--space-7) 0;
+}
+
+.donate-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent) 8%, transparent) 0%,
+    color-mix(in oklab, var(--accent) 3%, transparent) 100%);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  border-radius: var(--radius-2xl);
+  text-align: center;
+}
+
+.donate-container h2 {
+  margin: 0 0 var(--space-4);
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.donate-text {
+  margin-bottom: var(--space-5);
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.paypal-form {
+  display: inline-block;
+}
+
+.paypal-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #0070ba, #1f8dd6);
+  border: none;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  box-shadow: 0 4px 12px rgba(0, 112, 186, 0.3);
+}
+
+.paypal-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 112, 186, 0.4);
+  background: linear-gradient(135deg, #005a94, #1a7ab8);
+}
+
+.paypal-button:active {
+  transform: translateY(0);
+}
+
+.paypal-button i {
+  font-size: 1.4rem;
+}
+
+/* Footer CTA */
+.footer-cta {
+  padding: var(--space-7) 0;
+  background: var(--panel);
+  border-top: 1px solid var(--glass-border);
+}
+
+.footer-cta-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+  text-align: center;
+}
+
+.footer-cta h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+  color: var(--text);
+}
+
+.footer-cta p {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 0 0 var(--space-5);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero-section {
     padding-top: calc(70px + var(--space-6));
+  }
+
+  .nav-container {
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--glass-border);
   }
 
   .feature-grid {
@@ -540,6 +720,14 @@ onMounted(() => {
   .nav-brand span {
     display: none;
   }
+
+  .donate-container {
+    padding: var(--space-5);
+  }
+
+  .donate-container h2 {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -553,6 +741,16 @@ onMounted(() => {
     width: 36px;
     height: 36px;
     font-size: 0.8rem;
+  }
+
+  .nav-link {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .paypal-button {
+    padding: var(--space-3) var(--space-5);
+    font-size: 1rem;
   }
 }
 </style>

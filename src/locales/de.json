@@ -1,6 +1,11 @@
 {
   "landing": {
     "brand": "Bild-Batchbearbeitung",
+    "nav": {
+      "home": "Start",
+      "app": "App starten",
+      "faq": "FAQ"
+    },
     "hero": {
       "title": "Professionelle Bildbearbeitung direkt im Browser",
       "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",

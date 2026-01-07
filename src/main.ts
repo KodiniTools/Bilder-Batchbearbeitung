@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
+import router from './router'
 
 // Import translations
 import de from './locales/de.json'
@@ -26,6 +27,7 @@ const app = createApp(App)
 
 // Use plugins
 app.use(createPinia())
+app.use(router)
 app.use(i18n)
 
 // Mount app
