@@ -5,7 +5,8 @@
       "home": "Home",
       "app": "Launch App",
       "faq": "FAQ",
-      "blog": "Features"
+      "blog": "Features",
+      "learn": "Learn"
     },
     "hero": {
       "title": "Professional Image Editing Right in Your Browser",
@@ -695,6 +696,218 @@
         "ui": "Intuitive interface with dark mode",
         "free": "Completely free to use"
       }
+    }
+  },
+  "learn": {
+    "badge": "Developer Guide",
+    "title": "Web Audio API, Vue.js 3 & Modern Browser Technologies",
+    "subtitle": "A comprehensive learning resource for developers who want to understand and apply modern web technologies. From audio processing to reactive UI frameworks to performance optimization.",
+    "toc": "Table of Contents",
+    "showCode": "Show Code",
+    "hideCode": "Hide Code",
+    "tip": "Tip",
+    "warning": "Warning",
+    "intro": {
+      "p1": "Modern web applications use a variety of browser APIs to implement powerful features directly in the client. This guide walks you through the most important technologies.",
+      "p2": "Whether you want to create audio visualizations, process images, or build reactive user interfaces – you'll find the necessary knowledge here.",
+      "prereqTitle": "Prerequisites",
+      "prereq1": "Basic JavaScript knowledge (ES6+)",
+      "prereq2": "HTML and CSS fundamentals",
+      "prereq3": "Node.js and npm installed"
+    },
+    "sections": {
+      "webaudio": {
+        "title": "Web Audio API",
+        "intro": "The Web Audio API is a powerful browser API for audio processing and synthesis. It enables complex audio effects, visualizations, and real-time audio manipulation.",
+        "basics": {
+          "title": "Core Concepts",
+          "text": "The Web Audio API is based on a modular routing system. Audio nodes are connected together to form a processing graph."
+        },
+        "concepts": {
+          "context": "The central coordinator for all audio operations. Manages the audio graph and timing.",
+          "node": "Building blocks of audio processing: Sources, Effects, Analyzers, and Destination.",
+          "buffer": "Container for audio data in memory. Enables efficient playback and manipulation.",
+          "param": "Automatable parameters for precise control of volume, frequency, and more."
+        },
+        "analyser": {
+          "title": "Audio Analysis and Visualization",
+          "text": "With the AnalyserNode, you can extract frequency and time domain data for use in visualizations."
+        },
+        "tip": "AudioContext must be started by user interaction (e.g., click) since browsers block autoplay."
+      },
+      "vue3": {
+        "title": "Vue.js 3 Composition API",
+        "intro": "Vue.js 3 introduces the Composition API, enabling more flexible and reusable code organization.",
+        "optionsApi": "Classic approach with data, methods, computed. Good for simple components.",
+        "compositionApi": "Modern approach with setup(), ref(), reactive(). Ideal for complex logic and reusability.",
+        "reactivity": {
+          "title": "Reactivity System",
+          "text": "Vue 3 uses a Proxy-based reactivity system that automatically tracks dependencies and triggers updates."
+        },
+        "composables": {
+          "title": "Creating Composables",
+          "text": "Composables are reusable functions that encapsulate reactive logic. They follow the use* naming convention."
+        },
+        "lifecycle": {
+          "title": "Lifecycle Hooks",
+          "mounted": "DOM is ready, initialize external APIs",
+          "updated": "After every reactive update",
+          "unmounted": "Cleanup, remove event listeners",
+          "beforeMount": "Before the DOM is created"
+        }
+      },
+      "canvas": {
+        "title": "Canvas API for Image Processing",
+        "intro": "The Canvas API enables pixel-perfect image manipulation directly in the browser. Ideal for filters, transformations, and real-time effects.",
+        "features": {
+          "draw": "2D Drawing",
+          "drawDesc": "Draw shapes, lines, text, and complex paths.",
+          "image": "Image Manipulation",
+          "imageDesc": "Load, transform, and edit images pixel by pixel.",
+          "filter": "Filters & Effects",
+          "filterDesc": "Brightness, contrast, grayscale, and more.",
+          "export": "Export",
+          "exportDesc": "Export as PNG, JPEG, or WebP."
+        },
+        "warning": "For large images, Canvas processing can block the main thread. Consider Web Workers for intensive operations."
+      },
+      "fileapi": {
+        "title": "File API & Blob Handling",
+        "intro": "The File API provides access to user-selected files. Together with Blob and URL.createObjectURL, it forms the foundation for file-based web applications.",
+        "file": "Represents a file with metadata like name, size, and MIME type.",
+        "reader": "Reads file contents as text, ArrayBuffer, or Data URL.",
+        "blob": "Raw data container for binary data of any kind.",
+        "objecturl": "Creates a temporary URL for Blob objects for display or download."
+      },
+      "typescript": {
+        "title": "TypeScript in Vue 3",
+        "intro": "TypeScript provides static typing for JavaScript, improving the developer experience through better autocompletion, refactoring, and error detection.",
+        "benefits": {
+          "safety": "Type Safety",
+          "intellisense": "Better IDE Support",
+          "docs": "Self-Documenting Code",
+          "refactor": "Safe Refactoring"
+        }
+      },
+      "pinia": {
+        "title": "State Management with Pinia",
+        "intro": "Pinia is the official state management solution for Vue 3. It offers an intuitive API, full TypeScript support, and DevTools integration.",
+        "features": {
+          "lightweight": "Lightweight",
+          "typescript": "TypeScript-first",
+          "devtools": "DevTools Integration",
+          "modular": "Modular Stores"
+        }
+      },
+      "workers": {
+        "title": "Web Workers for Performance",
+        "intro": "Web Workers enable JavaScript execution in background threads without blocking the main thread. Ideal for intensive computations.",
+        "types": {
+          "dedicated": "Dedicated thread for compute-intensive tasks like image processing.",
+          "shared": "Can be shared across multiple browsing contexts.",
+          "service": "For offline functionality, caching, and push notifications."
+        },
+        "tip": "Use Transferable Objects for large data buffers to avoid copying costs."
+      },
+      "performance": {
+        "title": "Performance Optimization",
+        "intro": "A fast application significantly improves user experience. These techniques help optimize Vue applications.",
+        "techniques": {
+          "lazy": {
+            "title": "Lazy Loading",
+            "desc": "Load components and routes only when needed."
+          },
+          "virtual": {
+            "title": "Virtual Scrolling",
+            "desc": "Render only visible items in long lists."
+          },
+          "memo": {
+            "title": "Memoization",
+            "desc": "Cache expensive computations with computed() and v-memo."
+          },
+          "debounce": {
+            "title": "Debouncing",
+            "desc": "Batch frequent events for fewer updates."
+          }
+        }
+      },
+      "security": {
+        "title": "Web Application Security",
+        "intro": "Security is a critical aspect of any web application. These best practices help avoid common vulnerabilities.",
+        "practices": {
+          "csp": {
+            "title": "Content Security Policy",
+            "desc": "HTTP headers to control allowed resources."
+          },
+          "xss": {
+            "title": "XSS Prevention",
+            "desc": "Vue escapes automatically, but v-html requires caution."
+          },
+          "cors": {
+            "title": "Understanding CORS",
+            "desc": "Configure cross-origin requests correctly."
+          },
+          "privacy": {
+            "title": "Data Privacy",
+            "desc": "Process data locally when possible."
+          }
+        },
+        "clientSide": {
+          "title": "Client-Side Processing",
+          "text": "Maximum privacy through local data processing. No data leaves the browser, no server uploads required."
+        }
+      },
+      "practice": {
+        "title": "Practical Exercises",
+        "intro": "Put what you've learned into practice. These exercises help solidify the concepts.",
+        "levels": {
+          "beginner": "Beginner",
+          "intermediate": "Intermediate",
+          "advanced": "Advanced"
+        },
+        "exercises": {
+          "audio": {
+            "title": "Audio Player with Visualization",
+            "desc": "Create a simple audio player with frequency visualization.",
+            "task1": "Set up AudioContext and AnalyserNode",
+            "task2": "Implement Canvas visualization",
+            "task3": "Add play/pause and volume controls"
+          },
+          "gallery": {
+            "title": "Image Gallery with Filters",
+            "desc": "A Vue 3 component for image display with Canvas filters.",
+            "task1": "Implement drag & drop upload",
+            "task2": "Add Canvas filters (brightness, contrast)",
+            "task3": "Create Pinia store for image management"
+          },
+          "visualizer": {
+            "title": "Real-Time Audio Visualizer",
+            "desc": "Combine Web Audio API with Canvas for impressive visualizations.",
+            "task1": "Capture microphone input via getUserMedia()",
+            "task2": "Use FFT data for spectrum analysis",
+            "task3": "Implement different visualization modes"
+          }
+        },
+        "resources": {
+          "title": "Further Resources"
+        }
+      }
+    },
+    "conclusion": {
+      "title": "Summary",
+      "text": "You now have a comprehensive overview of modern web technologies. These concepts form the foundation for powerful browser applications.",
+      "items": {
+        "webaudio": "Web Audio API for audio processing",
+        "vue": "Vue.js 3 Composition API",
+        "canvas": "Canvas API for image manipulation",
+        "typescript": "TypeScript for type safety",
+        "performance": "Performance optimizations",
+        "security": "Security best practices"
+      },
+      "cta": "Try the App Now"
+    },
+    "footer": {
+      "text": "This learning resource is continuously expanded and updated."
     }
   }
 }

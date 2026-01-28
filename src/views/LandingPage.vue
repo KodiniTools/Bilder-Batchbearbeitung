@@ -34,6 +34,10 @@ const goToBlog = () => {
   router.push('/blog')
 }
 
+const goToLearn = () => {
+  router.push('/learn')
+}
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -63,6 +67,10 @@ onMounted(() => {
           <button class="nav-link" @click="goToBlog">
             <i class="fa-solid fa-book"></i>
             {{ t('landing.nav.blog') }}
+          </button>
+          <button class="nav-link" @click="goToLearn">
+            <i class="fa-solid fa-graduation-cap"></i>
+            {{ t('landing.nav.learn') }}
           </button>
           <button class="nav-link" @click="goToFaq">
             <i class="fa-solid fa-circle-question"></i>
