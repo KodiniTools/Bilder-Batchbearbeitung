@@ -579,6 +579,7 @@
       "bold": "Fett",
       "italic": "Kursiv",
       "width": "Breite: {width}px",
+      "height": "Höhe: {height}px",
       "opacity": "Deckkraft: {opacity}%",
       "position": "Position:",
       "layer": "Ebene:",

@@ -264,6 +264,30 @@
                       {{ t('commentPageDesigner.properties.italic') }}
                     </label>
                   </div>
+
+                  <div class="property-group">
+                    <label for="text-width">{{ t('commentPageDesigner.properties.width', { width: selectedElement.width }) }}</label>
+                    <input
+                        id="text-width"
+                        type="range"
+                        v-model.number="selectedElement.width"
+                        min="80"
+                        :max="pageWidth"
+                        step="10"
+                    >
+                  </div>
+
+                  <div class="property-group">
+                    <label for="text-height">{{ t('commentPageDesigner.properties.height', { height: selectedElement.height }) }}</label>
+                    <input
+                        id="text-height"
+                        type="range"
+                        v-model.number="selectedElement.height"
+                        min="30"
+                        :max="pageHeight"
+                        step="10"
+                    >
+                  </div>
                 </template>
 
                 <!-- Image Properties -->
@@ -402,6 +426,8 @@
                       position: 'absolute',
                       left: element.x + 'px',
                       top: element.y + 'px',
+                      width: element.type === 'text' && element.width ? element.width + 'px' : undefined,
+                      height: element.type === 'text' && element.height ? element.height + 'px' : undefined,
                       zIndex: element.zIndex,
                       cursor: 'move'
                     }"
@@ -456,7 +482,15 @@
                       <img :src="element.src" alt="Uploaded image">
                     </div>
 
-                    <!-- Resize Handle for selected element -->
+                    <!-- Resize Handles for text elements (4 corners) -->
+                    <div v-if="selectedElement?.id === element.id && element.type === 'text'" class="resize-handles">
+                      <div class="resize-handle-corner nw" @mousedown.stop="startTextResize($event, 'nw')"></div>
+                      <div class="resize-handle-corner ne" @mousedown.stop="startTextResize($event, 'ne')"></div>
+                      <div class="resize-handle-corner sw" @mousedown.stop="startTextResize($event, 'sw')"></div>
+                      <div class="resize-handle-corner se" @mousedown.stop="startTextResize($event, 'se')"></div>
+                    </div>
+
+                    <!-- Resize Handle for image elements -->
                     <div
                         v-if="selectedElement?.id === element.id && element.type === 'image'"
                         class="resize-handle"
@@ -547,6 +581,11 @@ watch(() => props.modelValue, (newVal) => {
       const elements = JSON.parse(JSON.stringify(props.initialElements));
 
       elements.forEach(el => {
+        // Backward compatibility: add width/height for text elements that don't have them
+        if (el.type === 'text') {
+          if (!el.width) el.width = 300;
+          if (!el.height) el.height = 60;
+        }
         const pageNum = el.page || 1;
         if (!elementsByPage.has(pageNum)) {
           elementsByPage.set(pageNum, []);
@@ -589,11 +628,14 @@ const inlineTextareaRef = ref(null);
 // Dragging state
 let isDragging = false;
 let isResizing = false;
+let isTextResizing = false;
+let resizeDirection = '';
 let dragStartX = 0;
 let dragStartY = 0;
 let elementStartX = 0;
 let elementStartY = 0;
-let resizeStartWidth = 0;
+let elementStartWidth = 0;
+let elementStartHeight = 0;
 
 // Generate unique ID
 function generateId() {
@@ -662,8 +704,10 @@ function addTextElement() {
     id: generateId(),
     type: 'text',
     content: 'Neuer Text',
-    x: Math.random() * (pageWidth - 200),
+    x: Math.random() * (pageWidth - 350),
     y: Math.random() * (pageHeight - 100),
+    width: 300,
+    height: 60,
     fontSize: 24,
     color: '#000000',
     align: 'left',
@@ -671,7 +715,7 @@ function addTextElement() {
     italic: false,
     zIndex: currentElements.value.length
   };
-  
+
   currentElements.value.push(newElement);
   selectedElement.value = newElement;
 }
@@ -777,26 +821,61 @@ function startResize(event) {
   if (!selectedElement.value) return;
   isResizing = true;
   dragStartX = event.clientX / zoomLevel.value;
-  resizeStartWidth = selectedElement.value.width;
+  elementStartWidth = selectedElement.value.width;
+  event.stopPropagation();
+}
+
+function startTextResize(event, direction) {
+  if (!selectedElement.value) return;
+  isTextResizing = true;
+  resizeDirection = direction;
+  dragStartX = event.clientX / zoomLevel.value;
+  dragStartY = event.clientY / zoomLevel.value;
+  elementStartX = selectedElement.value.x;
+  elementStartY = selectedElement.value.y;
+  elementStartWidth = selectedElement.value.width || 300;
+  elementStartHeight = selectedElement.value.height || 60;
   event.stopPropagation();
 }
 
 function handleMouseMove(event) {
-  if (isDragging && selectedElement.value && !isResizing && !editingTextId.value) {
+  if (isTextResizing && selectedElement.value) {
+    const dx = (event.clientX / zoomLevel.value) - dragStartX;
+    const dy = (event.clientY / zoomLevel.value) - dragStartY;
+
+    if (resizeDirection.includes('e')) {
+      selectedElement.value.width = Math.max(80, elementStartWidth + dx);
+    }
+    if (resizeDirection.includes('w')) {
+      const newWidth = Math.max(80, elementStartWidth - dx);
+      selectedElement.value.x = elementStartX + (elementStartWidth - newWidth);
+      selectedElement.value.width = newWidth;
+    }
+    if (resizeDirection.includes('s')) {
+      selectedElement.value.height = Math.max(30, elementStartHeight + dy);
+    }
+    if (resizeDirection.includes('n')) {
+      const newHeight = Math.max(30, elementStartHeight - dy);
+      selectedElement.value.y = elementStartY + (elementStartHeight - newHeight);
+      selectedElement.value.height = newHeight;
+    }
+  } else if (isDragging && selectedElement.value && !isResizing && !editingTextId.value) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
     const deltaY = (event.clientY / zoomLevel.value) - dragStartY;
-    
+
     selectedElement.value.x = Math.max(0, Math.min(pageWidth - 50, elementStartX + deltaX));
     selectedElement.value.y = Math.max(0, Math.min(pageHeight - 50, elementStartY + deltaY));
   } else if (isResizing && selectedElement.value) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
-    selectedElement.value.width = Math.max(50, Math.min(500, resizeStartWidth + deltaX));
+    selectedElement.value.width = Math.max(50, Math.min(500, elementStartWidth + deltaX));
   }
 }
 
 function handleMouseUp() {
   isDragging = false;
   isResizing = false;
+  isTextResizing = false;
+  resizeDirection = '';
 }
 
 // Zoom controls
@@ -1462,10 +1541,12 @@ onUnmounted(() => {
 }
 
 .element-text {
+  width: 100%;
+  height: 100%;
   padding: 8px;
-  min-width: 50px;
-  min-height: 30px;
+  box-sizing: border-box;
   font-family: Helvetica, Arial, sans-serif;
+  overflow: hidden;
 }
 
 .element-image {
@@ -1480,16 +1561,18 @@ onUnmounted(() => {
 }
 
 .text-content {
+  width: 100%;
+  height: 100%;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow: hidden;
   line-height: 1.5;
   cursor: text;
 }
 
 .inline-text-editor {
   width: 100%;
-  min-width: 80px;
-  min-height: 30px;
+  height: 100%;
   padding: 0;
   margin: 0;
   border: none;
@@ -1505,7 +1588,7 @@ onUnmounted(() => {
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
-  field-sizing: content;
+  overflow: hidden;
 }
 
 .canvas-element.editing {
@@ -1528,6 +1611,29 @@ onUnmounted(() => {
   opacity: 0.8;
 }
 
+/* Resize handles for text elements (4 corners, like FrontPageDesigner) */
+.resize-handles {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+}
+
+.resize-handle-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  pointer-events: all;
+}
+
+.resize-handle-corner.nw { top: 0; left: 0; cursor: nw-resize; }
+.resize-handle-corner.ne { top: 0; right: 0; cursor: ne-resize; }
+.resize-handle-corner.sw { bottom: 0; left: 0; cursor: sw-resize; }
+.resize-handle-corner.se { bottom: 0; right: 0; cursor: se-resize; }
+
+/* Resize handle for image elements (single bottom-right handle) */
 .resize-handle {
   position: absolute;
   right: -8px;

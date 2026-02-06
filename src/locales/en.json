@@ -404,6 +404,7 @@
       "bold": "Bold",
       "italic": "Italic",
       "width": "Width: {width}px",
+      "height": "Height: {height}px",
       "opacity": "Opacity: {opacity}%",
       "position": "Position:",
       "layer": "Layer:",
