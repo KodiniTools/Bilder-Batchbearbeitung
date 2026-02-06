@@ -34,9 +34,11 @@ export interface CanvasElement {
   align?: 'left' | 'center' | 'right'
   bold?: boolean
   italic?: boolean
+  // Shared properties
+  width?: number
+  height?: number
   // Image properties
   src?: string
-  width?: number
   opacity?: number
 }
 
@@ -701,9 +703,9 @@ function renderTextElement(
   // X-Position: element.x + Padding (in mm)
   const xBase = (element.x + paddingPx) * scaleX
 
-  // Verfügbare Breite für Textumbruch: Canvas-Breite minus Element-Position minus Padding
-  const canvasWidth = 794
-  const availableWidthMm = (canvasWidth - element.x - paddingPx * 2) * scaleX
+  // Verfügbare Breite für Textumbruch: Element-Breite minus Padding (WYSIWYG)
+  const elementWidth = element.width || 300
+  const availableWidthMm = (elementWidth - paddingPx * 2) * scaleX
 
   // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
   // splitTextToSize() repliziert das CSS word-break: break-word Verhalten
