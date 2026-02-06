@@ -88,6 +88,7 @@
               </button>
             </div>
 
+            <div class="canvas-scroll-area">
             <div class="canvas-wrapper">
               <div
                 class="canvas"
@@ -348,6 +349,7 @@
               <div class="no-selection-message">
                 {{ t('frontPageDesigner.properties.noSelection') }}
               </div>
+            </div>
             </div>
           </div>
 
@@ -862,6 +864,12 @@ function closeDesigner() {
   text-align: center;
 }
 
+.canvas-scroll-area {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
@@ -1262,6 +1270,10 @@ function closeDesigner() {
     height: 100vh;
     max-width: 100%;
     border-radius: 0;
+  }
+
+  .canvas-scroll-area {
+    flex-direction: column;
   }
 
   .properties-panel {
