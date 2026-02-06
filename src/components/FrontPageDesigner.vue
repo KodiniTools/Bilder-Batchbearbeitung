@@ -93,7 +93,11 @@
               <div
                 class="canvas"
                 ref="canvasRef"
-                :style="{ transform: `scale(${zoomLevel})` }"
+                :style="{
+                  transform: `scale(${zoomLevel})`,
+                  marginRight: `${794 * (zoomLevel - 1)}px`,
+                  marginBottom: `${1123 * (zoomLevel - 1)}px`
+                }"
                 @click="deselectAll"
               >
                 <!-- Elements -->
@@ -889,8 +893,8 @@ function closeDesigner() {
   border-radius: 4px;
   position: relative;
   flex-shrink: 0;
-  transform-origin: center;
-  transition: transform 0.2s ease;
+  transform-origin: top left;
+  transition: transform 0.2s ease, margin 0.2s ease;
 }
 
 /* Elements */
