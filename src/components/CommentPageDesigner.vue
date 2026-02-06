@@ -408,7 +408,9 @@
                     :style="{
                     width: pageWidth + 'px',
                     height: pageHeight + 'px',
-                    transform: `scale(${zoomLevel})`
+                    transform: `scale(${zoomLevel})`,
+                    marginRight: `${pageWidth * (zoomLevel - 1)}px`,
+                    marginBottom: `${pageHeight * (zoomLevel - 1)}px`
                   }"
                     @mousedown="handleCanvasClick"
                 >
@@ -1498,8 +1500,8 @@ onUnmounted(() => {
   border-radius: 4px;
   position: relative;
   flex-shrink: 0;
-  transform-origin: center;
-  transition: transform 0.2s ease;
+  transform-origin: top left;
+  transition: transform 0.2s ease, margin 0.2s ease;
 }
 
 .canvas-grid {
