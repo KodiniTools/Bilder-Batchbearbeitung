@@ -364,6 +364,11 @@
       "text": {
         "default": "New Text"
       }
+    },
+    "zoom": {
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "reset": "Reset zoom"
     }
   },
   "commentPageDesigner": {
