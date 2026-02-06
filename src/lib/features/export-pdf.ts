@@ -345,7 +345,13 @@ async function createCustomFrontPage(
 }
 
 /**
- * ✨ NEU: Rendert ein Text-Element der Startseite
+ * Rendert ein Text-Element der Startseite
+ *
+ * Koordinatensystem-Abgleich mit dem FrontPageDesigner-Canvas:
+ * - Canvas: 794×1123px (A4 @ 96 DPI)
+ * - PDF A4: 210×297mm
+ * - CSS .text-content hat padding: var(--space-2) (≈8px), line-height: 1.4
+ * - Elemente haben explizite width/height
  */
 function renderFrontPageTextElement(
   pdf: jsPDF,
@@ -355,22 +361,22 @@ function renderFrontPageTextElement(
 ): void {
   if (!element.content || !element.content.trim()) return
 
-  // Konvertiere Koordinaten
-  const x = element.x * scaleX
-  const y = element.y * scaleY
+  // Padding des Canvas-Elements in px (CSS: .text-content { padding: var(--space-2) })
+  const paddingPx = 8
 
-  // Setze Schriftgröße (px zu mm Umrechnung)
-  const fontSize = (element.fontSize || 24) * 0.35
-  pdf.setFontSize(fontSize)
+  // Schriftgröße: Canvas-px → PDF-Punkte
+  const fontSizePx = element.fontSize || 24
+  const fontSizePt = fontSizePx * scaleY / 0.3528
+  pdf.setFontSize(fontSizePt)
 
-  // Setze Schrift-Style basierend auf fontWeight
+  // Schrift-Style basierend auf fontWeight
   if (element.fontWeight === 'bold') {
     pdf.setFont('helvetica', 'bold')
   } else {
     pdf.setFont('helvetica', 'normal')
   }
 
-  // Setze Farbe
+  // Farbe setzen
   if (element.color) {
     const color = hexToRgb(element.color)
     if (color) {
@@ -380,24 +386,35 @@ function renderFrontPageTextElement(
     pdf.setTextColor(0, 0, 0)
   }
 
-  // Mehrzeiligen Text behandeln
+  // Mehrzeiligen Text verarbeiten
   const lines = element.content.split('\n')
-  const lineHeight = fontSize * 1.2
+
+  // Zeilenhöhe passend zu CSS line-height: 1.4
+  const lineHeightPx = fontSizePx * 1.4
+  const lineHeightMm = lineHeightPx * scaleY
+
+  // X-Position mit Padding
+  const xBase = (element.x + paddingPx) * scaleX
+
+  // Element-Breite (ohne Padding) für Ausrichtung
+  const elementContentWidthMm = (element.width - paddingPx * 2) * scaleX
 
   lines.forEach((line, index) => {
-    const yPos = y + (index * lineHeight)
-    
-    // Text-Ausrichtung behandeln (textAlign statt align)
+    // Y-Position: Baseline = element.y + padding + fontSize (1. Zeile) + index × lineHeight
+    const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.4)
+    const yPosMm = yPosPx * scaleY
+
+    // Text-Ausrichtung relativ zur Element-Breite
     if (element.textAlign === 'center') {
-      const textWidth = pdf.getTextWidth(line)
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      pdf.text(line, (pageWidth - textWidth) / 2, yPos)
+      const textWidthMm = pdf.getTextWidth(line)
+      const xPos = xBase + (elementContentWidthMm - textWidthMm) / 2
+      pdf.text(line, xPos, yPosMm)
     } else if (element.textAlign === 'right') {
-      const textWidth = pdf.getTextWidth(line)
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      pdf.text(line, pageWidth - textWidth - 10, yPos)
+      const textWidthMm = pdf.getTextWidth(line)
+      const xPos = xBase + (elementContentWidthMm - textWidthMm)
+      pdf.text(line, xPos, yPosMm)
     } else {
-      pdf.text(line, x, yPos)
+      pdf.text(line, xBase, yPosMm)
     }
   })
 }
@@ -626,6 +643,15 @@ async function renderSingleCommentPage(
 
 /**
  * Rendert ein Text-Element (für Kommentarseiten)
+ *
+ * Koordinatensystem-Abgleich mit dem Canvas-Editor:
+ * - Canvas: 794×1123px (A4 @ 96 DPI)
+ * - PDF A4: 210×297mm
+ * - 1 Canvas-Pixel = scaleX mm (≈ 0.2645 mm)
+ * - CSS .element-text hat padding: 8px
+ * - CSS .text-content hat line-height: 1.5
+ * - jsPDF text() positioniert an der Baseline
+ * - jsPDF setFontSize() erwartet Punkte (1pt = 0.3528mm)
  */
 function renderTextElement(
   pdf: jsPDF,
@@ -635,15 +661,16 @@ function renderTextElement(
 ): void {
   if (!element.content || !element.content.trim()) return
 
-  // Konvertiere Koordinaten
-  const x = element.x * scaleX
-  const y = element.y * scaleY
+  // Padding des Canvas-Elements in px (CSS: .element-text { padding: 8px })
+  const paddingPx = 8
 
-  // Setze Schriftgröße (px zu mm Umrechnung)
-  const fontSize = (element.fontSize || 24) * 0.35
-  pdf.setFontSize(fontSize)
+  // Schriftgröße: Canvas-px → PDF-Punkte
+  // fontSizePt = fontSizePx × (mm pro Canvas-px) / (mm pro Punkt)
+  const fontSizePx = element.fontSize || 24
+  const fontSizePt = fontSizePx * scaleY / 0.3528
+  pdf.setFontSize(fontSizePt)
 
-  // Setze Schrift-Style
+  // Schrift-Style setzen
   if (element.bold && element.italic) {
     pdf.setFont('helvetica', 'bolditalic')
   } else if (element.bold) {
@@ -654,7 +681,7 @@ function renderTextElement(
     pdf.setFont('helvetica', 'normal')
   }
 
-  // Setze Farbe
+  // Farbe setzen
   if (element.color) {
     const color = hexToRgb(element.color)
     if (color) {
@@ -664,24 +691,44 @@ function renderTextElement(
     pdf.setTextColor(0, 0, 0)
   }
 
-  // Mehrzeiligen Text behandeln
+  // Mehrzeiligen Text verarbeiten
   const lines = element.content.split('\n')
-  const lineHeight = fontSize * 1.2
+
+  // Zeilenhöhe passend zu CSS line-height: 1.5
+  const lineHeightPx = fontSizePx * 1.5
+  const lineHeightMm = lineHeightPx * scaleY
+
+  // X-Position: element.x + Padding (in mm)
+  const xBase = (element.x + paddingPx) * scaleX
+
+  // Für Center/Right-Ausrichtung: maximale Zeilenbreite ermitteln
+  // (Text wird relativ zum Element ausgerichtet, nicht zur ganzen Seite)
+  let maxLineWidthMm = 0
+  if (element.align === 'center' || element.align === 'right') {
+    lines.forEach(line => {
+      const w = pdf.getTextWidth(line)
+      if (w > maxLineWidthMm) maxLineWidthMm = w
+    })
+  }
 
   lines.forEach((line, index) => {
-    const yPos = y + (index * lineHeight)
-    
-    // Text-Ausrichtung behandeln
+    // Y-Position: Baseline der n-ten Zeile
+    // = element.y + padding + fontSize (Baseline der 1. Zeile) + index × lineHeight
+    // CSS-Modell: half-leading (0.25×fontSize) + Ascent (≈0.75×fontSize) ≈ fontSize
+    const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.5)
+    const yPosMm = yPosPx * scaleY
+
+    // Text-Ausrichtung relativ zum Element (nicht zur Seite!)
     if (element.align === 'center') {
-      const textWidth = pdf.getTextWidth(line)
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      pdf.text(line, (pageWidth - textWidth) / 2, yPos)
+      const textWidthMm = pdf.getTextWidth(line)
+      const xPos = xBase + (maxLineWidthMm - textWidthMm) / 2
+      pdf.text(line, xPos, yPosMm)
     } else if (element.align === 'right') {
-      const textWidth = pdf.getTextWidth(line)
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      pdf.text(line, pageWidth - textWidth - 10, yPos)
+      const textWidthMm = pdf.getTextWidth(line)
+      const xPos = xBase + (maxLineWidthMm - textWidthMm)
+      pdf.text(line, xPos, yPosMm)
     } else {
-      pdf.text(line, x, yPos)
+      pdf.text(line, xBase, yPosMm)
     }
   })
 }
