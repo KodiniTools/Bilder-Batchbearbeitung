@@ -584,6 +584,7 @@
       "toBackTooltip": "Nach hinten",
       "toBackButton": "Hinten",
       "deleteElement": "Element löschen",
+      "inlineEditHint": "Doppelklick auf Text im Canvas zum direkten Bearbeiten",
       "noSelection": "Klicken Sie auf ein Element, um es zu bearbeiten"
     },
     "zoom": {

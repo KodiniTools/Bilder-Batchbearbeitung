@@ -409,6 +409,7 @@
       "toBackTooltip": "Move to Back",
       "toBackButton": "Back",
       "deleteElement": "Delete Element",
+      "inlineEditHint": "Double-click text on canvas to edit directly",
       "noSelection": "Click on an element to edit it"
     },
     "zoom": {

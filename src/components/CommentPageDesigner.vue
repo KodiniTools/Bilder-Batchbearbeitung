@@ -181,6 +181,14 @@
                         rows="4"
                         :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
                     ></textarea>
+                    <div class="inline-edit-hint">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                      {{ t('commentPageDesigner.properties.inlineEditHint') }}
+                    </div>
                   </div>
 
                   <div class="property-group">
@@ -386,7 +394,7 @@
                   <div
                       v-for="element in currentElements"
                       :key="element.id"
-                      :class="['canvas-element', { selected: selectedElement?.id === element.id }]"
+                      :class="['canvas-element', { selected: selectedElement?.id === element.id, editing: editingTextId === element.id }]"
                       :style="{
                       position: 'absolute',
                       left: element.x + 'px',
@@ -408,7 +416,29 @@
                         fontStyle: element.italic ? 'italic' : 'normal'
                       }"
                     >
-                      <div class="text-content">{{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}</div>
+                      <div
+                          v-if="editingTextId !== element.id"
+                          class="text-content"
+                          @click.stop
+                          @dblclick.stop="startInlineEdit(element)"
+                      >{{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}</div>
+                      <textarea
+                          v-else
+                          ref="inlineTextareaRef"
+                          v-model="element.content"
+                          class="inline-text-editor"
+                          :style="{
+                            fontSize: element.fontSize + 'px',
+                            color: element.color,
+                            textAlign: element.align,
+                            fontWeight: element.bold ? 'bold' : 'normal',
+                            fontStyle: element.italic ? 'italic' : 'normal'
+                          }"
+                          @click.stop
+                          @mousedown.stop
+                          @blur="stopInlineEdit"
+                          @keydown.esc="stopInlineEdit"
+                      ></textarea>
                     </div>
 
                     <!-- Image Element -->
@@ -469,7 +499,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
@@ -517,6 +547,8 @@ const selectedElement = ref(null);
 const canvasRef = ref(null);
 const imageInput = ref(null);
 const zoomLevel = ref(1);
+const editingTextId = ref(null);
+const inlineTextareaRef = ref(null);
 
 // Dragging state
 let isDragging = false;
@@ -556,12 +588,13 @@ function deletePage() {
 
   if (confirm(t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }))) {
     pages.value.splice(currentPageIndex.value, 1);
-    
+
     if (currentPageIndex.value >= pages.value.length) {
       currentPageIndex.value = pages.value.length - 1;
     }
-    
+
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
@@ -569,6 +602,7 @@ function previousPage() {
   if (currentPageIndex.value > 0) {
     currentPageIndex.value--;
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
@@ -576,12 +610,14 @@ function nextPage() {
   if (currentPageIndex.value < pages.value.length - 1) {
     currentPageIndex.value++;
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
 function goToPage(index) {
   currentPageIndex.value = index;
   selectedElement.value = null;
+  editingTextId.value = null;
 }
 
 // Element Functions
@@ -637,10 +673,12 @@ function clearCurrentPage() {
   if (confirm(t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }))) {
     currentElements.value.length = 0;
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
 function selectElement(element, event) {
+  if (editingTextId.value) return;
   selectedElement.value = element;
   isDragging = true;
   dragStartX = event.clientX / zoomLevel.value;
@@ -649,19 +687,41 @@ function selectElement(element, event) {
   elementStartY = element.y;
 }
 
+// Inline text editing on canvas
+function startInlineEdit(element) {
+  if (element.type !== 'text') return;
+  editingTextId.value = element.id;
+  selectedElement.value = element;
+  nextTick(() => {
+    const textarea = Array.isArray(inlineTextareaRef.value)
+        ? inlineTextareaRef.value[0]
+        : inlineTextareaRef.value;
+    if (textarea) {
+      textarea.focus();
+      textarea.select();
+    }
+  });
+}
+
+function stopInlineEdit() {
+  editingTextId.value = null;
+}
+
 function handleCanvasClick(event) {
   if (event.target === canvasRef.value || event.target.classList.contains('canvas-grid')) {
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
 function deleteSelectedElement() {
   if (!selectedElement.value) return;
-  
+
   const index = currentElements.value.findIndex(el => el.id === selectedElement.value.id);
   if (index !== -1) {
     currentElements.value.splice(index, 1);
     selectedElement.value = null;
+    editingTextId.value = null;
   }
 }
 
@@ -686,7 +746,7 @@ function startResize(event) {
 }
 
 function handleMouseMove(event) {
-  if (isDragging && selectedElement.value && !isResizing) {
+  if (isDragging && selectedElement.value && !isResizing && !editingTextId.value) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
     const deltaY = (event.clientY / zoomLevel.value) - dragStartY;
     
@@ -743,11 +803,14 @@ function handleSave() {
 }
 // Keyboard shortcuts
 function handleKeyDown(event) {
+  // Don't handle shortcuts while editing text inline
+  if (editingTextId.value) return;
+
   if ((event.key === 'Delete' || event.key === 'Backspace') && selectedElement.value) {
     event.preventDefault();
     deleteSelectedElement();
   }
-  
+
   if (event.ctrlKey && event.key === 'ArrowLeft') {
     event.preventDefault();
     previousPage();
@@ -756,7 +819,7 @@ function handleKeyDown(event) {
     event.preventDefault();
     nextPage();
   }
-  
+
   if (event.ctrlKey && event.key === 'n') {
     event.preventDefault();
     addNewPage();
@@ -1374,6 +1437,49 @@ onUnmounted(() => {
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.5;
+  cursor: text;
+}
+
+.inline-text-editor {
+  width: 100%;
+  min-width: 80px;
+  min-height: 30px;
+  padding: 8px;
+  margin: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  color: inherit;
+  background: rgba(102, 126, 234, 0.06);
+  box-sizing: border-box;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  field-sizing: content;
+}
+
+.canvas-element.editing {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px color-mix(in oklab, var(--accent) 25%, transparent);
+  border-radius: 4px;
+}
+
+.canvas-element.editing::before {
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+.inline-edit-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.8;
 }
 
 .resize-handle {
