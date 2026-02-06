@@ -521,9 +521,12 @@
       "textAlignLeft": "Linksbündig",
       "textAlignCenter": "Zentriert",
       "textAlignRight": "Rechtsbündig",
+      "textLabel": "Text:",
       "textColor": "Textfarbe:",
+      "inlineEditHint": "Doppelklick auf Text im Canvas zum direkten Bearbeiten",
       "imageSize": "Bildgröße:",
       "position": "Position:",
+      "deleteElement": "Element löschen",
       "noSelection": "Wählen Sie ein Element aus, um es zu bearbeiten"
     },
     "footer": {
