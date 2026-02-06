@@ -73,10 +73,27 @@
 
           <!-- Canvas Area -->
           <div class="canvas-container">
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+              <button @click="zoomOut" :disabled="zoomLevel <= 0.5" :title="t('frontPageDesigner.zoom.zoomOut')">−</button>
+              <span>{{ Math.round(zoomLevel * 100) }}%</span>
+              <button @click="zoomIn" :disabled="zoomLevel >= 2" :title="t('frontPageDesigner.zoom.zoomIn')">+</button>
+              <button @click="resetZoom" :title="t('frontPageDesigner.zoom.reset')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                  <path d="M21 3v5h-5"></path>
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                  <path d="M3 21v-5h5"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="canvas-scroll-area">
             <div class="canvas-wrapper">
-              <div 
-                class="canvas" 
+              <div
+                class="canvas"
                 ref="canvasRef"
+                :style="{ transform: `scale(${zoomLevel})` }"
                 @click="deselectAll"
               >
                 <!-- Elements -->
@@ -171,6 +188,7 @@
                   </button>
                 </div>
               </div>
+            </div>
             </div>
 
             <!-- Properties Panel -->
@@ -399,6 +417,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const elements = ref<FrontPageElement[]>([])
 const selectedElementId = ref<string | null>(null)
 const editingTextId = ref<string | null>(null)
+const zoomLevel = ref(1)
 
 // Drag & Resize State
 const isDragging = ref(false)
@@ -544,15 +563,15 @@ function stopEditingText() {
 // Drag
 function startDrag(event: MouseEvent, id: string) {
   if (editingTextId.value) return
-  
+
   const element = elements.value.find(el => el.id === id)
   if (!element) return
 
   isDragging.value = true
   selectedElementId.value = id
-  dragStart.value = { x: event.clientX, y: event.clientY }
-  elementStartPos.value = { 
-    x: element.x, 
+  dragStart.value = { x: event.clientX / zoomLevel.value, y: event.clientY / zoomLevel.value }
+  elementStartPos.value = {
+    x: element.x,
     y: element.y,
     width: element.width,
     height: element.height
@@ -567,9 +586,9 @@ function startResize(event: MouseEvent, id: string, direction: string) {
   isResizing.value = true
   resizeDirection.value = direction
   selectedElementId.value = id
-  dragStart.value = { x: event.clientX, y: event.clientY }
-  elementStartPos.value = { 
-    x: element.x, 
+  dragStart.value = { x: event.clientX / zoomLevel.value, y: event.clientY / zoomLevel.value }
+  elementStartPos.value = {
+    x: element.x,
     y: element.y,
     width: element.width,
     height: element.height
@@ -582,8 +601,8 @@ function handleMouseMove(event: MouseEvent) {
     const element = elements.value.find(el => el.id === selectedElementId.value)
     if (!element) return
 
-    const dx = event.clientX - dragStart.value.x
-    const dy = event.clientY - dragStart.value.y
+    const dx = event.clientX / zoomLevel.value - dragStart.value.x
+    const dy = event.clientY / zoomLevel.value - dragStart.value.y
 
     element.x = Math.max(0, elementStartPos.value.x + dx)
     element.y = Math.max(0, elementStartPos.value.y + dy)
@@ -593,8 +612,8 @@ function handleMouseMove(event: MouseEvent) {
     const element = elements.value.find(el => el.id === selectedElementId.value)
     if (!element) return
 
-    const dx = event.clientX - dragStart.value.x
-    const dy = event.clientY - dragStart.value.y
+    const dx = event.clientX / zoomLevel.value - dragStart.value.x
+    const dy = event.clientY / zoomLevel.value - dragStart.value.y
 
     if (resizeDirection.value.includes('e')) {
       element.width = Math.max(50, elementStartPos.value.width + dx)
@@ -628,6 +647,19 @@ function maintainAspectRatio() {
   
   const ratio = element.originalWidth / element.originalHeight
   element.height = Math.round(element.width / ratio)
+}
+
+// Zoom controls
+function zoomIn() {
+  zoomLevel.value = Math.min(2, zoomLevel.value + 0.1)
+}
+
+function zoomOut() {
+  zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1)
+}
+
+function resetZoom() {
+  zoomLevel.value = 1
 }
 
 // Save & Close
@@ -779,24 +811,85 @@ function closeDesigner() {
 .canvas-container {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Zoom Controls */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.zoom-controls button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.zoom-controls button:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent);
+}
+
+.zoom-controls button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.zoom-controls span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  min-width: 50px;
+  text-align: center;
+}
+
+.canvas-scroll-area {
+  flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  padding: var(--space-6);
-  background: var(--panel);
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
+    linear-gradient(var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
+  background-color: var(--panel);
 }
 
 .canvas {
   position: relative;
   width: 794px; /* A4 width in pixels at 96 DPI */
   height: 1123px; /* A4 height in pixels at 96 DPI */
-  margin: 0 auto;
   background: white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transform-origin: center;
+  transition: transform 0.2s ease;
 }
 
 /* Elements */
@@ -1173,21 +1266,20 @@ function closeDesigner() {
     max-width: 100%;
     border-radius: 0;
   }
-  
-  .canvas-container {
+
+  .canvas-scroll-area {
     flex-direction: column;
   }
-  
+
   .properties-panel {
     width: 100%;
     border-left: none;
     border-top: 1px solid var(--border-color);
     max-height: 300px;
   }
-  
-  .canvas {
-    transform: scale(0.5);
-    transform-origin: top center;
+
+  .canvas-wrapper {
+    padding: 20px;
   }
 }
 </style>
