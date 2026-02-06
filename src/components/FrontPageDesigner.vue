@@ -1160,8 +1160,7 @@ function closeDesigner() {
 }
 
 .size-inputs input {
-  flex: 1;
-  min-width: 0;
+  width: 70px;
   padding: 6px 4px;
   background: var(--panel);
   border: 1px solid var(--border-color);
@@ -1173,15 +1172,14 @@ function closeDesigner() {
 }
 
 .size-inputs > div {
-  flex: 1;
-  min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
 }
 
 .size-inputs small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 
