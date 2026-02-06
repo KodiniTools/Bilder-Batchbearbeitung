@@ -91,6 +91,10 @@
             <div class="canvas-scroll-area">
             <div class="canvas-wrapper">
               <div
+                class="canvas-sizer"
+                :style="{ width: (794 * zoomLevel) + 'px', height: (1123 * zoomLevel) + 'px' }"
+              >
+              <div
                 class="canvas"
                 ref="canvasRef"
                 :style="{ transform: `scale(${zoomLevel})` }"
@@ -187,6 +191,7 @@
                     </svg>
                   </button>
                 </div>
+              </div>
               </div>
             </div>
             </div>
@@ -881,14 +886,21 @@ function closeDesigner() {
   background-color: var(--panel);
 }
 
-.canvas {
+.canvas-sizer {
+  flex-shrink: 0;
   position: relative;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 794px; /* A4 width in pixels at 96 DPI */
   height: 1123px; /* A4 height in pixels at 96 DPI */
   background: white;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  transform-origin: center;
+  transform-origin: top left;
   transition: transform 0.2s ease;
 }
 

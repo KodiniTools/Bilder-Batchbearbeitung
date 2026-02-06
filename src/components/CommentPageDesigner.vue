@@ -403,6 +403,10 @@
 
               <div class="canvas-wrapper">
                 <div
+                    class="canvas-sizer"
+                    :style="{ width: (pageWidth * zoomLevel) + 'px', height: (pageHeight * zoomLevel) + 'px' }"
+                >
+                <div
                     class="canvas"
                     ref="canvasRef"
                     :style="{
@@ -501,6 +505,7 @@
                       </svg>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -1492,12 +1497,19 @@ onUnmounted(() => {
   background-color: var(--panel);
 }
 
+.canvas-sizer {
+  flex-shrink: 0;
+  position: relative;
+}
+
 .canvas {
   background: white;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  position: relative;
-  transform-origin: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
   transition: transform 0.2s ease;
 }
 
