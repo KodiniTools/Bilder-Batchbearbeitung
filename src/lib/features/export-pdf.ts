@@ -386,20 +386,27 @@ function renderFrontPageTextElement(
     pdf.setTextColor(0, 0, 0)
   }
 
-  // Mehrzeiligen Text verarbeiten
-  const lines = element.content.split('\n')
-
-  // Zeilenhöhe passend zu CSS line-height: 1.4
-  const lineHeightPx = fontSizePx * 1.4
-  const lineHeightMm = lineHeightPx * scaleY
-
   // X-Position mit Padding
   const xBase = (element.x + paddingPx) * scaleX
 
-  // Element-Breite (ohne Padding) für Ausrichtung
+  // Element-Breite (ohne Padding) für Ausrichtung und Textumbruch
   const elementContentWidthMm = (element.width - paddingPx * 2) * scaleX
 
-  lines.forEach((line, index) => {
+  // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
+  // splitTextToSize() repliziert das CSS word-wrap: break-word Verhalten
+  const explicitLines = element.content.split('\n')
+  const allLines: string[] = []
+
+  explicitLines.forEach(line => {
+    if (line.trim() === '') {
+      allLines.push('')
+    } else {
+      const wrappedLines = pdf.splitTextToSize(line, elementContentWidthMm)
+      allLines.push(...wrappedLines)
+    }
+  })
+
+  allLines.forEach((line, index) => {
     // Y-Position: Baseline = element.y + padding + fontSize (1. Zeile) + index × lineHeight
     const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.4)
     const yPosMm = yPosPx * scaleY
@@ -691,27 +698,38 @@ function renderTextElement(
     pdf.setTextColor(0, 0, 0)
   }
 
-  // Mehrzeiligen Text verarbeiten
-  const lines = element.content.split('\n')
-
-  // Zeilenhöhe passend zu CSS line-height: 1.5
-  const lineHeightPx = fontSizePx * 1.5
-  const lineHeightMm = lineHeightPx * scaleY
-
   // X-Position: element.x + Padding (in mm)
   const xBase = (element.x + paddingPx) * scaleX
+
+  // Verfügbare Breite für Textumbruch: Canvas-Breite minus Element-Position minus Padding
+  const canvasWidth = 794
+  const availableWidthMm = (canvasWidth - element.x - paddingPx * 2) * scaleX
+
+  // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
+  // splitTextToSize() repliziert das CSS word-break: break-word Verhalten
+  const explicitLines = element.content.split('\n')
+  const allLines: string[] = []
+
+  explicitLines.forEach(line => {
+    if (line.trim() === '') {
+      allLines.push('')
+    } else {
+      const wrappedLines = pdf.splitTextToSize(line, availableWidthMm)
+      allLines.push(...wrappedLines)
+    }
+  })
 
   // Für Center/Right-Ausrichtung: maximale Zeilenbreite ermitteln
   // (Text wird relativ zum Element ausgerichtet, nicht zur ganzen Seite)
   let maxLineWidthMm = 0
   if (element.align === 'center' || element.align === 'right') {
-    lines.forEach(line => {
+    allLines.forEach(line => {
       const w = pdf.getTextWidth(line)
       if (w > maxLineWidthMm) maxLineWidthMm = w
     })
   }
 
-  lines.forEach((line, index) => {
+  allLines.forEach((line, index) => {
     // Y-Position: Baseline der n-ten Zeile
     // = element.y + padding + fontSize (Baseline der 1. Zeile) + index × lineHeight
     // CSS-Modell: half-leading (0.25×fontSize) + Ascent (≈0.75×fontSize) ≈ fontSize
