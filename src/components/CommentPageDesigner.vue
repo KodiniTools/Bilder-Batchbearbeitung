@@ -534,11 +534,36 @@ const pages = ref([
 ]);
 const currentPageIndex = ref(0);
 
-// Load initial elements when modal opens
+// Load initial elements when modal opens — distribute by page number
 watch(() => props.modelValue, (newVal) => {
-  if (newVal && props.initialElements && props.initialElements.length > 0) {
-    // Load initial elements into first page
-    pages.value[0].elements = JSON.parse(JSON.stringify(props.initialElements));
+  if (newVal) {
+    selectedElement.value = null;
+    editingTextId.value = null;
+    currentPageIndex.value = 0;
+
+    if (props.initialElements && props.initialElements.length > 0) {
+      // Group elements by their page number
+      const elementsByPage = new Map();
+      const elements = JSON.parse(JSON.stringify(props.initialElements));
+
+      elements.forEach(el => {
+        const pageNum = el.page || 1;
+        if (!elementsByPage.has(pageNum)) {
+          elementsByPage.set(pageNum, []);
+        }
+        elementsByPage.get(pageNum).push(el);
+      });
+
+      // Create pages with their respective elements
+      const pageNumbers = Array.from(elementsByPage.keys()).sort((a, b) => a - b);
+      pages.value = pageNumbers.map(pageNum => ({
+        id: generateId(),
+        elements: elementsByPage.get(pageNum)
+      }));
+    } else {
+      // No initial elements — start fresh with one empty page
+      pages.value = [{ id: generateId(), elements: [] }];
+    }
   }
 });
 
