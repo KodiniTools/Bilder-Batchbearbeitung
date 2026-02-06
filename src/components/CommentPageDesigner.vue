@@ -623,7 +623,7 @@ const footerPreviewText = computed(() => {
 const selectedElement = ref(null);
 const canvasRef = ref(null);
 const imageInput = ref(null);
-const zoomLevel = ref(1);
+const zoomLevel = ref(0.5);
 const editingTextId = ref(null);
 const inlineTextareaRef = ref(null);
 
