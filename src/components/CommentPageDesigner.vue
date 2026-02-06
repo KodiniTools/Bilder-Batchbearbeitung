@@ -388,7 +388,10 @@
                   }"
                     @mousedown="handleCanvasClick"
                 >
-                  <div class="canvas-grid"></div>
+                  <!-- PDF Footer Preview (shows what will appear in exported PDF) -->
+                  <div class="canvas-footer-preview">
+                    {{ footerPreviewText }}
+                  </div>
 
                   <!-- Render elements for current page -->
                   <div
@@ -541,6 +544,14 @@ watch(() => props.modelValue, (newVal) => {
 
 // Computed: Get current page elements
 const currentElements = computed(() => pages.value[currentPageIndex.value].elements);
+
+// Footer preview text (matches PDF export footer)
+const footerPreviewText = computed(() => {
+  const dateStr = new Date().toLocaleDateString('de-DE');
+  const pageNum = currentPageIndex.value + 1;
+  const total = pages.value.length;
+  return `Erstellt am ${dateStr} \u2022 Kommentarseite ${pageNum}${total > 1 ? ` von ${total}` : ''}`;
+});
 
 // Element management
 const selectedElement = ref(null);
@@ -1387,13 +1398,22 @@ onUnmounted(() => {
 }
 
 .canvas-grid {
+  display: none;
+}
+
+/* PDF Footer Preview — matches renderSingleCommentPage footer at pageHeight-10mm */
+.canvas-footer-preview {
   position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 9px;
+  line-height: 1;
+  color: rgb(150, 150, 150);
   pointer-events: none;
+  user-select: none;
 }
 
 /* Canvas Elements */
@@ -1420,6 +1440,7 @@ onUnmounted(() => {
   padding: 8px;
   min-width: 50px;
   min-height: 30px;
+  font-family: Helvetica, Arial, sans-serif;
 }
 
 .element-image {
@@ -1444,7 +1465,7 @@ onUnmounted(() => {
   width: 100%;
   min-width: 80px;
   min-height: 30px;
-  padding: 8px;
+  padding: 0;
   margin: 0;
   border: none;
   outline: none;
