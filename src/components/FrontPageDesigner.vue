@@ -79,11 +79,6 @@
                 ref="canvasRef"
                 @click="deselectAll"
               >
-                <!-- A4 Page Background -->
-                <div class="page-background">
-                  <div class="page-info">{{ t('frontPageDesigner.canvas.pageInfo') }}</div>
-                </div>
-
                 <!-- Elements -->
                 <div
                   v-for="element in elements"
@@ -191,6 +186,24 @@
 
               <!-- Text Properties -->
               <template v-if="selectedElement.type === 'text'">
+                <div class="property-group">
+                  <label>{{ t('frontPageDesigner.properties.textLabel') }}</label>
+                  <textarea
+                      v-model="selectedElement.content"
+                      rows="4"
+                      class="property-textarea"
+                      :placeholder="t('frontPageDesigner.canvas.emptyText')"
+                  ></textarea>
+                  <div class="inline-edit-hint">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    {{ t('frontPageDesigner.properties.inlineEditHint') }}
+                  </div>
+                </div>
+
                 <div class="property-group">
                   <label>{{ t('frontPageDesigner.properties.fontSize') }}</label>
                   <div class="slider-group">
@@ -786,23 +799,6 @@ function closeDesigner() {
   border-radius: var(--radius-lg);
 }
 
-.page-background {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.page-info {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-md);
-  font-size: 0.75rem;
-  color: rgba(0, 0, 0, 0.4);
-}
-
 /* Elements */
 .element {
   position: absolute;
@@ -827,6 +823,8 @@ function closeDesigner() {
   word-wrap: break-word;
   white-space: pre-wrap;
   line-height: 1.4;
+  font-family: Helvetica, Arial, sans-serif;
+  cursor: text;
 }
 
 .text-editor {
@@ -837,7 +835,7 @@ function closeDesigner() {
   border: none;
   outline: none;
   resize: none;
-  font-family: inherit;
+  font-family: Helvetica, Arial, sans-serif;
   font-size: inherit;
   font-weight: inherit;
   text-align: inherit;
@@ -1015,6 +1013,34 @@ function closeDesigner() {
   background: var(--accent);
   color: black;
   border-color: var(--accent);
+}
+
+.property-textarea {
+  width: 100%;
+  padding: var(--space-2);
+  background: var(--panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.property-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.inline-edit-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.8;
 }
 
 .color-picker {

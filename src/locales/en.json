@@ -346,9 +346,12 @@
       "textAlignLeft": "Left",
       "textAlignCenter": "Center",
       "textAlignRight": "Right",
+      "textLabel": "Text:",
       "textColor": "Text Color:",
+      "inlineEditHint": "Double-click text on canvas to edit directly",
       "imageSize": "Image Size:",
       "position": "Position:",
+      "deleteElement": "Delete Element",
       "noSelection": "Select an element to edit it"
     },
     "footer": {
