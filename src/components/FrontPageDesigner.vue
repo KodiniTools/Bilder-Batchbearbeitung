@@ -1023,44 +1023,47 @@ function closeDesigner() {
 
 /* Properties Panel */
 .properties-panel {
-  width: 300px;
+  width: 280px;
+  flex-shrink: 0;
   border-left: 1px solid var(--border-color);
-  padding: var(--space-4);
+  padding: 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--bg);
+  box-sizing: border-box;
 }
 
 .properties-panel h3 {
-  margin: 0 0 var(--space-4) 0;
-  font-size: 1rem;
+  margin: 0 0 12px 0;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
 .property-group {
-  margin-bottom: var(--space-4);
+  margin-bottom: 14px;
 }
 
 .property-group label {
   display: block;
-  margin-bottom: var(--space-2);
-  font-size: 0.875rem;
+  margin-bottom: 4px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--muted);
 }
 
 .property-value {
-  padding: var(--space-2);
+  padding: 6px 10px;
   background: var(--panel);
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  border-radius: 6px;
+  font-size: 13px;
   color: var(--muted);
 }
 
 .slider-group {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 8px;
 }
 
 .property-slider {
@@ -1068,34 +1071,34 @@ function closeDesigner() {
 }
 
 .slider-value {
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
-  min-width: 50px;
+  min-width: 40px;
   text-align: right;
 }
 
 .property-select {
   width: 100%;
-  padding: var(--space-2);
+  padding: 6px 8px;
   background: var(--panel);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: 13px;
 }
 
 .button-group {
   display: flex;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .button-group button {
   flex: 1;
-  padding: var(--space-2);
+  padding: 6px;
   background: var(--panel);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -1115,13 +1118,14 @@ function closeDesigner() {
 
 .property-textarea {
   width: 100%;
-  padding: var(--space-2);
+  padding: 6px 8px;
   background: var(--panel);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: 13px;
   font-family: inherit;
+  box-sizing: border-box;
   resize: vertical;
   transition: border-color 0.2s;
 }
@@ -1152,29 +1156,32 @@ function closeDesigner() {
 .size-inputs {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .size-inputs input {
   flex: 1;
-  padding: var(--space-2);
+  min-width: 0;
+  padding: 6px 4px;
   background: var(--panel);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: 13px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .size-inputs > div {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
 }
 
 .size-inputs small {
-  font-size: 0.75rem;
+  font-size: 11px;
   color: var(--muted);
 }
 
@@ -1261,7 +1268,7 @@ function closeDesigner() {
 /* Responsive */
 @media (max-width: 1200px) {
   .properties-panel {
-    width: 250px;
+    width: 240px;
   }
 }
 
