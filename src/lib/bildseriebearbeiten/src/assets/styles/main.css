@@ -20,16 +20,17 @@
   --cyan: #06b6d4;
 
   /* Light Theme (Standard) */
-  --bg: #F0F0F0;
+  --bg: #F5F4D6;
   --panel: #FFFFFF;
   --text: #1a1a1a;
   --muted: #555555;
-  --accent: #005cda;
-  --accent-text: #FFFFFF;
-  --btn: #E8E8E8;
-  --btn-hover: #D4D4D4;
-  --ring: #3e66d3;
-  --border-color: #C0C0C0;
+  --accent: #014f99;
+  --accent-hover: #003971;
+  --accent-text: #F5F4D6;
+  --btn: #f9f2d5;
+  --btn-hover: #f8e1a9;
+  --ring: #014f99;
+  --border-color: #AEAFB7;
   --shadow-color: rgb(0 0 0 / 10%);
   --canvas-bg: #000;
 
@@ -41,10 +42,10 @@
   --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 20%, transparent);
 
   /* Dynamische Hintergründe */
-  --body-gradient: 
-    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--accent) 4%, transparent) 0%, transparent 60%),
-    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--green) 3%, transparent) 0%, transparent 60%),
-    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 97%, var(--accent)) 100%);
+  --body-gradient:
+    radial-gradient(circle at 25% 25%, color-mix(in oklab, #f8e1a9 6%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--accent) 4%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 96%, #f8e1a9) 100%);
 
   /* Layout-Variablen */
   --radius-sm: 8px;

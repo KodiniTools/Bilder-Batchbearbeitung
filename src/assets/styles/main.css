@@ -12,14 +12,17 @@
   /* Platzhalter für die Höhe der globalen Navigation */
   --global-nav-height: 0px;
 
-  /* Neue Farbpalette */
-  --color-gold: #F2E28E;
-  --color-mauve: #A28680;
+  /* Farbpalette */
+  --color-gold: #c9984d;
+  --color-blue: #014f99;
+  --color-blue-dark: #003971;
+  --color-gold-light: #f8e1a9;
+  --color-cream: #f9f2d5;
   --color-gray: #5E5F69;
   --color-silver: #AEAFB7;
   --color-dark: #0C0C10;
 
-  /* Basis-Farben (angepasst an neue Palette) */
+  /* Basis-Farben */
   --green: #22c55e;
   --red: #ef4444;
   --yellow: var(--color-gold);
@@ -27,17 +30,17 @@
   --cyan: #06b6d4;
 
   /* Light Theme (Standard) */
-  --bg: #F8F7F2;
+  --bg: #F5F4D6;
   --panel: #FFFFFF;
   --text: var(--color-dark);
   --muted: var(--color-gray);
-  --accent: var(--color-gold);
-  --accent-hover: #E8D87E;
-  --accent-text: var(--color-dark);
-  --secondary: var(--color-mauve);
-  --btn: #F0EFE8;
-  --btn-hover: #E5E4DC;
-  --ring: var(--color-mauve);
+  --accent: var(--color-blue);
+  --accent-hover: var(--color-blue-dark);
+  --accent-text: #F5F4D6;
+  --secondary: var(--color-gold);
+  --btn: var(--color-cream);
+  --btn-hover: var(--color-gold-light);
+  --ring: var(--color-blue);
   --border-color: var(--color-silver);
   --shadow-color: rgb(12 12 16 / 12%);
   --canvas-bg: var(--color-dark);
@@ -51,9 +54,9 @@
 
   /* Dynamische Hintergründe */
   --body-gradient:
-    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--color-gold) 6%, transparent) 0%, transparent 60%),
-    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--color-mauve) 5%, transparent) 0%, transparent 60%),
-    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 96%, var(--color-gold)) 100%);
+    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--color-gold-light) 8%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--color-blue) 5%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 96%, var(--color-gold-light)) 100%);
 
   /* Layout-Variablen */
   --radius-sm: 8px;
@@ -85,13 +88,13 @@
   --panel: #1A1A1E;
   --text: #F5F5F2;
   --muted: var(--color-silver);
-  --accent: var(--color-gold);
+  --accent: #F2E28E;
   --accent-hover: #FFF0A0;
   --accent-text: var(--color-dark);
-  --secondary: var(--color-mauve);
+  --secondary: #A28680;
   --btn: #2A2A30;
   --btn-hover: var(--color-gray);
-  --ring: var(--color-mauve);
+  --ring: #A28680;
   --border-color: rgb(174 175 183 / 25%);
   --shadow-color: rgb(0 0 0 / 60%);
 
@@ -99,8 +102,8 @@
   --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
 
   --body-gradient:
-    radial-gradient(circle at 20% 80%, color-mix(in oklab, var(--color-gold) 8%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--color-mauve) 6%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, color-mix(in oklab, #F2E28E 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, #A28680 6%, transparent) 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, color-mix(in oklab, var(--color-gray) 5%, transparent) 0%, transparent 70%),
     linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 95%, #1a1a2e) 100%);
 }
