@@ -37,7 +37,7 @@ onMounted(() => {
     localStorage.setItem('theme', theme)
   }
 
-  const savedLang = localStorage.getItem('language')
+  const savedLang = localStorage.getItem('locale')
   if (savedLang) {
     locale.value = savedLang
   }
