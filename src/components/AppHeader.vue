@@ -2,24 +2,11 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-defineProps<{
-  theme: 'light' | 'dark'
-}>()
-
-const emit = defineEmits<{
-  'toggle-theme': []
-}>()
-
 const router = useRouter()
-const { locale, t } = useI18n()
+const { t } = useI18n()
 
 const goHome = () => {
   router.push('/')
-}
-
-const setLanguage = (lang: string) => {
-  locale.value = lang
-  localStorage.setItem('language', lang)
 }
 </script>
 
@@ -36,38 +23,13 @@ const setLanguage = (lang: string) => {
           <i class="fa-solid fa-house"></i>
         </button>
       </div>
-      
+
       <div class="app-header__title-container">
         <h1 class="app-title">{{ t('header.title') }}</h1>
       </div>
-      
-      <div class="header-actions">
-        <button
-          class="lang-toggle"
-          :class="{ active: locale === 'de' }"
-          @click="setLanguage('de')"
-          :title="t('header.langDE')"
-        >
-          DE
-        </button>
-        <button
-          class="lang-toggle"
-          :class="{ active: locale === 'en' }"
-          @click="setLanguage('en')"
-          :title="t('header.langEN')"
-        >
-          EN
-        </button>
-        <button
-          class="theme-toggle"
-          @click="emit('toggle-theme')"
-          :title="t('header.themeToggle')"
-          :aria-label="t('header.themeToggle')"
-        >
-          <i v-if="theme === 'dark'" class="fa-solid fa-sun"></i>
-          <i v-else class="fa-solid fa-moon"></i>
-        </button>
-      </div>
+
+      <!-- Platzhalter für symmetrisches Layout -->
+      <div class="app-header__trailing"></div>
     </div>
   </header>
 </template>
@@ -75,13 +37,13 @@ const setLanguage = (lang: string) => {
 <style scoped>
 .app-header {
   position: sticky;
-  top: var(--global-nav-height, 0);
+  top: 0;
   z-index: 100;
   padding: var(--space-3) var(--space-5);
   backdrop-filter: saturate(1.8) blur(24px);
   background: var(--glass-bg);
   border-bottom: 1px solid var(--glass-border);
-  box-shadow: 
+  box-shadow:
     0 8px 32px color-mix(in oklab, var(--shadow-color) 8%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 10%, transparent);
   transition: all 0.3s var(--ease-smooth);
@@ -140,68 +102,8 @@ const setLanguage = (lang: string) => {
   -webkit-text-fill-color: transparent;
 }
 
-.header-actions {
+.app-header__trailing {
   flex: 1 1 0%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-2);
-}
-
-.theme-toggle,
-.lang-toggle {
-  display: inline-grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  font-size: 1rem;
-  transition: all 0.3s var(--ease-spring);
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.theme-toggle::before,
-.lang-toggle::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--btn);
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.3s var(--ease-smooth);
-}
-
-.theme-toggle:hover,
-.lang-toggle:hover {
-  color: var(--text);
-  transform: scale(1.1);
-  border-color: var(--border-color);
-}
-
-.theme-toggle:hover::before,
-.lang-toggle:hover::before {
-  opacity: 1;
-}
-
-.lang-toggle.active {
-  background: var(--accent);
-  color: var(--accent-text);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
-}
-
-.theme-toggle {
-  color: var(--accent);
-}
-
-.theme-toggle:hover {
-  background: var(--accent);
-  color: var(--accent-text);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 @media (max-width: 768px) {
@@ -213,21 +115,20 @@ const setLanguage = (lang: string) => {
   .app-header__leading {
     flex: 0 0 auto;
   }
-  
+
   .app-header__title-container {
     flex-basis: 100%;
     order: -1;
     text-align: center;
     margin-bottom: var(--space-3);
   }
-  
+
   .app-title {
     white-space: normal;
   }
-  
-  .header-actions {
-    flex: 1;
-    justify-content: center;
+
+  .app-header__trailing {
+    display: none;
   }
 }
 
