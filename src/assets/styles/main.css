@@ -82,30 +82,30 @@
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Dark Theme Overrides */
+/* Dark Theme Overrides – Navy/Gold Palette */
 :root[data-theme="dark"] {
-  --bg: var(--color-dark);
-  --panel: #1A1A1E;
-  --text: #F5F5F2;
-  --muted: var(--color-silver);
-  --accent: #F2E28E;
-  --accent-hover: #FFF0A0;
-  --accent-text: var(--color-dark);
-  --secondary: #A28680;
-  --btn: #2A2A30;
-  --btn-hover: var(--color-gray);
-  --ring: #A28680;
-  --border-color: rgb(174 175 183 / 25%);
+  --bg: #091428;
+  --panel: #142640;
+  --text: #f9f2d5;
+  --muted: #7A8DA0;
+  --accent: #c9984d;
+  --accent-hover: #f8e1a9;
+  --accent-text: #091428;
+  --secondary: #014f99;
+  --btn: #0E1C32;
+  --btn-hover: #1a3050;
+  --ring: #c9984d;
+  --border-color: rgb(201 152 77 / 18%);
   --shadow-color: rgb(0 0 0 / 60%);
 
   --glass-bg: color-mix(in oklab, var(--panel) 75%, transparent);
   --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
 
   --body-gradient:
-    radial-gradient(circle at 20% 80%, color-mix(in oklab, #F2E28E 8%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in oklab, #A28680 6%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, color-mix(in oklab, var(--color-gray) 5%, transparent) 0%, transparent 70%),
-    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 95%, #1a1a2e) 100%);
+    radial-gradient(circle at 20% 80%, color-mix(in oklab, #c9984d 6%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, #014f99 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, color-mix(in oklab, #0E1C32 10%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg, #091428 0%, #0E1C32 100%);
 }
 
 /* =============================
