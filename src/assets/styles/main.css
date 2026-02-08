@@ -9,8 +9,8 @@
    Farbvariablen (erweitert)
    ============================= */
 :root {
-  /* Platzhalter für die Höhe der globalen Navigation */
-  --global-nav-height: 0px;
+  /* Höhe der globalen SSI-Navigation (position: relative, im Document Flow) */
+  --global-nav-height: 70px;
 
   /* Farbpalette */
   --color-gold: #c9984d;

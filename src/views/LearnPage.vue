@@ -1,28 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const { locale, t } = useI18n()
 const router = useRouter()
-const theme = ref<'light' | 'dark'>('light')
 const activeSection = ref<string | null>(null)
 const expandedCode = ref<string | null>(null)
-
-const setLanguage = (lang: string) => {
-  locale.value = lang
-  localStorage.setItem('language', lang)
-}
-
-const applyTheme = (newTheme: 'light' | 'dark') => {
-  theme.value = newTheme
-  document.documentElement.dataset.theme = newTheme
-  localStorage.setItem('theme', newTheme)
-}
-
-const toggleTheme = () => {
-  applyTheme(theme.value === 'dark' ? 'light' : 'dark')
-}
 
 const goToHome = () => {
   router.push('/')
@@ -44,9 +28,14 @@ const toggleCode = (id: string) => {
 }
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'))
+  // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
+  if (!document.documentElement.getAttribute('data-theme')) {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('theme', theme)
+  }
 
   const savedLang = localStorage.getItem('language')
   if (savedLang) {
@@ -79,32 +68,7 @@ const sections = [
             {{ t('landing.nav.app') }}
           </button>
         </div>
-        <div class="nav-actions">
-          <button
-            class="lang-btn"
-            :class="{ active: locale === 'de' }"
-            @click="setLanguage('de')"
-            :title="t('header.langDE')"
-          >
-            DE
-          </button>
-          <button
-            class="lang-btn"
-            :class="{ active: locale === 'en' }"
-            @click="setLanguage('en')"
-            :title="t('header.langEN')"
-          >
-            EN
-          </button>
-          <button
-            class="theme-btn"
-            @click="toggleTheme"
-            :title="t('header.themeToggle')"
-          >
-            <i v-if="theme === 'dark'" class="fa-solid fa-sun"></i>
-            <i v-else class="fa-solid fa-moon"></i>
-          </button>
-        </div>
+        <!-- Theme & Language Switcher sind jetzt in der globalen SSI Navigation -->
       </div>
     </nav>
 
@@ -1408,10 +1372,8 @@ function processLocally(image: File): Promise&lt;string&gt; {
 
 /* Navigation */
 .learn-nav {
-  position: fixed;
-  top: var(--global-nav-height, 0);
-  left: 0;
-  right: 0;
+  position: sticky;
+  top: 0;
   z-index: 100;
   backdrop-filter: saturate(1.8) blur(24px);
   background: var(--glass-bg);
@@ -1479,44 +1441,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.lang-btn, .theme-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s var(--ease-spring);
-}
-
-.lang-btn:hover, .theme-btn:hover {
-  color: var(--text);
-  background: var(--btn);
-  border-color: var(--border-color);
-}
-
-.lang-btn.active {
-  background: var(--accent);
-  color: var(--accent-text);
-}
-
-.theme-btn { color: var(--accent); }
-.theme-btn:hover { background: var(--accent); color: var(--accent-text); }
-
 /* Hero */
 .learn-hero {
-  padding-top: calc(80px + var(--space-8));
+  padding-top: var(--space-7);
   padding-bottom: var(--space-7);
   text-align: center;
   background: var(--panel);
@@ -1600,7 +1527,7 @@ function processLocally(image: File): Promise&lt;string&gt; {
 /* TOC */
 .toc {
   position: sticky;
-  top: calc(80px + var(--space-4));
+  top: var(--space-4);
   height: fit-content;
   background: var(--glass-bg);
   backdrop-filter: blur(16px);

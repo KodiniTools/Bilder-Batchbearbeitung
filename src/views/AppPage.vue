@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
 import DropZone from '@/components/DropZone.vue'
@@ -28,10 +27,8 @@ import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/expo
 import { downloadSvgBatch, checkSvgServiceAvailable, type SvgProgressCallback } from '@/lib/features/export-svg'
 
 const { t } = useI18n()
-const router = useRouter()
 const imageStore = useImageStore()
 const toast = useToast()
-const theme = ref<'light' | 'dark'>('light')
 
 const isEditorOpen = ref(false)
 const editingImage = ref<ImageObject | null>(null)
@@ -335,16 +332,6 @@ function handleBulkRenameConfirm(baseName: string, startNumber: number) {
   toast.success(t('toast.bulkRenamed', { count }))
 }
 
-const applyTheme = (newTheme: 'light' | 'dark') => {
-  theme.value = newTheme
-  document.documentElement.dataset.theme = newTheme
-  localStorage.setItem('theme', newTheme)
-}
-
-const toggleTheme = () => {
-  applyTheme(theme.value === 'dark' ? 'light' : 'dark')
-}
-
 function handleKeyboard(event: KeyboardEvent) {
   if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value) return
   const target = event.target as HTMLElement
@@ -381,9 +368,14 @@ function handleKeyboard(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'))
+  // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
+  if (!document.documentElement.getAttribute('data-theme')) {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('theme', theme)
+  }
 
   window.addEventListener('keydown', handleKeyboard)
 })
@@ -395,7 +387,7 @@ onUnmounted(() => {
 
 <template>
   <div class="app-page">
-    <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
+    <AppHeader />
 
     <main class="container">
       <StatusBar
