@@ -33,6 +33,10 @@ function handleLangClick(e: MouseEvent) {
   document.querySelectorAll('.global-nav-lang-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-lang') === targetLang)
   })
+
+  // Notify SSI nav to translate its own labels (since stopPropagation
+  // prevented the nav's own click handler from running)
+  window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang: targetLang } }))
 }
 
 onMounted(() => {
