@@ -1759,6 +1759,16 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+  }
+
+  .designer-modal {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
   .modal-body {
     flex-direction: column;
   }
@@ -1776,6 +1786,24 @@ onUnmounted(() => {
 
   .page-thumbnails {
     max-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .designer-modal {
+    height: 100dvh;
+  }
+
+  .sidebar {
+    max-height: 35vh;
+  }
+
+  .canvas-wrapper {
+    padding: 10px;
+  }
+
+  .page-thumbnails {
+    max-width: 100px;
   }
 }
 </style>

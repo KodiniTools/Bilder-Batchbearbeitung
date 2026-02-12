@@ -1271,6 +1271,10 @@ function closeDesigner() {
 }
 
 @media (max-width: 768px) {
+  .designer-overlay {
+    padding: 0;
+  }
+
   .designer-container {
     height: 100vh;
     max-width: 100%;
@@ -1290,6 +1294,21 @@ function closeDesigner() {
 
   .canvas-wrapper {
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .designer-container {
+    height: 100dvh;
+  }
+
+  .canvas-wrapper {
+    padding: 10px;
+  }
+
+  .properties-panel {
+    max-height: 240px;
+    padding: var(--space-3);
   }
 }
 </style>

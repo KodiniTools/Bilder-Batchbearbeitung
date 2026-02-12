@@ -434,4 +434,15 @@ function handleConfirm() {
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .modal-body {
+    padding: var(--space-3);
+  }
+}
 </style>

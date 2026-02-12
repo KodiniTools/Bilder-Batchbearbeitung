@@ -664,9 +664,22 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+  .hero-section {
+    padding-top: var(--space-5);
+  }
+
+  .hero-container {
+    padding: 0 var(--space-3);
+  }
+
   .hero-cta {
     width: 100%;
     justify-content: center;
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .nav-container {
+    padding: var(--space-2) var(--space-3);
   }
 
   .nav-link {
@@ -674,9 +687,33 @@ onMounted(() => {
     font-size: 0.85rem;
   }
 
+  .feature-card {
+    padding: var(--space-4);
+  }
+
+  .details-container {
+    padding: 0 var(--space-3);
+  }
+
+  .details-section {
+    padding: var(--space-6) 0;
+  }
+
+  .donate-container {
+    padding: var(--space-4);
+  }
+
+  .donate-container h2 {
+    font-size: 1.3rem;
+  }
+
   .paypal-button {
     padding: var(--space-3) var(--space-5);
     font-size: 1rem;
+  }
+
+  .footer-cta {
+    padding: var(--space-5);
   }
 }
 </style>

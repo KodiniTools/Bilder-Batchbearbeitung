@@ -204,14 +204,37 @@ const handleDrop = (event: DragEvent) => {
   .drop-area {
     min-height: 200px;
     padding: var(--space-5);
+    margin-bottom: var(--space-5);
   }
-  
+
   .upload-icon {
     font-size: 40px;
   }
-  
+
   .upload-text {
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drop-area {
+    min-height: 160px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .upload-icon {
+    font-size: 32px;
+  }
+
+  .upload-text {
+    font-size: 0.9rem;
+  }
+
+  .upload-btn.icon-only {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
   }
 }
 </style>

@@ -464,6 +464,14 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .container {
     padding: var(--space-4) var(--space-3);
+    margin-top: var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--space-3) var(--space-2);
+    margin-top: var(--space-4);
   }
 }
 </style>
