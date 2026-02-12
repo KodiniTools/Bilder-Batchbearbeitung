@@ -268,7 +268,7 @@ const sliderConfig = [
 
 .slider-label .slider-value {
   margin-left: auto;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--accent);
   background: color-mix(in oklab, var(--accent) 10%, transparent);

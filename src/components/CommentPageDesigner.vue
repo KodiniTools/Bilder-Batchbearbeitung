@@ -1515,7 +1515,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   text-align: center;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 9px;
   line-height: 1;
   color: rgb(150, 150, 150);
@@ -1548,7 +1548,7 @@ onUnmounted(() => {
   height: 100%;
   padding: 8px;
   box-sizing: border-box;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   overflow: hidden;
 }
 

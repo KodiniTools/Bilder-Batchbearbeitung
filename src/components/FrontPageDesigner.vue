@@ -921,7 +921,7 @@ function closeDesigner() {
   word-wrap: break-word;
   white-space: pre-wrap;
   line-height: 1.4;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   cursor: text;
 }
 
@@ -933,7 +933,7 @@ function closeDesigner() {
   border: none;
   outline: none;
   resize: none;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: inherit;
   font-weight: inherit;
   text-align: inherit;
