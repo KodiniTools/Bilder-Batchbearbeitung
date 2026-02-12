@@ -882,9 +882,19 @@ function startDrag(event: MouseEvent) {
     align-items: flex-start;
     gap: var(--space-3);
   }
-  
+
   .entry-actions {
     flex-direction: column;
+  }
+
+  .entries-list {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .entries-list {
+    max-height: 200px;
   }
 }
 

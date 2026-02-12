@@ -401,14 +401,48 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+  .nav-container {
+    padding: var(--space-2) var(--space-3);
+  }
+
   .nav-link {
     padding: var(--space-2) var(--space-3);
     font-size: 0.85rem;
   }
 
+  .faq-container {
+    padding: 0 var(--space-3);
+  }
+
+  .faq-content {
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-5);
+  }
+
+  .faq-item summary {
+    padding: var(--space-3);
+    font-size: 0.95rem;
+  }
+
+  .faq-item p {
+    padding: 0 var(--space-3) var(--space-3);
+    margin-left: var(--space-3);
+    margin-right: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .privacy-notice {
+    padding: var(--space-4);
+  }
+
+  .faq-cta {
+    padding: var(--space-4);
+  }
+
   .cta-button {
     width: 100%;
     justify-content: center;
+    padding: var(--space-3) var(--space-5);
   }
 }
 </style>

@@ -636,13 +636,18 @@ const handleReset = () => {
   }
 
   .btn-icon {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
   }
 
   .btn-group .btn-icon {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .dropdown-item {
+    padding: 14px 16px;
+    min-height: 44px;
   }
 }
 </style>

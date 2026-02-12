@@ -176,7 +176,7 @@ function getImageIndex(imageId: string): number {
 
 @media (max-width: 768px) {
   .image-container {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
     gap: var(--space-4);
   }
 }

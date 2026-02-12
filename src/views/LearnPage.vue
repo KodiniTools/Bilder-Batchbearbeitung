@@ -2382,4 +2382,32 @@ function processLocally(image: File): Promise&lt;string&gt; {
     align-items: center;
   }
 }
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .nav-link {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .footer-container,
+  .learn-container {
+    padding: 0 var(--space-3);
+  }
+
+  .article {
+    padding: var(--space-3);
+  }
+
+  .toc {
+    padding: var(--space-3);
+  }
+
+  .toc nav {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

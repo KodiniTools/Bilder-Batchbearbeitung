@@ -826,4 +826,51 @@ kbd {
 
   .privacy-highlight { flex-direction: column; text-align: center; align-items: center; }
 }
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .nav-link {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .hero-container {
+    padding: 0 var(--space-3);
+  }
+
+  .blog-container {
+    padding: 0 var(--space-3);
+  }
+
+  .article {
+    padding: var(--space-3);
+  }
+
+  .toc {
+    padding: var(--space-3);
+  }
+
+  .toc nav {
+    grid-template-columns: 1fr;
+  }
+
+  .content-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .cta-button {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .shortcuts-table th,
+  .shortcuts-table td {
+    padding: var(--space-2);
+    font-size: 0.85rem;
+  }
+}
 </style>

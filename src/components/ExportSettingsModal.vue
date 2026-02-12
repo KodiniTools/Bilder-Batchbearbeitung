@@ -733,13 +733,32 @@ function handleConfirm() {
 }
 
 @media (max-width: 640px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
   .modal-content {
     max-width: 100%;
     max-height: 95vh;
   }
-  
+
   .modal-body {
     padding: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 0;
+  }
+
+  .modal-content {
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .modal-body {
+    padding: var(--space-3);
   }
 }
 </style>
