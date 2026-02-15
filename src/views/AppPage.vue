@@ -136,7 +136,7 @@ async function handleExportConfirm(settings: ExportSettings) {
 
       const imageDataArray: ImageData[] = await Promise.all(
         images.map(async (img) => {
-          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92)
+          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92, { backgroundColor: '#ffffff' })
           return {
             dataUrl: dataUrl,
             originalName: img.outputName || img.file.name
