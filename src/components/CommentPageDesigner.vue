@@ -990,7 +990,7 @@ onUnmounted(() => {
 .designer-modal {
   width: 95vw;
   height: 90vh;
-  max-width: 1800px;
+  max-width: 1400px;
   background: var(--bg);
   border-radius: 16px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -1470,6 +1470,7 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -1520,7 +1521,7 @@ onUnmounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  padding: 16px;
+  padding: 40px;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
@@ -1816,7 +1817,7 @@ onUnmounted(() => {
   }
 
   .canvas-wrapper {
-    padding: 12px;
+    padding: 20px;
   }
 
   .page-thumbnails {
@@ -1834,7 +1835,7 @@ onUnmounted(() => {
   }
 
   .canvas-wrapper {
-    padding: 8px;
+    padding: 10px;
   }
 
   .page-thumbnails {
