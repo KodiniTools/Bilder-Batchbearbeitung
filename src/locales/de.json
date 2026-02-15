@@ -708,6 +708,26 @@
       "reset": "Zurücksetzen"
     },
     "resetSlider": "Zurücksetzen",
+    "transforms": {
+      "title": "Transformationen",
+      "border": {
+        "title": "Bildrand",
+        "width": "Breite",
+        "color": "Farbe"
+      },
+      "corners": {
+        "title": "Abgerundete Ecken",
+        "radius": "Radius"
+      },
+      "shadow": {
+        "title": "Schatten",
+        "blur": "Weichzeichnung",
+        "opacity": "Deckkraft",
+        "color": "Farbe",
+        "offsetX": "Versatz X",
+        "offsetY": "Versatz Y"
+      }
+    },
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"

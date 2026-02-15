@@ -31,6 +31,28 @@ export const defaultFilters: ImageFilters = {
   invert: 0
 }
 
+export interface ImageTransforms {
+  borderWidth: number     // 0-50, default 0
+  borderColor: string     // hex, default '#000000'
+  borderRadius: number    // 0-200, default 0
+  shadowBlur: number      // 0-50, default 0
+  shadowColor: string     // hex, default '#000000'
+  shadowOpacity: number   // 0-100, default 40
+  shadowOffsetX: number   // -25 to 25, default 5
+  shadowOffsetY: number   // -25 to 25, default 5
+}
+
+export const defaultTransforms: ImageTransforms = {
+  borderWidth: 0,
+  borderColor: '#000000',
+  borderRadius: 0,
+  shadowBlur: 0,
+  shadowColor: '#000000',
+  shadowOpacity: 40,
+  shadowOffsetX: 5,
+  shadowOffsetY: 5
+}
+
 export interface ImageObject {
   id: string
   file: File
@@ -43,6 +65,7 @@ export interface ImageObject {
   selected: boolean
   outputName: string
   filters?: ImageFilters
+  transforms?: ImageTransforms
 }
 
 export interface PdfSettings {

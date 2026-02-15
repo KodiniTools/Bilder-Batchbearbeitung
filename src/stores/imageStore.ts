@@ -1,8 +1,8 @@
 // src/stores/imageStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { ImageObject, ImageFilters } from '@/lib/core/types'
-import { defaultFilters } from '@/lib/core/types'
+import type { ImageObject, ImageFilters, ImageTransforms } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
 export const useImageStore = defineStore('images', () => {
@@ -157,6 +157,25 @@ export const useImageStore = defineStore('images', () => {
     })
   }
 
+  // Batch-Transforms für alle ausgewählten Bilder anwenden
+  function applyTransformsToSelectedImages(transforms: Partial<ImageTransforms>): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      if (!img.transforms) {
+        img.transforms = { ...defaultTransforms }
+      }
+      img.transforms = { ...img.transforms, ...transforms }
+    })
+  }
+
+  // Transforms für alle ausgewählten Bilder zurücksetzen
+  function resetTransformsForSelectedImages(): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      img.transforms = { ...defaultTransforms }
+    })
+  }
+
   // Batch-Umbenennung für alle ausgewählten Bilder
   function batchRenameSelectedImages(baseName: string, startNumber: number = 1): number {
     // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
@@ -213,6 +232,8 @@ export const useImageStore = defineStore('images', () => {
     resetSelectedImages,
     applyFiltersToSelectedImages,
     resetFiltersForSelectedImages,
+    applyTransformsToSelectedImages,
+    resetTransformsForSelectedImages,
     batchRenameSelectedImages,
     $reset
   }
