@@ -90,7 +90,10 @@ const sliderConfig = [
   { key: 'saturation', icon: 'fa-droplet', min: 0, max: 200, default: 100 },
   { key: 'hue', icon: 'fa-palette', min: 0, max: 360, default: 0 },
   { key: 'opacity', icon: 'fa-eye', min: 0, max: 100, default: 100 },
-  { key: 'blur', icon: 'fa-water', min: 0, max: 20, default: 0 }
+  { key: 'blur', icon: 'fa-water', min: 0, max: 20, default: 0 },
+  { key: 'grayscale', icon: 'fa-swatchbook', min: 0, max: 100, default: 0 },
+  { key: 'sepia', icon: 'fa-image', min: 0, max: 100, default: 0 },
+  { key: 'invert', icon: 'fa-right-left', min: 0, max: 100, default: 0 }
 ] as const
 </script>
 

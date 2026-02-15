@@ -523,7 +523,10 @@
       "saturation": "Saturation",
       "hue": "Hue",
       "opacity": "Opacity",
-      "blur": "Blur"
+      "blur": "Blur",
+      "grayscale": "Grayscale",
+      "sepia": "Sepia",
+      "invert": "Invert"
     },
     "buttons": {
       "apply": "Apply",

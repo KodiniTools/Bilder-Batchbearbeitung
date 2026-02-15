@@ -404,7 +404,10 @@ export class ImageProcessor {
       filters.saturation !== 100 ||
       filters.hue !== 0 ||
       filters.opacity !== 100 ||
-      filters.blur !== 0
+      filters.blur !== 0 ||
+      filters.grayscale !== 0 ||
+      filters.sepia !== 0 ||
+      filters.invert !== 0
 
     if (!hasFilters) {
       return canvas
@@ -426,7 +429,10 @@ export class ImageProcessor {
       `contrast(${filters.contrast}%)`,
       `saturate(${filters.saturation}%)`,
       `hue-rotate(${filters.hue}deg)`,
-      `blur(${filters.blur}px)`
+      `blur(${filters.blur}px)`,
+      `grayscale(${filters.grayscale}%)`,
+      `sepia(${filters.sepia}%)`,
+      `invert(${filters.invert}%)`
     ].join(' ')
 
     // Filter anwenden

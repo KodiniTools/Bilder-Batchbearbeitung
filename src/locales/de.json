@@ -698,7 +698,10 @@
       "saturation": "Sättigung",
       "hue": "Farbton",
       "opacity": "Transparenz",
-      "blur": "Weichzeichnung"
+      "blur": "Weichzeichnung",
+      "grayscale": "Graustufen",
+      "sepia": "Sepia",
+      "invert": "Invertieren"
     },
     "buttons": {
       "apply": "Anwenden",
