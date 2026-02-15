@@ -44,9 +44,6 @@ onMounted(() => {
     <!-- Navigation -->
     <nav class="landing-nav">
       <div class="nav-container">
-        <div class="nav-brand">
-          <span>{{ t('landing.brand') }}</span>
-        </div>
         <div class="nav-links">
           <button class="nav-link" @click="goToApp">{{ t('landing.nav.app') }}</button>
           <button class="nav-link" @click="goToBlog">{{ t('landing.nav.blog') }}</button>
@@ -201,15 +198,6 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   gap: var(--space-4);
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text);
 }
 
 .nav-links {
