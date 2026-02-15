@@ -24,7 +24,7 @@ import {
 } from '@/lib/features/export-pdf'
 
 import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
-import { downloadSvgBatch, checkSvgServiceAvailable, type SvgProgressCallback } from '@/lib/features/export-svg'
+import { downloadSvgBatch, downloadSingleSvg, checkSvgServiceAvailable, type SvgProgressCallback } from '@/lib/features/export-svg'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
@@ -220,15 +220,21 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
 
       try {
-        await downloadSvgBatch(
-          imagesToExport,
-          {
-            colormode: settings.svgColormode || 'color',
-            filter_speckle: settings.svgFilterSpeckle || 4
-          },
-          settings.zipName || 'svg_export',
-          onSvgProgress
-        )
+        const svgSettings = {
+          colormode: settings.svgColormode || 'color',
+          filter_speckle: settings.svgFilterSpeckle || 4
+        }
+
+        if (total === 1) {
+          await downloadSingleSvg(imagesToExport[0], svgSettings)
+        } else {
+          await downloadSvgBatch(
+            imagesToExport,
+            svgSettings,
+            settings.zipName || 'svg_export',
+            onSvgProgress
+          )
+        }
         toast.success(t('toast.svgSuccess', { count: total }) || `${total} Bilder erfolgreich als SVG exportiert`)
       } finally {
         loadingIndicator.value?.hide()
