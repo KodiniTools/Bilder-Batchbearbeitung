@@ -401,6 +401,7 @@
       "typeImage": "Image",
       "textLabel": "Text:",
       "textPlaceholder": "Enter text...",
+      "fontFamily": "Font:",
       "fontSize": "Font Size: {size}px",
       "textColor": "Text Color:",
       "textAlignment": "Text Alignment:",
