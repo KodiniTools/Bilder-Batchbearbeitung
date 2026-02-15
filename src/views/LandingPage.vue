@@ -156,17 +156,6 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- Footer CTA -->
-    <section class="footer-cta">
-      <div class="footer-cta-container">
-        <h2>{{ t('landing.app.title') }}</h2>
-        <p>{{ t('landing.app.subtitle') }}</p>
-        <button class="hero-cta" @click="goToApp">
-          <i class="fa-solid fa-arrow-right"></i>
-          {{ t('landing.hero.cta') }}
-        </button>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -442,13 +431,13 @@ onMounted(() => {
 
 /* Donate Section */
 .donate-section {
-  padding: var(--space-5) 0;
+  padding: var(--space-4) 0;
 }
 
 .donate-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5);
+  padding: var(--space-5) var(--space-5);
   background: linear-gradient(135deg,
     color-mix(in oklab, var(--accent) 8%, transparent) 0%,
     color-mix(in oklab, var(--accent) 3%, transparent) 100%);
@@ -506,33 +495,6 @@ onMounted(() => {
 
 .paypal-button i {
   font-size: 1.4rem;
-}
-
-/* Footer CTA */
-.footer-cta {
-  padding: var(--space-5) 0;
-  background: var(--panel);
-  border-top: 1px solid var(--glass-border);
-}
-
-.footer-cta-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 var(--space-5);
-  text-align: center;
-}
-
-.footer-cta h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 var(--space-3);
-  color: var(--text);
-}
-
-.footer-cta p {
-  font-size: 1rem;
-  color: var(--muted);
-  margin: 0 0 var(--space-5);
 }
 
 /* Responsive */
@@ -627,10 +589,6 @@ onMounted(() => {
   .paypal-button {
     padding: var(--space-3) var(--space-5);
     font-size: 1rem;
-  }
-
-  .footer-cta {
-    padding: var(--space-5);
   }
 }
 </style>
