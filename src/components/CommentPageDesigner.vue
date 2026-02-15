@@ -414,6 +414,7 @@
               </div>
 
               <div class="canvas-wrapper">
+                <div class="canvas-inner">
                 <div
                     class="canvas"
                     ref="canvasRef"
@@ -517,6 +518,7 @@
                       </svg>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -1521,13 +1523,18 @@ onUnmounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  padding: 40px;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
   background-size: 20px 20px;
   background-position: -1px -1px;
   background-color: var(--panel);
+}
+
+.canvas-inner {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 40px;
 }
 
 .canvas {
@@ -1538,7 +1545,6 @@ onUnmounted(() => {
   flex-shrink: 0;
   transform-origin: top left;
   transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
-  margin: auto;
 }
 
 .canvas-grid {
@@ -1816,7 +1822,7 @@ onUnmounted(() => {
     border-bottom: 1px solid var(--border-color);
   }
 
-  .canvas-wrapper {
+  .canvas-inner {
     padding: 20px;
   }
 
@@ -1834,7 +1840,7 @@ onUnmounted(() => {
     max-height: 35vh;
   }
 
-  .canvas-wrapper {
+  .canvas-inner {
     padding: 10px;
   }
 
