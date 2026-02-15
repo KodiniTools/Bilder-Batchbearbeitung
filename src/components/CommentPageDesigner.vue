@@ -1521,9 +1521,6 @@ onUnmounted(() => {
   flex: 1;
   overflow: auto;
   padding: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
@@ -1539,7 +1536,8 @@ onUnmounted(() => {
   position: relative;
   flex-shrink: 0;
   transform-origin: top left;
-  transition: transform 0.2s ease, margin 0.2s ease;
+  transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
+  margin: auto;
 }
 
 .canvas-grid {
