@@ -26,7 +26,9 @@ export async function exportImagesAsZip(
   zipFileName?: string,
   format: string = 'png',
   quality: number = 0.92,
-  onProgress?: ZipProgressCallback
+  onProgress?: ZipProgressCallback,
+  pngTransparent: boolean = true,
+  pngBackgroundColor: string = '#ffffff'
 ): Promise<void> {
   const JSZip = await getJSZip()
 
@@ -55,7 +57,11 @@ export async function exportImagesAsZip(
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = format === 'png' ? 1.0 : (quality / 100) || 0.92
       // Canvas mit angewendeten Filtern und Transformationen holen
-      const exportCanvas = ImageProcessor.getExportCanvas(image)
+      // PNG ohne Transparenz: Hintergrundfarbe setzen
+      const backgroundColor = (exportFormat === 'png' && !pngTransparent)
+        ? pngBackgroundColor
+        : undefined
+      const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
       const blob = await canvasToBlob(exportCanvas, exportFormat, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
       const fileNameWithExt = fileName.includes('.')

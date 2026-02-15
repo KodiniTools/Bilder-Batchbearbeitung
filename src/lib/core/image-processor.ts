@@ -463,14 +463,34 @@ export class ImageProcessor {
    * Erstellt ein Export-Canvas mit allen Filtern UND Transformationen (Rand, Schatten, Ecken)
    * Zentrale Methode für alle Export-Pfade (ZIP, PDF, SVG, Download)
    * @param imageObj Das Bild-Objekt
+   * @param options Export-Optionen (z.B. Hintergrundfarbe für PNG ohne Transparenz)
    * @returns Canvas mit angewendeten Filtern und Transformationen
    */
-  static getExportCanvas(imageObj: ImageObject): HTMLCanvasElement {
+  static getExportCanvas(
+    imageObj: ImageObject,
+    options?: { backgroundColor?: string }
+  ): HTMLCanvasElement {
     const filteredCanvas = this.getCanvasWithFilters(imageObj)
-    return this.getCanvasWithTransforms(
+    const transformedCanvas = this.getCanvasWithTransforms(
       filteredCanvas,
       imageObj.transforms || defaultTransforms
     )
+
+    // Hintergrundfarbe anwenden (z.B. für PNG ohne Transparenz)
+    if (options?.backgroundColor) {
+      const bgCanvas = document.createElement('canvas')
+      bgCanvas.width = transformedCanvas.width
+      bgCanvas.height = transformedCanvas.height
+      const ctx = bgCanvas.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = options.backgroundColor
+        ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height)
+        ctx.drawImage(transformedCanvas, 0, 0)
+        return bgCanvas
+      }
+    }
+
+    return transformedCanvas
   }
 
   /**
@@ -478,14 +498,16 @@ export class ImageProcessor {
    * @param imageObj Das Bild-Objekt
    * @param format MIME-Type (optional)
    * @param quality Qualität 0-1 (optional)
+   * @param options Export-Optionen (z.B. Hintergrundfarbe)
    * @returns Data URL des Bildes mit angewendeten Filtern und Transformationen
    */
   static getDataUrlForExport(
     imageObj: ImageObject,
     format = 'image/png',
-    quality = 0.92
+    quality = 0.92,
+    options?: { backgroundColor?: string }
   ): string {
-    const exportCanvas = this.getExportCanvas(imageObj)
+    const exportCanvas = this.getExportCanvas(imageObj, options)
     return exportCanvas.toDataURL(format, quality)
   }
 

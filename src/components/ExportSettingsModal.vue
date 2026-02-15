@@ -176,6 +176,24 @@
                   class="quality-slider"
                 >
               </div>
+
+              <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    v-model="settings.pngTransparent"
+                  >
+                  {{ t('exportModal.format.pngTransparent') }}
+                </label>
+                <p class="setting-hint">{{ t('exportModal.format.pngTransparentHint') }}</p>
+                <div v-if="!settings.pngTransparent" class="bg-color-picker">
+                  <label>{{ t('exportModal.format.pngBgColor') }}:</label>
+                  <div class="color-input-row">
+                    <input type="color" v-model="settings.pngBackgroundColor" />
+                    <span class="color-hex">{{ settings.pngBackgroundColor }}</span>
+                  </div>
+                </div>
+              </div>
             </template>
 
             <!-- SVG Export Settings -->
@@ -230,13 +248,31 @@
 
               <div class="setting-group">
                 <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
-                <input 
-                  type="range" 
-                  v-model.number="settings.quality" 
-                  min="1" 
+                <input
+                  type="range"
+                  v-model.number="settings.quality"
+                  min="1"
                   max="100"
                   class="quality-slider"
                 >
+              </div>
+
+              <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    v-model="settings.pngTransparent"
+                  >
+                  {{ t('exportModal.format.pngTransparent') }}
+                </label>
+                <p class="setting-hint">{{ t('exportModal.format.pngTransparentHint') }}</p>
+                <div v-if="!settings.pngTransparent" class="bg-color-picker">
+                  <label>{{ t('exportModal.format.pngBgColor') }}:</label>
+                  <div class="color-input-row">
+                    <input type="color" v-model="settings.pngBackgroundColor" />
+                    <span class="color-hex">{{ settings.pngBackgroundColor }}</span>
+                  </div>
+                </div>
               </div>
             </template>
 
@@ -333,6 +369,8 @@ const settings = reactive({
   zipName: 'bilder-export',
   format: 'png',
   quality: 92,
+  pngTransparent: true,
+  pngBackgroundColor: '#ffffff',
 
   // SVG Settings
   svgColormode: 'color' as 'color' | 'binary',
@@ -625,6 +663,47 @@ function handleConfirm() {
 
 .more-indicator {
   font-style: italic;
+}
+
+.png-bg-setting {
+  padding: var(--space-3);
+  background: color-mix(in oklab, var(--accent) 5%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 15%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.bg-color-picker {
+  margin-top: var(--space-3);
+}
+
+.bg-color-picker label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.color-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.color-input-row input[type="color"] {
+  width: 36px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px;
+  background: var(--panel);
+}
+
+.color-input-row .color-hex {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .info-box {
