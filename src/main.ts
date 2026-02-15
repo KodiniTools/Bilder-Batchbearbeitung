@@ -9,6 +9,7 @@ import de from './locales/de.json'
 import en from './locales/en.json'
 
 // Import global styles
+import './assets/styles/fonts.css'
 import './assets/styles/main.css'
 
 // Create i18n instance

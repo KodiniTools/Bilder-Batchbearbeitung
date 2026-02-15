@@ -53,6 +53,7 @@ export interface FrontPageElement {
   // Text properties
   content?: string
   fontSize?: number
+  fontFamily?: string
   fontWeight?: 'normal' | 'bold'
   textAlign?: 'left' | 'center' | 'right'
   color?: string
@@ -303,167 +304,159 @@ export interface ExportSettings {
 // ============================================================================
 
 /**
- * ✨ NEU: Erstellt eine benutzerdefinierte Startseite aus Designer-Elementen
+ * Erstellt eine benutzerdefinierte Startseite aus Designer-Elementen.
+ * Rendert via HTML5 Canvas, damit benutzerdefinierte @font-face-Schriften
+ * korrekt im PDF erscheinen.
  */
 async function createCustomFrontPage(
   pdf: jsPDF,
   elements: FrontPageElement[],
   jpegQuality: number,
-  maxImageDimension: number
+  _maxImageDimension: number
 ): Promise<void> {
   if (elements.length === 0) return
 
-  console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite')
-
-  const pageWidth = pdf.internal.pageSize.getWidth()
-  const pageHeight = pdf.internal.pageSize.getHeight()
+  console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite (Canvas-Rendering)')
 
   // Canvas-Dimensionen vom FrontPageDesigner (A4 bei 96 DPI)
-  const canvasWidth = 794 // pixels
-  const canvasHeight = 1123 // pixels
+  const canvasWidth = 794
+  const canvasHeight = 1123
 
-  // Umrechnungsfaktoren von Pixel zu mm
-  const scaleX = pageWidth / canvasWidth
-  const scaleY = pageHeight / canvasHeight
+  // Offscreen-Canvas erstellen
+  const canvas = document.createElement('canvas')
+  // 2× Auflösung für scharfe Schrift im PDF
+  const scale = 2
+  canvas.width = canvasWidth * scale
+  canvas.height = canvasHeight * scale
+  const ctx = canvas.getContext('2d')!
+  ctx.scale(scale, scale)
 
-  // Sortiere Elemente nach Position (y-Position für Render-Reihenfolge)
-  // Elemente weiter oben werden zuerst gerendert
+  // Weißer Hintergrund
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+
+  // Sortiere Elemente nach y-Position
   const sortedElements = [...elements].sort((a, b) => a.y - b.y)
 
-  // Rendere jedes Element
   for (const element of sortedElements) {
     try {
       if (element.type === 'text') {
-        renderFrontPageTextElement(pdf, element, scaleX, scaleY)
+        renderFrontPageTextOnCanvas(ctx, element)
       } else if (element.type === 'image') {
-        await renderFrontPageImageElement(pdf, element, scaleX, scaleY, jpegQuality, maxImageDimension)
+        await renderFrontPageImageOnCanvas(ctx, element)
       }
     } catch (error) {
-      console.error('❌ Fehler beim Rendern von Startseiten-Element:', element.id, error)
+      console.error('❌ Fehler beim Canvas-Rendern:', element.id, error)
     }
   }
 
-  console.log('✅ Startseite erfolgreich erstellt')
+  // Canvas als JPEG in PDF einfügen
+  const imgData = canvas.toDataURL('image/jpeg', jpegQuality)
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight)
+
+  console.log('✅ Startseite erfolgreich erstellt (Canvas-Rendering)')
 }
 
 /**
- * Rendert ein Text-Element der Startseite
- *
- * Koordinatensystem-Abgleich mit dem FrontPageDesigner-Canvas:
- * - Canvas: 794×1123px (A4 @ 96 DPI)
- * - PDF A4: 210×297mm
- * - CSS .text-content hat padding: var(--space-2) (≈8px), line-height: 1.4
- * - Elemente haben explizite width/height
+ * Rendert ein Text-Element auf dem Offscreen-Canvas.
+ * Unterstützt benutzerdefinierte Schriftarten über @font-face.
  */
-function renderFrontPageTextElement(
-  pdf: jsPDF,
-  element: FrontPageElement,
-  scaleX: number,
-  scaleY: number
+function renderFrontPageTextOnCanvas(
+  ctx: CanvasRenderingContext2D,
+  element: FrontPageElement
 ): void {
-  if (!element.content || !element.content.trim()) return
+  if (!element.content?.trim()) return
 
-  // Padding des Canvas-Elements in px (CSS: .text-content { padding: var(--space-2) })
-  const paddingPx = 8
+  const padding = 8
+  const fontSize = element.fontSize || 24
+  const fontFamily = element.fontFamily || 'Helvetica, Arial, sans-serif'
+  const fontWeight = element.fontWeight === 'bold' ? 'bold' : 'normal'
+  const lineHeight = fontSize * 1.4
 
-  // Schriftgröße: Canvas-px → PDF-Punkte
-  const fontSizePx = element.fontSize || 24
-  const fontSizePt = fontSizePx * scaleY / 0.3528
-  pdf.setFontSize(fontSizePt)
+  ctx.save()
+  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`
+  ctx.fillStyle = element.color || '#000000'
+  ctx.textBaseline = 'top'
 
-  // Schrift-Style basierend auf fontWeight
-  if (element.fontWeight === 'bold') {
-    pdf.setFont('helvetica', 'bold')
-  } else {
-    pdf.setFont('helvetica', 'normal')
-  }
+  const contentWidth = element.width - padding * 2
+  const x = element.x + padding
+  let y = element.y + padding
 
-  // Farbe setzen
-  if (element.color) {
-    const color = hexToRgb(element.color)
-    if (color) {
-      pdf.setTextColor(color.r, color.g, color.b)
-    }
-  } else {
-    pdf.setTextColor(0, 0, 0)
-  }
-
-  // X-Position mit Padding
-  const xBase = (element.x + paddingPx) * scaleX
-
-  // Element-Breite (ohne Padding) für Ausrichtung und Textumbruch
-  const elementContentWidthMm = (element.width - paddingPx * 2) * scaleX
-
-  // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
-  // splitTextToSize() repliziert das CSS word-wrap: break-word Verhalten
+  // Mehrzeiligen Text verarbeiten (explizite Umbrüche + Wortumbruch)
   const explicitLines = element.content.split('\n')
   const allLines: string[] = []
 
-  explicitLines.forEach(line => {
+  for (const line of explicitLines) {
     if (line.trim() === '') {
       allLines.push('')
     } else {
-      const wrappedLines = pdf.splitTextToSize(line, elementContentWidthMm)
-      allLines.push(...wrappedLines)
+      allLines.push(...wrapText(ctx, line, contentWidth))
     }
-  })
+  }
 
-  allLines.forEach((line, index) => {
-    // Y-Position: Baseline = element.y + padding + fontSize (1. Zeile) + index × lineHeight
-    const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.4)
-    const yPosMm = yPosPx * scaleY
-
-    // Text-Ausrichtung relativ zur Element-Breite
+  for (const line of allLines) {
+    let xPos = x
     if (element.textAlign === 'center') {
-      const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (elementContentWidthMm - textWidthMm) / 2
-      pdf.text(line, xPos, yPosMm)
+      const w = ctx.measureText(line).width
+      xPos = x + (contentWidth - w) / 2
     } else if (element.textAlign === 'right') {
-      const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (elementContentWidthMm - textWidthMm)
-      pdf.text(line, xPos, yPosMm)
-    } else {
-      pdf.text(line, xBase, yPosMm)
+      const w = ctx.measureText(line).width
+      xPos = x + contentWidth - w
     }
-  })
+    ctx.fillText(line, xPos, y)
+    y += lineHeight
+  }
+
+  ctx.restore()
 }
 
-/**
- * ✨ NEU: Rendert ein Bild-Element der Startseite
- */
-async function renderFrontPageImageElement(
-  pdf: jsPDF,
-  element: FrontPageElement,
-  scaleX: number,
-  scaleY: number,
-  jpegQuality: number,
-  maxImageDimension: number
+/** Bricht Text in Zeilen um die in maxWidth passen */
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current)
+      current = word
+    } else {
+      current = test
+    }
+  }
+  if (current) lines.push(current)
+  return lines.length ? lines : ['']
+}
+
+/** Rendert ein Bild-Element auf dem Offscreen-Canvas */
+async function renderFrontPageImageOnCanvas(
+  ctx: CanvasRenderingContext2D,
+  element: FrontPageElement
 ): Promise<void> {
   if (!element.src) return
 
-  try {
-    // Konvertiere PNG zu JPEG wenn nötig
-    let imageSrc = element.src
-    if (element.src.startsWith('data:image/png')) {
-      console.log('  🔄 Konvertiere Startseiten-Bild von PNG zu JPEG...')
-      imageSrc = await resizeAndConvertDataUrl(element.src, maxImageDimension, jpegQuality)
+  return new Promise<void>((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      ctx.drawImage(img, element.x, element.y, element.width, element.height)
+      resolve()
     }
-    
-    // Konvertiere Koordinaten
-    const x = element.x * scaleX
-    const y = element.y * scaleY
-    
-    // Berechne skalierte Größe
-    const width = element.width * scaleX
-    const height = element.height * scaleY
-
-    // Füge Bild hinzu (sollte jetzt immer JPEG sein)
-    const imageFormat = imageSrc.startsWith('data:image/png') ? 'PNG' : 'JPEG'
-    pdf.addImage(imageSrc, imageFormat, x, y, width, height)
-  } catch (error) {
-    console.error('❌ Fehler beim Hinzufügen von Startseiten-Bild zum PDF:', error)
-  }
+    img.onerror = () => {
+      console.error('❌ Bild konnte nicht geladen werden:', element.id)
+      resolve()
+    }
+    img.src = element.src
+  })
 }
+
+/* renderFrontPageTextElement entfernt – Text wird jetzt via Canvas gerendert
+   (siehe renderFrontPageTextOnCanvas) für Custom-Font-Unterstützung */
+
+/* renderFrontPageImageElement entfernt – Bilder werden jetzt via Canvas gerendert
+   (siehe renderFrontPageImageOnCanvas) */
 
 /**
  * Fügt automatisch page-Nummern zu Elementen hinzu die keine haben
