@@ -302,7 +302,10 @@
         "label": "Quality",
         "smaller": "Smaller",
         "better": "Better"
-      }
+      },
+      "pngTransparent": "Transparent background",
+      "pngTransparentHint": "Disable to place a colored background behind the image (e.g. for shadows or rounded corners).",
+      "pngBgColor": "Background color"
     },
     "buttons": {
       "cancel": "Cancel",

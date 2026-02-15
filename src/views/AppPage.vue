@@ -194,7 +194,9 @@ async function handleExportConfirm(settings: ExportSettings) {
           settings.zipName,
           settings.format,
           settings.quality,
-          onProgress
+          onProgress,
+          settings.pngTransparent ?? true,
+          settings.pngBackgroundColor ?? '#ffffff'
         )
         toast.success(t('toast.zipSuccess', { count: total }))
       } finally {
@@ -243,8 +245,12 @@ async function handleExportConfirm(settings: ExportSettings) {
     } else if (currentMode === 'save') {
       const images = imageStore.images.filter(img => img.selected)
 
+      const bgColor = (settings.format === 'png' && !settings.pngTransparent)
+        ? (settings.pngBackgroundColor ?? '#ffffff')
+        : undefined
+
       for (const image of images) {
-        await downloadSingleImage(image, settings.format, settings.quality / 100)
+        await downloadSingleImage(image, settings.format, settings.quality / 100, bgColor)
         await new Promise(resolve => setTimeout(resolve, 200))
       }
 
@@ -256,14 +262,14 @@ async function handleExportConfirm(settings: ExportSettings) {
   }
 }
 
-function downloadSingleImage(image: ImageObject, format?: string, quality?: number): Promise<void> {
+function downloadSingleImage(image: ImageObject, format?: string, quality?: number, backgroundColor?: string): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = quality !== undefined ? quality : (image.quality || 0.92)
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
 
-      const exportCanvas = ImageProcessor.getExportCanvas(image)
+      const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
 
       exportCanvas.toBlob((blob) => {
         if (!blob) {
