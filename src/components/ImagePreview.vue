@@ -144,9 +144,9 @@ onUnmounted(() => {
   max-width: 95vw;
   max-height: 95vh;
   background: var(--panel);
-  border-radius: var(--radius-2xl);
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.3),
     0 0 0 1px var(--border-color);
   display: flex;
@@ -208,7 +208,6 @@ onUnmounted(() => {
   display: block;
   max-width: 100%;
   max-height: 100%;
-  border-radius: var(--radius-lg);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 

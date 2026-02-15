@@ -294,10 +294,10 @@ onMounted(() => {
 .image-preview {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   background: var(--bg);
   border: 1px solid color-mix(in oklab, var(--border-color) 50%, transparent);
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.06),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
