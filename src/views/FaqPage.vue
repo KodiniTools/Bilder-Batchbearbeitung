@@ -36,9 +36,6 @@ onMounted(() => {
     <!-- Navigation -->
     <nav class="faq-nav">
       <div class="nav-container">
-        <button class="nav-brand" @click="goToHome">
-          <span>{{ t('landing.brand') }}</span>
-        </button>
         <div class="nav-links">
           <button class="nav-link" @click="goToHome">{{ t('landing.nav.home') }}</button>
           <button class="nav-link primary" @click="goToApp">{{ t('landing.nav.app') }}</button>
@@ -111,23 +108,6 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   gap: var(--space-4);
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s var(--ease-spring);
-}
-
-.nav-brand:hover {
-  color: var(--accent);
 }
 
 .nav-links {
@@ -360,10 +340,6 @@ onMounted(() => {
     margin-top: var(--space-3);
     padding-top: var(--space-3);
     border-top: 1px solid var(--glass-border);
-  }
-
-  .nav-brand span {
-    display: none;
   }
 
   .privacy-notice {
