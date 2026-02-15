@@ -90,6 +90,7 @@
 
             <div class="canvas-scroll-area">
             <div class="canvas-wrapper">
+              <div class="canvas-inner">
               <div
                 class="canvas"
                 ref="canvasRef"
@@ -192,6 +193,7 @@
                     </svg>
                   </button>
                 </div>
+              </div>
               </div>
             </div>
 
@@ -904,13 +906,18 @@ function closeDesigner() {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  padding: 40px;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
   background-size: 20px 20px;
   background-position: -1px -1px;
   background-color: var(--panel);
+}
+
+.canvas-inner {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 40px;
 }
 
 .canvas {
@@ -923,7 +930,6 @@ function closeDesigner() {
   flex-shrink: 0;
   transform-origin: top left;
   transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
-  margin: auto;
 }
 
 /* Elements */
@@ -1326,7 +1332,7 @@ function closeDesigner() {
     max-height: 300px;
   }
 
-  .canvas-wrapper {
+  .canvas-inner {
     padding: 20px;
   }
 }
@@ -1336,7 +1342,7 @@ function closeDesigner() {
     height: 100dvh;
   }
 
-  .canvas-wrapper {
+  .canvas-inner {
     padding: 10px;
   }
 
