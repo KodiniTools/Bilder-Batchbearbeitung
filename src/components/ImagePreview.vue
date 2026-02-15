@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
-import { defaultFilters } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import { ImageProcessor } from '@/lib/core/image-processor'
 
 const props = defineProps<{
   image: ImageObject | null
@@ -42,6 +43,24 @@ const filterStyle = computed(() => {
     `.trim(),
     opacity: f.opacity / 100
   }
+})
+
+// Computed CSS transform style (border, radius, shadow)
+const transformStyle = computed(() => {
+  if (!props.image) return {}
+  const t = props.image.transforms || defaultTransforms
+  const style: Record<string, string> = {}
+  if (t.borderWidth > 0) {
+    style.border = `${t.borderWidth}px solid ${t.borderColor}`
+  }
+  if (t.borderRadius > 0) {
+    style.borderRadius = `${t.borderRadius}px`
+  }
+  if (t.shadowBlur > 0) {
+    const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
+    style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
+  }
+  return style
 })
 
 function updatePreview() {
@@ -118,7 +137,7 @@ onUnmounted(() => {
         </div>
         
         <div class="preview-content">
-          <canvas ref="previewCanvas" :style="filterStyle"></canvas>
+          <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
         </div>
         
         <div class="preview-info" v-if="image">

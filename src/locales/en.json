@@ -533,6 +533,26 @@
       "reset": "Reset"
     },
     "resetSlider": "Reset",
+    "transforms": {
+      "title": "Transformations",
+      "border": {
+        "title": "Border",
+        "width": "Width",
+        "color": "Color"
+      },
+      "corners": {
+        "title": "Rounded Corners",
+        "radius": "Radius"
+      },
+      "shadow": {
+        "title": "Shadow",
+        "blur": "Blur",
+        "opacity": "Opacity",
+        "color": "Color",
+        "offsetX": "Offset X",
+        "offsetY": "Offset Y"
+      }
+    },
     "toast": {
       "applied": "Filters applied to {count} image(s)",
       "reset": "Filters reset for {count} image(s)"

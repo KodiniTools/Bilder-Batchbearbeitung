@@ -1,8 +1,8 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageObject, ImageFilters } from './types'
-import { defaultFilters } from './types'
+import type { ImageFormat, ImageObject, ImageFilters, ImageTransforms } from './types'
+import { defaultFilters, defaultTransforms } from './types'
 
 /**
  * Zentrale Klasse für alle Bildverarbeitungsoperationen
@@ -457,5 +457,119 @@ export class ImageProcessor {
   ): string {
     const filteredCanvas = this.getCanvasWithFilters(imageObj)
     return filteredCanvas.toDataURL(format, quality)
+  }
+
+  /**
+   * Zeichnet ein abgerundetes Rechteck als Pfad
+   */
+  private static drawRoundRect(
+    ctx: CanvasRenderingContext2D,
+    x: number, y: number,
+    w: number, h: number,
+    r: number
+  ): void {
+    r = Math.min(r, w / 2, h / 2)
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.lineTo(x + w - r, y)
+    ctx.arcTo(x + w, y, x + w, y + r, r)
+    ctx.lineTo(x + w, y + h - r)
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+    ctx.lineTo(x + r, y + h)
+    ctx.arcTo(x, y + h, x, y + h - r, r)
+    ctx.lineTo(x, y + r)
+    ctx.arcTo(x, y, x + r, y, r)
+    ctx.closePath()
+  }
+
+  /**
+   * Konvertiert Hex-Farbe + Opacity zu rgba String
+   */
+  static hexToRgba(hex: string, opacity: number): string {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`
+  }
+
+  /**
+   * Erstellt ein Canvas mit angewendeten Transformationen (Rand, Schatten, abgerundete Ecken)
+   * @param sourceCanvas Das Quell-Canvas
+   * @param transforms Die Transformations-Einstellungen
+   * @returns Canvas mit angewendeten Transformationen
+   */
+  static getCanvasWithTransforms(
+    sourceCanvas: HTMLCanvasElement,
+    transforms: ImageTransforms
+  ): HTMLCanvasElement {
+    const t = transforms
+    const hasTransforms = t.borderWidth > 0 || t.borderRadius > 0 || t.shadowBlur > 0
+
+    if (!hasTransforms) {
+      return sourceCanvas
+    }
+
+    const imgW = sourceCanvas.width
+    const imgH = sourceCanvas.height
+
+    // Padding für Schatten berechnen
+    const shadowPadding = t.shadowBlur > 0
+      ? Math.ceil(t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY)))
+      : 0
+
+    // Gesamtpadding pro Seite
+    const padding = t.borderWidth + shadowPadding
+
+    const canvas = document.createElement('canvas')
+    canvas.width = imgW + padding * 2
+    canvas.height = imgH + padding * 2
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) return sourceCanvas
+
+    // Position des äußeren Rand-Rechtecks
+    const outerX = shadowPadding
+    const outerY = shadowPadding
+    const outerW = imgW + t.borderWidth * 2
+    const outerH = imgH + t.borderWidth * 2
+    const outerR = t.borderRadius > 0 ? t.borderRadius + t.borderWidth : 0
+
+    // Position des inneren Bildbereichs
+    const innerX = shadowPadding + t.borderWidth
+    const innerY = shadowPadding + t.borderWidth
+    const innerR = t.borderRadius
+
+    // Schatten zeichnen
+    if (t.shadowBlur > 0) {
+      ctx.save()
+      ctx.shadowBlur = t.shadowBlur
+      ctx.shadowColor = this.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
+      ctx.shadowOffsetX = t.shadowOffsetX
+      ctx.shadowOffsetY = t.shadowOffsetY
+      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerR)
+      ctx.fillStyle = t.borderWidth > 0 ? t.borderColor : '#ffffff'
+      ctx.fill()
+      ctx.restore()
+    }
+
+    // Rand zeichnen (gefülltes Rechteck hinter dem Bild)
+    if (t.borderWidth > 0) {
+      ctx.save()
+      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerR)
+      ctx.fillStyle = t.borderColor
+      ctx.fill()
+      ctx.restore()
+    }
+
+    // Bild zeichnen (mit abgerundeten Ecken geclippt)
+    ctx.save()
+    if (innerR > 0) {
+      this.drawRoundRect(ctx, innerX, innerY, imgW, imgH, innerR)
+      ctx.clip()
+    }
+    ctx.drawImage(sourceCanvas, innerX, innerY)
+    ctx.restore()
+
+    return canvas
   }
 }
