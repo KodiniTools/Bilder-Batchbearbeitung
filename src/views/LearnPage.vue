@@ -55,18 +55,11 @@ const sections = [
     <nav class="learn-nav">
       <div class="nav-container">
         <button class="nav-brand" @click="goToHome">
-          <i class="fa-solid fa-images"></i>
           <span>{{ t('landing.brand') }}</span>
         </button>
         <div class="nav-links">
-          <button class="nav-link" @click="goToHome">
-            <i class="fa-solid fa-home"></i>
-            {{ t('landing.nav.home') }}
-          </button>
-          <button class="nav-link primary" @click="goToApp">
-            <i class="fa-solid fa-rocket"></i>
-            {{ t('landing.nav.app') }}
-          </button>
+          <button class="nav-link" @click="goToHome">{{ t('landing.nav.home') }}</button>
+          <button class="nav-link primary" @click="goToApp">{{ t('landing.nav.app') }}</button>
         </div>
         <!-- Theme & Language Switcher sind jetzt in der globalen SSI Navigation -->
       </div>
@@ -1385,7 +1378,7 @@ function processLocally(image: File): Promise&lt;string&gt; {
   margin: 0 auto;
   padding: var(--space-3) var(--space-5);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: var(--space-4);
 }
@@ -1403,7 +1396,6 @@ function processLocally(image: File): Promise&lt;string&gt; {
 }
 
 .nav-brand:hover { color: var(--accent); }
-.nav-brand i { color: var(--accent); font-size: 1.3rem; }
 
 .nav-links {
   display: flex;
