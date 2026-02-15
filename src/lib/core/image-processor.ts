@@ -460,6 +460,36 @@ export class ImageProcessor {
   }
 
   /**
+   * Erstellt ein Export-Canvas mit allen Filtern UND Transformationen (Rand, Schatten, Ecken)
+   * Zentrale Methode für alle Export-Pfade (ZIP, PDF, SVG, Download)
+   * @param imageObj Das Bild-Objekt
+   * @returns Canvas mit angewendeten Filtern und Transformationen
+   */
+  static getExportCanvas(imageObj: ImageObject): HTMLCanvasElement {
+    const filteredCanvas = this.getCanvasWithFilters(imageObj)
+    return this.getCanvasWithTransforms(
+      filteredCanvas,
+      imageObj.transforms || defaultTransforms
+    )
+  }
+
+  /**
+   * Erstellt eine Data URL mit allen Filtern UND Transformationen für den Export
+   * @param imageObj Das Bild-Objekt
+   * @param format MIME-Type (optional)
+   * @param quality Qualität 0-1 (optional)
+   * @returns Data URL des Bildes mit angewendeten Filtern und Transformationen
+   */
+  static getDataUrlForExport(
+    imageObj: ImageObject,
+    format = 'image/png',
+    quality = 0.92
+  ): string {
+    const exportCanvas = this.getExportCanvas(imageObj)
+    return exportCanvas.toDataURL(format, quality)
+  }
+
+  /**
    * Zeichnet ein abgerundetes Rechteck als Pfad
    */
   private static drawRoundRect(
