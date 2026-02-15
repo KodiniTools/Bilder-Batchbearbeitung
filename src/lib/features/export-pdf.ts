@@ -30,6 +30,7 @@ export interface CanvasElement {
   // Text properties
   content?: string
   fontSize?: number
+  fontFamily?: string
   color?: string
   align?: 'left' | 'center' | 'right'
   bold?: boolean
