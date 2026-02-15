@@ -715,16 +715,6 @@ function renderTextElement(
     }
   })
 
-  // Für Center/Right-Ausrichtung: maximale Zeilenbreite ermitteln
-  // (Text wird relativ zum Element ausgerichtet, nicht zur ganzen Seite)
-  let maxLineWidthMm = 0
-  if (element.align === 'center' || element.align === 'right') {
-    allLines.forEach(line => {
-      const w = pdf.getTextWidth(line)
-      if (w > maxLineWidthMm) maxLineWidthMm = w
-    })
-  }
-
   allLines.forEach((line, index) => {
     // Y-Position: Baseline der n-ten Zeile
     // = element.y + padding + fontSize (Baseline der 1. Zeile) + index × lineHeight
@@ -732,14 +722,14 @@ function renderTextElement(
     const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.5)
     const yPosMm = yPosPx * scaleY
 
-    // Text-Ausrichtung relativ zum Element (nicht zur Seite!)
+    // Text-Ausrichtung relativ zur Element-Breite (wie CSS text-align)
     if (element.align === 'center') {
       const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (maxLineWidthMm - textWidthMm) / 2
+      const xPos = xBase + (availableWidthMm - textWidthMm) / 2
       pdf.text(line, xPos, yPosMm)
     } else if (element.align === 'right') {
       const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (maxLineWidthMm - textWidthMm)
+      const xPos = xBase + (availableWidthMm - textWidthMm)
       pdf.text(line, xPos, yPosMm)
     } else {
       pdf.text(line, xBase, yPosMm)
