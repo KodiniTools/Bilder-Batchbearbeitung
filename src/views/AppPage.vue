@@ -136,7 +136,7 @@ async function handleExportConfirm(settings: ExportSettings) {
 
       const imageDataArray: ImageData[] = await Promise.all(
         images.map(async (img) => {
-          const dataUrl = ImageProcessor.getDataUrlWithFilters(img, 'image/png', 0.92)
+          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92)
           return {
             dataUrl: dataUrl,
             originalName: img.outputName || img.file.name
@@ -263,9 +263,9 @@ function downloadSingleImage(image: ImageObject, format?: string, quality?: numb
       const exportQuality = quality !== undefined ? quality : (image.quality || 0.92)
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
 
-      const canvasWithFilters = ImageProcessor.getCanvasWithFilters(image)
+      const exportCanvas = ImageProcessor.getExportCanvas(image)
 
-      canvasWithFilters.toBlob((blob) => {
+      exportCanvas.toBlob((blob) => {
         if (!blob) {
           reject(new Error('Blob-Konvertierung fehlgeschlagen'))
           return

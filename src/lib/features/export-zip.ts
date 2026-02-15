@@ -54,9 +54,9 @@ export async function exportImagesAsZip(
 
       const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = format === 'png' ? 1.0 : (quality / 100) || 0.92
-      // Canvas mit angewendeten Filtern holen
-      const canvasWithFilters = ImageProcessor.getCanvasWithFilters(image)
-      const blob = await canvasToBlob(canvasWithFilters, exportFormat, exportQuality)
+      // Canvas mit angewendeten Filtern und Transformationen holen
+      const exportCanvas = ImageProcessor.getExportCanvas(image)
+      const blob = await canvasToBlob(exportCanvas, exportFormat, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
       const fileNameWithExt = fileName.includes('.')
         ? fileName

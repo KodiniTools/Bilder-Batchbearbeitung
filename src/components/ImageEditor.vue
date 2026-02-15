@@ -523,14 +523,18 @@ async function downloadImage() {
     const format = availableFormats.value.find(f => f.mimeType === selectedFormat.value)
     if (!format) throw new Error('Ungültiges Format')
 
-    // Create temporary image object for conversion
+    // Create temporary image object and apply filters + transforms for export
     const tempImageObj: ImageObject = {
       ...originalImageObj,
       canvas: workingCanvas,
       ctx: workingCanvas.getContext('2d')!
     }
 
-    const blob = await ImageProcessor.convertToFormat(tempImageObj, format)
+    const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
+    const blob = await ImageProcessor.convertToFormat(
+      { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
+      format
+    )
     const fileBase = fileName.value.trim() || ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
     const downloadFileName = `${ImageProcessor.safeBaseName(fileBase)}.${format.ext}`
 

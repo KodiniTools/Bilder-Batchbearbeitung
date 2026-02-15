@@ -57,8 +57,8 @@ export async function convertImageToSvg(
 ): Promise<Blob> {
   const mergedSettings = { ...defaultSvgSettings, ...settings }
 
-  // Canvas mit Filtern holen und zu Blob konvertieren
-  const canvas = ImageProcessor.getCanvasWithFilters(imageObj)
+  // Canvas mit Filtern und Transformationen holen und zu Blob konvertieren
+  const canvas = ImageProcessor.getExportCanvas(imageObj)
   const blob = await canvasToBlob(canvas, 'png')
 
   // FormData erstellen
@@ -110,7 +110,7 @@ export async function convertImagesToSvgBatch(
     }
 
     try {
-      const canvas = ImageProcessor.getCanvasWithFilters(image)
+      const canvas = ImageProcessor.getExportCanvas(image)
       const blob = await canvasToBlob(canvas, 'png')
       formData.append('files', blob, `${image.outputName || `image_${i}`}.png`)
     } catch (error) {
