@@ -30,6 +30,9 @@ const filterStyle = computed(() => {
       saturate(${f.saturation}%)
       hue-rotate(${f.hue}deg)
       blur(${f.blur}px)
+      grayscale(${f.grayscale}%)
+      sepia(${f.sepia}%)
+      invert(${f.invert}%)
     `.trim(),
     opacity: f.opacity / 100
   }

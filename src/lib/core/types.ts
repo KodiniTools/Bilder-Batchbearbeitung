@@ -14,6 +14,9 @@ export interface ImageFilters {
   hue: number         // 0-360, default 0
   opacity: number     // 0-100, default 100
   blur: number        // 0-20, default 0
+  grayscale: number   // 0-100, default 0
+  sepia: number       // 0-100, default 0
+  invert: number      // 0-100, default 0
 }
 
 export const defaultFilters: ImageFilters = {
@@ -22,7 +25,10 @@ export const defaultFilters: ImageFilters = {
   saturation: 100,
   hue: 0,
   opacity: 100,
-  blur: 0
+  blur: 0,
+  grayscale: 0,
+  sepia: 0,
+  invert: 0
 }
 
 export interface ImageObject {
