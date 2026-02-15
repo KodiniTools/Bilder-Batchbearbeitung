@@ -45,26 +45,13 @@ onMounted(() => {
     <nav class="landing-nav">
       <div class="nav-container">
         <div class="nav-brand">
-          <i class="fa-solid fa-images"></i>
           <span>{{ t('landing.brand') }}</span>
         </div>
         <div class="nav-links">
-          <button class="nav-link" @click="goToApp">
-            <i class="fa-solid fa-rocket"></i>
-            {{ t('landing.nav.app') }}
-          </button>
-          <button class="nav-link" @click="goToBlog">
-            <i class="fa-solid fa-book"></i>
-            {{ t('landing.nav.blog') }}
-          </button>
-          <button class="nav-link" @click="goToLearn">
-            <i class="fa-solid fa-graduation-cap"></i>
-            {{ t('landing.nav.learn') }}
-          </button>
-          <button class="nav-link" @click="goToFaq">
-            <i class="fa-solid fa-circle-question"></i>
-            {{ t('landing.nav.faq') }}
-          </button>
+          <button class="nav-link" @click="goToApp">{{ t('landing.nav.app') }}</button>
+          <button class="nav-link" @click="goToBlog">{{ t('landing.nav.blog') }}</button>
+          <button class="nav-link" @click="goToLearn">{{ t('landing.nav.learn') }}</button>
+          <button class="nav-link" @click="goToFaq">{{ t('landing.nav.faq') }}</button>
         </div>
         <!-- Theme & Language Switcher sind jetzt in der globalen SSI Navigation -->
       </div>
@@ -76,19 +63,13 @@ onMounted(() => {
         <div class="hero-content">
           <h1 class="hero-title">{{ t('landing.hero.title') }}</h1>
           <p class="hero-subtitle">{{ t('landing.hero.subtitle') }}</p>
-          <button class="hero-cta" @click="goToApp">
-            <i class="fa-solid fa-rocket"></i>
-            {{ t('landing.hero.cta') }}
-          </button>
+          <button class="hero-cta" @click="goToApp">{{ t('landing.hero.cta') }}</button>
         </div>
 
         <!-- Feature Cards Grid -->
         <div class="feature-grid">
           <!-- Card 1: Privacy -->
           <div class="feature-card">
-            <div class="feature-icon privacy">
-              <i class="fa-solid fa-shield-halved"></i>
-            </div>
             <h3 class="feature-title">{{ t('landing.features.privacy.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.privacy.description') }}</p>
             <ul class="feature-list">
@@ -100,9 +81,6 @@ onMounted(() => {
 
           <!-- Card 2: Batch Operations -->
           <div class="feature-card">
-            <div class="feature-icon batch">
-              <i class="fa-solid fa-layer-group"></i>
-            </div>
             <h3 class="feature-title">{{ t('landing.features.batch.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.batch.description') }}</p>
             <ul class="feature-list">
@@ -114,9 +92,6 @@ onMounted(() => {
 
           <!-- Card 3: Export Formats -->
           <div class="feature-card">
-            <div class="feature-icon export">
-              <i class="fa-solid fa-file-export"></i>
-            </div>
             <h3 class="feature-title">{{ t('landing.features.export.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.export.description') }}</p>
             <ul class="feature-list">
@@ -223,7 +198,7 @@ onMounted(() => {
   margin: 0 auto;
   padding: var(--space-3) var(--space-5);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: var(--space-4);
 }
@@ -235,11 +210,6 @@ onMounted(() => {
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--text);
-}
-
-.nav-brand i {
-  color: var(--accent);
-  font-size: 1.3rem;
 }
 
 .nav-links {
@@ -269,15 +239,10 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-.nav-link i {
-  font-size: 0.85rem;
-  color: var(--accent);
-}
-
 /* Hero Section */
 .hero-section {
-  padding-top: var(--space-7);
-  padding-bottom: var(--space-7);
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-5);
 }
 
 .hero-container {
@@ -288,7 +253,7 @@ onMounted(() => {
 
 .hero-content {
   text-align: center;
-  margin-bottom: var(--space-7);
+  margin-bottom: var(--space-5);
 }
 
 .hero-title {
@@ -344,7 +309,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--space-5);
-  margin-top: var(--space-6);
+  margin-top: var(--space-4);
 }
 
 .feature-card {
@@ -378,42 +343,6 @@ onMounted(() => {
 
 .feature-card:hover::before {
   opacity: 1;
-}
-
-.feature-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--radius-xl);
-  display: grid;
-  place-items: center;
-  font-size: 1.75rem;
-  margin-bottom: var(--space-4);
-  transition: all 0.3s var(--ease-spring);
-}
-
-.feature-icon.privacy {
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--green) 15%, transparent),
-    color-mix(in oklab, var(--green) 5%, transparent));
-  color: var(--green);
-}
-
-.feature-icon.batch {
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--accent) 15%, transparent),
-    color-mix(in oklab, var(--accent) 5%, transparent));
-  color: var(--accent);
-}
-
-.feature-icon.export {
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--purple) 15%, transparent),
-    color-mix(in oklab, var(--purple) 5%, transparent));
-  color: var(--purple);
-}
-
-.feature-card:hover .feature-icon {
-  transform: scale(1.1) rotate(-5deg);
 }
 
 .feature-title {
@@ -459,7 +388,7 @@ onMounted(() => {
 
 /* Details Section */
 .details-section {
-  padding: var(--space-7) 0;
+  padding: var(--space-5) 0;
   background: var(--panel);
   border-top: 1px solid var(--glass-border);
   border-bottom: 1px solid var(--glass-border);
@@ -525,7 +454,7 @@ onMounted(() => {
 
 /* Donate Section */
 .donate-section {
-  padding: var(--space-7) 0;
+  padding: var(--space-5) 0;
 }
 
 .donate-container {
@@ -593,7 +522,7 @@ onMounted(() => {
 
 /* Footer CTA */
 .footer-cta {
-  padding: var(--space-7) 0;
+  padding: var(--space-5) 0;
   background: var(--panel);
   border-top: 1px solid var(--glass-border);
 }
