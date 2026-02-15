@@ -514,6 +514,7 @@
       "typeText": "Text",
       "typeImage": "Bild",
       "fontSize": "Schriftgröße:",
+      "fontFamily": "Schriftart:",
       "fontWeight": "Schriftstärke:",
       "fontWeightNormal": "Normal",
       "fontWeightBold": "Fett",
