@@ -61,9 +61,6 @@ const handleDrop = (event: DragEvent) => {
     @drop="handleDrop"
     :aria-label="t('accessibility.dropzone')"
   >
-    <div class="upload-icon" aria-hidden="true">
-      <i class="fa-solid fa-cloud-arrow-up"></i>
-    </div>
     <div class="upload-text">
       {{ t('upload.text') }}
     </div>
@@ -85,9 +82,9 @@ const handleDrop = (event: DragEvent) => {
 .drop-area {
   display: grid;
   place-items: center;
-  gap: var(--space-3);
-  min-height: 240px;
-  padding: var(--space-6);
+  gap: var(--space-2);
+  min-height: 120px;
+  padding: var(--space-4);
   border: 2px dashed color-mix(in oklab, var(--border-color) 50%, transparent);
   border-radius: var(--radius-2xl);
   background:
@@ -135,16 +132,6 @@ const handleDrop = (event: DragEvent) => {
 .drop-area.loading {
   pointer-events: none;
   opacity: 0.7;
-}
-
-.upload-icon {
-  font-size: 48px;
-  color: var(--accent);
-  transition: all 0.3s var(--ease-bounce);
-}
-
-.drop-area:hover .upload-icon {
-  transform: scale(1.1) rotate(5deg);
 }
 
 .upload-text {
@@ -202,13 +189,9 @@ const handleDrop = (event: DragEvent) => {
 
 @media (max-width: 768px) {
   .drop-area {
-    min-height: 200px;
-    padding: var(--space-5);
+    min-height: 100px;
+    padding: var(--space-3);
     margin-bottom: var(--space-5);
-  }
-
-  .upload-icon {
-    font-size: 40px;
   }
 
   .upload-text {
@@ -218,13 +201,9 @@ const handleDrop = (event: DragEvent) => {
 
 @media (max-width: 480px) {
   .drop-area {
-    min-height: 160px;
-    padding: var(--space-4);
+    min-height: 80px;
+    padding: var(--space-3);
     margin-bottom: var(--space-4);
-  }
-
-  .upload-icon {
-    font-size: 32px;
   }
 
   .upload-text {
