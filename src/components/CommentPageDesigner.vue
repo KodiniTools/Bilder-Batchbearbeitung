@@ -453,7 +453,7 @@
                         class="element-text"
                         :style="{
                         fontSize: element.fontSize + 'px',
-                        fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
+                        fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
                         color: element.color,
                         textAlign: element.align,
                         fontWeight: element.bold ? 'bold' : 'normal',
@@ -473,7 +473,7 @@
                           class="inline-text-editor"
                           :style="{
                             fontSize: element.fontSize + 'px',
-                            fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
+                            fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
                             color: element.color,
                             textAlign: element.align,
                             fontWeight: element.bold ? 'bold' : 'normal',
@@ -638,7 +638,7 @@ const footerPreviewText = computed(() => {
 const selectedElement = ref(null);
 const canvasRef = ref(null);
 const imageInput = ref(null);
-const zoomLevel = ref(0.5);
+const zoomLevel = ref(1);
 const editingTextId = ref(null);
 const inlineTextareaRef = ref(null);
 
@@ -1060,14 +1060,14 @@ onUnmounted(() => {
 
 /* Sidebar */
 .sidebar {
-  width: 320px;
+  width: 300px;
   background: var(--panel);
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+  gap: 12px;
+  padding: 14px;
 }
 
 /* Page Section */
@@ -1520,7 +1520,7 @@ onUnmounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  padding: 40px;
+  padding: 16px;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
@@ -1551,7 +1551,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   text-align: center;
-  font-family: var(--font-sans);
+  font-family: Helvetica, Arial, sans-serif;
   font-size: 9px;
   line-height: 1;
   color: rgb(150, 150, 150);
@@ -1584,7 +1584,6 @@ onUnmounted(() => {
   height: 100%;
   padding: 8px;
   box-sizing: border-box;
-  font-family: var(--font-sans);
   overflow: hidden;
 }
 
@@ -1817,7 +1816,7 @@ onUnmounted(() => {
   }
 
   .canvas-wrapper {
-    padding: 20px;
+    padding: 12px;
   }
 
   .page-thumbnails {
@@ -1835,7 +1834,7 @@ onUnmounted(() => {
   }
 
   .canvas-wrapper {
-    padding: 10px;
+    padding: 8px;
   }
 
   .page-thumbnails {

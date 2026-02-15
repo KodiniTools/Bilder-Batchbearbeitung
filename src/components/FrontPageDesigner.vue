@@ -451,7 +451,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const elements = ref<FrontPageElement[]>([])
 const selectedElementId = ref<string | null>(null)
 const editingTextId = ref<string | null>(null)
-const zoomLevel = ref(0.5)
+const zoomLevel = ref(1)
 
 // Drag & Resize State
 const isDragging = ref(false)
