@@ -192,6 +192,18 @@
                   </div>
 
                   <div class="property-group">
+                    <label>{{ t('commentPageDesigner.properties.fontFamily') }}</label>
+                    <select v-model="selectedElement.fontFamily" class="property-select font-select">
+                      <option
+                        v-for="font in CUSTOM_FONT_FAMILIES"
+                        :key="font"
+                        :value="font"
+                        :style="{ fontFamily: font }"
+                      >{{ font }}</option>
+                    </select>
+                  </div>
+
+                  <div class="property-group">
                     <label for="font-size">{{ t('commentPageDesigner.properties.fontSize', { size: selectedElement.fontSize }) }}</label>
                     <input
                         id="font-size"
@@ -441,6 +453,7 @@
                         class="element-text"
                         :style="{
                         fontSize: element.fontSize + 'px',
+                        fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
                         color: element.color,
                         textAlign: element.align,
                         fontWeight: element.bold ? 'bold' : 'normal',
@@ -460,6 +473,7 @@
                           class="inline-text-editor"
                           :style="{
                             fontSize: element.fontSize + 'px',
+                            fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
                             color: element.color,
                             textAlign: element.align,
                             fontWeight: element.bold ? 'bold' : 'normal',
@@ -540,6 +554,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n'
+import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 const { t } = useI18n()
 
 // Props - FIXED to use v-model
@@ -711,6 +726,7 @@ function addTextElement() {
     width: 300,
     height: 60,
     fontSize: 24,
+    fontFamily: 'Helvetica',
     color: '#000000',
     align: 'left',
     bold: false,
@@ -1279,6 +1295,28 @@ onUnmounted(() => {
   border-radius: 6px;
   font-size: 13px;
   color: var(--text);
+}
+
+.property-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.property-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.font-select option {
+  padding: 4px 8px;
+  font-size: 14px;
 }
 
 .property-group textarea,

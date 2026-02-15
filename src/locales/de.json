@@ -576,6 +576,7 @@
       "typeImage": "Bild",
       "textLabel": "Text:",
       "textPlaceholder": "Text eingeben...",
+      "fontFamily": "Schriftart:",
       "fontSize": "Schriftgröße: {size}px",
       "textColor": "Textfarbe:",
       "textAlignment": "Text-Ausrichtung:",
