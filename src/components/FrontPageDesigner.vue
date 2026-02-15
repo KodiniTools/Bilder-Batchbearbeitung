@@ -389,11 +389,7 @@
   </Teleport>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
-
+<script lang="ts">
 export const CUSTOM_FONT_FAMILIES = [
   'Helvetica',
   'Alpino',
@@ -428,6 +424,12 @@ export interface FrontPageElement {
   originalWidth?: number
   originalHeight?: number
 }
+</script>
+
+<script setup lang="ts">
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 interface Props {
   modelValue: boolean
