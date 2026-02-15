@@ -116,6 +116,7 @@
                     width: element.width + 'px',
                     height: element.height + 'px',
                     fontSize: element.fontSize + 'px',
+                    fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
                     fontWeight: element.fontWeight,
                     textAlign: element.textAlign,
                     color: element.color
@@ -237,6 +238,18 @@
                     >
                     <span class="slider-value">{{ selectedElement.fontSize }}px</span>
                   </div>
+                </div>
+
+                <div class="property-group">
+                  <label>{{ t('frontPageDesigner.properties.fontFamily') }}</label>
+                  <select v-model="selectedElement.fontFamily" class="property-select font-select">
+                    <option
+                      v-for="font in CUSTOM_FONT_FAMILIES"
+                      :key="font"
+                      :value="font"
+                      :style="{ fontFamily: font }"
+                    >{{ font }}</option>
+                  </select>
                 </div>
 
                 <div class="property-group">
@@ -381,6 +394,20 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
+export const CUSTOM_FONT_FAMILIES = [
+  'Helvetica',
+  'Alpino',
+  'Author',
+  'Chillax',
+  'Clash Display',
+  'General Sans',
+  'Hind',
+  'Ranade',
+  'Satoshi',
+  'Supreme',
+  'Switzer'
+] as const
+
 export interface FrontPageElement {
   id: string
   type: 'text' | 'image'
@@ -391,6 +418,7 @@ export interface FrontPageElement {
   // Text properties
   content?: string
   fontSize?: number
+  fontFamily?: string
   fontWeight?: 'normal' | 'bold'
   textAlign?: 'left' | 'center' | 'right'
   color?: string
@@ -462,6 +490,7 @@ function addTextElement() {
     height: 60,
     content: t('frontPageDesigner.element.text.default'),
     fontSize: 24,
+    fontFamily: 'Helvetica',
     fontWeight: 'normal',
     textAlign: 'left',
     color: '#000000'
@@ -921,7 +950,7 @@ function closeDesigner() {
   word-wrap: break-word;
   white-space: pre-wrap;
   line-height: 1.4;
-  font-family: var(--font-sans);
+  font-family: inherit;
   cursor: text;
 }
 
@@ -933,7 +962,7 @@ function closeDesigner() {
   border: none;
   outline: none;
   resize: none;
-  font-family: var(--font-sans);
+  font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
   text-align: inherit;
@@ -1086,6 +1115,11 @@ function closeDesigner() {
   border-radius: 6px;
   color: var(--text);
   font-size: 13px;
+}
+
+.font-select option {
+  padding: 4px 8px;
+  font-size: 14px;
 }
 
 .button-group {
