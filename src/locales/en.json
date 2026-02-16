@@ -88,6 +88,23 @@
     "app": {
       "title": "Ready to Start?",
       "subtitle": "Drag your images into the area below or click to upload."
+    },
+    "tools": {
+      "title": "Discover More KodiniTools",
+      "subtitle": "Use our free browser tools for all your image editing needs.",
+      "cta": "Open Tool",
+      "converter": {
+        "title": "Image Converter",
+        "description": "Convert images between PNG, JPEG, WebP and more formats - fast and directly in your browser."
+      },
+      "collage": {
+        "title": "Collage Maker",
+        "description": "Create custom photo collages with flexible layouts, borders, and backgrounds."
+      },
+      "colorExtractor": {
+        "title": "Color Extractor",
+        "description": "Extract color palettes from your images and export the values as HEX, RGB, or HSL."
+      }
     }
   },
   "head": {

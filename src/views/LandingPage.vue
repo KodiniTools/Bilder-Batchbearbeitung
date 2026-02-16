@@ -141,6 +141,52 @@ onMounted(() => {
       </div>
     </section>
 
+    <!-- Related Tools Section -->
+    <section class="tools-section">
+      <div class="tools-container">
+        <h2 class="section-title">{{ t('landing.tools.title') }}</h2>
+        <p class="tools-subtitle">{{ t('landing.tools.subtitle') }}</p>
+
+        <div class="tools-grid">
+          <!-- Bildkonverter -->
+          <a href="https://kodinitools.com/bildkonverter/" class="tool-card" rel="noopener">
+            <div class="tool-icon">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+            <h3>{{ t('landing.tools.converter.title') }}</h3>
+            <p>{{ t('landing.tools.converter.description') }}</p>
+            <span class="tool-link">
+              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </a>
+
+          <!-- Collage Maker -->
+          <a href="https://kodinitools.com/collagemaker/" class="tool-card" rel="noopener">
+            <div class="tool-icon">
+              <i class="fa-solid fa-table-cells-large"></i>
+            </div>
+            <h3>{{ t('landing.tools.collage.title') }}</h3>
+            <p>{{ t('landing.tools.collage.description') }}</p>
+            <span class="tool-link">
+              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </a>
+
+          <!-- Color Extractor -->
+          <a href="https://kodinitools.com/kodini-color-extractor/" class="tool-card" rel="noopener">
+            <div class="tool-icon">
+              <i class="fa-solid fa-eye-dropper"></i>
+            </div>
+            <h3>{{ t('landing.tools.colorExtractor.title') }}</h3>
+            <p>{{ t('landing.tools.colorExtractor.description') }}</p>
+            <span class="tool-link">
+              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Donate Section -->
     <section class="donate-section">
       <div class="donate-container">
@@ -429,6 +475,130 @@ onMounted(() => {
   line-height: 1.5;
 }
 
+/* Related Tools Section */
+.tools-section {
+  padding: var(--space-5) 0;
+}
+
+.tools-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+.tools-subtitle {
+  text-align: center;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto var(--space-6);
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-6);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.4s var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--secondary));
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+
+.tool-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--surface-hover);
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--glass-border));
+}
+
+.tool-card:hover::before {
+  opacity: 1;
+}
+
+.tool-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+  margin-bottom: var(--space-4);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.tool-card:hover .tool-icon {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  transform: scale(1.08);
+}
+
+.tool-icon i {
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+
+.tool-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+  color: var(--text);
+}
+
+.tool-card p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 var(--space-4);
+  flex: 1;
+}
+
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: gap 0.2s var(--ease-smooth);
+}
+
+.tool-card:hover .tool-link {
+  gap: var(--space-3);
+}
+
+.tool-link i {
+  font-size: 0.75rem;
+  transition: transform 0.2s var(--ease-smooth);
+}
+
+.tool-card:hover .tool-link i {
+  transform: translateX(2px);
+}
+
 /* Donate Section */
 .donate-section {
   padding: var(--space-4) 0;
@@ -529,6 +699,15 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .tool-card {
+    padding: var(--space-5);
+  }
+
   .nav-brand span {
     display: none;
   }
@@ -576,6 +755,23 @@ onMounted(() => {
 
   .details-section {
     padding: var(--space-6) 0;
+  }
+
+  .tools-container {
+    padding: 0 var(--space-3);
+  }
+
+  .tool-card {
+    padding: var(--space-4);
+  }
+
+  .tool-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .tool-icon i {
+    font-size: 1.3rem;
   }
 
   .donate-container {
