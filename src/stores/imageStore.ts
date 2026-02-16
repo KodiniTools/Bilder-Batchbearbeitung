@@ -177,7 +177,7 @@ export const useImageStore = defineStore('images', () => {
   }
 
   // Batch-Umbenennung für alle ausgewählten Bilder
-  function batchRenameSelectedImages(baseName: string, startNumber: number = 1): number {
+  function batchRenameSelectedImages(baseName: string, startNumber: number = 1, separator: string = '_', lowercase: boolean = false): number {
     // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
     const selectedInOrder = images.value.filter(img => img.selected)
 
@@ -186,10 +186,14 @@ export const useImageStore = defineStore('images', () => {
     // Sanitize baseName
     const safeBaseName = ImageProcessor.safeBaseName(baseName)
 
-    // Umbenennen mit fortlaufender Nummerierung
+    // SEO-freundliche Umbenennung mit konfigurierbarem Trennzeichen
     selectedInOrder.forEach((img, index) => {
       const number = startNumber + index
-      img.outputName = `${safeBaseName}_${number}`
+      let name = safeBaseName.replace(/\s+/g, separator).replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
+      if (lowercase) {
+        name = name.toLowerCase()
+      }
+      img.outputName = `${name}${separator}${number}`
     })
 
     return selectedInOrder.length

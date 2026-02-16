@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useSeoMeta } from '@/composables/useSeoMeta'
 
 const { locale } = useI18n()
+
+// Dynamic SEO meta tags per route and locale
+useSeoMeta()
 
 /**
  * Handle the 'language-changed' event dispatched by the SSI nav.html.
