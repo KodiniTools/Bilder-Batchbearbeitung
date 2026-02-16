@@ -338,8 +338,8 @@ function closeBatchEditPanel() {
   isBatchEditPanelOpen.value = false
 }
 
-function handleBulkRenameConfirm(baseName: string, startNumber: number) {
-  const count = imageStore.batchRenameSelectedImages(baseName, startNumber)
+function handleBulkRenameConfirm(baseName: string, startNumber: number, separator: string, lowercase: boolean) {
+  const count = imageStore.batchRenameSelectedImages(baseName, startNumber, separator, lowercase)
   closeBulkRenameModal()
   toast.success(t('toast.bulkRenamed', { count }))
 }

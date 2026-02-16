@@ -37,6 +37,36 @@
               <p class="setting-hint">{{ t('bulkRename.startNumber.hint') }}</p>
             </div>
 
+            <!-- SEO-Optionen -->
+            <div class="setting-group">
+              <label>{{ t('bulkRename.seo.label') }}</label>
+              <div class="seo-options">
+                <div class="option-row">
+                  <label for="separator" class="option-label">{{ t('bulkRename.seo.separator') }}</label>
+                  <select id="separator" v-model="separator" class="option-select">
+                    <option value="-">{{ t('bulkRename.seo.hyphen') }} (-)</option>
+                    <option value="_">{{ t('bulkRename.seo.underscore') }} (_)</option>
+                  </select>
+                </div>
+                <div class="option-row">
+                  <label for="lowercase" class="option-label">{{ t('bulkRename.seo.lowercase') }}</label>
+                  <button
+                    id="lowercase"
+                    type="button"
+                    class="toggle-btn"
+                    :class="{ active: lowercaseEnabled }"
+                    @click="lowercaseEnabled = !lowercaseEnabled"
+                  >
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </button>
+                </div>
+              </div>
+              <p class="setting-hint seo-hint">
+                <i class="fa-solid fa-circle-info"></i>
+                {{ t('bulkRename.seo.hint') }}
+              </p>
+            </div>
+
             <!-- Live-Vorschau -->
             <div class="preview-section">
               <div class="preview-header">
@@ -99,12 +129,14 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  confirm: [baseName: string, startNumber: number]
+  confirm: [baseName: string, startNumber: number, separator: string, lowercase: boolean]
 }>()
 
 // Form state
 const baseName = ref('Bild')
 const startNumber = ref(1)
+const separator = ref('-')
+const lowercaseEnabled = ref(true)
 const maxPreviewItems = 5
 
 // Computed
@@ -114,6 +146,16 @@ const isValid = computed(() => {
   return baseName.value.trim().length > 0 && startNumber.value >= 0
 })
 
+function buildSeoName(base: string, number: number, sep: string, lowercase: boolean): string {
+  let name = base
+    .replace(/\s+/g, sep)
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
+  if (lowercase) {
+    name = name.toLowerCase()
+  }
+  return `${name}${sep}${number}`
+}
+
 const previewNames = computed(() => {
   const selected = imageStore.images.filter(img => img.selected)
   const safeBase = ImageProcessor.safeBaseName(baseName.value) || 'Bild'
@@ -121,9 +163,10 @@ const previewNames = computed(() => {
   return selected.slice(0, maxPreviewItems).map((img, index) => {
     const number = startNumber.value + index
     const extension = img.file.name.split('.').pop() || 'jpg'
+    const newName = buildSeoName(safeBase, number, separator.value, lowercaseEnabled.value)
     return {
       old: img.outputName || img.file.name.replace(/\.[^.]+$/, ''),
-      new: `${safeBase}_${number}.${extension}`
+      new: `${newName}.${extension}`
     }
   })
 })
@@ -133,12 +176,14 @@ watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     baseName.value = 'Bild'
     startNumber.value = 1
+    separator.value = '-'
+    lowercaseEnabled.value = true
   }
 })
 
 function handleConfirm() {
   if (!isValid.value) return
-  emit('confirm', baseName.value.trim(), startNumber.value)
+  emit('confirm', baseName.value.trim(), startNumber.value, separator.value, lowercaseEnabled.value)
 }
 </script>
 
@@ -251,6 +296,97 @@ function handleConfirm() {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* SEO Options */
+.seo-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.option-label {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.option-select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.option-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.toggle-track {
+  display: block;
+  width: 44px;
+  height: 24px;
+  background: var(--border-color);
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle-btn.active .toggle-track {
+  background: var(--accent);
+}
+
+.toggle-thumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn.active .toggle-thumb {
+  transform: translateX(20px);
+}
+
+.seo-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.seo-hint i {
+  color: var(--accent);
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 /* Preview Section */

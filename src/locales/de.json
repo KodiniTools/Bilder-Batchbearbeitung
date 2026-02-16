@@ -1,4 +1,26 @@
 {
+  "seo": {
+    "home": {
+      "title": "Bilderserie Bearbeiten - Batch Bildbearbeitung Online | KodiniTools",
+      "description": "Bearbeiten, konvertieren und exportieren Sie mehrere Bilder gleichzeitig direkt im Browser. Schnell, privat und modern - ohne Upload auf Server."
+    },
+    "app": {
+      "title": "Mehrere Bilder gleichzeitig bearbeiten - Batch Editor | KodiniTools",
+      "description": "Laden Sie Ihre Bilder hoch und bearbeiten Sie sie direkt im Browser. Filter anwenden, Größe ändern, konvertieren und als PDF, ZIP oder SVG exportieren."
+    },
+    "faq": {
+      "title": "FAQ - Häufige Fragen zur Batch-Bildbearbeitung | KodiniTools",
+      "description": "Antworten auf häufig gestellte Fragen zur Online-Bildbearbeitung: Formate, Export, Datenschutz und mehr."
+    },
+    "blog": {
+      "title": "Bilder-Batchbearbeitung: Funktionen und Anleitung | KodiniTools",
+      "description": "Entdecken Sie alle Funktionen: Batch-Filter, PDF-Export mit Designer, SVG-Konvertierung, Stapelumbenennung und mehr."
+    },
+    "learn": {
+      "title": "Web-Technologien lernen: Vue.js, Canvas API, TypeScript | KodiniTools",
+      "description": "Lernressource für Entwickler: Web Audio API, Vue.js 3 Composition API, Canvas-Bildverarbeitung und Performance-Optimierung."
+    }
+  },
   "landing": {
     "brand": "Bild-Batchbearbeitung",
     "nav": {
@@ -687,6 +709,14 @@
       "more": "+{count} weitere..."
     },
     "info": "{count} Bild(er) werden umbenannt",
+    "seo": {
+      "label": "SEO-Optionen",
+      "separator": "Trennzeichen",
+      "hyphen": "Bindestrich",
+      "underscore": "Unterstrich",
+      "lowercase": "Kleinbuchstaben",
+      "hint": "SEO-freundliche Dateinamen verwenden Bindestriche und Kleinbuchstaben (z. B. urlaub-strand-bild-01.jpg), um in der Google-Bildersuche besser gefunden zu werden."
+    },
     "buttons": {
       "cancel": "Abbrechen",
       "rename": "Umbenennen"

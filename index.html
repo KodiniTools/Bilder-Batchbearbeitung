@@ -14,7 +14,15 @@
     
     <!-- Canonical URL - verhindert Duplicate Content -->
     <link rel="canonical" href="https://kodinitools.com/bilderseriebearbeiten/" />
-    
+
+    <!-- Hreflang Tags für Internationalisierung -->
+    <link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/" />
+    <link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://kodinitools.com/bilderseriebearbeiten/" />
+
+    <!-- OG Locale Alternate -->
+    <meta property="og:locale:alternate" content="en_US" />
+
     <!-- PWA Theme Colors (beibehalten) -->
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
@@ -105,12 +113,13 @@
     }
     </script>
     
-    <!-- SoftwareApplication Schema (Alternative zu WebApplication) -->
+    <!-- SoftwareApplication Schema (erweitert) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Bilderserie Bearbeiten",
+      "name": "Kodini Bilder-Batchbearbeiter",
+      "alternateName": ["Batch Image Editor", "Bilderserie Bearbeiten"],
       "applicationCategory": "MultimediaApplication",
       "operatingSystem": "Web Browser",
       "offers": {
@@ -124,7 +133,62 @@
         "ratingCount": "127",
         "bestRating": "5",
         "worstRating": "1"
-      }
+      },
+      "inLanguage": ["de", "en"],
+      "availableLanguage": [
+        { "@type": "Language", "name": "German", "alternateName": "de" },
+        { "@type": "Language", "name": "English", "alternateName": "en" }
+      ]
+    }
+    </script>
+
+    <!-- FAQPage Schema für Google FAQ Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Wie füge ich Bilder hinzu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sie können Bilder einfach per Drag-and-Drop in den markierten Bereich ziehen oder auf die Schaltfläche 'Dateien auswählen' klicken, um sie von Ihrem Gerät hochzuladen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Welche Bildformate werden unterstützt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Die Anwendung unterstützt die gängigsten Formate wie PNG, JPEG, WebP, BMP und GIF, abhängig von der Unterstützung Ihres Browsers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf die Schaltfläche ZIP in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie erstelle ich eine PDF-Datei aus meinen Bildern?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sie können entweder alle Bilder oder nur die ausgewählten Bilder als PDF exportieren. In den PDF-Einstellungen können Sie das Layout weiter anpassen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Werden meine Bilder auf einen Server hochgeladen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nein. Alle Ihre Bilder werden ausschließlich lokal in Ihrem Browser verarbeitet. Es werden keine Dateien auf einen Server hochgeladen. Ihre Daten verlassen niemals Ihr Gerät."
+          }
+        }
+      ]
     }
     </script>
     

@@ -1,4 +1,26 @@
 {
+  "seo": {
+    "home": {
+      "title": "Batch Image Editor - Edit Multiple Images Online | KodiniTools",
+      "description": "Edit, convert, and export multiple images simultaneously in your browser. Fast, private, and modern - no server uploads."
+    },
+    "app": {
+      "title": "Edit Multiple Images at Once - Batch Editor | KodiniTools",
+      "description": "Upload your images and edit them directly in the browser. Apply filters, resize, convert, and export as PDF, ZIP, or SVG."
+    },
+    "faq": {
+      "title": "FAQ - Frequently Asked Questions about Batch Image Editing | KodiniTools",
+      "description": "Answers to common questions about online image editing: formats, export, privacy, and more."
+    },
+    "blog": {
+      "title": "Batch Image Editor: Features and Guide | KodiniTools",
+      "description": "Discover all features: batch filters, PDF export with designer, SVG conversion, bulk renaming, and more."
+    },
+    "learn": {
+      "title": "Learn Web Technologies: Vue.js, Canvas API, TypeScript | KodiniTools",
+      "description": "Developer learning resource: Web Audio API, Vue.js 3 Composition API, Canvas image processing, and performance optimization."
+    }
+  },
   "landing": {
     "brand": "Batch Image Editor",
     "nav": {
@@ -512,6 +534,14 @@
       "more": "+{count} more..."
     },
     "info": "{count} image(s) will be renamed",
+    "seo": {
+      "label": "SEO Options",
+      "separator": "Separator",
+      "hyphen": "Hyphen",
+      "underscore": "Underscore",
+      "lowercase": "Lowercase",
+      "hint": "SEO-friendly file names use hyphens and lowercase letters (e.g. vacation-beach-photo-01.jpg) to rank better in Google Image Search."
+    },
     "buttons": {
       "cancel": "Cancel",
       "rename": "Rename"
