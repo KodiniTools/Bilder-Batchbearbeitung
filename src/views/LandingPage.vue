@@ -70,9 +70,9 @@ onMounted(() => {
             <h3 class="feature-title">{{ t('landing.features.privacy.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.privacy.description') }}</p>
             <ul class="feature-list">
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.privacy.point1') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.privacy.point2') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.privacy.point3') }}</li>
+              <li>{{ t('landing.features.privacy.point1') }}</li>
+              <li>{{ t('landing.features.privacy.point2') }}</li>
+              <li>{{ t('landing.features.privacy.point3') }}</li>
             </ul>
           </div>
 
@@ -81,9 +81,9 @@ onMounted(() => {
             <h3 class="feature-title">{{ t('landing.features.batch.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.batch.description') }}</p>
             <ul class="feature-list">
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.batch.point1') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.batch.point2') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.batch.point3') }}</li>
+              <li>{{ t('landing.features.batch.point1') }}</li>
+              <li>{{ t('landing.features.batch.point2') }}</li>
+              <li>{{ t('landing.features.batch.point3') }}</li>
             </ul>
           </div>
 
@@ -92,9 +92,9 @@ onMounted(() => {
             <h3 class="feature-title">{{ t('landing.features.export.title') }}</h3>
             <p class="feature-description">{{ t('landing.features.export.description') }}</p>
             <ul class="feature-list">
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.export.point1') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.export.point2') }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ t('landing.features.export.point3') }}</li>
+              <li>{{ t('landing.features.export.point1') }}</li>
+              <li>{{ t('landing.features.export.point2') }}</li>
+              <li>{{ t('landing.features.export.point3') }}</li>
             </ul>
           </div>
         </div>
@@ -108,32 +108,26 @@ onMounted(() => {
 
         <div class="details-grid">
           <div class="detail-item">
-            <i class="fa-solid fa-crop"></i>
             <h4>{{ t('landing.details.crop.title') }}</h4>
             <p>{{ t('landing.details.crop.text') }}</p>
           </div>
           <div class="detail-item">
-            <i class="fa-solid fa-sliders"></i>
             <h4>{{ t('landing.details.filters.title') }}</h4>
             <p>{{ t('landing.details.filters.text') }}</p>
           </div>
           <div class="detail-item">
-            <i class="fa-solid fa-rotate"></i>
             <h4>{{ t('landing.details.transform.title') }}</h4>
             <p>{{ t('landing.details.transform.text') }}</p>
           </div>
           <div class="detail-item">
-            <i class="fa-solid fa-file-pdf"></i>
             <h4>{{ t('landing.details.pdf.title') }}</h4>
             <p>{{ t('landing.details.pdf.text') }}</p>
           </div>
           <div class="detail-item">
-            <i class="fa-solid fa-bezier-curve"></i>
             <h4>{{ t('landing.details.svg.title') }}</h4>
             <p>{{ t('landing.details.svg.text') }}</p>
           </div>
           <div class="detail-item">
-            <i class="fa-solid fa-language"></i>
             <h4>{{ t('landing.details.i18n.title') }}</h4>
             <p>{{ t('landing.details.i18n.text') }}</p>
           </div>
@@ -150,37 +144,28 @@ onMounted(() => {
         <div class="tools-grid">
           <!-- Bildkonverter -->
           <a href="https://kodinitools.com/bildkonverter/" class="tool-card" rel="noopener">
-            <div class="tool-icon">
-              <i class="fa-solid fa-arrows-rotate"></i>
-            </div>
             <h3>{{ t('landing.tools.converter.title') }}</h3>
             <p>{{ t('landing.tools.converter.description') }}</p>
             <span class="tool-link">
-              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+              {{ t('landing.tools.cta') }} &rarr;
             </span>
           </a>
 
           <!-- Collage Maker -->
           <a href="https://kodinitools.com/collagemaker/" class="tool-card" rel="noopener">
-            <div class="tool-icon">
-              <i class="fa-solid fa-table-cells-large"></i>
-            </div>
             <h3>{{ t('landing.tools.collage.title') }}</h3>
             <p>{{ t('landing.tools.collage.description') }}</p>
             <span class="tool-link">
-              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+              {{ t('landing.tools.cta') }} &rarr;
             </span>
           </a>
 
           <!-- Color Extractor -->
           <a href="https://kodinitools.com/kodini-color-extractor/" class="tool-card" rel="noopener">
-            <div class="tool-icon">
-              <i class="fa-solid fa-eye-dropper"></i>
-            </div>
             <h3>{{ t('landing.tools.colorExtractor.title') }}</h3>
             <p>{{ t('landing.tools.colorExtractor.description') }}</p>
             <span class="tool-link">
-              {{ t('landing.tools.cta') }} <i class="fa-solid fa-arrow-right"></i>
+              {{ t('landing.tools.cta') }} &rarr;
             </span>
           </a>
         </div>
@@ -195,7 +180,6 @@ onMounted(() => {
         <form action="https://www.paypal.com/donate" method="post" target="_top" class="paypal-form">
           <input type="hidden" name="hosted_button_id" value="8RGLGQ2BFMHU6" />
           <button type="submit" class="paypal-button">
-            <i class="fa-brands fa-paypal"></i>
             {{ t('donate.button') }}
           </button>
         </form>
@@ -389,9 +373,6 @@ onMounted(() => {
 }
 
 .feature-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
   padding: var(--space-2) 0;
   font-size: 0.9rem;
   color: var(--text);
@@ -400,13 +381,6 @@ onMounted(() => {
 
 .feature-list li:first-child {
   border-top: none;
-}
-
-.feature-list li i {
-  color: var(--green);
-  font-size: 0.8rem;
-  margin-top: 3px;
-  flex-shrink: 0;
 }
 
 /* Details Section */
@@ -436,13 +410,13 @@ onMounted(() => {
 
 .details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-5);
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
 }
 
 .detail-item {
   text-align: center;
-  padding: var(--space-5);
+  padding: var(--space-4);
   border-radius: var(--radius-xl);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -453,12 +427,6 @@ onMounted(() => {
   transform: translateY(-4px);
   box-shadow: var(--surface-elevation);
   border-color: color-mix(in oklab, var(--accent) 25%, var(--glass-border));
-}
-
-.detail-item i {
-  font-size: 2rem;
-  color: var(--accent);
-  margin-bottom: var(--space-3);
 }
 
 .detail-item h4 {
@@ -498,7 +466,7 @@ onMounted(() => {
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .tool-card {
@@ -506,7 +474,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: var(--space-6);
+  padding: var(--space-5);
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
@@ -540,27 +508,6 @@ onMounted(() => {
   opacity: 1;
 }
 
-.tool-icon {
-  width: 64px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-xl);
-  background: color-mix(in oklab, var(--accent) 10%, transparent);
-  margin-bottom: var(--space-4);
-  transition: all 0.3s var(--ease-smooth);
-}
-
-.tool-card:hover .tool-icon {
-  background: color-mix(in oklab, var(--accent) 18%, transparent);
-  transform: scale(1.08);
-}
-
-.tool-icon i {
-  font-size: 1.6rem;
-  color: var(--accent);
-}
-
 .tool-card h3 {
   font-size: 1.15rem;
   font-weight: 700;
@@ -579,7 +526,7 @@ onMounted(() => {
 .tool-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--accent);
@@ -587,16 +534,7 @@ onMounted(() => {
 }
 
 .tool-card:hover .tool-link {
-  gap: var(--space-3);
-}
-
-.tool-link i {
-  font-size: 0.75rem;
-  transition: transform 0.2s var(--ease-smooth);
-}
-
-.tool-card:hover .tool-link i {
-  transform: translateX(2px);
+  gap: var(--space-2);
 }
 
 /* Donate Section */
@@ -663,10 +601,6 @@ onMounted(() => {
   transform: translateY(0);
 }
 
-.paypal-button i {
-  font-size: 1.4rem;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .hero-section {
@@ -696,7 +630,7 @@ onMounted(() => {
   }
 
   .details-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .tools-grid {
@@ -705,7 +639,7 @@ onMounted(() => {
   }
 
   .tool-card {
-    padding: var(--space-5);
+    padding: var(--space-4);
   }
 
   .nav-brand span {
@@ -753,6 +687,10 @@ onMounted(() => {
     padding: 0 var(--space-3);
   }
 
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
   .details-section {
     padding: var(--space-6) 0;
   }
@@ -762,16 +700,7 @@ onMounted(() => {
   }
 
   .tool-card {
-    padding: var(--space-4);
-  }
-
-  .tool-icon {
-    width: 52px;
-    height: 52px;
-  }
-
-  .tool-icon i {
-    font-size: 1.3rem;
+    padding: var(--space-3);
   }
 
   .donate-container {
