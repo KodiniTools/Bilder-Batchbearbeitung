@@ -66,6 +66,7 @@ export interface ImageObject {
   outputName: string
   filters?: ImageFilters
   transforms?: ImageTransforms
+  watermark?: WatermarkSettings
 }
 
 export interface PdfSettings {
@@ -84,6 +85,32 @@ export interface PdfSettings {
 export interface EditorState {
   currentImage: ImageObject | null
   originalCanvas: HTMLCanvasElement | null
+}
+
+export interface WatermarkSettings {
+  enabled: boolean
+  text: string
+  fontFamily: string
+  fontSize: number       // 10-200, default 48
+  color: string          // hex, default '#ffffff'
+  opacity: number        // 0-100, default 50
+  rotation: number       // -180 to 180, default -30
+  position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'tile'
+  bold: boolean
+  italic: boolean
+}
+
+export const defaultWatermark: WatermarkSettings = {
+  enabled: false,
+  text: '',
+  fontFamily: 'Helvetica',
+  fontSize: 48,
+  color: '#ffffff',
+  opacity: 50,
+  rotation: -30,
+  position: 'center',
+  bold: false,
+  italic: false
 }
 
 export type TransformOperation = 'rotateLeft' | 'rotateRight' | 'rotate180' | 'flipHorizontal' | 'flipVertical'

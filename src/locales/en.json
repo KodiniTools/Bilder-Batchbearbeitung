@@ -603,6 +603,28 @@
         "offsetY": "Offset Y"
       }
     },
+    "watermark": {
+      "title": "Watermark",
+      "enable": "Enable watermark",
+      "text": "Text",
+      "textPlaceholder": "e.g. © My Name",
+      "fontFamily": "Font",
+      "fontSize": "Font size",
+      "bold": "Bold",
+      "italic": "Italic",
+      "color": "Color",
+      "opacity": "Opacity",
+      "rotation": "Rotation",
+      "position": "Position",
+      "positions": {
+        "center": "Center",
+        "topLeft": "Top left",
+        "topRight": "Top right",
+        "bottomLeft": "Bottom left",
+        "bottomRight": "Bottom right",
+        "tile": "Tile (repeated)"
+      }
+    },
     "toast": {
       "applied": "Filters applied to {count} image(s)",
       "reset": "Filters reset for {count} image(s)"

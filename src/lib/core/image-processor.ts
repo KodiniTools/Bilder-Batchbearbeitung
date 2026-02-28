@@ -1,8 +1,8 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageObject, ImageFilters, ImageTransforms } from './types'
-import { defaultFilters, defaultTransforms } from './types'
+import type { ImageFormat, ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from './types'
+import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
 
 /**
  * Zentrale Klasse für alle Bildverarbeitungsoperationen
@@ -460,6 +460,112 @@ export class ImageProcessor {
   }
 
   /**
+   * Erstellt ein Canvas mit Text-Wasserzeichen
+   * @param sourceCanvas Das Quell-Canvas
+   * @param watermark Die Wasserzeichen-Einstellungen
+   * @returns Canvas mit Wasserzeichen
+   */
+  static getCanvasWithWatermark(
+    sourceCanvas: HTMLCanvasElement,
+    watermark: WatermarkSettings
+  ): HTMLCanvasElement {
+    if (!watermark.enabled || !watermark.text.trim()) {
+      return sourceCanvas
+    }
+
+    const canvas = document.createElement('canvas')
+    canvas.width = sourceCanvas.width
+    canvas.height = sourceCanvas.height
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) return sourceCanvas
+
+    // Quellbild zeichnen
+    ctx.drawImage(sourceCanvas, 0, 0)
+
+    // Wasserzeichen-Einstellungen
+    const fontWeight = watermark.bold ? 'bold' : 'normal'
+    const fontStyle = watermark.italic ? 'italic' : 'normal'
+    const fontSize = watermark.fontSize
+    const fontFamily = watermark.fontFamily || 'Helvetica'
+    ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px "${fontFamily}", Arial, sans-serif`
+    ctx.fillStyle = watermark.color
+    ctx.globalAlpha = watermark.opacity / 100
+    ctx.textBaseline = 'middle'
+    ctx.textAlign = 'center'
+
+    const text = watermark.text
+    const rotation = (watermark.rotation * Math.PI) / 180
+
+    if (watermark.position === 'tile') {
+      // Kachelmodus: Text wiederholt über das gesamte Bild
+      const metrics = ctx.measureText(text)
+      const textWidth = metrics.width
+      const textHeight = fontSize * 1.2
+      const spacingX = textWidth + fontSize * 2
+      const spacingY = textHeight * 3
+
+      // Größeren Bereich abdecken für Rotation
+      const diagonal = Math.sqrt(canvas.width ** 2 + canvas.height ** 2)
+      const startX = -diagonal / 2
+      const startY = -diagonal / 2
+      const endX = diagonal * 1.5
+      const endY = diagonal * 1.5
+
+      ctx.save()
+      ctx.translate(canvas.width / 2, canvas.height / 2)
+      ctx.rotate(rotation)
+      ctx.translate(-canvas.width / 2, -canvas.height / 2)
+
+      for (let y = startY; y < endY; y += spacingY) {
+        for (let x = startX; x < endX; x += spacingX) {
+          ctx.fillText(text, x, y)
+        }
+      }
+      ctx.restore()
+    } else {
+      // Einzelposition
+      let x: number
+      let y: number
+
+      switch (watermark.position) {
+        case 'top-left':
+          x = canvas.width * 0.15
+          y = canvas.height * 0.1
+          break
+        case 'top-right':
+          x = canvas.width * 0.85
+          y = canvas.height * 0.1
+          break
+        case 'bottom-left':
+          x = canvas.width * 0.15
+          y = canvas.height * 0.9
+          break
+        case 'bottom-right':
+          x = canvas.width * 0.85
+          y = canvas.height * 0.9
+          break
+        case 'center':
+        default:
+          x = canvas.width / 2
+          y = canvas.height / 2
+          break
+      }
+
+      ctx.save()
+      ctx.translate(x, y)
+      ctx.rotate(rotation)
+      ctx.fillText(text, 0, 0)
+      ctx.restore()
+    }
+
+    // Alpha zurücksetzen
+    ctx.globalAlpha = 1
+
+    return canvas
+  }
+
+  /**
    * Erstellt ein Export-Canvas mit allen Filtern UND Transformationen (Rand, Schatten, Ecken)
    * Zentrale Methode für alle Export-Pfade (ZIP, PDF, SVG, Download)
    * @param imageObj Das Bild-Objekt
@@ -471,8 +577,12 @@ export class ImageProcessor {
     options?: { backgroundColor?: string }
   ): HTMLCanvasElement {
     const filteredCanvas = this.getCanvasWithFilters(imageObj)
-    const transformedCanvas = this.getCanvasWithTransforms(
+    const watermarkedCanvas = this.getCanvasWithWatermark(
       filteredCanvas,
+      imageObj.watermark || defaultWatermark
+    )
+    const transformedCanvas = this.getCanvasWithTransforms(
+      watermarkedCanvas,
       imageObj.transforms || defaultTransforms
     )
 
