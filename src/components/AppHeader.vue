@@ -1,13 +1,35 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const { t } = useI18n()
+const { locale, t } = useI18n()
+
+const isElectron = !!(window as any).electronAPI?.isElectron
+const theme = ref<'light' | 'dark'>('light')
 
 const goHome = () => {
   router.push('/')
 }
+
+const setLanguage = (lang: string) => {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
+}
+
+const toggleTheme = () => {
+  const newTheme = theme.value === 'dark' ? 'light' : 'dark'
+  theme.value = newTheme
+  document.documentElement.dataset.theme = newTheme
+  localStorage.setItem('theme', newTheme)
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  theme.value = savedTheme || (prefersDark ? 'dark' : 'light')
+})
 </script>
 
 <template>
@@ -28,8 +50,33 @@ const goHome = () => {
         <h1 class="app-title">{{ t('header.title') }}</h1>
       </div>
 
-      <!-- Platzhalter für symmetrisches Layout -->
-      <div class="app-header__trailing"></div>
+      <div class="app-header__trailing">
+        <div v-if="isElectron" class="header-actions">
+          <button
+            class="lang-toggle"
+            :class="{ active: locale === 'de' }"
+            @click="setLanguage('de')"
+            title="Deutsch"
+          >
+            DE
+          </button>
+          <button
+            class="lang-toggle"
+            :class="{ active: locale === 'en' }"
+            @click="setLanguage('en')"
+            title="English"
+          >
+            EN
+          </button>
+          <button
+            class="theme-toggle"
+            @click="toggleTheme"
+            :title="t('header.themeToggle')"
+          >
+            {{ theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF13' }}
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 </template>
@@ -104,6 +151,43 @@ const goHome = () => {
 
 .app-header__trailing {
   flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.theme-toggle,
+.lang-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  transition: all 0.3s var(--ease-spring);
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.lang-toggle:hover {
+  color: var(--text);
+  transform: scale(1.1);
+  border-color: var(--border-color);
+  background: var(--btn);
+}
+
+.lang-toggle.active {
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 @media (max-width: 768px) {
