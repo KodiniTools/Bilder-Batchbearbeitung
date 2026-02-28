@@ -4,7 +4,7 @@
   "description": "Batch-Bildbearbeitung Desktop App - Bilder bearbeiten, konvertieren und exportieren",
   "author": "KodiniTools",
   "type": "module",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
