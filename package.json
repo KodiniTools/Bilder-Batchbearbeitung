@@ -54,7 +54,7 @@
           ]
         }
       ],
-      "icon": "electron/icon.png"
+      "icon": "electron/icon.ico"
     },
     "nsis": {
       "oneClick": false,
