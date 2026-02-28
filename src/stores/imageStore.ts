@@ -199,6 +199,14 @@ export const useImageStore = defineStore('images', () => {
     return selectedInOrder.length
   }
 
+  // Batch-Größenänderung für alle ausgewählten Bilder
+  function resizeSelectedImages(width: number, height: number, keepAspect: boolean): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      ImageProcessor.resizeImage(img, width, height, keepAspect)
+    })
+  }
+
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
   function applyWatermarkToSelectedImages(watermark: Partial<WatermarkSettings>): void {
     const selected = images.value.filter(img => img.selected)
@@ -258,6 +266,7 @@ export const useImageStore = defineStore('images', () => {
     applyTransformsToSelectedImages,
     resetTransformsForSelectedImages,
     batchRenameSelectedImages,
+    resizeSelectedImages,
     applyWatermarkToSelectedImages,
     resetWatermarkForSelectedImages,
     $reset

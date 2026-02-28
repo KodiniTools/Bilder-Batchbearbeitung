@@ -585,6 +585,13 @@
     "resetSlider": "Reset",
     "transforms": {
       "title": "Transformations",
+      "resize": {
+        "title": "Resize",
+        "width": "Width",
+        "height": "Height",
+        "keepAspect": "Keep aspect ratio",
+        "apply": "Apply resize"
+      },
       "border": {
         "title": "Border",
         "width": "Width",
@@ -624,6 +631,9 @@
         "bottomRight": "Bottom right",
         "tile": "Tile (repeated)"
       }
+    },
+    "resize": {
+      "toast": "{count} image(s) resized"
     },
     "toast": {
       "applied": "Filters applied to {count} image(s)",

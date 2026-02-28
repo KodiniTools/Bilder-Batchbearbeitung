@@ -760,6 +760,13 @@
     "resetSlider": "Zurücksetzen",
     "transforms": {
       "title": "Transformationen",
+      "resize": {
+        "title": "Größe ändern",
+        "width": "Breite",
+        "height": "Höhe",
+        "keepAspect": "Seitenverhältnis beibehalten",
+        "apply": "Größe anwenden"
+      },
       "border": {
         "title": "Bildrand",
         "width": "Breite",
@@ -799,6 +806,9 @@
         "bottomRight": "Unten rechts",
         "tile": "Kachel (wiederholt)"
       }
+    },
+    "resize": {
+      "toast": "Größe von {count} Bild(ern) geändert"
     },
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
