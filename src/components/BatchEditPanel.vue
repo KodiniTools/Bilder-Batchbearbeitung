@@ -26,6 +26,13 @@ const filters = ref<ImageFilters>({ ...defaultFilters })
 const transforms = ref<ImageTransforms>({ ...defaultTransforms })
 const transformsOpen = ref(false)
 
+// Local resize state
+const resizeOpen = ref(false)
+const resizeWidth = ref(1920)
+const resizeHeight = ref(1080)
+const resizeKeepAspect = ref(true)
+const resizeAspectRatio = ref(1920 / 1080)
+
 // Local watermark state
 const watermark = ref<WatermarkSettings>({ ...defaultWatermark })
 const watermarkOpen = ref(false)
@@ -51,6 +58,7 @@ watch(() => props.isOpen, (open) => {
     filters.value = { ...defaultFilters }
     transforms.value = { ...defaultTransforms }
     watermark.value = { ...defaultWatermark }
+    initResizeFromSelection()
   }
 })
 
@@ -122,6 +130,43 @@ onUnmounted(() => {
 // Computed for disabled state
 const hasSelection = computed(() => imageStore.hasSelection)
 const selectedCount = computed(() => imageStore.selectedCount)
+
+// Resize: Seitenverhältnis beibehalten
+function onResizeWidthChange() {
+  if (resizeKeepAspect.value && resizeWidth.value > 0) {
+    resizeHeight.value = Math.round(resizeWidth.value / resizeAspectRatio.value)
+  }
+}
+
+function onResizeHeightChange() {
+  if (resizeKeepAspect.value && resizeHeight.value > 0) {
+    resizeWidth.value = Math.round(resizeHeight.value * resizeAspectRatio.value)
+  }
+}
+
+function onKeepAspectChange() {
+  if (resizeKeepAspect.value && resizeWidth.value > 0 && resizeHeight.value > 0) {
+    resizeAspectRatio.value = resizeWidth.value / resizeHeight.value
+  }
+}
+
+// Resize anwenden
+function applyResize() {
+  if (!hasSelection.value || resizeWidth.value <= 0 || resizeHeight.value <= 0) return
+  imageStore.resizeSelectedImages(resizeWidth.value, resizeHeight.value, resizeKeepAspect.value)
+  toast.success(t('batchEdit.resize.toast', { count: selectedCount.value }))
+}
+
+// Initialisiere Resize-Werte basierend auf dem ersten ausgewählten Bild
+function initResizeFromSelection() {
+  const selected = imageStore.selectedImages
+  if (selected.length > 0) {
+    const first = selected[0]
+    resizeWidth.value = first.canvas.width
+    resizeHeight.value = first.canvas.height
+    resizeAspectRatio.value = first.canvas.width / first.canvas.height
+  }
+}
 
 // Reset single slider and apply
 function resetSlider(key: keyof ImageFilters, defaultValue: number) {
@@ -220,6 +265,65 @@ const sliderConfig = [
         </button>
 
         <div v-show="transformsOpen" class="transforms-container">
+          <!-- Größe ändern -->
+          <div class="transform-subsection">
+            <h4>
+              <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+              {{ t('batchEdit.transforms.resize.title') }}
+            </h4>
+            <div class="resize-inputs">
+              <div class="resize-field">
+                <label>{{ t('batchEdit.transforms.resize.width') }}</label>
+                <div class="resize-input-wrapper">
+                  <input
+                    type="number"
+                    v-model.number="resizeWidth"
+                    min="1"
+                    max="10000"
+                    class="resize-input"
+                    @input="onResizeWidthChange"
+                  />
+                  <span class="resize-unit">px</span>
+                </div>
+              </div>
+              <div class="resize-link-icon" :class="{ active: resizeKeepAspect }">
+                <i class="fa-solid fa-link"></i>
+              </div>
+              <div class="resize-field">
+                <label>{{ t('batchEdit.transforms.resize.height') }}</label>
+                <div class="resize-input-wrapper">
+                  <input
+                    type="number"
+                    v-model.number="resizeHeight"
+                    min="1"
+                    max="10000"
+                    class="resize-input"
+                    @input="onResizeHeightChange"
+                  />
+                  <span class="resize-unit">px</span>
+                </div>
+              </div>
+            </div>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  v-model="resizeKeepAspect"
+                  @change="onKeepAspectChange"
+                />
+                <span>{{ t('batchEdit.transforms.resize.keepAspect') }}</span>
+              </label>
+            </div>
+            <button
+              class="btn btn-apply-resize"
+              @click="applyResize"
+              :disabled="!hasSelection || resizeWidth <= 0 || resizeHeight <= 0"
+            >
+              <i class="fa-solid fa-check"></i>
+              {{ t('batchEdit.transforms.resize.apply') }}
+            </button>
+          </div>
+
           <!-- Bildrand -->
           <div class="transform-subsection">
             <h4>
@@ -889,6 +993,115 @@ const sliderConfig = [
   font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.resize-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.resize-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.resize-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.resize-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.resize-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.resize-input::-webkit-inner-spin-button,
+.resize-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.resize-input:focus {
+  outline: none;
+}
+
+.resize-input-wrapper:focus-within {
+  border-color: var(--accent);
+}
+
+.resize-unit {
+  padding: 0 var(--space-2);
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.resize-link-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.resize-link-icon.active {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.btn-apply-resize {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in oklab, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.btn-apply-resize:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 25%, transparent);
+  border-color: var(--accent);
+}
+
+.btn-apply-resize:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .checkbox-group {
