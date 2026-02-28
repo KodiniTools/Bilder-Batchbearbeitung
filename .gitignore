@@ -28,3 +28,6 @@ dist-ssr
 .env.local
 .env.*.local
 vue-image-editor-Backup/
+
+# Electron build output
+release/
