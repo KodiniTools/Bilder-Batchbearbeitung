@@ -619,25 +619,34 @@ export class ImageProcessor {
   }
 
   /**
-   * Zeichnet ein abgerundetes Rechteck als Pfad
+   * Zeichnet ein abgerundetes Rechteck als Pfad (mit elliptischen Ecken)
+   * @param rx Horizontaler Eckenradius
+   * @param ry Vertikaler Eckenradius (optional, Standard = rx)
    */
   private static drawRoundRect(
     ctx: CanvasRenderingContext2D,
     x: number, y: number,
     w: number, h: number,
-    r: number
+    rx: number, ry?: number
   ): void {
-    r = Math.min(r, w / 2, h / 2)
+    if (ry === undefined) ry = rx
+    rx = Math.min(rx, w / 2)
+    ry = Math.min(ry, h / 2)
+
     ctx.beginPath()
-    ctx.moveTo(x + r, y)
-    ctx.lineTo(x + w - r, y)
-    ctx.arcTo(x + w, y, x + w, y + r, r)
-    ctx.lineTo(x + w, y + h - r)
-    ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
-    ctx.lineTo(x + r, y + h)
-    ctx.arcTo(x, y + h, x, y + h - r, r)
-    ctx.lineTo(x, y + r)
-    ctx.arcTo(x, y, x + r, y, r)
+    ctx.moveTo(x + rx, y)
+    ctx.lineTo(x + w - rx, y)
+    // Oben-rechts
+    ctx.ellipse(x + w - rx, y + ry, rx, ry, 0, -Math.PI / 2, 0)
+    ctx.lineTo(x + w, y + h - ry)
+    // Unten-rechts
+    ctx.ellipse(x + w - rx, y + h - ry, rx, ry, 0, 0, Math.PI / 2)
+    ctx.lineTo(x + rx, y + h)
+    // Unten-links
+    ctx.ellipse(x + rx, y + h - ry, rx, ry, 0, Math.PI / 2, Math.PI)
+    ctx.lineTo(x, y + ry)
+    // Oben-links
+    ctx.ellipse(x + rx, y + ry, rx, ry, 0, Math.PI, -Math.PI / 2)
     ctx.closePath()
   }
 
@@ -671,6 +680,12 @@ export class ImageProcessor {
     const imgW = sourceCanvas.width
     const imgH = sourceCanvas.height
 
+    // borderRadius als Prozent der Bilddimensionen skalieren
+    // Slider 0-200 → 0%-50% → bei 200 = voller Kreis/Ellipse
+    const radiusFraction = t.borderRadius / 200 * 0.5 // 0 bis 0.5
+    const innerRx = radiusFraction * imgW
+    const innerRy = radiusFraction * imgH
+
     // Padding für Schatten berechnen
     const shadowPadding = t.shadowBlur > 0
       ? Math.ceil(t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY)))
@@ -691,12 +706,12 @@ export class ImageProcessor {
     const outerY = shadowPadding
     const outerW = imgW + t.borderWidth * 2
     const outerH = imgH + t.borderWidth * 2
-    const outerR = t.borderRadius > 0 ? t.borderRadius + t.borderWidth : 0
+    const outerRx = innerRx > 0 ? innerRx + t.borderWidth : 0
+    const outerRy = innerRy > 0 ? innerRy + t.borderWidth : 0
 
     // Position des inneren Bildbereichs
     const innerX = shadowPadding + t.borderWidth
     const innerY = shadowPadding + t.borderWidth
-    const innerR = t.borderRadius
 
     // Schatten zeichnen
     if (t.shadowBlur > 0) {
@@ -705,7 +720,7 @@ export class ImageProcessor {
       ctx.shadowColor = this.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
       ctx.shadowOffsetX = t.shadowOffsetX
       ctx.shadowOffsetY = t.shadowOffsetY
-      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerR)
+      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerRx, outerRy)
       ctx.fillStyle = t.borderWidth > 0 ? t.borderColor : '#ffffff'
       ctx.fill()
       ctx.restore()
@@ -714,7 +729,7 @@ export class ImageProcessor {
     // Rand zeichnen (gefülltes Rechteck hinter dem Bild)
     if (t.borderWidth > 0) {
       ctx.save()
-      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerR)
+      this.drawRoundRect(ctx, outerX, outerY, outerW, outerH, outerRx, outerRy)
       ctx.fillStyle = t.borderColor
       ctx.fill()
       ctx.restore()
@@ -722,8 +737,8 @@ export class ImageProcessor {
 
     // Bild zeichnen (mit abgerundeten Ecken geclippt)
     ctx.save()
-    if (innerR > 0) {
-      this.drawRoundRect(ctx, innerX, innerY, imgW, imgH, innerR)
+    if (innerRx > 0 || innerRy > 0) {
+      this.drawRoundRect(ctx, innerX, innerY, imgW, imgH, innerRx, innerRy)
       ctx.clip()
     }
     ctx.drawImage(sourceCanvas, innerX, innerY)
