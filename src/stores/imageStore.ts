@@ -1,8 +1,8 @@
 // src/stores/imageStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { ImageObject, ImageFilters, ImageTransforms } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import type { ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
 export const useImageStore = defineStore('images', () => {
@@ -199,6 +199,25 @@ export const useImageStore = defineStore('images', () => {
     return selectedInOrder.length
   }
 
+  // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
+  function applyWatermarkToSelectedImages(watermark: Partial<WatermarkSettings>): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      if (!img.watermark) {
+        img.watermark = { ...defaultWatermark }
+      }
+      img.watermark = { ...img.watermark, ...watermark }
+    })
+  }
+
+  // Wasserzeichen für alle ausgewählten Bilder zurücksetzen
+  function resetWatermarkForSelectedImages(): void {
+    const selected = images.value.filter(img => img.selected)
+    selected.forEach(img => {
+      img.watermark = { ...defaultWatermark }
+    })
+  }
+
   // Reset store
   function $reset(): void {
     images.value = []
@@ -239,6 +258,8 @@ export const useImageStore = defineStore('images', () => {
     applyTransformsToSelectedImages,
     resetTransformsForSelectedImages,
     batchRenameSelectedImages,
+    applyWatermarkToSelectedImages,
+    resetWatermarkForSelectedImages,
     $reset
   }
 })

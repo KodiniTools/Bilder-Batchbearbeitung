@@ -2,7 +2,7 @@
 import { computed, ref, onMounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageStore } from '@/stores/imageStore'
 
@@ -53,6 +53,35 @@ const transformStyle = computed(() => {
     style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
   }
   return style
+})
+
+// Watermark state
+const watermarkActive = computed(() => {
+  const w = props.image.watermark || defaultWatermark
+  return w.enabled && w.text.trim().length > 0
+})
+
+const watermarkStyle = computed(() => {
+  const w = props.image.watermark || defaultWatermark
+  return {
+    fontFamily: `"${w.fontFamily}", Arial, sans-serif`,
+    fontSize: `${Math.max(10, w.fontSize * 0.15)}px`,
+    fontWeight: w.bold ? 'bold' : 'normal',
+    fontStyle: w.italic ? 'italic' : 'normal',
+    color: w.color,
+    opacity: w.opacity / 100,
+    transform: `rotate(${w.rotation}deg)`
+  }
+})
+
+const watermarkText = computed(() => {
+  const w = props.image.watermark || defaultWatermark
+  return w.text
+})
+
+const watermarkPosition = computed(() => {
+  const w = props.image.watermark || defaultWatermark
+  return w.position
 })
 
 // Inline-Umbenennung
@@ -150,6 +179,25 @@ onMounted(() => {
       @click.stop="handlePreview"
     >
       <!-- Canvas wird hier von onMounted eingefügt -->
+      <div
+        v-if="watermarkActive"
+        class="watermark-overlay"
+        :class="[`watermark-${watermarkPosition}`]"
+      >
+        <span
+          v-if="watermarkPosition !== 'tile'"
+          class="watermark-text"
+          :style="watermarkStyle"
+        >{{ watermarkText }}</span>
+        <template v-else>
+          <span
+            v-for="i in 9"
+            :key="i"
+            class="watermark-text watermark-tile"
+            :style="watermarkStyle"
+          >{{ watermarkText }}</span>
+        </template>
+      </div>
     </div>
     
     <div class="image-info" @dblclick="startEditing" :title="displayName">
@@ -419,5 +467,61 @@ onMounted(() => {
   box-shadow: 0 8px 20px var(--shadow-color);
   color: var(--text);
   border-color: var(--accent);
+}
+
+/* Wasserzeichen-Overlay */
+.watermark-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  z-index: 5;
+}
+
+.watermark-overlay.watermark-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.watermark-overlay.watermark-top-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 8px;
+}
+
+.watermark-overlay.watermark-top-right {
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.watermark-overlay.watermark-bottom-left {
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 8px;
+}
+
+.watermark-overlay.watermark-bottom-right {
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.watermark-overlay.watermark-tile {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.watermark-text {
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+.watermark-tile {
+  flex: 0 0 auto;
 }
 </style>

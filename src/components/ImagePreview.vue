@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
 const props = defineProps<{
@@ -61,6 +61,39 @@ const transformStyle = computed(() => {
     style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
   }
   return style
+})
+
+// Watermark state
+const watermarkActive = computed(() => {
+  if (!props.image) return false
+  const w = props.image.watermark || defaultWatermark
+  return w.enabled && w.text.trim().length > 0
+})
+
+const watermarkStyle = computed(() => {
+  if (!props.image) return {}
+  const w = props.image.watermark || defaultWatermark
+  return {
+    fontFamily: `"${w.fontFamily}", Arial, sans-serif`,
+    fontSize: `${w.fontSize}px`,
+    fontWeight: w.bold ? 'bold' : 'normal',
+    fontStyle: w.italic ? 'italic' : 'normal',
+    color: w.color,
+    opacity: w.opacity / 100,
+    transform: `rotate(${w.rotation}deg)`
+  }
+})
+
+const watermarkText = computed(() => {
+  if (!props.image) return ''
+  const w = props.image.watermark || defaultWatermark
+  return w.text
+})
+
+const watermarkPosition = computed(() => {
+  if (!props.image) return 'center'
+  const w = props.image.watermark || defaultWatermark
+  return w.position
 })
 
 function updatePreview() {
@@ -137,7 +170,28 @@ onUnmounted(() => {
         </div>
         
         <div class="preview-content">
-          <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
+          <div class="preview-canvas-wrapper">
+            <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
+            <div
+              v-if="watermarkActive"
+              class="watermark-overlay"
+              :class="[`watermark-${watermarkPosition}`]"
+            >
+              <span
+                v-if="watermarkPosition !== 'tile'"
+                class="watermark-text"
+                :style="watermarkStyle"
+              >{{ watermarkText }}</span>
+              <template v-else>
+                <span
+                  v-for="i in 25"
+                  :key="i"
+                  class="watermark-text watermark-tile"
+                  :style="watermarkStyle"
+                >{{ watermarkText }}</span>
+              </template>
+            </div>
+          </div>
         </div>
         
         <div class="preview-info" v-if="image">
@@ -256,6 +310,67 @@ onUnmounted(() => {
   font-weight: 600;
   font-size: 0.85rem;
   letter-spacing: 0.05em;
+}
+
+.preview-canvas-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Wasserzeichen-Overlay */
+.watermark-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  z-index: 5;
+}
+
+.watermark-overlay.watermark-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.watermark-overlay.watermark-top-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 16px;
+}
+
+.watermark-overlay.watermark-top-right {
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.watermark-overlay.watermark-bottom-left {
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 16px;
+}
+
+.watermark-overlay.watermark-bottom-right {
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.watermark-overlay.watermark-tile {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.watermark-text {
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+
+.watermark-tile {
+  flex: 0 0 auto;
 }
 
 /* Transitions */

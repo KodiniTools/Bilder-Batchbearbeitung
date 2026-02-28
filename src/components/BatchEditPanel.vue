@@ -3,8 +3,9 @@ import { ref, watch, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
-import { defaultFilters, defaultTransforms } from '@/lib/core/types'
-import type { ImageFilters, ImageTransforms } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
+import type { ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
+import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -25,15 +26,31 @@ const filters = ref<ImageFilters>({ ...defaultFilters })
 const transforms = ref<ImageTransforms>({ ...defaultTransforms })
 const transformsOpen = ref(false)
 
+// Local watermark state
+const watermark = ref<WatermarkSettings>({ ...defaultWatermark })
+const watermarkOpen = ref(false)
+
+// Watermark position options
+const watermarkPositions = [
+  { value: 'center', labelKey: 'batchEdit.watermark.positions.center' },
+  { value: 'top-left', labelKey: 'batchEdit.watermark.positions.topLeft' },
+  { value: 'top-right', labelKey: 'batchEdit.watermark.positions.topRight' },
+  { value: 'bottom-left', labelKey: 'batchEdit.watermark.positions.bottomLeft' },
+  { value: 'bottom-right', labelKey: 'batchEdit.watermark.positions.bottomRight' },
+  { value: 'tile', labelKey: 'batchEdit.watermark.positions.tile' }
+] as const
+
 // Debounce timers
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let transformDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let watermarkDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-// Reset filters and transforms when panel opens
+// Reset filters, transforms, and watermark when panel opens
 watch(() => props.isOpen, (open) => {
   if (open) {
     filters.value = { ...defaultFilters }
     transforms.value = { ...defaultTransforms }
+    watermark.value = { ...defaultWatermark }
   }
 })
 
@@ -78,10 +95,28 @@ watch(transforms, () => {
   applyTransformsDebounced()
 }, { deep: true })
 
+// Apply watermark with debounce
+function applyWatermarkDebounced() {
+  if (watermarkDebounceTimer) {
+    clearTimeout(watermarkDebounceTimer)
+  }
+  watermarkDebounceTimer = setTimeout(() => {
+    if (props.isOpen && imageStore.hasSelection) {
+      imageStore.applyWatermarkToSelectedImages({ ...watermark.value })
+    }
+  }, 16)
+}
+
+// Watch for watermark changes and apply with debounce
+watch(watermark, () => {
+  applyWatermarkDebounced()
+}, { deep: true })
+
 // Cleanup on unmount
 onUnmounted(() => {
   if (debounceTimer) clearTimeout(debounceTimer)
   if (transformDebounceTimer) clearTimeout(transformDebounceTimer)
+  if (watermarkDebounceTimer) clearTimeout(watermarkDebounceTimer)
 })
 
 // Computed for disabled state
@@ -93,12 +128,14 @@ function resetSlider(key: keyof ImageFilters, defaultValue: number) {
   filters.value[key] = defaultValue
 }
 
-// Reset all filters and transforms
+// Reset all filters, transforms, and watermark
 function resetFilters() {
   filters.value = { ...defaultFilters }
   transforms.value = { ...defaultTransforms }
+  watermark.value = { ...defaultWatermark }
   imageStore.resetFiltersForSelectedImages()
   imageStore.resetTransformsForSelectedImages()
+  imageStore.resetWatermarkForSelectedImages()
   toast.success(t('batchEdit.toast.reset', { count: selectedCount.value }))
 }
 
@@ -363,6 +400,172 @@ const sliderConfig = [
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Wasserzeichen -->
+        <button class="section-toggle" @click="watermarkOpen = !watermarkOpen">
+          <i class="fa-solid fa-stamp"></i>
+          <span>{{ t('batchEdit.watermark.title') }}</span>
+          <i :class="['fa-solid', watermarkOpen ? 'fa-chevron-up' : 'fa-chevron-down']" class="toggle-icon"></i>
+        </button>
+
+        <div v-show="watermarkOpen" class="transforms-container">
+          <div class="transform-subsection">
+            <!-- Aktivieren -->
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="watermark.enabled" />
+                <span>{{ t('batchEdit.watermark.enable') }}</span>
+              </label>
+            </div>
+
+            <template v-if="watermark.enabled">
+              <!-- Text -->
+              <div class="property-group">
+                <label>{{ t('batchEdit.watermark.text') }}</label>
+                <input
+                  type="text"
+                  v-model="watermark.text"
+                  :placeholder="t('batchEdit.watermark.textPlaceholder')"
+                  class="text-input"
+                />
+              </div>
+
+              <!-- Schriftart -->
+              <div class="property-group">
+                <label>{{ t('batchEdit.watermark.fontFamily') }}</label>
+                <select v-model="watermark.fontFamily" class="property-select font-select">
+                  <option
+                    v-for="font in CUSTOM_FONT_FAMILIES"
+                    :key="font"
+                    :value="font"
+                    :style="{ fontFamily: font }"
+                  >{{ font }}</option>
+                </select>
+              </div>
+
+              <!-- Schriftgröße -->
+              <div class="slider-group">
+                <label class="slider-label">
+                  <span>{{ t('batchEdit.watermark.fontSize') }}</span>
+                  <span class="slider-value">{{ watermark.fontSize }}px</span>
+                </label>
+                <div class="slider-wrapper">
+                  <input
+                    type="range"
+                    min="10"
+                    max="200"
+                    v-model.number="watermark.fontSize"
+                    class="slider"
+                    :style="{ '--progress': `${((watermark.fontSize - 10) / 190) * 100}%` }"
+                  />
+                  <button
+                    class="btn-reset-slider"
+                    @click="watermark.fontSize = 48"
+                    :title="t('batchEdit.resetSlider')"
+                    :class="{ 'is-visible': watermark.fontSize !== 48 }"
+                  >
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Fett / Kursiv -->
+              <div class="style-toggles">
+                <button
+                  class="style-toggle-btn"
+                  :class="{ active: watermark.bold }"
+                  @click="watermark.bold = !watermark.bold"
+                  :title="t('batchEdit.watermark.bold')"
+                >
+                  <i class="fa-solid fa-bold"></i>
+                </button>
+                <button
+                  class="style-toggle-btn"
+                  :class="{ active: watermark.italic }"
+                  @click="watermark.italic = !watermark.italic"
+                  :title="t('batchEdit.watermark.italic')"
+                >
+                  <i class="fa-solid fa-italic"></i>
+                </button>
+              </div>
+
+              <!-- Farbe -->
+              <div class="color-group">
+                <label>{{ t('batchEdit.watermark.color') }}</label>
+                <div class="color-input-wrapper">
+                  <input type="color" v-model="watermark.color" />
+                  <span class="color-value">{{ watermark.color }}</span>
+                </div>
+              </div>
+
+              <!-- Deckkraft -->
+              <div class="slider-group">
+                <label class="slider-label">
+                  <span>{{ t('batchEdit.watermark.opacity') }}</span>
+                  <span class="slider-value">{{ watermark.opacity }}%</span>
+                </label>
+                <div class="slider-wrapper">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    v-model.number="watermark.opacity"
+                    class="slider"
+                    :style="{ '--progress': `${watermark.opacity}%` }"
+                  />
+                  <button
+                    class="btn-reset-slider"
+                    @click="watermark.opacity = 50"
+                    :title="t('batchEdit.resetSlider')"
+                    :class="{ 'is-visible': watermark.opacity !== 50 }"
+                  >
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Drehung -->
+              <div class="slider-group">
+                <label class="slider-label">
+                  <span>{{ t('batchEdit.watermark.rotation') }}</span>
+                  <span class="slider-value">{{ watermark.rotation }}°</span>
+                </label>
+                <div class="slider-wrapper">
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    v-model.number="watermark.rotation"
+                    class="slider"
+                    :style="{ '--progress': `${((watermark.rotation + 180) / 360) * 100}%` }"
+                  />
+                  <button
+                    class="btn-reset-slider"
+                    @click="watermark.rotation = -30"
+                    :title="t('batchEdit.resetSlider')"
+                    :class="{ 'is-visible': watermark.rotation !== -30 }"
+                  >
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Position -->
+              <div class="property-group">
+                <label>{{ t('batchEdit.watermark.position') }}</label>
+                <select v-model="watermark.position" class="property-select">
+                  <option
+                    v-for="pos in watermarkPositions"
+                    :key="pos.value"
+                    :value="pos.value"
+                  >{{ t(pos.labelKey) }}</option>
+                </select>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -686,6 +889,111 @@ const sliderConfig = [
   font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.property-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.property-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.text-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.text-input::placeholder {
+  color: var(--muted);
+}
+
+.property-select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.property-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.font-select option {
+  padding: var(--space-2);
+}
+
+.style-toggles {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.style-toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--btn);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.style-toggle-btn:hover {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.style-toggle-btn.active {
+  background: color-mix(in oklab, var(--accent) 20%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .panel-footer {

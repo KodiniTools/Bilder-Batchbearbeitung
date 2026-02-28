@@ -778,6 +778,28 @@
         "offsetY": "Versatz Y"
       }
     },
+    "watermark": {
+      "title": "Wasserzeichen",
+      "enable": "Wasserzeichen aktivieren",
+      "text": "Text",
+      "textPlaceholder": "z. B. © Mein Name",
+      "fontFamily": "Schriftart",
+      "fontSize": "Schriftgröße",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "color": "Farbe",
+      "opacity": "Deckkraft",
+      "rotation": "Drehung",
+      "position": "Position",
+      "positions": {
+        "center": "Mitte",
+        "topLeft": "Oben links",
+        "topRight": "Oben rechts",
+        "bottomLeft": "Unten links",
+        "bottomRight": "Unten rechts",
+        "tile": "Kachel (wiederholt)"
+      }
+    },
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"
