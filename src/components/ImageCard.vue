@@ -61,27 +61,51 @@ const watermarkActive = computed(() => {
   return w.enabled && w.text.trim().length > 0
 })
 
-const watermarkStyle = computed(() => {
+const watermarkCanvasRef = ref<HTMLCanvasElement | null>(null)
+
+// Wasserzeichen auf separates Canvas rendern (Preview)
+function renderWatermarkPreview() {
   const w = props.image.watermark || defaultWatermark
-  return {
-    fontFamily: `"${w.fontFamily}", Arial, sans-serif`,
-    fontSize: `${Math.max(10, w.fontSize * 0.15)}px`,
-    fontWeight: w.bold ? 'bold' : 'normal',
-    fontStyle: w.italic ? 'italic' : 'normal',
-    color: w.color,
-    opacity: w.opacity / 100,
-    transform: `rotate(${w.rotation}deg)`
+  if (!w.enabled || !w.text.trim() || !watermarkCanvasRef.value || !props.image.canvas) return
+
+  const srcCanvas = props.image.canvas
+  const previewCanvas = watermarkCanvasRef.value
+
+  // Preview-Canvas hat die gleichen CSS-Dimensionen wie das Bild-Canvas
+  // Wir nutzen die Originaldimensionen, da CSS das skaliert
+  previewCanvas.width = srcCanvas.width
+  previewCanvas.height = srcCanvas.height
+
+  const wmCanvas = ImageProcessor.getCanvasWithWatermark(
+    // Transparentes Canvas als Quelle (nur Wasserzeichen)
+    createTransparentCanvas(srcCanvas.width, srcCanvas.height),
+    w
+  )
+  const ctx = previewCanvas.getContext('2d')
+  if (ctx) {
+    ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height)
+    ctx.drawImage(wmCanvas, 0, 0)
   }
-})
+}
 
-const watermarkText = computed(() => {
-  const w = props.image.watermark || defaultWatermark
-  return w.text
-})
+function createTransparentCanvas(width: number, height: number): HTMLCanvasElement {
+  const c = document.createElement('canvas')
+  c.width = width
+  c.height = height
+  return c
+}
 
-const watermarkPosition = computed(() => {
-  const w = props.image.watermark || defaultWatermark
-  return w.position
+// Wasserzeichen-Canvas aktualisieren wenn sich Einstellungen ändern
+watch(() => props.image.watermark, () => {
+  if (watermarkActive.value) {
+    renderWatermarkPreview()
+  }
+}, { deep: true })
+
+watch(watermarkActive, (active) => {
+  if (active) {
+    nextTick(() => renderWatermarkPreview())
+  }
 })
 
 // Inline-Umbenennung
@@ -157,6 +181,10 @@ onMounted(() => {
     previewContainer.value.innerHTML = ''
     // Append the actual canvas
     previewContainer.value.appendChild(props.image.canvas)
+    // Wasserzeichen-Canvas wird NACH dem v-if gerendert (ref wird erst verfügbar)
+    if (watermarkActive.value) {
+      nextTick(() => renderWatermarkPreview())
+    }
   }
 })
 </script>
@@ -172,32 +200,19 @@ onMounted(() => {
       <i v-if="image.selected" class="fas fa-check"></i>
     </div>
 
-    <div
-      ref="previewContainer"
-      class="image-preview"
-      :style="[filterStyle, transformStyle]"
-      @click.stop="handlePreview"
-    >
-      <!-- Canvas wird hier von onMounted eingefügt -->
+    <div class="image-preview-wrapper" @click.stop="handlePreview">
       <div
-        v-if="watermarkActive"
-        class="watermark-overlay"
-        :class="[`watermark-${watermarkPosition}`]"
+        ref="previewContainer"
+        class="image-preview"
+        :style="[filterStyle, transformStyle]"
       >
-        <span
-          v-if="watermarkPosition !== 'tile'"
-          class="watermark-text"
-          :style="watermarkStyle"
-        >{{ watermarkText }}</span>
-        <template v-else>
-          <span
-            v-for="i in 9"
-            :key="i"
-            class="watermark-text watermark-tile"
-            :style="watermarkStyle"
-          >{{ watermarkText }}</span>
-        </template>
+        <!-- Canvas wird hier von onMounted eingefügt -->
       </div>
+      <canvas
+        v-if="watermarkActive"
+        ref="watermarkCanvasRef"
+        class="watermark-canvas"
+      ></canvas>
     </div>
     
     <div class="image-info" @dblclick="startEditing" :title="displayName">
@@ -469,59 +484,18 @@ onMounted(() => {
   border-color: var(--accent);
 }
 
-/* Wasserzeichen-Overlay */
-.watermark-overlay {
+.image-preview-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wasserzeichen-Canvas-Overlay */
+.watermark-canvas {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  overflow: hidden;
-  display: flex;
   z-index: 5;
-}
-
-.watermark-overlay.watermark-center {
-  align-items: center;
-  justify-content: center;
-}
-
-.watermark-overlay.watermark-top-left {
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 8px;
-}
-
-.watermark-overlay.watermark-top-right {
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 8px;
-}
-
-.watermark-overlay.watermark-bottom-left {
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 8px;
-}
-
-.watermark-overlay.watermark-bottom-right {
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 8px;
-}
-
-.watermark-overlay.watermark-tile {
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.watermark-text {
-  white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  user-select: none;
-}
-
-.watermark-tile {
-  flex: 0 0 auto;
 }
 </style>

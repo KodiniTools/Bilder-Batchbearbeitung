@@ -480,7 +480,7 @@ export class ImageProcessor {
 
     if (!ctx) return sourceCanvas
 
-    // Quellbild zeichnen
+    // Quellbild zuerst zeichnen (mit voller Deckkraft)
     ctx.drawImage(sourceCanvas, 0, 0)
 
     // Wasserzeichen-Einstellungen
@@ -501,24 +501,21 @@ export class ImageProcessor {
       // Kachelmodus: Text wiederholt über das gesamte Bild
       const metrics = ctx.measureText(text)
       const textWidth = metrics.width
-      const textHeight = fontSize * 1.2
-      const spacingX = textWidth + fontSize * 2
-      const spacingY = textHeight * 3
+      const spacingX = textWidth + fontSize * 2.5
+      const spacingY = fontSize * 4
 
       // Größeren Bereich abdecken für Rotation
       const diagonal = Math.sqrt(canvas.width ** 2 + canvas.height ** 2)
-      const startX = -diagonal / 2
-      const startY = -diagonal / 2
-      const endX = diagonal * 1.5
-      const endY = diagonal * 1.5
 
       ctx.save()
+      // Koordinatensystem: Zur Mitte verschieben, rotieren, dann zurück
       ctx.translate(canvas.width / 2, canvas.height / 2)
       ctx.rotate(rotation)
-      ctx.translate(-canvas.width / 2, -canvas.height / 2)
 
-      for (let y = startY; y < endY; y += spacingY) {
-        for (let x = startX; x < endX; x += spacingX) {
+      // Von der Mitte aus den gesamten Bereich abdecken
+      const halfDiag = diagonal / 2 + spacingX
+      for (let y = -halfDiag; y < halfDiag; y += spacingY) {
+        for (let x = -halfDiag; x < halfDiag; x += spacingX) {
           ctx.fillText(text, x, y)
         }
       }
