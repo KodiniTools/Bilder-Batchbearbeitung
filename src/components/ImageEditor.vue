@@ -302,7 +302,8 @@ const transformStyle = computed(() => {
     style.border = `${t.borderWidth}px solid ${t.borderColor}`
   }
   if (t.borderRadius > 0) {
-    style.borderRadius = `${t.borderRadius}px`
+    const pct = (t.borderRadius / 200) * 50
+    style.borderRadius = `${pct}%`
   }
   if (t.shadowBlur > 0) {
     const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
