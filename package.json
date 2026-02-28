@@ -14,6 +14,7 @@
     "dist:win": "npm run build:electron && electron-builder --win"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
     "i18next": "^25.6.0",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
@@ -47,11 +48,20 @@
     "win": {
       "target": [
         {
-          "target": "dir",
-          "arch": ["x64"]
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "electron/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bilderserie Bearbeiten"
     }
   }
 }

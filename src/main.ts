@@ -8,6 +8,10 @@ import router from './router'
 import de from './locales/de.json'
 import en from './locales/en.json'
 
+// Import FontAwesome (bundled by Vite for both web and Electron builds)
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
+import '@fortawesome/fontawesome-free/css/solid.min.css'
+
 // Import global styles
 import './assets/styles/fonts.css'
 import './assets/styles/main.css'

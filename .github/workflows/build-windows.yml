@@ -25,9 +25,9 @@ jobs:
       - name: Build Electron app for Windows
         run: npm run dist:win
 
-      - name: Upload Windows build artifact
+      - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: Bilderserie-Bearbeiten-Windows-x64
-          path: release/win-unpacked/
+          path: release/*.exe
           retention-days: 30
