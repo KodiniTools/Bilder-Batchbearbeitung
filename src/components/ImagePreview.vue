@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
@@ -70,31 +70,37 @@ const watermarkActive = computed(() => {
   return w.enabled && w.text.trim().length > 0
 })
 
-const watermarkStyle = computed(() => {
-  if (!props.image) return {}
+const watermarkCanvasRef = ref<HTMLCanvasElement | null>(null)
+
+function renderWatermarkPreview() {
+  if (!props.image || !watermarkCanvasRef.value) return
   const w = props.image.watermark || defaultWatermark
-  return {
-    fontFamily: `"${w.fontFamily}", Arial, sans-serif`,
-    fontSize: `${w.fontSize}px`,
-    fontWeight: w.bold ? 'bold' : 'normal',
-    fontStyle: w.italic ? 'italic' : 'normal',
-    color: w.color,
-    opacity: w.opacity / 100,
-    transform: `rotate(${w.rotation}deg)`
+  if (!w.enabled || !w.text.trim()) return
+
+  const srcCanvas = props.image.canvas
+  const wmPreview = watermarkCanvasRef.value
+
+  // Gleiche Dimensionen wie das Preview-Canvas
+  if (previewCanvas.value) {
+    wmPreview.width = previewCanvas.value.width
+    wmPreview.height = previewCanvas.value.height
+  } else {
+    wmPreview.width = srcCanvas.width
+    wmPreview.height = srcCanvas.height
   }
-})
 
-const watermarkText = computed(() => {
-  if (!props.image) return ''
-  const w = props.image.watermark || defaultWatermark
-  return w.text
-})
+  // Skaliertes transparentes Canvas erstellen
+  const transparentCanvas = document.createElement('canvas')
+  transparentCanvas.width = wmPreview.width
+  transparentCanvas.height = wmPreview.height
 
-const watermarkPosition = computed(() => {
-  if (!props.image) return 'center'
-  const w = props.image.watermark || defaultWatermark
-  return w.position
-})
+  const wmCanvas = ImageProcessor.getCanvasWithWatermark(transparentCanvas, w)
+  const ctx = wmPreview.getContext('2d')
+  if (ctx) {
+    ctx.clearRect(0, 0, wmPreview.width, wmPreview.height)
+    ctx.drawImage(wmCanvas, 0, 0)
+  }
+}
 
 function updatePreview() {
   if (!previewCanvas.value || !props.image) return
@@ -118,6 +124,9 @@ function updatePreview() {
   
   // Draw the image
   ctx.drawImage(props.image.canvas, 0, 0, canvas.width, canvas.height)
+
+  // Wasserzeichen auch aktualisieren
+  nextTick(() => renderWatermarkPreview())
 }
 
 function handleClose() {
@@ -141,6 +150,13 @@ watch(() => props.image, () => {
     updatePreview()
   }
 })
+
+// Wasserzeichen bei Änderung aktualisieren
+watch(() => props.image?.watermark, () => {
+  if (props.isOpen && watermarkActive.value) {
+    nextTick(() => renderWatermarkPreview())
+  }
+}, { deep: true })
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
@@ -172,25 +188,11 @@ onUnmounted(() => {
         <div class="preview-content">
           <div class="preview-canvas-wrapper">
             <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
-            <div
+            <canvas
               v-if="watermarkActive"
-              class="watermark-overlay"
-              :class="[`watermark-${watermarkPosition}`]"
-            >
-              <span
-                v-if="watermarkPosition !== 'tile'"
-                class="watermark-text"
-                :style="watermarkStyle"
-              >{{ watermarkText }}</span>
-              <template v-else>
-                <span
-                  v-for="i in 25"
-                  :key="i"
-                  class="watermark-text watermark-tile"
-                  :style="watermarkStyle"
-                >{{ watermarkText }}</span>
-              </template>
-            </div>
+              ref="watermarkCanvasRef"
+              class="watermark-canvas"
+            ></canvas>
           </div>
         </div>
         
@@ -317,60 +319,14 @@ onUnmounted(() => {
   display: inline-block;
 }
 
-/* Wasserzeichen-Overlay */
-.watermark-overlay {
+/* Wasserzeichen-Canvas-Overlay */
+.watermark-canvas {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  overflow: hidden;
-  display: flex;
   z-index: 5;
-}
-
-.watermark-overlay.watermark-center {
-  align-items: center;
-  justify-content: center;
-}
-
-.watermark-overlay.watermark-top-left {
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 16px;
-}
-
-.watermark-overlay.watermark-top-right {
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 16px;
-}
-
-.watermark-overlay.watermark-bottom-left {
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 16px;
-}
-
-.watermark-overlay.watermark-bottom-right {
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 16px;
-}
-
-.watermark-overlay.watermark-tile {
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-}
-
-.watermark-text {
-  white-space: nowrap;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-  user-select: none;
-}
-
-.watermark-tile {
-  flex: 0 0 auto;
 }
 
 /* Transitions */
