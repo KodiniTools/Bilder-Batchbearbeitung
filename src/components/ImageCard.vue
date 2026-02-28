@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, nextTick, watch } from 'vue'
+import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
@@ -117,6 +117,18 @@ const baseName = computed(() => ImageProcessor.resolveBaseName(props.image))
 const fileExt = computed(() => ImageProcessor.getFileExtension(props.image.file.name))
 const displayName = computed(() => `${baseName.value}.${fileExt.value}`)
 
+// Reaktive Bildgröße (Canvas-Dimensionen sind nicht automatisch reaktiv)
+const imageDimensions = ref({ width: 0, height: 0 })
+
+function updateDimensions() {
+  if (props.image.canvas) {
+    imageDimensions.value = {
+      width: props.image.canvas.width,
+      height: props.image.canvas.height
+    }
+  }
+}
+
 const handleCardClick = () => {
   if (!isEditing.value) {
     imageStore.toggleImageSelection(props.image.id)
@@ -174,6 +186,9 @@ const handleEditKeydown = (event: KeyboardEvent) => {
   }
 }
 
+// Canvas-Dimensionen überwachen (MutationObserver erkennt width/height-Attributänderungen)
+let mutationObserver: MutationObserver | null = null
+
 onMounted(() => {
   // Append the actual canvas from the image object
   if (previewContainer.value && props.image.canvas) {
@@ -181,10 +196,26 @@ onMounted(() => {
     previewContainer.value.innerHTML = ''
     // Append the actual canvas
     previewContainer.value.appendChild(props.image.canvas)
+    // Initiale Dimensionen setzen
+    updateDimensions()
+    // MutationObserver auf Canvas-Attribute (width, height)
+    mutationObserver = new MutationObserver(() => {
+      updateDimensions()
+    })
+    mutationObserver.observe(props.image.canvas, {
+      attributes: true,
+      attributeFilter: ['width', 'height']
+    })
     // Wasserzeichen-Canvas wird NACH dem v-if gerendert (ref wird erst verfügbar)
     if (watermarkActive.value) {
       nextTick(() => renderWatermarkPreview())
     }
+  }
+})
+
+onUnmounted(() => {
+  if (mutationObserver) {
+    mutationObserver.disconnect()
   }
 })
 </script>
@@ -215,21 +246,27 @@ onMounted(() => {
       ></canvas>
     </div>
     
-    <div class="image-info" @dblclick="startEditing" :title="displayName">
-      <template v-if="!isEditing">
-        <span class="file-name">{{ baseName }}</span>
-        <span class="file-ext">.{{ fileExt }}</span>
-      </template>
-      <div v-else class="inline-edit" @click.stop>
-        <input
-          ref="editInput"
-          v-model="editName"
-          type="text"
-          class="edit-input"
-          @blur="saveEdit"
-          @keydown="handleEditKeydown"
-        />
-        <span class="file-ext">.{{ fileExt }}</span>
+    <div class="image-meta">
+      <div class="image-info" @dblclick="startEditing" :title="displayName">
+        <template v-if="!isEditing">
+          <span class="file-name">{{ baseName }}</span>
+          <span class="file-ext">.{{ fileExt }}</span>
+        </template>
+        <div v-else class="inline-edit" @click.stop>
+          <input
+            ref="editInput"
+            v-model="editName"
+            type="text"
+            class="edit-input"
+            @blur="saveEdit"
+            @keydown="handleEditKeydown"
+          />
+          <span class="file-ext">.{{ fileExt }}</span>
+        </div>
+      </div>
+      <div class="image-dimensions">
+        <i class="fa-solid fa-expand"></i>
+        {{ imageDimensions.width }} × {{ imageDimensions.height }} px
       </div>
     </div>
     
@@ -398,20 +435,41 @@ onMounted(() => {
   transform: scale(1.05);
 }
 
+.image-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 2;
+}
+
 .image-info {
   font-size: 0.92rem;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  position: relative;
-  z-index: 2;
   display: flex;
   align-items: center;
   cursor: text;
   padding: 4px 0;
   border-radius: var(--radius-md);
   transition: background 0.2s;
+}
+
+.image-dimensions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  opacity: 0.7;
+  padding: 0 2px;
+}
+
+.image-dimensions i {
+  font-size: 0.65rem;
 }
 
 .image-info:hover:not(:has(.inline-edit)) {
