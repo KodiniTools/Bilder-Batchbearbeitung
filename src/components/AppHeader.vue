@@ -37,6 +37,7 @@ onMounted(() => {
     <div class="app-header__limiter">
       <div class="app-header__leading">
         <button
+          v-if="!isElectron"
           class="home-btn"
           @click="goHome"
           :title="t('landing.nav.home')"
@@ -211,7 +212,7 @@ onMounted(() => {
     white-space: normal;
   }
 
-  .app-header__trailing {
+  .app-header__trailing:empty {
     display: none;
   }
 }
