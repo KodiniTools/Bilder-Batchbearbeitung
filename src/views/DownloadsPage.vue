@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+const GITHUB_REPO = 'KodiniTools/Bilder-Batchbearbeitung'
+const RELEASES_FALLBACK = `https://github.com/${GITHUB_REPO}/releases/latest`
+
 const { locale, t } = useI18n()
 const router = useRouter()
+
+const installerUrl = ref(RELEASES_FALLBACK)
+const portableUrl = ref(RELEASES_FALLBACK)
+const releaseVersion = ref('')
+const installerSize = ref('')
+const portableSize = ref('')
+const loading = ref(true)
 
 const goToHome = () => {
   router.push('/')
@@ -12,6 +22,37 @@ const goToHome = () => {
 
 const goToApp = () => {
   router.push('/app')
+}
+
+function formatBytes(bytes: number): string {
+  const mb = bytes / (1024 * 1024)
+  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`
+}
+
+async function fetchLatestRelease() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`)
+    if (!res.ok) return
+
+    const release = await res.json()
+    releaseVersion.value = release.tag_name || release.name || ''
+
+    for (const asset of release.assets ?? []) {
+      const name: string = asset.name.toLowerCase()
+
+      if (name.endsWith('.exe')) {
+        installerUrl.value = asset.browser_download_url
+        installerSize.value = formatBytes(asset.size)
+      } else if (name.endsWith('.zip')) {
+        portableUrl.value = asset.browser_download_url
+        portableSize.value = formatBytes(asset.size)
+      }
+    }
+  } catch {
+    // Fallback-URLs bleiben aktiv
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
@@ -27,6 +68,8 @@ onMounted(() => {
   if (savedLang) {
     locale.value = savedLang
   }
+
+  fetchLatestRelease()
 })
 </script>
 
@@ -49,6 +92,7 @@ onMounted(() => {
         <div class="downloads-header">
           <h1 class="downloads-title">{{ t('downloads.title') }}</h1>
           <p class="downloads-subtitle">{{ t('downloads.subtitle') }}</p>
+          <span v-if="releaseVersion" class="version-badge">{{ releaseVersion }}</span>
         </div>
 
         <!-- Download Cards Grid -->
@@ -81,15 +125,16 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.installer.size') }}</span>
+              <span><i class="fa-solid fa-hard-drive"></i> {{ installerSize || t('downloads.installer.size') }}</span>
               <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.installer.requirements') }}</span>
             </div>
 
             <a
-              href="https://github.com/KodiniTools/Bilder-Batchbearbeitung/releases/latest"
+              :href="installerUrl"
               target="_blank"
               rel="noopener"
               class="download-button installer-button"
+              :class="{ 'is-loading': loading }"
             >
               <i class="fa-solid fa-download"></i>
               {{ t('downloads.installer.button') }}
@@ -124,15 +169,16 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.portable.size') }}</span>
+              <span><i class="fa-solid fa-hard-drive"></i> {{ portableSize || t('downloads.portable.size') }}</span>
               <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.portable.requirements') }}</span>
             </div>
 
             <a
-              href="https://github.com/KodiniTools/Bilder-Batchbearbeitung/releases/latest"
+              :href="portableUrl"
               target="_blank"
               rel="noopener"
               class="download-button portable-button"
+              :class="{ 'is-loading': loading }"
             >
               <i class="fa-solid fa-file-zipper"></i>
               {{ t('downloads.portable.button') }}
@@ -276,6 +322,18 @@ onMounted(() => {
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
+}
+
+.version-badge {
+  display: inline-block;
+  margin-top: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  border-radius: var(--radius-lg);
 }
 
 /* Download Cards Grid */
@@ -449,6 +507,11 @@ onMounted(() => {
   transform: translateY(-3px) scale(1.02);
   border-color: var(--accent);
   box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+.download-button.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* Info Section */
