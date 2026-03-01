@@ -19,6 +19,10 @@
     "learn": {
       "title": "Web-Technologien lernen: Vue.js, Canvas API, TypeScript | KodiniTools",
       "description": "Lernressource für Entwickler: Web Audio API, Vue.js 3 Composition API, Canvas-Bildverarbeitung und Performance-Optimierung."
+    },
+    "downloads": {
+      "title": "Downloads - Desktop Version herunterladen | KodiniTools",
+      "description": "Laden Sie die Desktop-Version der Bilder-Batchbearbeitung als Windows Installer oder portable ZIP-Datei herunter. Offline nutzbar."
     }
   },
   "landing": {
@@ -28,12 +32,15 @@
       "app": "App starten",
       "blog": "Funktionen",
       "faq": "FAQ",
-      "learn": "Lernen"
+      "learn": "Lernen",
+      "downloads": "Downloads"
     },
     "hero": {
       "title": "Professionelle Bildbearbeitung direkt im Browser",
       "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",
-      "cta": "Jetzt starten"
+      "cta": "Jetzt starten",
+      "downloadHint": "Auch als Desktop-App verfügbar",
+      "downloadLink": "Jetzt herunterladen"
     },
     "features": {
       "privacy": {
@@ -814,6 +821,43 @@
       "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"
     }
+  },
+  "downloads": {
+    "title": "Downloads",
+    "subtitle": "Laden Sie die Desktop-Version der Bilder-Batchbearbeitung herunter. Offline nutzbar, schnell und ohne Browser.",
+    "installer": {
+      "title": "Windows Installer (.exe)",
+      "description": "Klassische Installation mit Desktop-Verknüpfung und Startmenü-Eintrag. Empfohlen für die meisten Nutzer.",
+      "features": {
+        "desktop": "Desktop-Verknüpfung",
+        "startmenu": "Startmenü-Eintrag",
+        "auto": "Automatische Updates",
+        "registry": "Saubere Deinstallation"
+      },
+      "button": "Installer herunterladen",
+      "size": "ca. 85 MB",
+      "requirements": "Windows 10/11 (64-Bit)"
+    },
+    "portable": {
+      "title": "Portable Version (.zip)",
+      "description": "Keine Installation nötig. Entpacken und sofort starten. Ideal für USB-Sticks oder eingeschränkte Systeme.",
+      "features": {
+        "noinstall": "Keine Installation nötig",
+        "usb": "Ideal für USB-Sticks",
+        "noAdmin": "Keine Admin-Rechte nötig",
+        "clean": "Hinterlässt keine Spuren"
+      },
+      "button": "ZIP herunterladen",
+      "size": "ca. 80 MB",
+      "requirements": "Windows 10/11 (64-Bit)"
+    },
+    "info": {
+      "title": "Hinweise",
+      "offline": "Beide Versionen funktionieren vollständig offline. Ihre Bilder verlassen niemals Ihren Computer.",
+      "source": "Der Quellcode ist auf GitHub verfügbar.",
+      "web": "Sie können die Anwendung auch direkt im Browser nutzen, ohne etwas herunterzuladen."
+    },
+    "webCta": "Lieber im Browser nutzen?"
   },
   "learn": {
     "badge": "Entwickler-Leitfaden",

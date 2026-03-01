@@ -26,6 +26,10 @@ const routeSeoConfig: Record<string, { titleKey: string; descriptionKey: string 
   learn: {
     titleKey: 'seo.learn.title',
     descriptionKey: 'seo.learn.description'
+  },
+  downloads: {
+    titleKey: 'seo.downloads.title',
+    descriptionKey: 'seo.downloads.description'
   }
 }
 

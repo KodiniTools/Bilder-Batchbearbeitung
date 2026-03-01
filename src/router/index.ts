@@ -27,6 +27,11 @@ const webRoutes = [
     path: '/learn',
     name: 'learn',
     component: () => import('@/views/LearnPage.vue')
+  },
+  {
+    path: '/downloads',
+    name: 'downloads',
+    component: () => import('@/views/DownloadsPage.vue')
   }
 ]
 
