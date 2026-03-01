@@ -25,6 +25,10 @@ const goToLearn = () => {
   router.push('/learn')
 }
 
+const goToDownloads = () => {
+  router.push('/downloads')
+}
+
 const setLanguage = (lang: string) => {
   locale.value = lang
   localStorage.setItem('locale', lang)
@@ -64,6 +68,7 @@ onMounted(() => {
           <button class="nav-link" @click="goToBlog">{{ t('landing.nav.blog') }}</button>
           <button class="nav-link" @click="goToLearn">{{ t('landing.nav.learn') }}</button>
           <button class="nav-link" @click="goToFaq">{{ t('landing.nav.faq') }}</button>
+          <button class="nav-link" @click="goToDownloads">{{ t('landing.nav.downloads') }}</button>
         </div>
         <!-- In Electron: eigene Sprach-/Theme-Umschalter (SSI nav fehlt) -->
         <div v-if="isElectron" class="nav-actions">
@@ -101,6 +106,11 @@ onMounted(() => {
           <h1 class="hero-title">{{ t('landing.hero.title') }}</h1>
           <p class="hero-subtitle">{{ t('landing.hero.subtitle') }}</p>
           <button class="hero-cta" @click="goToApp">{{ t('landing.hero.cta') }}</button>
+          <p class="hero-download-hint">
+            <i class="fa-solid fa-download"></i>
+            {{ t('landing.hero.downloadHint') }} &mdash;
+            <button class="hero-download-link" @click="goToDownloads">{{ t('landing.hero.downloadLink') }}</button>
+          </p>
         </div>
 
         <!-- Feature Cards Grid -->
@@ -384,6 +394,37 @@ onMounted(() => {
 
 .hero-cta:active {
   transform: translateY(-1px);
+}
+
+.hero-download-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: var(--space-4) auto 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hero-download-hint i {
+  font-size: 0.85rem;
+}
+
+.hero-download-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.hero-download-link:hover {
+  color: var(--secondary);
 }
 
 /* Feature Cards Grid */

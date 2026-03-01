@@ -19,6 +19,10 @@
     "learn": {
       "title": "Learn Web Technologies: Vue.js, Canvas API, TypeScript | KodiniTools",
       "description": "Developer learning resource: Web Audio API, Vue.js 3 Composition API, Canvas image processing, and performance optimization."
+    },
+    "downloads": {
+      "title": "Downloads - Download Desktop Version | KodiniTools",
+      "description": "Download the desktop version of the Batch Image Editor as a Windows installer or portable ZIP file. Works offline."
     }
   },
   "landing": {
@@ -28,12 +32,15 @@
       "app": "Launch App",
       "faq": "FAQ",
       "blog": "Features",
-      "learn": "Learn"
+      "learn": "Learn",
+      "downloads": "Downloads"
     },
     "hero": {
       "title": "Professional Image Editing Right in Your Browser",
       "subtitle": "Edit, convert, and export as many images as you want simultaneously. Completely local, 100% private, no server uploads.",
-      "cta": "Get Started"
+      "cta": "Get Started",
+      "downloadHint": "Also available as a desktop app",
+      "downloadLink": "Download now"
     },
     "features": {
       "privacy": {
@@ -814,6 +821,43 @@
         "free": "Completely free to use"
       }
     }
+  },
+  "downloads": {
+    "title": "Downloads",
+    "subtitle": "Download the desktop version of the Batch Image Editor. Works offline, fast, and without a browser.",
+    "installer": {
+      "title": "Windows Installer (.exe)",
+      "description": "Classic installation with desktop shortcut and start menu entry. Recommended for most users.",
+      "features": {
+        "desktop": "Desktop shortcut",
+        "startmenu": "Start menu entry",
+        "auto": "Automatic updates",
+        "registry": "Clean uninstall"
+      },
+      "button": "Download Installer",
+      "size": "approx. 85 MB",
+      "requirements": "Windows 10/11 (64-bit)"
+    },
+    "portable": {
+      "title": "Portable Version (.zip)",
+      "description": "No installation required. Extract and start immediately. Ideal for USB drives or restricted systems.",
+      "features": {
+        "noinstall": "No installation required",
+        "usb": "Ideal for USB drives",
+        "noAdmin": "No admin rights needed",
+        "clean": "Leaves no traces"
+      },
+      "button": "Download ZIP",
+      "size": "approx. 80 MB",
+      "requirements": "Windows 10/11 (64-bit)"
+    },
+    "info": {
+      "title": "Notes",
+      "offline": "Both versions work completely offline. Your images never leave your computer.",
+      "source": "The source code is available on GitHub.",
+      "web": "You can also use the application directly in your browser without downloading anything."
+    },
+    "webCta": "Prefer using it in the browser?"
   },
   "learn": {
     "badge": "Developer Guide",
