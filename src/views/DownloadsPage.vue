@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-const GITHUB_REPO = 'KodiniTools/Bilder-Batchbearbeitung'
-const RELEASES_FALLBACK = `https://github.com/${GITHUB_REPO}/releases/latest`
+const RELEASE_BASE = 'https://kodinitools.com/bilderseriebearbeiten/release'
+const APP_VERSION = '1.0.0'
+
+const installerUrl = `${RELEASE_BASE}/Bilderserie%20Bearbeiten%20Setup%20${APP_VERSION}.exe`
+const portableUrl = `${RELEASE_BASE}/Bilderserie%20Bearbeiten-${APP_VERSION}-win.zip`
 
 const { locale, t } = useI18n()
 const router = useRouter()
-
-const installerUrl = ref(RELEASES_FALLBACK)
-const portableUrl = ref(RELEASES_FALLBACK)
-const releaseVersion = ref('')
-const installerSize = ref('')
-const portableSize = ref('')
-const loading = ref(true)
 
 const goToHome = () => {
   router.push('/')
@@ -22,37 +18,6 @@ const goToHome = () => {
 
 const goToApp = () => {
   router.push('/app')
-}
-
-function formatBytes(bytes: number): string {
-  const mb = bytes / (1024 * 1024)
-  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`
-}
-
-async function fetchLatestRelease() {
-  try {
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`)
-    if (!res.ok) return
-
-    const release = await res.json()
-    releaseVersion.value = release.tag_name || release.name || ''
-
-    for (const asset of release.assets ?? []) {
-      const name: string = asset.name.toLowerCase()
-
-      if (name.endsWith('.exe')) {
-        installerUrl.value = asset.browser_download_url
-        installerSize.value = formatBytes(asset.size)
-      } else if (name.endsWith('.zip')) {
-        portableUrl.value = asset.browser_download_url
-        portableSize.value = formatBytes(asset.size)
-      }
-    }
-  } catch {
-    // Fallback-URLs bleiben aktiv
-  } finally {
-    loading.value = false
-  }
 }
 
 onMounted(() => {
@@ -68,8 +33,6 @@ onMounted(() => {
   if (savedLang) {
     locale.value = savedLang
   }
-
-  fetchLatestRelease()
 })
 </script>
 
@@ -92,7 +55,7 @@ onMounted(() => {
         <div class="downloads-header">
           <h1 class="downloads-title">{{ t('downloads.title') }}</h1>
           <p class="downloads-subtitle">{{ t('downloads.subtitle') }}</p>
-          <span v-if="releaseVersion" class="version-badge">{{ releaseVersion }}</span>
+          <span class="version-badge">v{{ APP_VERSION }}</span>
         </div>
 
         <!-- Download Cards Grid -->
@@ -125,16 +88,14 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ installerSize || t('downloads.installer.size') }}</span>
+              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.installer.size') }}</span>
               <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.installer.requirements') }}</span>
             </div>
 
             <a
               :href="installerUrl"
-              target="_blank"
-              rel="noopener"
               class="download-button installer-button"
-              :class="{ 'is-loading': loading }"
+              download
             >
               <i class="fa-solid fa-download"></i>
               {{ t('downloads.installer.button') }}
@@ -169,16 +130,14 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ portableSize || t('downloads.portable.size') }}</span>
+              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.portable.size') }}</span>
               <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.portable.requirements') }}</span>
             </div>
 
             <a
               :href="portableUrl"
-              target="_blank"
-              rel="noopener"
               class="download-button portable-button"
-              :class="{ 'is-loading': loading }"
+              download
             >
               <i class="fa-solid fa-file-zipper"></i>
               {{ t('downloads.portable.button') }}
@@ -507,11 +466,6 @@ onMounted(() => {
   transform: translateY(-3px) scale(1.02);
   border-color: var(--accent);
   box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 20%, transparent);
-}
-
-.download-button.is-loading {
-  opacity: 0.6;
-  pointer-events: none;
 }
 
 /* Info Section */
