@@ -1101,6 +1101,13 @@
         "description": "Farbpaletten aus Bildern extrahieren."
       }
     },
+    "sendImages": "{count} Bild(er) mitnehmen",
     "backHome": "Zurueck zur Startseite"
+  },
+  "handoff": {
+    "title": "{count} Bild(er) bereit zur Uebernahme",
+    "from": "Aus {tool} uebertragen",
+    "accept": "Bilder uebernehmen",
+    "dismiss": "Verwerfen"
   }
 }
