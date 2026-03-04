@@ -57,11 +57,9 @@
             </div>
 
             <div class="tools-grid">
-              <a
-                href="https://kodinitools.com/bildkonverter/"
+              <button
                 class="tool-card"
-                rel="noopener"
-                target="_blank"
+                @click="handleToolNavigation('bildkonverter')"
               >
                 <div class="tool-icon tool-icon-converter">
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -76,14 +74,15 @@
                   <span class="tool-name">{{ t('wizard.tools.converter.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.converter.description') }}</span>
                 </div>
+                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                  {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
+                </span>
                 <span class="tool-arrow">&rarr;</span>
-              </a>
+              </button>
 
-              <a
-                href="https://kodinitools.com/collagemaker/"
+              <button
                 class="tool-card"
-                rel="noopener"
-                target="_blank"
+                @click="handleToolNavigation('collagemaker')"
               >
                 <div class="tool-icon tool-icon-collage">
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -97,14 +96,15 @@
                   <span class="tool-name">{{ t('wizard.tools.collage.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.collage.description') }}</span>
                 </div>
+                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                  {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
+                </span>
                 <span class="tool-arrow">&rarr;</span>
-              </a>
+              </button>
 
-              <a
-                href="https://kodinitools.com/kodini-color-extractor/"
+              <button
                 class="tool-card"
-                rel="noopener"
-                target="_blank"
+                @click="handleToolNavigation('color-extractor')"
               >
                 <div class="tool-icon tool-icon-color">
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -119,8 +119,11 @@
                   <span class="tool-name">{{ t('wizard.tools.colorExtractor.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.colorExtractor.description') }}</span>
                 </div>
+                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                  {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
+                </span>
                 <span class="tool-arrow">&rarr;</span>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -143,9 +146,12 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useImageStore } from '@/stores/imageStore'
+import { prepareHandoff, type HandoffTarget } from '@/lib/core/handoff'
 
 const { t } = useI18n()
 const router = useRouter()
+const imageStore = useImageStore()
 
 interface Props {
   isOpen: boolean
@@ -175,6 +181,27 @@ function handleNewProject() {
 function handleGoHome() {
   emit('close')
   router.push('/')
+}
+
+function handleToolNavigation(target: HandoffTarget) {
+  const canvases = imageStore.images.map(img => ({
+    name: img.outputName || img.file.name,
+    canvas: img.canvas
+  }))
+
+  const url = prepareHandoff(canvases, target)
+
+  if (url) {
+    window.open(url, '_blank', 'noopener')
+  } else {
+    // Fallback: open without handoff data
+    const fallbackUrls: Record<HandoffTarget, string> = {
+      'bildkonverter': 'https://kodinitools.com/bildkonverter/',
+      'collagemaker': 'https://kodinitools.com/collagemaker/',
+      'color-extractor': 'https://kodinitools.com/kodini-color-extractor/'
+    }
+    window.open(fallbackUrls[target], '_blank', 'noopener')
+  }
 }
 </script>
 
@@ -402,7 +429,9 @@ function handleGoHome() {
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
   text-decoration: none;
+  text-align: left;
   color: inherit;
+  width: 100%;
   transition: all 0.3s var(--ease-spring);
 }
 
@@ -459,6 +488,17 @@ function handleGoHome() {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.tool-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tool-arrow {

@@ -1101,6 +1101,13 @@
         "description": "Extract color palettes from your images."
       }
     },
+    "sendImages": "{count} image(s) to transfer",
     "backHome": "Back to Home"
+  },
+  "handoff": {
+    "title": "{count} image(s) ready to import",
+    "from": "Transferred from {tool}",
+    "accept": "Import Images",
+    "dismiss": "Dismiss"
   }
 }
