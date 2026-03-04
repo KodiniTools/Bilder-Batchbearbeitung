@@ -1070,5 +1070,37 @@
     "footer": {
       "text": "This learning resource is continuously expanded and updated."
     }
+  },
+  "wizard": {
+    "title": "Export Successful!",
+    "question": "What would you like to do next?",
+    "summary": {
+      "pdf": "{count} image(s) successfully exported as PDF.",
+      "zip": "{count} image(s) successfully saved as ZIP archive.",
+      "svg": "{count} image(s) successfully converted to SVG.",
+      "save": "{count} image(s) successfully saved."
+    },
+    "actions": {
+      "continue": "Continue Editing",
+      "continueHint": "Back to the editor",
+      "newProject": "New Project",
+      "newProjectHint": "Clear images and start fresh"
+    },
+    "toolsTitle": "More KodiniTools",
+    "tools": {
+      "converter": {
+        "title": "Image Converter",
+        "description": "Convert images between PNG, JPEG, WebP and more."
+      },
+      "collage": {
+        "title": "Collage Maker",
+        "description": "Create photo collages with flexible layouts."
+      },
+      "colorExtractor": {
+        "title": "Color Extractor",
+        "description": "Extract color palettes from your images."
+      }
+    },
+    "backHome": "Back to Home"
   }
 }

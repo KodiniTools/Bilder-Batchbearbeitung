@@ -12,6 +12,7 @@ import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
 import BulkRenameModal from '@/components/BulkRenameModal.vue'
 import BatchEditPanel from '@/components/BatchEditPanel.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
+import WizardNavigator from '@/components/WizardNavigator.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
 import type { ImageObject } from '@/lib/core/types'
@@ -43,6 +44,28 @@ const isBulkRenameModalOpen = ref(false)
 const isBatchEditPanelOpen = ref(false)
 
 const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
+
+const isWizardOpen = ref(false)
+const wizardExportType = ref<'pdf' | 'zip' | 'svg' | 'save' | null>(null)
+const wizardExportCount = ref(0)
+
+function showWizard(type: 'pdf' | 'zip' | 'svg' | 'save', count: number) {
+  wizardExportType.value = type
+  wizardExportCount.value = count
+  isWizardOpen.value = true
+}
+
+function closeWizard() {
+  isWizardOpen.value = false
+  wizardExportType.value = null
+  wizardExportCount.value = 0
+}
+
+function handleWizardNewProject() {
+  imageStore.images.forEach(img => img.selected = true)
+  imageStore.removeSelectedImages()
+  closeWizard()
+}
 
 const exportImageCount = computed(() => {
   if (exportMode.value === 'pdf-all') {
@@ -169,6 +192,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       )
 
       toast.success(t('toast.pdfSuccess', { count: images.length }))
+      showWizard('pdf', images.length)
 
     } else if (currentMode === 'zip') {
       const imagesToExport = imageStore.hasSelection
@@ -199,6 +223,7 @@ async function handleExportConfirm(settings: ExportSettings) {
           settings.pngBackgroundColor ?? '#ffffff'
         )
         toast.success(t('toast.zipSuccess', { count: total }))
+        showWizard('zip', total)
       } finally {
         loadingIndicator.value?.hide()
       }
@@ -238,6 +263,7 @@ async function handleExportConfirm(settings: ExportSettings) {
           )
         }
         toast.success(t('toast.svgSuccess', { count: total }) || `${total} Bilder erfolgreich als SVG exportiert`)
+        showWizard('svg', total)
       } finally {
         loadingIndicator.value?.hide()
       }
@@ -255,6 +281,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
 
       toast.success(t('toast.saveSuccess', { count: images.length }))
+      showWizard('save', images.length)
     }
   } catch (error) {
     console.error('Export fehlgeschlagen:', error)
@@ -345,7 +372,7 @@ function handleBulkRenameConfirm(baseName: string, startNumber: number, separato
 }
 
 function handleKeyboard(event: KeyboardEvent) {
-  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value) return
+  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value || isWizardOpen.value) return
   const target = event.target as HTMLElement
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
 
@@ -451,6 +478,14 @@ onUnmounted(() => {
     <BatchEditPanel
       :is-open="isBatchEditPanelOpen"
       @close="closeBatchEditPanel"
+    />
+
+    <WizardNavigator
+      :is-open="isWizardOpen"
+      :export-type="wizardExportType"
+      :export-count="wizardExportCount"
+      @close="closeWizard"
+      @new-project="handleWizardNewProject"
     />
   </div>
 </template>
