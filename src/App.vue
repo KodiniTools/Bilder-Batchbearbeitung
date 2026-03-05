@@ -11,12 +11,12 @@ useSeoMeta()
 // FontAwesome CSS is now imported via main.ts and bundled by Vite
 
 /**
- * Handle the 'language-changed' event dispatched by the SSI nav.html.
+ * Handle the 'locale-changed' event dispatched by the SSI nav.html.
  * The SSI nav already handles localStorage, button styling and translateNav().
  * We only need to sync vue-i18n so Vue components re-render.
  */
 function onLanguageChanged(e: Event) {
-  const lang = (e as CustomEvent).detail?.lang
+  const lang = (e as CustomEvent).detail?.locale
   if (lang && lang !== locale.value) {
     locale.value = lang
   }
@@ -31,11 +31,11 @@ onMounted(() => {
 
   // Listen for language changes from SSI nav — no interception needed,
   // nav.html handles everything and dispatches this event
-  window.addEventListener('language-changed', onLanguageChanged)
+  window.addEventListener('locale-changed', onLanguageChanged)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('language-changed', onLanguageChanged)
+  window.removeEventListener('locale-changed', onLanguageChanged)
 })
 </script>
 
