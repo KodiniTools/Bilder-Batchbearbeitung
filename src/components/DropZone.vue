@@ -7,11 +7,17 @@ const imageStore = useImageStore()
 const { t } = useI18n()
 
 const fileInput = ref<HTMLInputElement>()
+const folderInput = ref<HTMLInputElement>()
 const isHighlighted = ref(false)
 const isLoading = ref(false)
 
 const handleClick = () => {
   fileInput.value?.click()
+}
+
+const handleFolderClick = (event: MouseEvent) => {
+  event.stopPropagation()
+  folderInput.value?.click()
 }
 
 const handleFiles = async (files: FileList | null) => {
@@ -64,14 +70,27 @@ const handleDrop = (event: DragEvent) => {
     <div class="upload-text">
       {{ t('upload.text') }}
     </div>
-    <button type="button" class="btn upload-btn icon-only" @click.stop="handleClick" :title="t('upload.button')" :aria-label="t('upload.button')">
-      <i class="fa-solid fa-file-arrow-up"></i>
-    </button>
+    <div class="upload-buttons">
+      <button type="button" class="btn upload-btn icon-only" @click.stop="handleClick" :title="t('upload.button')" :aria-label="t('upload.button')">
+        <i class="fa-solid fa-file-arrow-up"></i>
+      </button>
+      <button type="button" class="btn upload-btn icon-only folder-btn" @click="handleFolderClick" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')">
+        <i class="fa-solid fa-folder-arrow-up"></i>
+      </button>
+    </div>
     <input
       ref="fileInput"
       type="file"
       accept="image/*"
       multiple
+      hidden
+      @change="handleFileInput"
+    />
+    <input
+      ref="folderInput"
+      type="file"
+      accept="image/*"
+      webkitdirectory
       hidden
       @change="handleFileInput"
     />
@@ -144,8 +163,14 @@ const handleDrop = (event: DragEvent) => {
   color: var(--accent);
 }
 
-.upload-btn {
+.upload-buttons {
+  display: flex;
+  gap: var(--space-3);
   margin-top: var(--space-2);
+}
+
+.upload-btn {
+  margin-top: 0;
 }
 
 .upload-btn.icon-only {
@@ -164,6 +189,16 @@ const handleDrop = (event: DragEvent) => {
   background: var(--accent-hover, var(--accent));
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.folder-btn {
+  background: var(--green, #22c55e);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--green, #22c55e) 35%, transparent);
+}
+
+.folder-btn:hover {
+  background: color-mix(in oklab, var(--green, #22c55e) 85%, white);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--green, #22c55e) 45%, transparent);
 }
 
 .btn {

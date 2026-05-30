@@ -331,7 +331,8 @@
   },
   "upload": {
     "text": "Bilder hierher ziehen oder klicken",
-    "button": "Dateien auswählen"
+    "button": "Dateien auswählen",
+    "folderButton": "Ordner auswählen"
   },
   "emptyState": {
     "title": "Keine Bilder geladen",
