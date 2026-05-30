@@ -99,7 +99,7 @@ const handleDrop = async (event: DragEvent) => {
         <i class="fa-solid fa-file-arrow-up"></i>
       </button>
       <button type="button" class="btn upload-btn icon-only folder-btn" @click.stop="folderInput?.click()" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')">
-        <i class="fa-solid fa-folder-arrow-up"></i>
+        <i class="fa-solid fa-folder-open"></i>
       </button>
     </div>
     <input

@@ -428,7 +428,7 @@ onUnmounted(() => {
   <div class="app-page">
     <AppHeader />
 
-    <main class="container">
+    <main class="container" :class="{ 'panel-open': isBatchEditPanelOpen }">
       <StatusBar
         v-if="imageStore.hasImages"
         @export-pdf="handleExportPdf"
@@ -506,6 +506,11 @@ onUnmounted(() => {
   margin-top: var(--space-7);
   flex: 1;
   width: 100%;
+  transition: padding-left 0.3s var(--ease-smooth, ease);
+}
+
+.container.panel-open {
+  padding-left: calc(320px + var(--space-5));
 }
 
 @media (max-width: 768px) {
