@@ -11,22 +11,13 @@ const folderInput = ref<HTMLInputElement>()
 const isHighlighted = ref(false)
 const isLoading = ref(false)
 
-const handleClick = () => {
-  fileInput.value?.click()
-}
-
-const handleFolderClick = (event: MouseEvent) => {
-  event.stopPropagation()
-  folderInput.value?.click()
-}
-
-const handleFiles = async (files: FileList | null) => {
+const handleFiles = async (files: FileList | File[] | null) => {
   if (!files || files.length === 0) return
-  
+
   isLoading.value = true
   try {
-    const fileArray = Array.from(files)
-    await imageStore.addImages(fileArray)
+    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (fileArray.length > 0) await imageStore.addImages(fileArray)
   } catch (error) {
     console.error('Fehler beim Laden der Dateien:', error)
   } finally {
@@ -37,7 +28,6 @@ const handleFiles = async (files: FileList | null) => {
 const handleFileInput = (event: Event) => {
   const target = event.target as HTMLInputElement
   handleFiles(target.files)
-  // Reset input
   target.value = ''
 }
 
@@ -50,10 +40,45 @@ const handleDragLeave = () => {
   isHighlighted.value = false
 }
 
-const handleDrop = (event: DragEvent) => {
+const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
   isHighlighted.value = false
-  handleFiles(event.dataTransfer?.files || null)
+
+  const items = event.dataTransfer?.items
+  if (!items) return
+
+  const files: File[] = []
+
+  const readEntry = (entry: FileSystemEntry): Promise<void> => {
+    if (entry.isFile) {
+      return new Promise(resolve => {
+        (entry as FileSystemFileEntry).file(f => { files.push(f); resolve() })
+      })
+    }
+    if (entry.isDirectory) {
+      const reader = (entry as FileSystemDirectoryEntry).createReader()
+      return new Promise(resolve => {
+        const readAll = () => {
+          reader.readEntries(async entries => {
+            if (entries.length === 0) return resolve()
+            await Promise.all(entries.map(readEntry))
+            readAll()
+          })
+        }
+        readAll()
+      })
+    }
+    return Promise.resolve()
+  }
+
+  await Promise.all(
+    Array.from(items)
+      .map(item => item.webkitGetAsEntry())
+      .filter((e): e is FileSystemEntry => e !== null)
+      .map(readEntry)
+  )
+
+  handleFiles(files)
 }
 </script>
 
@@ -61,7 +86,6 @@ const handleDrop = (event: DragEvent) => {
   <section
     class="drop-area"
     :class="{ highlight: isHighlighted, loading: isLoading }"
-    @click="handleClick"
     @dragover="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
@@ -71,10 +95,10 @@ const handleDrop = (event: DragEvent) => {
       {{ t('upload.text') }}
     </div>
     <div class="upload-buttons">
-      <button type="button" class="btn upload-btn icon-only" @click.stop="handleClick" :title="t('upload.button')" :aria-label="t('upload.button')">
+      <button type="button" class="btn upload-btn icon-only" @click.stop="fileInput?.click()" :title="t('upload.button')" :aria-label="t('upload.button')">
         <i class="fa-solid fa-file-arrow-up"></i>
       </button>
-      <button type="button" class="btn upload-btn icon-only folder-btn" @click="handleFolderClick" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')">
+      <button type="button" class="btn upload-btn icon-only folder-btn" @click.stop="folderInput?.click()" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')">
         <i class="fa-solid fa-folder-arrow-up"></i>
       </button>
     </div>
@@ -115,7 +139,7 @@ const handleDrop = (event: DragEvent) => {
       transparent 70%);
   color: var(--muted);
   transition: all 0.4s var(--ease-spring);
-  cursor: pointer;
+  cursor: default;
   position: relative;
   z-index: 1;
   overflow: hidden;
