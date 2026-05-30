@@ -156,7 +156,8 @@
   },
   "upload": {
     "text": "Drag and drop images here or click",
-    "button": "Select Files"
+    "button": "Select Files",
+    "folderButton": "Select Folder"
   },
   "emptyState": {
     "title": "No images loaded",
