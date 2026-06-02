@@ -54,23 +54,23 @@ const handleSaveImages = () => {
 }
 
 // Batch-Transformationen
-const handleRotateLeft = () => {
-  imageStore.rotateSelectedImages(-90)
+const handleRotateLeft = async () => {
+  await imageStore.rotateSelectedImages(-90)
   toast.success(t('toast.rotated', { count: imageStore.selectedCount }))
 }
 
-const handleRotateRight = () => {
-  imageStore.rotateSelectedImages(90)
+const handleRotateRight = async () => {
+  await imageStore.rotateSelectedImages(90)
   toast.success(t('toast.rotated', { count: imageStore.selectedCount }))
 }
 
-const handleFlipH = () => {
-  imageStore.flipSelectedImages('horizontal')
+const handleFlipH = async () => {
+  await imageStore.flipSelectedImages('horizontal')
   toast.success(t('toast.flipped', { count: imageStore.selectedCount }))
 }
 
-const handleFlipV = () => {
-  imageStore.flipSelectedImages('vertical')
+const handleFlipV = async () => {
+  await imageStore.flipSelectedImages('vertical')
   toast.success(t('toast.flipped', { count: imageStore.selectedCount }))
 }
 
@@ -87,8 +87,8 @@ const closeAspectRatioDropdown = () => {
   isAspectRatioDropdownOpen.value = false
 }
 
-const handleCropToAspectRatio = (ratio: number) => {
-  imageStore.cropSelectedImagesToAspectRatio(ratio)
+const handleCropToAspectRatio = async (ratio: number) => {
+  await imageStore.cropSelectedImagesToAspectRatio(ratio)
   toast.success(t('toast.cropped', { count: imageStore.selectedCount }))
   closeAspectRatioDropdown()
 }

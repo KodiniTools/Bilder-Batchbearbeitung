@@ -150,9 +150,9 @@ function onKeepAspectChange() {
 }
 
 // Resize anwenden
-function applyResize() {
+async function applyResize() {
   if (!hasSelection.value || resizeWidth.value <= 0 || resizeHeight.value <= 0) return
-  imageStore.resizeSelectedImages(resizeWidth.value, resizeHeight.value, resizeKeepAspect.value)
+  await imageStore.resizeSelectedImages(resizeWidth.value, resizeHeight.value, resizeKeepAspect.value)
   toast.success(t('batchEdit.resize.toast', { count: selectedCount.value }))
 }
 
