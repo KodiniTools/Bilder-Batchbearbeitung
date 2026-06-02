@@ -27,7 +27,6 @@ const transforms = ref<ImageTransforms>({ ...defaultTransforms })
 const transformsOpen = ref(false)
 
 // Local resize state
-const resizeOpen = ref(false)
 const resizeWidth = ref(1920)
 const resizeHeight = ref(1080)
 const resizeKeepAspect = ref(true)

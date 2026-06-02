@@ -221,13 +221,11 @@ interface Props {
   isOpen: boolean
 }
 
-interface Emits {
-  (e: 'close'): void
-  (e: 'save', image: ImageObject): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  close: []
+  save: [image: ImageObject]
+}>()
 
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
 const fileName = ref('')
@@ -487,34 +485,6 @@ function resetSize() {
   }
 }
 
-function applyResize() {
-  if (!workingCanvas) return
-
-  const newWidth = resizeWidth.value || workingCanvas.width
-  const newHeight = resizeHeight.value || workingCanvas.height
-
-  if (newWidth <= 0 || newHeight <= 0) return
-
-  const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = newWidth
-  tempCanvas.height = newHeight
-  const tempCtx = tempCanvas.getContext('2d')
-  if (!tempCtx) return
-
-  tempCtx.drawImage(workingCanvas, 0, 0, workingCanvas.width, workingCanvas.height, 0, 0, newWidth, newHeight)
-
-  workingCanvas.width = newWidth
-  workingCanvas.height = newHeight
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, newWidth, newHeight)
-    ctx.drawImage(tempCanvas, 0, 0)
-  }
-
-  aspectRatio = newWidth / newHeight
-  updatePreview()
-}
-
 async function downloadImage() {
   if (!workingCanvas || !originalImageObj) return
 
@@ -604,7 +574,10 @@ function saveChanges() {
     }
   }
 
-  // Copy working canvas back to original image object
+  // Copy working canvas back to original image object.
+  // Intentional deep mutation: the store holds ImageObject references and
+  // the parent expects the canvas to be updated in-place before 'save' is emitted.
+  /* eslint-disable vue/no-mutating-props */
   props.image.canvas.width = workingCanvas.width
   props.image.canvas.height = workingCanvas.height
   const ctx = props.image.canvas.getContext('2d')
@@ -618,6 +591,7 @@ function saveChanges() {
   if (newName) {
     props.image.outputName = ImageProcessor.safeBaseName(newName)
   }
+  /* eslint-enable vue/no-mutating-props */
 
   emit('save', props.image)
   toast.success(t('toast.changesApplied'))

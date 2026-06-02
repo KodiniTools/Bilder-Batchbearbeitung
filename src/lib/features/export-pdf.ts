@@ -843,7 +843,7 @@ function resizeCanvas(sourceCanvas: HTMLCanvasElement, maxDimension: number): HT
  * WICHTIG: Konvertiert PNG zu JPEG für drastisch kleinere Dateien!
  */
 async function resizeAndConvertDataUrl(dataUrl: string, maxDimension: number, quality: number): Promise<string> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const img = new Image()
     
     img.onload = () => {

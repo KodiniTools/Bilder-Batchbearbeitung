@@ -62,7 +62,10 @@ export default [
       ...tsPlugin.configs.recommended.rules,
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-non-null-assertion': 'warn',
     },
   },
