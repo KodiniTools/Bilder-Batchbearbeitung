@@ -123,38 +123,42 @@ export const useImageStore = defineStore('images', () => {
   // Batch-Rotation für alle ausgewählten Bilder
   async function rotateSelectedImages(degrees: number): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
-    if (workerSupported) {
-      await processBatch(
-        selected.map((img) => img.canvas),
-        'rotate',
-        { degrees: degrees as 90 | -90 | 180 }
-      )
-      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
-    } else {
+    const ids = new Set(selected.map((img) => img.id))
+    const workerOk =
+      workerSupported &&
+      (await processBatch(selected.map((img) => img.canvas), 'rotate', {
+        degrees: degrees as 90 | -90 | 180,
+      }))
+    if (!workerOk) {
       selected.forEach((img) => ImageProcessor.rotateImage(img, degrees))
     }
+    notifyImagesUpdated(ids)
   }
 
   // Batch-Flip für alle ausgewählten Bilder
   async function flipSelectedImages(direction: 'horizontal' | 'vertical'): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
-    if (workerSupported) {
-      await processBatch(selected.map((img) => img.canvas), 'flip', { direction })
-      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
-    } else {
+    const ids = new Set(selected.map((img) => img.id))
+    const workerOk =
+      workerSupported &&
+      (await processBatch(selected.map((img) => img.canvas), 'flip', { direction }))
+    if (!workerOk) {
       selected.forEach((img) => ImageProcessor.flipImage(img, direction))
     }
+    notifyImagesUpdated(ids)
   }
 
   // Batch-Zuschneiden auf Seitenverhältnis für alle ausgewählten Bilder
   async function cropSelectedImagesToAspectRatio(aspectRatio: number): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
-    if (workerSupported) {
-      await processBatch(selected.map((img) => img.canvas), 'crop', { aspectRatio })
-      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
-    } else {
+    const ids = new Set(selected.map((img) => img.id))
+    const workerOk =
+      workerSupported &&
+      (await processBatch(selected.map((img) => img.canvas), 'crop', { aspectRatio }))
+    if (!workerOk) {
       selected.forEach((img) => ImageProcessor.cropToAspectRatio(img, aspectRatio))
     }
+    notifyImagesUpdated(ids)
   }
 
   // Alle Bearbeitungen der ausgewählten Bilder rückgängig machen
@@ -229,26 +233,34 @@ export const useImageStore = defineStore('images', () => {
   // Batch-Größenänderung für alle ausgewählten Bilder
   async function resizeSelectedImages(width: number, height: number, keepAspect: boolean): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
+    const ids = new Set(selected.map((img) => img.id))
+    let workerOk = false
+
     if (workerSupported) {
       // Dimensionen pro Bild vorab berechnen (keepAspect variiert je nach Originalformat)
-      const jobs = selected.map((img) => {
-        let targetW = width
-        let targetH = height
-        if (keepAspect) {
-          const aspect = img.originalWidth / img.originalHeight
-          if (width / height > aspect) {
-            targetW = Math.round(height * aspect)
-          } else {
-            targetH = Math.round(width / aspect)
+      const results = await Promise.all(
+        selected.map((img) => {
+          let targetW = width
+          let targetH = height
+          if (keepAspect) {
+            const aspect = img.originalWidth / img.originalHeight
+            if (width / height > aspect) {
+              targetW = Math.round(height * aspect)
+            } else {
+              targetH = Math.round(width / aspect)
+            }
           }
-        }
-        return processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
-      })
-      await Promise.all(jobs)
-      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
-    } else {
+          return processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
+        })
+      )
+      workerOk = results.every(Boolean)
+    }
+
+    if (!workerOk) {
       selected.forEach((img) => ImageProcessor.resizeImage(img, width, height, keepAspect))
     }
+
+    notifyImagesUpdated(ids)
   }
 
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
