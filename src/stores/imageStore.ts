@@ -4,6 +4,9 @@ import { ref, computed } from 'vue'
 import type { ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { useImageWorker } from '@/composables/useImageWorker'
+
+const { processBatch, processCanvas, supported: workerSupported } = useImageWorker()
 
 export const useImageStore = defineStore('images', () => {
   // State
@@ -107,27 +110,37 @@ export const useImageStore = defineStore('images', () => {
   }
 
   // Batch-Rotation für alle ausgewählten Bilder
-  function rotateSelectedImages(degrees: number): void {
-    const selected = images.value.filter(img => img.selected)
-    selected.forEach(img => {
-      ImageProcessor.rotateImage(img, degrees)
-    })
+  async function rotateSelectedImages(degrees: number): Promise<void> {
+    const selected = images.value.filter((img) => img.selected)
+    if (workerSupported) {
+      await processBatch(
+        selected.map((img) => img.canvas),
+        'rotate',
+        { degrees: degrees as 90 | -90 | 180 }
+      )
+    } else {
+      selected.forEach((img) => ImageProcessor.rotateImage(img, degrees))
+    }
   }
 
   // Batch-Flip für alle ausgewählten Bilder
-  function flipSelectedImages(direction: 'horizontal' | 'vertical'): void {
-    const selected = images.value.filter(img => img.selected)
-    selected.forEach(img => {
-      ImageProcessor.flipImage(img, direction)
-    })
+  async function flipSelectedImages(direction: 'horizontal' | 'vertical'): Promise<void> {
+    const selected = images.value.filter((img) => img.selected)
+    if (workerSupported) {
+      await processBatch(selected.map((img) => img.canvas), 'flip', { direction })
+    } else {
+      selected.forEach((img) => ImageProcessor.flipImage(img, direction))
+    }
   }
 
   // Batch-Zuschneiden auf Seitenverhältnis für alle ausgewählten Bilder
-  function cropSelectedImagesToAspectRatio(aspectRatio: number): void {
-    const selected = images.value.filter(img => img.selected)
-    selected.forEach(img => {
-      ImageProcessor.cropToAspectRatio(img, aspectRatio)
-    })
+  async function cropSelectedImagesToAspectRatio(aspectRatio: number): Promise<void> {
+    const selected = images.value.filter((img) => img.selected)
+    if (workerSupported) {
+      await processBatch(selected.map((img) => img.canvas), 'crop', { aspectRatio })
+    } else {
+      selected.forEach((img) => ImageProcessor.cropToAspectRatio(img, aspectRatio))
+    }
   }
 
   // Alle Bearbeitungen der ausgewählten Bilder rückgängig machen
@@ -200,11 +213,27 @@ export const useImageStore = defineStore('images', () => {
   }
 
   // Batch-Größenänderung für alle ausgewählten Bilder
-  function resizeSelectedImages(width: number, height: number, keepAspect: boolean): void {
-    const selected = images.value.filter(img => img.selected)
-    selected.forEach(img => {
-      ImageProcessor.resizeImage(img, width, height, keepAspect)
-    })
+  async function resizeSelectedImages(width: number, height: number, keepAspect: boolean): Promise<void> {
+    const selected = images.value.filter((img) => img.selected)
+    if (workerSupported) {
+      // Dimensionen pro Bild vorab berechnen (keepAspect variiert je nach Originalformat)
+      const jobs = selected.map((img) => {
+        let targetW = width
+        let targetH = height
+        if (keepAspect) {
+          const aspect = img.originalWidth / img.originalHeight
+          if (width / height > aspect) {
+            targetW = Math.round(height * aspect)
+          } else {
+            targetH = Math.round(width / aspect)
+          }
+        }
+        return processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
+      })
+      await Promise.all(jobs)
+    } else {
+      selected.forEach((img) => ImageProcessor.resizeImage(img, width, height, keepAspect))
+    }
   }
 
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
