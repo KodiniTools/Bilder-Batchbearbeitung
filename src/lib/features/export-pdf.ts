@@ -329,7 +329,8 @@ async function createCustomFrontPage(
   const scale = 2
   canvas.width = canvasWidth * scale
   canvas.height = canvasHeight * scale
-  const ctx = canvas.getContext('2d')!
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const ctx = canvas.getContext('2d')! // guaranteed on a freshly created canvas element
   ctx.scale(scale, scale)
 
   // Weißer Hintergrund
@@ -575,7 +576,8 @@ async function createCommentPagesFromElements(
     if (!elementsByPage.has(pageNum)) {
       elementsByPage.set(pageNum, [])
     }
-    elementsByPage.get(pageNum)!.push(element)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    elementsByPage.get(pageNum)!.push(element) // set() called on line above
   })
 
   // Sortiere Seiten-Nummern
@@ -585,7 +587,8 @@ async function createCommentPagesFromElements(
   // Rendere jede Seite
   for (let i = 0; i < pageNumbers.length; i++) {
     const pageNum = pageNumbers[i]
-    const pageElements = elementsByPage.get(pageNum)!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const pageElements = elementsByPage.get(pageNum)! // key guaranteed from keys() above
 
     // Füge neue Seite hinzu (außer für die erste)
     if (i > 0) {

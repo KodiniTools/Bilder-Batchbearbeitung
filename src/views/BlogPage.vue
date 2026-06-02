@@ -74,8 +74,8 @@ const sections = [
             <button
               v-for="(section, index) in sections"
               :key="section"
-              @click="scrollToSection(section)"
               class="toc-link"
+              @click="scrollToSection(section)"
             >
               {{ index + 1 }}. {{ t(`blog.sections.${section}.title`) }}
             </button>

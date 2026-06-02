@@ -200,7 +200,7 @@ function startDrag(event: MouseEvent) {
       <div class="entries-list">
         <div class="list-header">
           <span>Einträge ({{ entries.length }})</span>
-          <button @click="addEntry" class="add-entry-btn" title="Neuer Eintrag">
+          <button class="add-entry-btn" title="Neuer Eintrag" @click="addEntry">
             <i class="fa-solid fa-plus"></i>
             Hinzufügen
           </button>
@@ -227,26 +227,26 @@ function startDrag(event: MouseEvent) {
 
             <div class="entry-actions">
               <button
-                @click.stop="moveEntry(entry.id, 'up')"
                 :disabled="index === 0"
                 class="move-btn"
                 title="Nach oben"
+                @click.stop="moveEntry(entry.id, 'up')"
               >
                 <i class="fa-solid fa-arrow-up"></i>
               </button>
               <button
-                @click.stop="moveEntry(entry.id, 'down')"
                 :disabled="index === entries.length - 1"
                 class="move-btn"
                 title="Nach unten"
+                @click.stop="moveEntry(entry.id, 'down')"
               >
                 <i class="fa-solid fa-arrow-down"></i>
               </button>
               <button
-                @click.stop="removeEntry(entry.id)"
                 :disabled="entries.length === 1"
                 class="remove-btn"
                 title="Entfernen"
+                @click.stop="removeEntry(entry.id)"
               >
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -270,10 +270,10 @@ function startDrag(event: MouseEvent) {
             </label>
             <textarea
               :value="activeEntry.text"
-              @input="updateEntryText(activeEntryId, ($event.target as HTMLTextAreaElement).value)"
               placeholder="Beschreibung der ausgeführten Arbeiten..."
               rows="4"
               class="textarea-field"
+              @input="updateEntryText(activeEntryId, ($event.target as HTMLTextAreaElement).value)"
             ></textarea>
           </div>
 
@@ -286,11 +286,11 @@ function startDrag(event: MouseEvent) {
             
             <div v-if="!activeEntry.image" class="upload-area">
               <input
+                :id="`file-${activeEntryId}`"
                 type="file"
                 accept="image/*"
-                @change="handleImageUpload($event, activeEntryId)"
                 class="file-input"
-                :id="`file-${activeEntryId}`"
+                @change="handleImageUpload($event, activeEntryId)"
               />
               <label :for="`file-${activeEntryId}`" class="upload-label">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -310,18 +310,18 @@ function startDrag(event: MouseEvent) {
                   <input
                     type="range"
                     :value="activeEntry.position.scale"
-                    @input="updateImagePosition(activeEntryId, { 
-                      ...activeEntry.position, 
-                      scale: parseFloat(($event.target as HTMLInputElement).value) 
-                    })"
                     min="0.1"
                     max="1"
                     step="0.05"
                     class="scale-slider"
+                    @input="updateImagePosition(activeEntryId, { 
+                      ...activeEntry.position, 
+                      scale: parseFloat(($event.target as HTMLInputElement).value) 
+                    })"
                   />
                   <span class="scale-value">{{ Math.round(activeEntry.position.scale * 100) }}%</span>
                 </div>
-                <button @click="removeImage(activeEntryId)" class="remove-image-btn">
+                <button class="remove-image-btn" @click="removeImage(activeEntryId)">
                   <i class="fa-solid fa-trash"></i>
                   Entfernen
                 </button>
@@ -342,7 +342,7 @@ function startDrag(event: MouseEvent) {
               :class="{ 'orientation-landscape': orientation === 'landscape' }"
               :style="{ aspectRatio: pageAspectRatio }"
             >
-              <div class="preview-text" v-if="activeEntry.text">
+              <div v-if="activeEntry.text" class="preview-text">
                 {{ activeEntry.text }}
               </div>
               <div v-else class="preview-placeholder">

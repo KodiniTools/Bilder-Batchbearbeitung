@@ -5,7 +5,7 @@ import { ImageProcessor } from '../core/image-processor'
 export type ZipProgressCallback = (current: number, total: number) => void
 
 async function getJSZip() {
-  // @ts-ignore
+  // @ts-expect-error — JSZip may be loaded as a UMD global via script tag
   if (window.JSZip) return window.JSZip
   try {
     const mod = await import('jszip')

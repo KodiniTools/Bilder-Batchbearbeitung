@@ -249,7 +249,7 @@ onUnmounted(() => {
     </div>
     
     <div class="image-meta">
-      <div class="image-info" @dblclick="startEditing" :title="displayName">
+      <div class="image-info" :title="displayName" @dblclick="startEditing">
         <template v-if="!isEditing">
           <span class="file-name">{{ baseName }}</span>
           <span class="file-ext">.{{ fileExt }}</span>
@@ -276,9 +276,9 @@ onUnmounted(() => {
       <button
         type="button"
         class="image-action-btn remove-btn"
-        @click="handleRemove"
         :title="t('imageCard.remove')"
         :aria-label="t('imageCard.remove')"
+        @click="handleRemove"
       >
         <i class="fas fa-times"></i>
       </button>
@@ -286,9 +286,9 @@ onUnmounted(() => {
       <button
         type="button"
         class="image-action-btn edit-btn"
-        @click="handleEdit"
         :title="t('imageCard.edit')"
         :aria-label="t('imageCard.edit')"
+        @click="handleEdit"
       >
         <i class="fa-solid fa-wand-magic-sparkles"></i>
       </button>

@@ -24,8 +24,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.author') }}:</label>
                 <input 
-                  type="text" 
                   v-model="settings.author" 
+                  type="text" 
                   :placeholder="t('exportModal.pdf.authorPlaceholder')"
                 >
               </div>
@@ -34,8 +34,8 @@
               <div class="setting-group">
                 <label class="checkbox-label">
                   <input 
-                    type="checkbox" 
-                    v-model="settings.includeCustomFrontPage"
+                    v-model="settings.includeCustomFrontPage" 
+                    type="checkbox"
                   >
                   {{ t('exportModal.pdf.frontPage.label') }}
                 </label>
@@ -63,7 +63,7 @@
                 <div v-if="settings.frontPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
                     <span>{{ settings.frontPageElements.length }} {{ t('exportModal.pdf.frontPage.elementsAdded') }}</span>
-                    <button type="button" @click="clearFrontPageElements" class="clear-btn">
+                    <button type="button" class="clear-btn" @click="clearFrontPageElements">
                       {{ t('exportModal.pdf.frontPage.clearButton') }}
                     </button>
                   </div>
@@ -92,8 +92,8 @@
               <div class="setting-group">
                 <label class="checkbox-label">
                   <input 
-                    type="checkbox" 
-                    v-model="settings.includeCommentPages"
+                    v-model="settings.includeCommentPages" 
+                    type="checkbox"
                   >
                   {{ t('exportModal.pdf.commentPage.label') }}
                 </label>
@@ -120,7 +120,7 @@
                 <div v-if="settings.commentPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
                     <span>{{ settings.commentPageElements.length }} {{ t('exportModal.pdf.commentPage.elementsAdded') }}</span>
-                    <button type="button" @click="clearCommentPageElements" class="clear-btn">
+                    <button type="button" class="clear-btn" @click="clearCommentPageElements">
                       {{ t('exportModal.pdf.commentPage.clearButton') }}
                     </button>
                   </div>
@@ -151,8 +151,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.zip.fileName') }}:</label>
                 <input
-                  type="text"
                   v-model="settings.zipName"
+                  type="text"
                   :placeholder="t('exportModal.zip.fileNamePlaceholder')"
                 >
               </div>
@@ -169,8 +169,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
                 <input
-                  type="range"
                   v-model.number="settings.quality"
+                  type="range"
                   min="1"
                   max="100"
                   class="quality-slider"
@@ -180,8 +180,8 @@
               <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
                 <label class="checkbox-label">
                   <input
-                    type="checkbox"
                     v-model="settings.pngTransparent"
+                    type="checkbox"
                   >
                   {{ t('exportModal.format.pngTransparent') }}
                 </label>
@@ -189,7 +189,7 @@
                 <div v-if="!settings.pngTransparent" class="bg-color-picker">
                   <label>{{ t('exportModal.format.pngBgColor') }}:</label>
                   <div class="color-input-row">
-                    <input type="color" v-model="settings.pngBackgroundColor" />
+                    <input v-model="settings.pngBackgroundColor" type="color" />
                     <span class="color-hex">{{ settings.pngBackgroundColor }}</span>
                   </div>
                 </div>
@@ -201,8 +201,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.zip.fileName') }}:</label>
                 <input
-                  type="text"
                   v-model="settings.zipName"
+                  type="text"
                   :placeholder="t('exportModal.zip.fileNamePlaceholder')"
                 >
               </div>
@@ -218,8 +218,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}</label>
                 <input
-                  type="range"
                   v-model.number="settings.svgFilterSpeckle"
+                  type="range"
                   min="1"
                   max="32"
                   class="quality-slider"
@@ -249,8 +249,8 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
                 <input
-                  type="range"
                   v-model.number="settings.quality"
+                  type="range"
                   min="1"
                   max="100"
                   class="quality-slider"
@@ -260,8 +260,8 @@
               <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
                 <label class="checkbox-label">
                   <input
-                    type="checkbox"
                     v-model="settings.pngTransparent"
+                    type="checkbox"
                   >
                   {{ t('exportModal.format.pngTransparent') }}
                 </label>
@@ -269,7 +269,7 @@
                 <div v-if="!settings.pngTransparent" class="bg-color-picker">
                   <label>{{ t('exportModal.format.pngBgColor') }}:</label>
                   <div class="color-input-row">
-                    <input type="color" v-model="settings.pngBackgroundColor" />
+                    <input v-model="settings.pngBackgroundColor" type="color" />
                     <span class="color-hex">{{ settings.pngBackgroundColor }}</span>
                   </div>
                 </div>

@@ -15,7 +15,7 @@
                 <p>{{ t('frontPageDesigner.subtitle') }}</p>
               </div>
             </div>
-            <button class="close-btn" @click="closeDesigner" :title="t('frontPageDesigner.close')">×</button>
+            <button class="close-btn" :title="t('frontPageDesigner.close')" @click="closeDesigner">×</button>
           </div>
 
           <!-- Toolbar -->
@@ -23,8 +23,8 @@
             <div class="tool-group">
               <button 
                 class="tool-btn" 
-                @click="addTextElement"
                 :title="t('frontPageDesigner.toolbar.addTextTooltip')"
+                @click="addTextElement"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="4 7 4 4 20 4 20 7"></polyline>
@@ -36,8 +36,8 @@
               
               <button 
                 class="tool-btn" 
-                @click="triggerImageUpload"
                 :title="t('frontPageDesigner.toolbar.addImageTooltip')"
+                @click="triggerImageUpload"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -50,17 +50,17 @@
                 ref="imageInput" 
                 type="file" 
                 accept="image/*" 
-                @change="handleImageUpload" 
-                style="display: none;"
+                style="display: none;" 
+                @change="handleImageUpload"
               >
             </div>
 
             <div class="tool-group">
               <button 
                 class="tool-btn danger" 
-                @click="clearCanvas"
                 :disabled="elements.length === 0"
                 :title="t('frontPageDesigner.toolbar.clearAllTooltip')"
+                @click="clearCanvas"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"></polyline>
@@ -75,10 +75,10 @@
           <div class="canvas-container">
             <!-- Zoom Controls -->
             <div class="zoom-controls">
-              <button @click="zoomOut" :disabled="zoomLevel <= 0.5" :title="t('frontPageDesigner.zoom.zoomOut')">−</button>
+              <button :disabled="zoomLevel <= 0.5" :title="t('frontPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
               <span>{{ Math.round(zoomLevel * 100) }}%</span>
-              <button @click="zoomIn" :disabled="zoomLevel >= 2" :title="t('frontPageDesigner.zoom.zoomIn')">+</button>
-              <button @click="resetZoom" :title="t('frontPageDesigner.zoom.reset')">
+              <button :disabled="zoomLevel >= 2" :title="t('frontPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
+              <button :title="t('frontPageDesigner.zoom.reset')" @click="resetZoom">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                   <path d="M21 3v5h-5"></path>
@@ -92,8 +92,8 @@
             <div class="canvas-wrapper">
               <div class="canvas-inner">
               <div
-                class="canvas"
                 ref="canvasRef"
+                class="canvas"
                 :style="{
                   transform: `scale(${zoomLevel})`,
                   marginRight: `${794 * (zoomLevel - 1)}px`,
@@ -184,8 +184,8 @@
                   <button
                     v-if="element.id === selectedElementId"
                     class="delete-element-btn"
-                    @click.stop="deleteElement(element.id)"
                     :title="t('frontPageDesigner.properties.deleteElement')"
+                    @click.stop="deleteElement(element.id)"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -198,7 +198,7 @@
             </div>
 
             <!-- Properties Panel -->
-            <div class="properties-panel" v-if="selectedElement">
+            <div v-if="selectedElement" class="properties-panel">
               <h3>{{ t('frontPageDesigner.properties.title') }}</h3>
               
               <div class="property-group">
@@ -232,8 +232,8 @@
                   <label>{{ t('frontPageDesigner.properties.fontSize') }}</label>
                   <div class="slider-group">
                     <input 
-                      type="range" 
                       v-model.number="selectedElement.fontSize" 
+                      type="range" 
                       min="12" 
                       max="72"
                       class="property-slider"
@@ -266,9 +266,9 @@
                   <label>{{ t('frontPageDesigner.properties.textAlign') }}</label>
                   <div class="button-group">
                     <button 
-                      @click="selectedElement.textAlign = 'left'"
                       :class="{ active: selectedElement.textAlign === 'left' }"
                       :title="t('frontPageDesigner.properties.textAlignLeft')"
+                      @click="selectedElement.textAlign = 'left'"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="17" y1="10" x2="3" y2="10"></line>
@@ -278,9 +278,9 @@
                       </svg>
                     </button>
                     <button 
-                      @click="selectedElement.textAlign = 'center'"
                       :class="{ active: selectedElement.textAlign === 'center' }"
                       :title="t('frontPageDesigner.properties.textAlignCenter')"
+                      @click="selectedElement.textAlign = 'center'"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="10" x2="6" y2="10"></line>
@@ -290,9 +290,9 @@
                       </svg>
                     </button>
                     <button 
-                      @click="selectedElement.textAlign = 'right'"
                       :class="{ active: selectedElement.textAlign === 'right' }"
                       :title="t('frontPageDesigner.properties.textAlignRight')"
+                      @click="selectedElement.textAlign = 'right'"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="21" y1="10" x2="7" y2="10"></line>
@@ -307,8 +307,8 @@
                 <div class="property-group">
                   <label>{{ t('frontPageDesigner.properties.textColor') }}</label>
                   <input 
-                    type="color" 
                     v-model="selectedElement.color" 
+                    type="color" 
                     class="color-picker"
                   >
                 </div>
@@ -320,15 +320,15 @@
                   <label>{{ t('frontPageDesigner.properties.imageSize') }}</label>
                   <div class="size-inputs">
                     <input 
-                      type="number" 
                       v-model.number="selectedElement.width" 
-                      @input="maintainAspectRatio"
+                      type="number" 
                       min="50"
+                      @input="maintainAspectRatio"
                     >
                     <span>×</span>
                     <input 
-                      type="number" 
                       v-model.number="selectedElement.height" 
+                      type="number" 
                       min="50"
                     >
                   </div>
@@ -342,16 +342,16 @@
                   <div>
                     <small>X:</small>
                     <input 
-                      type="number" 
                       v-model.number="selectedElement.x" 
+                      type="number" 
                       min="0"
                     >
                   </div>
                   <div>
                     <small>Y:</small>
                     <input 
-                      type="number" 
                       v-model.number="selectedElement.y" 
+                      type="number" 
                       min="0"
                     >
                   </div>
@@ -360,7 +360,7 @@
             </div>
 
             <!-- No Selection Message -->
-            <div class="properties-panel no-selection-panel" v-else>
+            <div v-else class="properties-panel no-selection-panel">
               <div class="no-selection-message">
                 {{ t('frontPageDesigner.properties.noSelection') }}
               </div>

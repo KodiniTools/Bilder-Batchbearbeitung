@@ -86,19 +86,19 @@ const handleDrop = async (event: DragEvent) => {
   <section
     class="drop-area"
     :class="{ highlight: isHighlighted, loading: isLoading }"
+    :aria-label="t('accessibility.dropzone')"
     @dragover="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
-    :aria-label="t('accessibility.dropzone')"
   >
     <div class="upload-text">
       {{ t('upload.text') }}
     </div>
     <div class="upload-buttons">
-      <button type="button" class="btn upload-btn icon-only" @click.stop="fileInput?.click()" :title="t('upload.button')" :aria-label="t('upload.button')">
+      <button type="button" class="btn upload-btn icon-only" :title="t('upload.button')" :aria-label="t('upload.button')" @click.stop="fileInput?.click()">
         <i class="fa-solid fa-file-arrow-up"></i>
       </button>
-      <button type="button" class="btn upload-btn icon-only folder-btn" @click.stop="folderInput?.click()" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')">
+      <button type="button" class="btn upload-btn icon-only folder-btn" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')" @click.stop="folderInput?.click()">
         <i class="fa-solid fa-folder-open"></i>
       </button>
     </div>

@@ -75,23 +75,23 @@ onMounted(() => {
           <button
             class="lang-toggle"
             :class="{ active: locale === 'de' }"
-            @click="setLanguage('de')"
             title="Deutsch"
+            @click="setLanguage('de')"
           >
             DE
           </button>
           <button
             class="lang-toggle"
             :class="{ active: locale === 'en' }"
-            @click="setLanguage('en')"
             title="English"
+            @click="setLanguage('en')"
           >
             EN
           </button>
           <button
             class="theme-toggle"
-            @click="toggleTheme"
             :title="t('header.themeToggle')"
+            @click="toggleTheme"
           >
             {{ theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF13' }}
           </button>
