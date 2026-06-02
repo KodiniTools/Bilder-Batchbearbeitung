@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 
 const { locale, t } = useI18n()
 const router = useRouter()
-const activeSection = ref<string | null>(null)
 const expandedCode = ref<string | null>(null)
 
 const goToHome = () => {
@@ -235,7 +234,7 @@ function visualize(canvas: HTMLCanvasElement) {
     const barWidth = (width / bufferLength) * 2.5;
     let x = 0;
 
-    for (let i = 0; i < bufferLength; i++) {
+    for (let i = 0; i &lt; bufferLength; i++) {
       const barHeight = (dataArray[i] / 255) * height;
 
       // Farbverlauf basierend auf Frequenz
@@ -475,7 +474,7 @@ function processImage(image: HTMLImageElement): string {
   const data = imageData.data
 
   // Graustufenkonvertierung
-  for (let i = 0; i < data.length; i += 4) {
+  for (let i = 0; i &lt; data.length; i += 4) {
     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
     data[i] = avg     // R
     data[i + 1] = avg // G
@@ -520,8 +519,8 @@ function adjustBrightnessContrast(
   const data = imageData.data
   const factor = (259 * (contrast + 255)) / (255 * (259 - contrast))
 
-  for (let i = 0; i < data.length; i += 4) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = 0; i &lt; data.length; i += 4) {
+    for (let j = 0; j &lt; 3; j++) {
       let value = data[i + j]
       // Helligkeit
       value += brightness
@@ -963,7 +962,7 @@ async function processImageData(data: {
   const pixels = imageData.data
 
   // Intensive Berechnung im Worker
-  for (let i = 0; i < pixels.length; i += 4) {
+  for (let i = 0; i &lt; pixels.length; i += 4) {
     // Helligkeit
     pixels[i] = Math.min(255, pixels[i] + filters.brightness)
     pixels[i + 1] = Math.min(255, pixels[i + 1] + filters.brightness)

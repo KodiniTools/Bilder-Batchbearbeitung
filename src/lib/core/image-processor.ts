@@ -1,7 +1,7 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from './types'
+import type { ImageFormat, ImageObject, ImageTransforms, WatermarkSettings } from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
 
 /**
@@ -31,7 +31,7 @@ export class ImageProcessor {
     try {
       const dataURL = canvas.toDataURL(mimeType)
       return dataURL.startsWith('data:' + mimeType)
-    } catch (e) { 
+    } catch (_e) {
       return false
     }
   }
@@ -363,7 +363,7 @@ export class ImageProcessor {
    * Bereinigt einen Dateinamen für sicheren Export
    */
   static safeBaseName(name: string): string {
-    return (name || '').replace(/[\\\/:*?"<>|]+/g, '_').trim() || 'Unbenannt'
+    return (name || '').replace(/[\\/:*?"<>|]+/g, '_').trim() || 'Unbenannt'
   }
 
   /**

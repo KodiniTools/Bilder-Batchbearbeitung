@@ -2,12 +2,6 @@
 import type { ImageObject } from '../core/types'
 import { ImageProcessor } from '../core/image-processor'
 
-interface ZipSettings {
-  zipName?: string
-  format?: 'png' | 'jpg' | 'webp'
-  quality?: number
-}
-
 export type ZipProgressCallback = (current: number, total: number) => void
 
 async function getJSZip() {

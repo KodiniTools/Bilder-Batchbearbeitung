@@ -73,9 +73,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
   dropTargetIndex.value = null
 }
 
-function getImageIndex(imageId: string): number {
-  return imageStore.images.findIndex(img => img.id === imageId)
-}
+
 </script>
 
 <template>
