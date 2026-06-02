@@ -5,7 +5,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h2>{{ t('bulkRename.title') }}</h2>
-            <button class="close-btn" @click="$emit('close')" :title="t('bulkRename.close')">×</button>
+            <button class="close-btn" :title="t('bulkRename.close')" @click="$emit('close')">×</button>
           </div>
 
           <div class="modal-body">
@@ -14,11 +14,11 @@
               <label for="baseName">{{ t('bulkRename.baseName.label') }}</label>
               <input
                 id="baseName"
-                type="text"
                 v-model="baseName"
+                type="text"
                 :placeholder="t('bulkRename.baseName.placeholder')"
-                @keydown.enter="handleConfirm"
                 autofocus
+                @keydown.enter="handleConfirm"
               >
               <p class="setting-hint">{{ t('bulkRename.baseName.hint') }}</p>
             </div>
@@ -28,8 +28,8 @@
               <label for="startNumber">{{ t('bulkRename.startNumber.label') }}</label>
               <input
                 id="startNumber"
-                type="number"
                 v-model.number="startNumber"
+                type="number"
                 min="0"
                 :placeholder="t('bulkRename.startNumber.placeholder')"
                 @keydown.enter="handleConfirm"
@@ -99,8 +99,8 @@
             </button>
             <button
               class="btn-primary"
-              @click="handleConfirm"
               :disabled="!isValid"
+              @click="handleConfirm"
             >
               <i class="fa-solid fa-pen"></i>
               {{ t('bulkRename.buttons.rename') }}

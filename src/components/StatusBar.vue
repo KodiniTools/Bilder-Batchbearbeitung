@@ -120,17 +120,17 @@ const handleReset = () => {
     <div class="toolbar-section">
       <button
         class="btn btn-icon"
-        @click="handleSelectAll"
         :title="t('statusBar.tooltips.selectAll')"
+        @click="handleSelectAll"
       >
         <i class="fa-solid fa-border-all"></i>
       </button>
 
       <button
         class="btn btn-icon btn-danger"
-        @click="handleDelete"
         :disabled="!imageStore.hasSelection"
         :title="t('statusBar.tooltips.deleteSelected')"
+        @click="handleDelete"
       >
         <i class="fa-solid fa-trash-can"></i>
       </button>
@@ -138,8 +138,8 @@ const handleReset = () => {
       <button
         class="btn btn-icon btn-batch-edit"
         :class="{ 'has-selection': imageStore.hasSelection }"
-        @click="emit('batch-edit')"
         :title="t('statusBar.tooltips.batchEdit')"
+        @click="emit('batch-edit')"
       >
         <i class="fa-solid fa-sliders"></i>
       </button>
@@ -153,15 +153,15 @@ const handleReset = () => {
         <div class="btn-group">
           <button
             class="btn btn-icon"
-            @click="handleRotateLeft"
             :title="t('statusBar.tooltips.rotateLeft')"
+            @click="handleRotateLeft"
           >
             <i class="fa-solid fa-rotate-left"></i>
           </button>
           <button
             class="btn btn-icon"
-            @click="handleRotateRight"
             :title="t('statusBar.tooltips.rotateRight')"
+            @click="handleRotateRight"
           >
             <i class="fa-solid fa-rotate-right"></i>
           </button>
@@ -170,15 +170,15 @@ const handleReset = () => {
         <div class="btn-group">
           <button
             class="btn btn-icon"
-            @click="handleFlipH"
             :title="t('statusBar.tooltips.flipH')"
+            @click="handleFlipH"
           >
             <i class="fa-solid fa-arrows-left-right"></i>
           </button>
           <button
             class="btn btn-icon"
-            @click="handleFlipV"
             :title="t('statusBar.tooltips.flipV')"
+            @click="handleFlipV"
           >
             <i class="fa-solid fa-arrows-up-down"></i>
           </button>
@@ -188,12 +188,12 @@ const handleReset = () => {
         <div class="dropdown-wrapper">
           <button
             class="btn btn-icon"
-            @click="toggleAspectRatioDropdown"
             :title="t('statusBar.tooltips.aspectRatio')"
+            @click="toggleAspectRatioDropdown"
           >
             <i class="fa-solid fa-crop"></i>
           </button>
-          <div class="dropdown-menu" v-if="isAspectRatioDropdownOpen" @mouseleave="closeAspectRatioDropdown">
+          <div v-if="isAspectRatioDropdownOpen" class="dropdown-menu" @mouseleave="closeAspectRatioDropdown">
             <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
               <i class="fa-solid fa-square"></i>
               <span>1:1</span>
@@ -211,16 +211,16 @@ const handleReset = () => {
 
         <button
           class="btn btn-icon"
-          @click="handleReset"
           :title="t('statusBar.tooltips.reset')"
+          @click="handleReset"
         >
           <i class="fa-solid fa-arrow-rotate-left"></i>
         </button>
 
         <button
           class="btn btn-icon"
-          @click="handleBulkRename"
           :title="t('statusBar.tooltips.bulkRename')"
+          @click="handleBulkRename"
         >
           <i class="fa-solid fa-pen"></i>
         </button>
@@ -234,16 +234,16 @@ const handleReset = () => {
       <div class="btn-group">
         <button
           class="btn btn-icon"
-          @click="handleExportPdf('selected')"
           :disabled="!imageStore.hasSelection"
           :title="t('statusBar.tooltips.exportSelectedPdf')"
+          @click="handleExportPdf('selected')"
         >
           <i class="fa-solid fa-file-pdf"></i>
         </button>
         <button
           class="btn btn-icon"
-          @click="handleExportPdf('all')"
           :title="t('statusBar.tooltips.exportAllPdf')"
+          @click="handleExportPdf('all')"
         >
           <i class="fa-solid fa-file-pdf"></i>
           <i class="fa-solid fa-asterisk btn-badge"></i>
@@ -252,25 +252,25 @@ const handleReset = () => {
 
       <button
         class="btn btn-icon"
-        @click="handleExportZip"
         :title="t('statusBar.tooltips.downloadZip')"
+        @click="handleExportZip"
       >
         <i class="fa-solid fa-file-zipper"></i>
       </button>
 
       <button
         class="btn btn-icon btn-svg"
-        @click="handleExportSvg"
         :title="t('statusBar.tooltips.exportSvg') || 'Als SVG exportieren (Vektorisierung)'"
+        @click="handleExportSvg"
       >
         <i class="fa-solid fa-bezier-curve"></i>
       </button>
 
       <button
         class="btn btn-icon btn-primary"
-        @click="handleSaveImages"
         :disabled="!imageStore.hasSelection"
         :title="t('statusBar.tooltips.saveSelected')"
+        @click="handleSaveImages"
       >
         <i class="fa-solid fa-download"></i>
       </button>

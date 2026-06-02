@@ -13,7 +13,7 @@
             </div>
             <h2 class="wizard-title">{{ t('wizard.title') }}</h2>
             <p class="wizard-summary">{{ getSummaryText() }}</p>
-            <button class="close-btn" @click="handleClose" :title="t('buttons.close')">
+            <button class="close-btn" :title="t('buttons.close')" @click="handleClose">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -74,7 +74,7 @@
                   <span class="tool-name">{{ t('wizard.tools.converter.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.converter.description') }}</span>
                 </div>
-                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                <span v-if="imageStore.imageCount > 0" class="tool-badge">
                   {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
                 </span>
                 <span class="tool-arrow">&rarr;</span>
@@ -96,7 +96,7 @@
                   <span class="tool-name">{{ t('wizard.tools.collage.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.collage.description') }}</span>
                 </div>
-                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                <span v-if="imageStore.imageCount > 0" class="tool-badge">
                   {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
                 </span>
                 <span class="tool-arrow">&rarr;</span>
@@ -119,7 +119,7 @@
                   <span class="tool-name">{{ t('wizard.tools.colorExtractor.title') }}</span>
                   <span class="tool-desc">{{ t('wizard.tools.colorExtractor.description') }}</span>
                 </div>
-                <span class="tool-badge" v-if="imageStore.imageCount > 0">
+                <span v-if="imageStore.imageCount > 0" class="tool-badge">
                   {{ t('wizard.sendImages', { count: imageStore.imageCount }) }}
                 </span>
                 <span class="tool-arrow">&rarr;</span>

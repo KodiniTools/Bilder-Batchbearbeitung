@@ -61,7 +61,8 @@ function compressCanvas(canvas: HTMLCanvasElement): { dataUrl: string; width: nu
   const tmp = document.createElement('canvas')
   tmp.width = width
   tmp.height = height
-  const ctx = tmp.getContext('2d')!
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const ctx = tmp.getContext('2d')! // guaranteed on a freshly created canvas element
   ctx.drawImage(canvas, 0, 0, width, height)
 
   return {

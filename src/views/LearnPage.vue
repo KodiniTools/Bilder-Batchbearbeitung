@@ -89,8 +89,8 @@ const sections = [
             <button
               v-for="(section, index) in sections"
               :key="section"
-              @click="scrollToSection(section)"
               class="toc-link"
+              @click="scrollToSection(section)"
             >
               {{ index + 1 }}. {{ t(`learn.sections.${section}.title`) }}
             </button>
@@ -147,7 +147,7 @@ const sections = [
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Web Audio API Grundlagen</span>
-                <button @click="toggleCode('webaudio1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('webaudio1')">
                   {{ expandedCode === 'webaudio1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -202,7 +202,7 @@ function playTone(frequency: number, duration: number) {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Audio-Visualisierung</span>
-                <button @click="toggleCode('webaudio2')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('webaudio2')">
                   {{ expandedCode === 'webaudio2' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -282,7 +282,7 @@ function visualize(canvas: HTMLCanvasElement) {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-vuejs"></i> Reaktivität in Vue 3</span>
-                <button @click="toggleCode('vue1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('vue1')">
                   {{ expandedCode === 'vue1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -337,7 +337,7 @@ const updateUser = (newName: string) => user.name = newName
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-vuejs"></i> Eigene Composables</span>
-                <button @click="toggleCode('vue2')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('vue2')">
                   {{ expandedCode === 'vue2' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -454,7 +454,7 @@ const { isPlaying, volume, playSound, setVolume } = useAudio()
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Bildverarbeitung mit Canvas</span>
-                <button @click="toggleCode('canvas1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('canvas1')">
                   {{ expandedCode === 'canvas1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -571,7 +571,7 @@ function adjustBrightnessContrast(
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Datei-Handling</span>
-                <button @click="toggleCode('file1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('file1')">
                   {{ expandedCode === 'file1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -676,7 +676,7 @@ function downloadBlob(data: BlobPart[], filename: string, type: string) {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> TypeScript mit Vue 3</span>
-                <button @click="toggleCode('ts1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('ts1')">
                   {{ expandedCode === 'ts1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -788,7 +788,7 @@ function isImageFile(obj: unknown): obj is ImageFile {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-vuejs"></i> Pinia Store</span>
-                <button @click="toggleCode('pinia1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('pinia1')">
                   {{ expandedCode === 'pinia1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -933,7 +933,7 @@ const handleDelete = (id: string) => store.removeImage(id)
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Web Worker für Bildverarbeitung</span>
-                <button @click="toggleCode('worker1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('worker1')">
                   {{ expandedCode === 'worker1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -1075,7 +1075,7 @@ export function useImageWorker() {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-vuejs"></i> Performance-Optimierungen</span>
-                <button @click="toggleCode('perf1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('perf1')">
                   {{ expandedCode === 'perf1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
@@ -1175,7 +1175,7 @@ function useLazyLoad(callback: () => void) {
             <div class="code-block">
               <div class="code-header">
                 <span><i class="fa-brands fa-js"></i> Sicherheits-Best-Practices</span>
-                <button @click="toggleCode('sec1')" class="code-toggle">
+                <button class="code-toggle" @click="toggleCode('sec1')">
                   {{ expandedCode === 'sec1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>

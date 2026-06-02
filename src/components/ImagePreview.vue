@@ -179,8 +179,8 @@ onUnmounted(() => {
           </div>
           <button 
             class="preview-close-btn"
-            @click="handleClose"
             aria-label="Schließen"
+            @click="handleClose"
           >
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -197,7 +197,7 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <div class="preview-info" v-if="image">
+        <div v-if="image" class="preview-info">
           <span>{{ image.canvas.width }} × {{ image.canvas.height }} px</span>
           <span class="format-badge">{{ imageFormat }}</span>
           <span>{{ image.outputName || image.file.name }}</span>

@@ -35,8 +35,8 @@ const getIcon = (type: string) => {
           <button
             type="button"
             class="toast-close"
-            @click.stop="removeToast(toast.id)"
             aria-label="Schließen"
+            @click.stop="removeToast(toast.id)"
           >
             <i class="fas fa-times"></i>
           </button>

@@ -62,6 +62,7 @@ onMounted(() => {
         <div class="faq-list">
           <details v-for="i in 8" :key="i" class="faq-item">
             <summary>{{ t(`faq.q${i}.question`) }}</summary>
+            <!-- eslint-disable-next-line vue/no-v-html -- content is from static i18n translation files, not user input -->
             <p v-html="t(`faq.q${i}.answer`)"></p>
           </details>
         </div>

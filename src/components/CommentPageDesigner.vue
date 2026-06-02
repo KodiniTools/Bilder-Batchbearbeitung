@@ -22,7 +22,7 @@
               {{ pages.length }} {{ pages.length === 1 ? t('commentPageDesigner.page.singular') : t('commentPageDesigner.page.plural') }}
             </div>
 
-            <button class="close-btn" @click="handleClose" :title="t('commentPageDesigner.close')">
+            <button class="close-btn" :title="t('commentPageDesigner.close')" @click="handleClose">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -53,10 +53,10 @@
                 <!-- Page Navigation -->
                 <div class="page-navigation">
                   <button
-                      @click="previousPage"
                       :disabled="currentPageIndex === 0"
                       class="nav-btn"
                       :title="t('commentPageDesigner.pageManagement.previousPage')"
+                      @click="previousPage"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="15 18 9 12 15 6"></polyline>
@@ -67,19 +67,19 @@
                     <button
                         v-for="(page, index) in pages"
                         :key="page.id"
-                        @click="goToPage(index)"
                         :class="['page-thumb', { active: index === currentPageIndex }]"
                         :title="t('commentPageDesigner.pageManagement.pageTitle', { number: index + 1 })"
+                        @click="goToPage(index)"
                     >
                       {{ index + 1 }}
                     </button>
                   </div>
 
                   <button
-                      @click="nextPage"
                       :disabled="currentPageIndex === pages.length - 1"
                       class="nav-btn"
                       :title="t('commentPageDesigner.pageManagement.nextPage')"
+                      @click="nextPage"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="9 18 15 12 9 6"></polyline>
@@ -89,7 +89,7 @@
 
                 <!-- Page Actions -->
                 <div class="page-actions">
-                  <button class="tool-btn primary" @click="addNewPage" :title="t('commentPageDesigner.pageManagement.addPageTooltip')">
+                  <button class="tool-btn primary" :title="t('commentPageDesigner.pageManagement.addPageTooltip')" @click="addNewPage">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                       <polyline points="14 2 14 8 20 8"/>
@@ -101,9 +101,9 @@
 
                   <button
                       class="tool-btn danger"
-                      @click="deletePage"
                       :disabled="pages.length === 1"
                       :title="t('commentPageDesigner.pageManagement.deletePageTooltip')"
+                      @click="deletePage"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="3 6 5 6 21 6"></polyline>
@@ -126,7 +126,7 @@
                 </h3>
 
                 <!-- Add Text Button -->
-                <button class="tool-btn" @click="addTextElement" :disabled="currentElements.length >= 20">
+                <button class="tool-btn" :disabled="currentElements.length >= 20" @click="addTextElement">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="4 7 4 4 20 4 20 7"></polyline>
                     <line x1="9" y1="20" x2="15" y2="20"></line>
@@ -136,7 +136,7 @@
                 </button>
 
                 <!-- Add Image Button -->
-                <button class="tool-btn" @click="triggerImageUpload" :disabled="currentElements.length >= 20">
+                <button class="tool-btn" :disabled="currentElements.length >= 20" @click="triggerImageUpload">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -153,7 +153,7 @@
                 >
 
                 <!-- Clear Current Page Button -->
-                <button class="tool-btn danger" @click="clearCurrentPage" v-if="currentElements.length > 0">
+                <button v-if="currentElements.length > 0" class="tool-btn danger" @click="clearCurrentPage">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -163,7 +163,7 @@
               </div>
 
               <!-- Element Properties -->
-              <div class="properties-section" v-if="selectedElement">
+              <div v-if="selectedElement" class="properties-section">
                 <h3>{{ t('commentPageDesigner.properties.title') }}</h3>
 
                 <div class="property-group">
@@ -207,8 +207,8 @@
                     <label for="font-size">{{ t('commentPageDesigner.properties.fontSize', { size: selectedElement.fontSize }) }}</label>
                     <input
                         id="font-size"
-                        type="range"
                         v-model.number="selectedElement.fontSize"
+                        type="range"
                         min="10"
                         max="72"
                         step="1"
@@ -219,8 +219,8 @@
                     <label for="text-color">{{ t('commentPageDesigner.properties.textColor') }}</label>
                     <input
                         id="text-color"
-                        type="color"
                         v-model="selectedElement.color"
+                        type="color"
                     >
                   </div>
 
@@ -228,9 +228,9 @@
                     <label>{{ t('commentPageDesigner.properties.textAlignment') }}</label>
                     <div class="align-buttons">
                       <button
-                          @click="selectedElement.align = 'left'"
                           :class="{ active: selectedElement.align === 'left' }"
                           :title="t('commentPageDesigner.properties.alignLeft')"
+                          @click="selectedElement.align = 'left'"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="17" y1="10" x2="3" y2="10"></line>
@@ -240,9 +240,9 @@
                         </svg>
                       </button>
                       <button
-                          @click="selectedElement.align = 'center'"
                           :class="{ active: selectedElement.align === 'center' }"
                           :title="t('commentPageDesigner.properties.alignCenter')"
+                          @click="selectedElement.align = 'center'"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="18" y1="10" x2="6" y2="10"></line>
@@ -252,9 +252,9 @@
                         </svg>
                       </button>
                       <button
-                          @click="selectedElement.align = 'right'"
                           :class="{ active: selectedElement.align === 'right' }"
                           :title="t('commentPageDesigner.properties.alignRight')"
+                          @click="selectedElement.align = 'right'"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="21" y1="10" x2="7" y2="10"></line>
@@ -268,11 +268,11 @@
 
                   <div class="property-group">
                     <label>
-                      <input type="checkbox" v-model="selectedElement.bold">
+                      <input v-model="selectedElement.bold" type="checkbox">
                       {{ t('commentPageDesigner.properties.bold') }}
                     </label>
                     <label>
-                      <input type="checkbox" v-model="selectedElement.italic">
+                      <input v-model="selectedElement.italic" type="checkbox">
                       {{ t('commentPageDesigner.properties.italic') }}
                     </label>
                   </div>
@@ -281,8 +281,8 @@
                     <label for="text-width">{{ t('commentPageDesigner.properties.width', { width: selectedElement.width }) }}</label>
                     <input
                         id="text-width"
-                        type="range"
                         v-model.number="selectedElement.width"
+                        type="range"
                         min="80"
                         :max="pageWidth"
                         step="10"
@@ -293,8 +293,8 @@
                     <label for="text-height">{{ t('commentPageDesigner.properties.height', { height: selectedElement.height }) }}</label>
                     <input
                         id="text-height"
-                        type="range"
                         v-model.number="selectedElement.height"
+                        type="range"
                         min="30"
                         :max="pageHeight"
                         step="10"
@@ -308,8 +308,8 @@
                     <label for="img-width">{{ t('commentPageDesigner.properties.width', { width: selectedElement.width }) }}</label>
                     <input
                         id="img-width"
-                        type="range"
                         v-model.number="selectedElement.width"
+                        type="range"
                         min="50"
                         max="500"
                         step="10"
@@ -320,8 +320,8 @@
                     <label for="img-opacity">{{ t('commentPageDesigner.properties.opacity', { opacity: Math.round(selectedElement.opacity * 100) }) }}</label>
                     <input
                         id="img-opacity"
-                        type="range"
                         v-model.number="selectedElement.opacity"
+                        type="range"
                         min="0.1"
                         max="1"
                         step="0.1"
@@ -336,8 +336,8 @@
                     <div>
                       <span>X:</span>
                       <input
-                          type="number"
                           v-model.number="selectedElement.x"
+                          type="number"
                           min="0"
                           :max="pageWidth"
                           step="1"
@@ -346,8 +346,8 @@
                     <div>
                       <span>Y:</span>
                       <input
-                          type="number"
                           v-model.number="selectedElement.y"
+                          type="number"
                           min="0"
                           :max="pageHeight"
                           step="1"
@@ -360,13 +360,13 @@
                 <div class="property-group">
                   <label>{{ t('commentPageDesigner.properties.layer') }}</label>
                   <div class="layer-buttons">
-                    <button @click="moveToFront" :title="t('commentPageDesigner.properties.toFrontTooltip')">
+                    <button :title="t('commentPageDesigner.properties.toFrontTooltip')" @click="moveToFront">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="18 15 12 9 6 15"></polyline>
                       </svg>
                       {{ t('commentPageDesigner.properties.toFrontButton') }}
                     </button>
-                    <button @click="moveToBack" :title="t('commentPageDesigner.properties.toBackTooltip')">
+                    <button :title="t('commentPageDesigner.properties.toBackTooltip')" @click="moveToBack">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
@@ -386,7 +386,7 @@
               </div>
 
               <!-- Info when no element selected -->
-              <div class="no-selection" v-else-if="currentElements.length > 0">
+              <div v-else-if="currentElements.length > 0" class="no-selection">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -400,10 +400,10 @@
             <div class="canvas-area">
               <!-- Zoom Controls -->
               <div class="zoom-controls">
-                <button @click="zoomOut" :disabled="zoomLevel <= 0.5" :title="t('commentPageDesigner.zoom.zoomOut')">−</button>
+                <button :disabled="zoomLevel <= 0.5" :title="t('commentPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
                 <span>{{ Math.round(zoomLevel * 100) }}%</span>
-                <button @click="zoomIn" :disabled="zoomLevel >= 2" :title="t('commentPageDesigner.zoom.zoomIn')">+</button>
-                <button @click="resetZoom" :title="t('commentPageDesigner.zoom.reset')">
+                <button :disabled="zoomLevel >= 2" :title="t('commentPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
+                <button :title="t('commentPageDesigner.zoom.reset')" @click="resetZoom">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                     <path d="M21 3v5h-5"></path>
@@ -416,8 +416,8 @@
               <div class="canvas-wrapper">
                 <div class="canvas-inner">
                 <div
-                    class="canvas"
                     ref="canvasRef"
+                    class="canvas"
                     :style="{
                     width: pageWidth + 'px',
                     height: pageHeight + 'px',

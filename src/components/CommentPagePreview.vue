@@ -102,8 +102,8 @@ const pageAspectRatio = computed(() => {
             <i class="fa-solid fa-search-plus"></i>
           </label>
           <input 
-            type="range" 
             v-model.number="imageScale" 
+            type="range" 
             min="0.1" 
             max="1" 
             step="0.05"
@@ -113,9 +113,9 @@ const pageAspectRatio = computed(() => {
         </div>
         
         <button 
-          @click="resetPosition" 
-          class="reset-btn"
+          class="reset-btn" 
           title="Position zurücksetzen"
+          @click="resetPosition"
         >
           <i class="fa-solid fa-arrows-rotate"></i>
           Zentrieren
