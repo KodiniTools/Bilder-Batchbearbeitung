@@ -75,7 +75,6 @@ function resize(bitmap: ImageBitmap, params: ResizeParams): { canvas: OffscreenC
   const canvas = new OffscreenCanvas(params.width, params.height)
   const ctx = canvas.getContext('2d')!
   ctx.imageSmoothingEnabled = true
-  ctx.imageSmoothingQuality = 'high'
   ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, params.width, params.height)
   return { canvas }
 }
