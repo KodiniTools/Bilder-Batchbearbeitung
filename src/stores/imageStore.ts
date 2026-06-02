@@ -109,6 +109,17 @@ export const useImageStore = defineStore('images', () => {
     images.value.splice(toIndex, 0, movedImage)
   }
 
+  // Triggert Vue-Reaktivität für betroffene Bilder nach Worker-Update.
+  // Nötig weil HTMLCanvasElement kein reaktives Objekt ist — putImageData() ist
+  // für Vue unsichtbar. Ein splice() mit demselben Objekt löst den Re-Render aus.
+  function notifyImagesUpdated(ids: Set<string>): void {
+    images.value.forEach((img, i) => {
+      if (ids.has(img.id)) {
+        images.value.splice(i, 1, img)
+      }
+    })
+  }
+
   // Batch-Rotation für alle ausgewählten Bilder
   async function rotateSelectedImages(degrees: number): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
@@ -118,6 +129,7 @@ export const useImageStore = defineStore('images', () => {
         'rotate',
         { degrees: degrees as 90 | -90 | 180 }
       )
+      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
     } else {
       selected.forEach((img) => ImageProcessor.rotateImage(img, degrees))
     }
@@ -128,6 +140,7 @@ export const useImageStore = defineStore('images', () => {
     const selected = images.value.filter((img) => img.selected)
     if (workerSupported) {
       await processBatch(selected.map((img) => img.canvas), 'flip', { direction })
+      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
     } else {
       selected.forEach((img) => ImageProcessor.flipImage(img, direction))
     }
@@ -138,6 +151,7 @@ export const useImageStore = defineStore('images', () => {
     const selected = images.value.filter((img) => img.selected)
     if (workerSupported) {
       await processBatch(selected.map((img) => img.canvas), 'crop', { aspectRatio })
+      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
     } else {
       selected.forEach((img) => ImageProcessor.cropToAspectRatio(img, aspectRatio))
     }
@@ -231,6 +245,7 @@ export const useImageStore = defineStore('images', () => {
         return processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
       })
       await Promise.all(jobs)
+      notifyImagesUpdated(new Set(selected.map((img) => img.id)))
     } else {
       selected.forEach((img) => ImageProcessor.resizeImage(img, width, height, keepAspect))
     }
