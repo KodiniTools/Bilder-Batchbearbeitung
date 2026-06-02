@@ -1,0 +1,8 @@
+dist/
+release/
+node_modules/
+src/lib/bildseriebearbeiten/
+*.woff2
+*.ico
+*.png
+package-lock.json
