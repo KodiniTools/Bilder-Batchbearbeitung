@@ -1,6 +1,6 @@
 // src/stores/imageStore.ts
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import type { ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
@@ -12,6 +12,7 @@ export const useImageStore = defineStore('images', () => {
   // State
   const images = ref<ImageObject[]>([])
   const currentImageIndex = ref(0)
+  const resizeProgress = reactive({ active: false, current: 0, total: 0 })
 
   // Getters
   const imageCount = computed(() => images.value.length)
@@ -236,10 +237,13 @@ export const useImageStore = defineStore('images', () => {
     const ids = new Set(selected.map((img) => img.id))
     let workerOk = false
 
+    resizeProgress.active = true
+    resizeProgress.current = 0
+    resizeProgress.total = selected.length
+
     if (workerSupported) {
-      // Dimensionen pro Bild vorab berechnen (keepAspect variiert je nach Originalformat)
       const results = await Promise.all(
-        selected.map((img) => {
+        selected.map(async (img) => {
           let targetW = width
           let targetH = height
           if (keepAspect) {
@@ -250,17 +254,25 @@ export const useImageStore = defineStore('images', () => {
               targetH = Math.round(width / aspect)
             }
           }
-          return processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
+          const result = await processCanvas(img.canvas, 'resize', { width: targetW, height: targetH })
+          resizeProgress.current++
+          return result
         })
       )
       workerOk = results.every(Boolean)
     }
 
     if (!workerOk) {
-      selected.forEach((img) => ImageProcessor.resizeImage(img, width, height, keepAspect))
+      resizeProgress.current = 0
+      for (const img of selected) {
+        ImageProcessor.resizeImage(img, width, height, keepAspect)
+        resizeProgress.current++
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
     }
 
     notifyImagesUpdated(ids)
+    resizeProgress.active = false
   }
 
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
@@ -292,6 +304,7 @@ export const useImageStore = defineStore('images', () => {
     // State
     images,
     currentImageIndex,
+    resizeProgress,
     
     // Getters
     imageCount,
