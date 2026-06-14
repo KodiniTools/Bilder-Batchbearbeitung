@@ -818,6 +818,7 @@ function applyChanges() {
   }
 
   updatePreview()
+  compareMode.value = 'after'
   changesApplied.value = true
 }
 
@@ -1009,18 +1010,13 @@ function closeEditor() {
   max-width: 100%;
   max-height: 100%;
   border-radius: var(--radius-md);
-  position: relative;
-  z-index: 1;
 }
 
-/* Original canvas (absolute, on top of edited, used for comparison) */
+/* Original canvas (absolute overlay for comparison — same pixel dims as edited, no CSS size override) */
 .original-canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
   border-radius: var(--radius-md);
   pointer-events: none;
 }
@@ -1032,7 +1028,6 @@ function closeEditor() {
   bottom: 0;
   width: 2px;
   background: white;
-  z-index: 3;
   transform: translateX(-50%);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
   pointer-events: none;
@@ -1046,7 +1041,6 @@ function closeEditor() {
   height: 32px;
   background: white;
   border-radius: 50%;
-  z-index: 4;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
@@ -1069,7 +1063,6 @@ function closeEditor() {
   font-weight: 700;
   border-radius: 4px;
   pointer-events: none;
-  z-index: 3;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }

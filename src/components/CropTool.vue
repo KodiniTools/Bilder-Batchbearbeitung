@@ -297,6 +297,7 @@ function onDocMouseUp() {
   inset: 0;
   cursor: crosshair;
   overflow: hidden;
+  z-index: 10;
 }
 
 /* Dark masks */
