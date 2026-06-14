@@ -102,6 +102,10 @@ const handleDrop = async (event: DragEvent) => {
         <i class="fa-solid fa-folder-open"></i>
       </button>
     </div>
+    <div class="paste-hint" :title="t('upload.pasteHintTooltip')">
+      <kbd>Ctrl</kbd><span class="kbd-plus">+</span><kbd>V</kbd>
+      <span class="paste-hint-label">{{ t('upload.pasteHint') }}</span>
+    </div>
     <input
       ref="fileInput"
       type="file"
@@ -274,5 +278,45 @@ const handleDrop = async (event: DragEvent) => {
     height: 48px;
     font-size: 1.2rem;
   }
+}
+
+.paste-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+  font-size: 0.75rem;
+  color: var(--muted);
+  user-select: none;
+}
+
+.drop-area:hover .paste-hint {
+  opacity: 0.85;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--border-color);
+  line-height: 1.4;
+}
+
+.kbd-plus {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.paste-hint-label {
+  margin-left: 2px;
 }
 </style>
