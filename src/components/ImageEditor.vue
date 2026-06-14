@@ -20,11 +20,20 @@
               <div class="editor-section">
                 <h3>{{ t('imageEditor.sections.preview') }}</h3>
                 <div class="preview-container">
-                  <canvas
-                    ref="previewCanvas"
-                    class="editor-preview-canvas"
-                    :style="[filterStyle, transformStyle]"
-                  ></canvas>
+                  <div class="canvas-crop-wrapper">
+                    <canvas
+                      ref="previewCanvas"
+                      class="editor-preview-canvas"
+                      :style="[filterStyle, transformStyle]"
+                    ></canvas>
+                    <CropTool
+                      v-if="isCropMode"
+                      :image-pixel-width="currentWidth"
+                      :image-pixel-height="currentHeight"
+                      :locked-ratio="cropLockedRatio"
+                      @update:crop="onCropUpdate"
+                    />
+                  </div>
                 </div>
                 <div class="image-info">
                   <span>{{ dimensions }}</span>
@@ -44,6 +53,41 @@
                   >
                   <small class="help-text">{{ t('imageEditor.fileName.helpText') }}</small>
                 </div>
+              </div>
+
+              <!-- Crop Section -->
+              <div class="editor-section">
+                <h3>{{ t('imageEditor.sections.crop') }}</h3>
+
+                <div v-if="!isCropMode" class="button-group">
+                  <button type="button" class="btn btn-sm" @click="startCropMode">
+                    <i class="fa-solid fa-crop-simple"></i> {{ t('imageEditor.crop.start') }}
+                  </button>
+                </div>
+
+                <template v-else>
+                  <div class="control-group">
+                    <label>{{ t('imageEditor.crop.ratio') }}</label>
+                    <div class="button-group">
+                      <button
+                        v-for="preset in CROP_RATIO_PRESETS"
+                        :key="preset.label"
+                        type="button"
+                        class="btn btn-sm"
+                        :class="{ 'btn-primary': cropLockedRatio === preset.ratio }"
+                        @click="setCropRatio(preset.ratio)"
+                      >{{ preset.label }}</button>
+                    </div>
+                  </div>
+                  <div class="button-group">
+                    <button type="button" class="btn btn-sm btn-primary" @click="applyCrop">
+                      <i class="fa-solid fa-check"></i> {{ t('imageEditor.crop.apply') }}
+                    </button>
+                    <button type="button" class="btn btn-sm" @click="cancelCropMode">
+                      {{ t('imageEditor.crop.cancel') }}
+                    </button>
+                  </div>
+                </template>
               </div>
 
               <div class="editor-section">
@@ -212,9 +256,17 @@ import type { ImageObject } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
+import CropTool from './CropTool.vue'
 
 const { t } = useI18n()
 const toast = useToast()
+
+const CROP_RATIO_PRESETS = [
+  { label: t('imageEditor.crop.ratioFree'), ratio: null },
+  { label: '1:1', ratio: 1 },
+  { label: '4:3', ratio: 4 / 3 },
+  { label: '16:9', ratio: 16 / 9 },
+] as const
 
 interface Props {
   image: ImageObject | null
@@ -238,6 +290,11 @@ const isDownloading = ref(false)
 // Reaktive Variablen für die aktuelle Canvas-Größe
 const currentWidth = ref(0)
 const currentHeight = ref(0)
+
+// Crop state
+const isCropMode = ref(false)
+const cropLockedRatio = ref<number | null>(null)
+const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
 
 let workingCanvas: HTMLCanvasElement | null = null
 let originalCanvas: HTMLCanvasElement | null = null
@@ -598,7 +655,55 @@ function saveChanges() {
   closeEditor()
 }
 
+// Crop functions
+function startCropMode() {
+  cropLockedRatio.value = null
+  isCropMode.value = true
+}
+
+function cancelCropMode() {
+  isCropMode.value = false
+}
+
+function setCropRatio(ratio: number | null) {
+  cropLockedRatio.value = ratio
+}
+
+function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) {
+  cropNorm.value = rect
+}
+
+function applyCrop() {
+  if (!workingCanvas) return
+
+  const x = Math.round(cropNorm.value.x * workingCanvas.width)
+  const y = Math.round(cropNorm.value.y * workingCanvas.height)
+  const w = Math.max(1, Math.round(cropNorm.value.w * workingCanvas.width))
+  const h = Math.max(1, Math.round(cropNorm.value.h * workingCanvas.height))
+
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = w
+  tempCanvas.height = h
+  const tempCtx = tempCanvas.getContext('2d')
+  if (!tempCtx) return
+
+  tempCtx.drawImage(workingCanvas, x, y, w, h, 0, 0, w, h)
+
+  workingCanvas.width = w
+  workingCanvas.height = h
+  const ctx = workingCanvas.getContext('2d')
+  if (ctx) {
+    ctx.clearRect(0, 0, w, h)
+    ctx.drawImage(tempCanvas, 0, 0)
+  }
+
+  aspectRatio = w / h
+  isCropMode.value = false
+  updatePreview()
+}
+
 function closeEditor() {
+  isCropMode.value = false
   emit('close')
 }
 </script>
@@ -682,10 +787,17 @@ function closeEditor() {
   padding: var(--space-4);
 }
 
+.canvas-crop-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
 .editor-preview-canvas {
   max-width: 100%;
   max-height: 400px;
   border-radius: var(--radius-md);
+  display: block;
 }
 
 .image-info {

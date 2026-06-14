@@ -675,7 +675,8 @@
       "fileName": "Dateiname",
       "transformations": "Transformationen",
       "resize": "Größe ändern",
-      "export": "Exportieren"
+      "export": "Exportieren",
+      "crop": "Zuschneiden"
     },
     "fileName": {
       "label": "Neuer Name:",
@@ -714,6 +715,13 @@
       "cancel": "Abbrechen",
       "reset": "Zurücksetzen",
       "save": "Änderungen übernehmen"
+    },
+    "crop": {
+      "start": "Zuschneiden starten",
+      "apply": "Zuschnitt anwenden",
+      "cancel": "Abbrechen",
+      "ratio": "Seitenverhältnis",
+      "ratioFree": "Frei"
     }
   },
   "bulkRename": {
