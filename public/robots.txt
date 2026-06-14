@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /bilderseriebearbeiten/
+Disallow: /bilderseriebearbeiten/dist/
+
+Sitemap: https://kodinitools.com/bilderseriebearbeiten/sitemap.xml
