@@ -500,7 +500,8 @@
       "fileName": "File Name",
       "transformations": "Transformations",
       "resize": "Resize",
-      "export": "Export"
+      "export": "Export",
+      "crop": "Crop"
     },
     "fileName": {
       "label": "New Name:",
@@ -539,6 +540,13 @@
       "cancel": "Cancel",
       "reset": "Reset",
       "save": "Apply changes"
+    },
+    "crop": {
+      "start": "Start cropping",
+      "apply": "Apply crop",
+      "cancel": "Cancel",
+      "ratio": "Aspect ratio",
+      "ratioFree": "Free"
     }
   },
   "bulkRename": {
