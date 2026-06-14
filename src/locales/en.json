@@ -504,6 +504,7 @@
     "sections": {
       "preview": "Preview",
       "fileName": "File Name",
+      "filters": "Filters",
       "transformations": "Transformations",
       "resize": "Resize",
       "export": "Export",
@@ -547,6 +548,22 @@
       "reset": "Reset",
       "save": "Save",
       "apply": "Apply changes"
+    },
+    "compare": {
+      "before": "Before",
+      "split": "Compare",
+      "after": "After"
+    },
+    "filters": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "saturation": "Saturation",
+      "hue": "Hue",
+      "grayscale": "Grayscale",
+      "sepia": "Sepia",
+      "blur": "Blur",
+      "opacity": "Opacity",
+      "reset": "Reset filters"
     },
     "crop": {
       "start": "Start cropping",
