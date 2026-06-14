@@ -21,8 +21,8 @@
           <!-- Toolbar -->
           <div class="toolbar">
             <div class="tool-group">
-              <button 
-                class="tool-btn" 
+              <button
+                class="tool-btn"
                 :title="t('frontPageDesigner.toolbar.addTextTooltip')"
                 @click="addTextElement"
               >
@@ -33,9 +33,9 @@
                 </svg>
                 {{ t('frontPageDesigner.toolbar.addText') }}
               </button>
-              
-              <button 
-                class="tool-btn" 
+
+              <button
+                class="tool-btn"
                 :title="t('frontPageDesigner.toolbar.addImageTooltip')"
                 @click="triggerImageUpload"
               >
@@ -46,18 +46,18 @@
                 </svg>
                 {{ t('frontPageDesigner.toolbar.addImage') }}
               </button>
-              <input 
-                ref="imageInput" 
-                type="file" 
-                accept="image/*" 
-                style="display: none;" 
+              <input
+                ref="imageInput"
+                type="file"
+                accept="image/*"
+                style="display: none;"
                 @change="handleImageUpload"
               >
             </div>
 
             <div class="tool-group">
-              <button 
-                class="tool-btn danger" 
+              <button
+                class="tool-btn danger"
                 :disabled="elements.length === 0"
                 :title="t('frontPageDesigner.toolbar.clearAllTooltip')"
                 @click="clearCanvas"
@@ -89,282 +89,40 @@
             </div>
 
             <div class="canvas-scroll-area">
-            <div class="canvas-wrapper">
-              <div class="canvas-inner">
-              <div
-                ref="canvasRef"
-                class="canvas"
-                :style="{
-                  transform: `scale(${zoomLevel})`,
-                  marginRight: `${794 * (zoomLevel - 1)}px`,
-                  marginBottom: `${1123 * (zoomLevel - 1)}px`
-                }"
-                @click="deselectAll"
-              >
-                <!-- Elements -->
-                <div
-                  v-for="element in elements"
-                  :key="element.id"
-                  class="element"
-                  :class="{ 
-                    selected: element.id === selectedElementId,
-                    'element-text': element.type === 'text',
-                    'element-image': element.type === 'image'
-                  }"
-                  :style="{
-                    left: element.x + 'px',
-                    top: element.y + 'px',
-                    width: element.width + 'px',
-                    height: element.height + 'px',
-                    fontSize: element.fontSize + 'px',
-                    fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
-                    fontWeight: element.fontWeight,
-                    textAlign: element.textAlign,
-                    color: element.color
-                  }"
-                  @click.stop="selectElement(element.id)"
-                  @mousedown="startDrag($event, element.id)"
-                >
-                  <!-- Text Element -->
-                  <template v-if="element.type === 'text'">
-                    <div 
-                      v-if="element.id !== editingTextId"
-                      class="text-content"
-                      @click.stop
-                      @dblclick.stop="startEditingText(element.id)"
-                    >
-                      {{ element.content || t('frontPageDesigner.canvas.emptyText') }}
-                    </div>
-                    <textarea
-                      v-else
-                      ref="textareaRef"
-                      v-model="element.content"
-                      class="text-editor"
-                      @click.stop
-                      @blur="stopEditingText"
-                      @keydown.esc="stopEditingText"
-                      @mousedown.stop
+              <div class="canvas-wrapper">
+                <div class="canvas-inner">
+                  <div
+                    ref="canvasRef"
+                    class="canvas"
+                    :style="{
+                      transform: `scale(${zoomLevel})`,
+                      marginRight: `${794 * (zoomLevel - 1)}px`,
+                      marginBottom: `${1123 * (zoomLevel - 1)}px`
+                    }"
+                    @click="deselectAll"
+                  >
+                    <FrontPageDesignerElement
+                      v-for="element in elements"
+                      :key="element.id"
+                      :element="element"
+                      :is-selected="element.id === selectedElementId"
+                      :is-editing="element.id === editingTextId"
+                      @select="selectElement"
+                      @edit-start="startEditingText"
+                      @edit-stop="stopEditingText"
+                      @drag-start="startDrag"
+                      @resize-start="startResize"
+                      @delete="deleteElement"
+                      @update-content="updateElementContent"
                     />
-                  </template>
-
-                  <!-- Image Element -->
-                  <template v-if="element.type === 'image'">
-                    <img 
-                      :src="element.src" 
-                      :alt="element.alt || t('frontPageDesigner.properties.typeImage')"
-                      class="image-content"
-                      draggable="false"
-                    >
-                  </template>
-
-                  <!-- Resize Handles -->
-                  <div 
-                    v-if="element.id === selectedElementId" 
-                    class="resize-handles"
-                  >
-                    <div 
-                      class="resize-handle nw" 
-                      @mousedown.stop="startResize($event, element.id, 'nw')"
-                    ></div>
-                    <div 
-                      class="resize-handle ne" 
-                      @mousedown.stop="startResize($event, element.id, 'ne')"
-                    ></div>
-                    <div 
-                      class="resize-handle sw" 
-                      @mousedown.stop="startResize($event, element.id, 'sw')"
-                    ></div>
-                    <div 
-                      class="resize-handle se" 
-                      @mousedown.stop="startResize($event, element.id, 'se')"
-                    ></div>
-                  </div>
-
-                  <!-- Delete Button -->
-                  <button
-                    v-if="element.id === selectedElementId"
-                    class="delete-element-btn"
-                    :title="t('frontPageDesigner.properties.deleteElement')"
-                    @click.stop="deleteElement(element.id)"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              </div>
-            </div>
-
-            <!-- Properties Panel -->
-            <div v-if="selectedElement" class="properties-panel">
-              <h3>{{ t('frontPageDesigner.properties.title') }}</h3>
-              
-              <div class="property-group">
-                <label>{{ t('frontPageDesigner.properties.elementType') }}</label>
-                <div class="property-value">
-                  {{ selectedElement.type === 'text' ? t('frontPageDesigner.properties.typeText') : t('frontPageDesigner.properties.typeImage') }}
-                </div>
-              </div>
-
-              <!-- Text Properties -->
-              <template v-if="selectedElement.type === 'text'">
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.textLabel') }}</label>
-                  <textarea
-                      v-model="selectedElement.content"
-                      rows="4"
-                      class="property-textarea"
-                      :placeholder="t('frontPageDesigner.canvas.emptyText')"
-                  ></textarea>
-                  <div class="inline-edit-hint">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="16" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    {{ t('frontPageDesigner.properties.inlineEditHint') }}
-                  </div>
-                </div>
-
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.fontSize') }}</label>
-                  <div class="slider-group">
-                    <input 
-                      v-model.number="selectedElement.fontSize" 
-                      type="range" 
-                      min="12" 
-                      max="72"
-                      class="property-slider"
-                    >
-                    <span class="slider-value">{{ selectedElement.fontSize }}px</span>
-                  </div>
-                </div>
-
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.fontFamily') }}</label>
-                  <select v-model="selectedElement.fontFamily" class="property-select font-select">
-                    <option
-                      v-for="font in CUSTOM_FONT_FAMILIES"
-                      :key="font"
-                      :value="font"
-                      :style="{ fontFamily: font }"
-                    >{{ font }}</option>
-                  </select>
-                </div>
-
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.fontWeight') }}</label>
-                  <select v-model="selectedElement.fontWeight" class="property-select">
-                    <option value="normal">{{ t('frontPageDesigner.properties.fontWeightNormal') }}</option>
-                    <option value="bold">{{ t('frontPageDesigner.properties.fontWeightBold') }}</option>
-                  </select>
-                </div>
-
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.textAlign') }}</label>
-                  <div class="button-group">
-                    <button 
-                      :class="{ active: selectedElement.textAlign === 'left' }"
-                      :title="t('frontPageDesigner.properties.textAlignLeft')"
-                      @click="selectedElement.textAlign = 'left'"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="17" y1="10" x2="3" y2="10"></line>
-                        <line x1="21" y1="6" x2="3" y2="6"></line>
-                        <line x1="21" y1="14" x2="3" y2="14"></line>
-                        <line x1="17" y1="18" x2="3" y2="18"></line>
-                      </svg>
-                    </button>
-                    <button 
-                      :class="{ active: selectedElement.textAlign === 'center' }"
-                      :title="t('frontPageDesigner.properties.textAlignCenter')"
-                      @click="selectedElement.textAlign = 'center'"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="10" x2="6" y2="10"></line>
-                        <line x1="21" y1="6" x2="3" y2="6"></line>
-                        <line x1="21" y1="14" x2="3" y2="14"></line>
-                        <line x1="18" y1="18" x2="6" y2="18"></line>
-                      </svg>
-                    </button>
-                    <button 
-                      :class="{ active: selectedElement.textAlign === 'right' }"
-                      :title="t('frontPageDesigner.properties.textAlignRight')"
-                      @click="selectedElement.textAlign = 'right'"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="21" y1="10" x2="7" y2="10"></line>
-                        <line x1="21" y1="6" x2="3" y2="6"></line>
-                        <line x1="21" y1="14" x2="3" y2="14"></line>
-                        <line x1="21" y1="18" x2="7" y2="18"></line>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.textColor') }}</label>
-                  <input 
-                    v-model="selectedElement.color" 
-                    type="color" 
-                    class="color-picker"
-                  >
-                </div>
-              </template>
-
-              <!-- Image Properties -->
-              <template v-if="selectedElement.type === 'image'">
-                <div class="property-group">
-                  <label>{{ t('frontPageDesigner.properties.imageSize') }}</label>
-                  <div class="size-inputs">
-                    <input 
-                      v-model.number="selectedElement.width" 
-                      type="number" 
-                      min="50"
-                      @input="maintainAspectRatio"
-                    >
-                    <span>×</span>
-                    <input 
-                      v-model.number="selectedElement.height" 
-                      type="number" 
-                      min="50"
-                    >
-                  </div>
-                </div>
-              </template>
-
-              <!-- Position -->
-              <div class="property-group">
-                <label>{{ t('frontPageDesigner.properties.position') }}</label>
-                <div class="size-inputs">
-                  <div>
-                    <small>X:</small>
-                    <input 
-                      v-model.number="selectedElement.x" 
-                      type="number" 
-                      min="0"
-                    >
-                  </div>
-                  <div>
-                    <small>Y:</small>
-                    <input 
-                      v-model.number="selectedElement.y" 
-                      type="number" 
-                      min="0"
-                    >
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- No Selection Message -->
-            <div v-else class="properties-panel no-selection-panel">
-              <div class="no-selection-message">
-                {{ t('frontPageDesigner.properties.noSelection') }}
-              </div>
-            </div>
+              <FrontPageDesignerProperties
+                :element="selectedElement"
+                @maintain-aspect-ratio="maintainAspectRatio"
+              />
             </div>
           </div>
 
@@ -429,8 +187,11 @@ export interface FrontPageElement {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import FrontPageDesignerElement from './FrontPageDesignerElement.vue'
+import FrontPageDesignerProperties from './FrontPageDesignerProperties.vue'
+
 const { t } = useI18n()
 
 interface Props {
@@ -447,7 +208,6 @@ const emit = defineEmits<{
 // Refs
 const canvasRef = ref<HTMLElement | null>(null)
 const imageInput = ref<HTMLInputElement | null>(null)
-const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 // State
 const elements = ref<FrontPageElement[]>([])
@@ -463,7 +223,7 @@ const dragStart = ref({ x: 0, y: 0 })
 const elementStartPos = ref({ x: 0, y: 0, width: 0, height: 0 })
 
 // Computed
-const selectedElement = computed(() => 
+const selectedElement = computed(() =>
   elements.value.find(el => el.id === selectedElementId.value)
 )
 
@@ -473,7 +233,6 @@ onMounted(() => {
     elements.value = JSON.parse(JSON.stringify(props.initialElements))
   }
 
-  // Global mouse events for drag and resize
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
 })
@@ -546,7 +305,6 @@ function handleImageUpload(event: Event) {
   }
   reader.readAsDataURL(file)
 
-  // Reset input
   target.value = ''
 }
 
@@ -562,11 +320,14 @@ function clearCanvas() {
   }
 }
 
+function updateElementContent(id: string, content: string) {
+  const el = elements.value.find(e => e.id === id)
+  if (el) el.content = content
+}
+
 // Selection
 function selectElement(id: string) {
-  // Don't change selection if we're currently editing text
   if (editingTextId.value) return
-  
   selectedElementId.value = id
   editingTextId.value = null
 }
@@ -580,17 +341,6 @@ function deselectAll() {
 function startEditingText(id: string) {
   editingTextId.value = id
   selectedElementId.value = id
-  nextTick(() => {
-    const textarea = Array.isArray(textareaRef.value) 
-      ? textareaRef.value[0] 
-      : textareaRef.value
-    
-    if (textarea) {
-      textarea.focus()
-      // Select all text for easy editing
-      textarea.select()
-    }
-  })
 }
 
 function stopEditingText() {
@@ -681,7 +431,7 @@ function handleMouseUp() {
 function maintainAspectRatio() {
   const element = selectedElement.value
   if (!element || element.type !== 'image' || !element.originalWidth || !element.originalHeight) return
-  
+
   const ratio = element.originalWidth / element.originalHeight
   element.height = Math.round(element.width / ratio)
 }
@@ -932,311 +682,6 @@ function closeDesigner() {
   transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
 }
 
-/* Elements */
-.element {
-  position: absolute;
-  cursor: move;
-  user-select: none;
-  border: 2px solid transparent;
-  transition: border-color 0.2s;
-}
-
-.element.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-
-.element-text .text-content {
-  width: 100%;
-  height: 100%;
-  padding: var(--space-2);
-  margin: 0;
-  box-sizing: border-box;
-  overflow: hidden;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  line-height: 1.4;
-  font-family: inherit;
-  cursor: text;
-}
-
-.text-editor {
-  width: 100%;
-  height: 100%;
-  padding: var(--space-2);
-  margin: 0;
-  border: none;
-  outline: none;
-  resize: none;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  text-align: inherit;
-  color: inherit;
-  background: rgba(102, 126, 234, 0.05);
-  box-sizing: border-box;
-  line-height: inherit;
-  overflow: hidden;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.element-image {
-  overflow: hidden;
-}
-
-.image-content {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-/* Resize Handles */
-.resize-handles {
-  position: absolute;
-  inset: -6px;
-  pointer-events: none;
-}
-
-.resize-handle {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: white;
-  border: 2px solid var(--accent);
-  border-radius: 50%;
-  pointer-events: all;
-  cursor: pointer;
-}
-
-.resize-handle.nw {
-  top: 0;
-  left: 0;
-  cursor: nw-resize;
-}
-
-.resize-handle.ne {
-  top: 0;
-  right: 0;
-  cursor: ne-resize;
-}
-
-.resize-handle.sw {
-  bottom: 0;
-  left: 0;
-  cursor: sw-resize;
-}
-
-.resize-handle.se {
-  bottom: 0;
-  right: 0;
-  cursor: se-resize;
-}
-
-/* Delete Button */
-.delete-element-btn {
-  position: absolute;
-  top: -12px;
-  right: -12px;
-  width: 24px;
-  height: 24px;
-  background: var(--red);
-  color: white;
-  border: 2px solid white;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s;
-}
-
-.delete-element-btn:hover {
-  transform: scale(1.1);
-}
-
-/* Properties Panel */
-.properties-panel {
-  width: 280px;
-  flex-shrink: 0;
-  border-left: 1px solid var(--border-color);
-  padding: 16px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: var(--bg);
-  box-sizing: border-box;
-}
-
-.properties-panel h3 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.property-group {
-  margin-bottom: 14px;
-}
-
-.property-group label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.property-value {
-  padding: 6px 10px;
-  background: var(--panel);
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.slider-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.property-slider {
-  flex: 1;
-}
-
-.slider-value {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  min-width: 40px;
-  text-align: right;
-}
-
-.property-select {
-  width: 100%;
-  padding: 6px 8px;
-  background: var(--panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.font-select option {
-  padding: 4px 8px;
-  font-size: 14px;
-}
-
-.button-group {
-  display: flex;
-  gap: 6px;
-}
-
-.button-group button {
-  flex: 1;
-  padding: 6px;
-  background: var(--panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.button-group button:hover {
-  background: var(--bg);
-}
-
-.button-group button.active {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
-}
-
-.property-textarea {
-  width: 100%;
-  padding: 6px 8px;
-  background: var(--panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: inherit;
-  box-sizing: border-box;
-  resize: vertical;
-  transition: border-color 0.2s;
-}
-
-.property-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.inline-edit-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-.color-picker {
-  width: 100%;
-  height: 40px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-}
-
-.size-inputs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.size-inputs input {
-  width: 70px;
-  padding: 6px 4px;
-  background: var(--panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.size-inputs > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-}
-
-.size-inputs small {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* No Selection Panel */
-.no-selection-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-selection-message {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.875rem;
-  padding: var(--space-4);
-}
-
 /* Footer */
 .designer-footer {
   display: flex;
@@ -1304,12 +749,6 @@ function closeDesigner() {
 }
 
 /* Responsive */
-@media (max-width: 1200px) {
-  .properties-panel {
-    width: 240px;
-  }
-}
-
 @media (max-width: 768px) {
   .designer-overlay {
     padding: 0;
@@ -1325,13 +764,6 @@ function closeDesigner() {
     flex-direction: column;
   }
 
-  .properties-panel {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--border-color);
-    max-height: 300px;
-  }
-
   .canvas-inner {
     padding: 20px;
   }
@@ -1344,11 +776,6 @@ function closeDesigner() {
 
   .canvas-inner {
     padding: 10px;
-  }
-
-  .properties-panel {
-    max-height: 240px;
-    padding: var(--space-3);
   }
 }
 </style>
