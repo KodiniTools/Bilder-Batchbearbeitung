@@ -2,86 +2,95 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="isOpen" class="modal-overlay" @click.self="closeEditor">
-        <div class="modal-container editor-container">
+        <div class="modal-container">
+
+          <!-- Header -->
           <div class="modal-header">
-            <div class="modal-title">{{ t('imageEditor.title') }}</div>
-            <button 
-              class="image-action-btn" 
-              :aria-label="t('imageEditor.close')"
-              @click="closeEditor"
-            >
+            <div class="header-left">
+              <i class="fa-solid fa-image header-icon"></i>
+              <span class="modal-title">{{ t('imageEditor.title') }}</span>
+              <span class="header-filename">{{ fileName || '–' }}</span>
+            </div>
+            <button class="icon-btn" :aria-label="t('imageEditor.close')" @click="closeEditor">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
-          <div class="modal-body editor-body">
-            <div class="editor-sections">
-              
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.preview') }}</h3>
-                <div class="preview-container">
-                  <div class="canvas-crop-wrapper">
-                    <canvas
-                      ref="previewCanvas"
-                      class="editor-preview-canvas"
-                      :style="[filterStyle, transformStyle]"
-                    ></canvas>
-                    <CropTool
-                      v-if="isCropMode"
-                      :image-pixel-width="currentWidth"
-                      :image-pixel-height="currentHeight"
-                      :locked-ratio="cropLockedRatio"
-                      @update:crop="onCropUpdate"
-                    />
-                  </div>
-                </div>
-                <div class="image-info">
-                  <span>{{ dimensions }}</span>
-                  <span>{{ fileSize }}</span>
+          <!-- Body: Preview (left) + Controls (right) -->
+          <div class="editor-body">
+
+            <!-- Preview Panel -->
+            <div ref="previewAreaRef" class="preview-panel">
+              <div class="preview-area">
+                <div class="canvas-crop-wrapper">
+                  <canvas
+                    ref="previewCanvas"
+                    class="preview-canvas"
+                    :style="[filterStyle, transformStyle]"
+                  ></canvas>
+                  <CropTool
+                    v-if="isCropMode"
+                    :image-pixel-width="currentWidth"
+                    :image-pixel-height="currentHeight"
+                    :locked-ratio="cropLockedRatio"
+                    @update:crop="onCropUpdate"
+                  />
                 </div>
               </div>
+              <div class="image-meta">
+                <span><i class="fa-solid fa-expand"></i> {{ dimensions }}</span>
+                <span><i class="fa-solid fa-weight-hanging"></i> {{ fileSize }}</span>
+              </div>
+            </div>
 
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.fileName') }}</h3>
-                <div class="input-group">
-                  <label for="editorFileName">{{ t('imageEditor.fileName.label') }}</label>
-                  <input 
-                    id="editorFileName"
-                    v-model="fileName"
-                    type="text" 
-                    :placeholder="t('imageEditor.fileName.placeholder')"
-                  >
-                  <small class="help-text">{{ t('imageEditor.fileName.helpText') }}</small>
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+
+              <!-- Dateiname -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  {{ t('imageEditor.sections.fileName') }}
                 </div>
+                <input
+                  id="editorFileName"
+                  v-model="fileName"
+                  type="text"
+                  class="ctrl-input"
+                  :placeholder="t('imageEditor.fileName.placeholder')"
+                >
               </div>
 
-              <!-- Crop Section -->
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.crop') }}</h3>
-
-                <div v-if="!isCropMode" class="button-group">
+              <!-- Zuschneiden -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-crop-simple"></i>
+                  {{ t('imageEditor.sections.crop') }}
+                </div>
+                <div v-if="!isCropMode">
                   <button type="button" class="btn btn-sm" @click="startCropMode">
-                    <i class="fa-solid fa-crop-simple"></i> {{ t('imageEditor.crop.start') }}
+                    <i class="fa-solid fa-crop-simple"></i>
+                    {{ t('imageEditor.crop.start') }}
                   </button>
                 </div>
-
                 <template v-else>
-                  <div class="control-group">
-                    <label>{{ t('imageEditor.crop.ratio') }}</label>
-                    <div class="button-group">
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.crop.ratio') }}</span>
+                    <div class="btn-cluster">
                       <button
                         v-for="preset in CROP_RATIO_PRESETS"
                         :key="preset.label"
                         type="button"
-                        class="btn btn-sm"
-                        :class="{ 'btn-primary': cropLockedRatio === preset.ratio }"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': cropLockedRatio === preset.ratio }"
                         @click="setCropRatio(preset.ratio)"
                       >{{ preset.label }}</button>
                     </div>
                   </div>
-                  <div class="button-group">
+                  <div class="btn-row">
                     <button type="button" class="btn btn-sm btn-primary" @click="applyCrop">
-                      <i class="fa-solid fa-check"></i> {{ t('imageEditor.crop.apply') }}
+                      <i class="fa-solid fa-check"></i>
+                      {{ t('imageEditor.crop.apply') }}
                     </button>
                     <button type="button" class="btn btn-sm" @click="cancelCropMode">
                       {{ t('imageEditor.crop.cancel') }}
@@ -90,159 +99,153 @@
                 </template>
               </div>
 
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.transformations') }}</h3>
-                <div class="transform-controls">
-                  <div class="control-group">
-                    <label>{{ t('imageEditor.transformations.rotate.label') }}</label>
-                    <div class="button-group">
-                      <button 
-                        type="button" 
-                        class="btn btn-sm" 
-                        :title="t('imageEditor.transformations.rotate.left90')"
-                        @click="rotate(-90)"
-                      >
-                        <i class="fa-solid fa-rotate-left"></i> 90°
-                      </button>
-                      <button 
-                        type="button" 
-                        class="btn btn-sm" 
-                        :title="t('imageEditor.transformations.rotate.rotate180')"
-                        @click="rotate(180)"
-                      >
-                        <i class="fa-solid fa-arrow-rotate-right"></i> 180°
-                      </button>
-                      <button 
-                        type="button" 
-                        class="btn btn-sm" 
-                        :title="t('imageEditor.transformations.rotate.right90')"
-                        @click="rotate(90)"
-                      >
-                        <i class="fa-solid fa-rotate-right"></i> 90°
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div class="control-group">
-                    <label>{{ t('imageEditor.transformations.flip.label') }}</label>
-                    <div class="button-group">
-                      <button 
-                        type="button" 
-                        class="btn btn-sm" 
-                        :title="t('imageEditor.transformations.flip.horizontalTitle')"
-                        @click="flip('horizontal')"
-                      >
-                        <i class="fa-solid fa-left-right"></i> {{ t('imageEditor.transformations.flip.horizontal') }}
-                      </button>
-                      <button 
-                        type="button" 
-                        class="btn btn-sm" 
-                        :title="t('imageEditor.transformations.flip.verticalTitle')"
-                        @click="flip('vertical')"
-                      >
-                        <i class="fa-solid fa-up-down"></i> {{ t('imageEditor.transformations.flip.vertical') }}
-                      </button>
-                    </div>
-                  </div>
+              <!-- Transformationen -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-rotate"></i>
+                  {{ t('imageEditor.sections.transformations') }}
                 </div>
-              </div>
-
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.resize') }}</h3>
-                <div class="resize-controls">
-                  <div class="input-row">
-                    <div class="input-group">
-                      <label for="resizeWidth">{{ t('imageEditor.resize.width') }}</label>
-                      <input 
-                        id="resizeWidth"
-                        v-model.number="resizeWidth"
-                        type="number" 
-                        min="1" 
-                        max="5000"
-                        @input="onResizeWidthChange"
-                      >
-                      <span class="unit">{{ t('imageEditor.resize.unit') }}</span>
-                    </div>
-                    <div class="input-group">
-                      <label for="resizeHeight">{{ t('imageEditor.resize.height') }}</label>
-                      <input 
-                        id="resizeHeight"
-                        v-model.number="resizeHeight"
-                        type="number" 
-                        min="1" 
-                        max="5000"
-                        @input="onResizeHeightChange"
-                      >
-                      <span class="unit">{{ t('imageEditor.resize.unit') }}</span>
-                    </div>
-                  </div>
-                  
-                  <div class="checkbox-group">
-                    <input
-                      id="keepAspectRatio"
-                      v-model="keepAspectRatio"
-                      type="checkbox"
-                    >
-                    <label for="keepAspectRatio">{{ t('imageEditor.resize.keepAspectRatio') }}</label>
-                  </div>
-
-                  <div class="button-group">
+                <div class="ctrl-row">
+                  <span class="ctrl-sublabel">{{ t('imageEditor.transformations.rotate.label') }}</span>
+                  <div class="btn-cluster">
                     <button
                       type="button"
-                      class="btn btn-sm"
-                      @click="resetSize"
+                      class="btn btn-icon-sm"
+                      :title="t('imageEditor.transformations.rotate.left90')"
+                      @click="rotate(-90)"
                     >
-                      <i class="fa-solid fa-arrow-rotate-left"></i> {{ t('imageEditor.resize.resetSize') }}
+                      <i class="fa-solid fa-rotate-left"></i> −90°
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-icon-sm"
+                      :title="t('imageEditor.transformations.rotate.rotate180')"
+                      @click="rotate(180)"
+                    >180°</button>
+                    <button
+                      type="button"
+                      class="btn btn-icon-sm"
+                      :title="t('imageEditor.transformations.rotate.right90')"
+                      @click="rotate(90)"
+                    >
+                      +90° <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="ctrl-row">
+                  <span class="ctrl-sublabel">{{ t('imageEditor.transformations.flip.label') }}</span>
+                  <div class="btn-cluster">
+                    <button
+                      type="button"
+                      class="btn btn-icon-sm"
+                      :title="t('imageEditor.transformations.flip.horizontalTitle')"
+                      @click="flip('horizontal')"
+                    >
+                      <i class="fa-solid fa-left-right"></i>
+                      {{ t('imageEditor.transformations.flip.horizontal') }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-icon-sm"
+                      :title="t('imageEditor.transformations.flip.verticalTitle')"
+                      @click="flip('vertical')"
+                    >
+                      <i class="fa-solid fa-up-down"></i>
+                      {{ t('imageEditor.transformations.flip.vertical') }}
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div class="editor-section">
-                <h3>{{ t('imageEditor.sections.export') }}</h3>
-                <div class="resize-controls">
-                  <div class="input-row">
-                    <div class="input-group">
-                      <label for="exportFormat">{{ t('imageEditor.export.format') }}</label>
-                      <select id="exportFormat" v-model="selectedFormat">
-                        <option 
-                          v-for="format in availableFormats" 
-                          :key="format.mimeType"
-                          :value="format.mimeType"
-                        >
-                          {{ format.name }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="button-group">
-                    <button 
-                      type="button" 
-                      class="btn"
-                      :disabled="isDownloading"
-                      @click="downloadImage"
-                    >
-                      <i :class="isDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'"></i>
-                      {{ isDownloading ? t('imageEditor.export.downloading') : t('imageEditor.export.downloadButton') }}
-                    </button>
-                  </div>
+              <!-- Größe ändern -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-expand"></i>
+                  {{ t('imageEditor.sections.resize') }}
+                </div>
+                <div class="size-row">
+                  <label class="size-label" for="resizeWidth">B</label>
+                  <input
+                    id="resizeWidth"
+                    v-model.number="resizeWidth"
+                    type="number"
+                    class="size-input"
+                    min="1"
+                    max="5000"
+                    @input="onResizeWidthChange"
+                  >
+                  <span class="size-unit">px</span>
+                  <button
+                    type="button"
+                    class="link-btn"
+                    :class="{ active: keepAspectRatio }"
+                    :title="t('imageEditor.resize.keepAspectRatio')"
+                    @click="keepAspectRatio = !keepAspectRatio"
+                  >
+                    <i :class="keepAspectRatio ? 'fa-solid fa-link' : 'fa-solid fa-link-slash'"></i>
+                  </button>
+                  <label class="size-label" for="resizeHeight">H</label>
+                  <input
+                    id="resizeHeight"
+                    v-model.number="resizeHeight"
+                    type="number"
+                    class="size-input"
+                    min="1"
+                    max="5000"
+                    @input="onResizeHeightChange"
+                  >
+                  <span class="size-unit">px</span>
+                </div>
+                <button type="button" class="btn btn-xs btn-ghost" @click="resetSize">
+                  <i class="fa-solid fa-arrow-rotate-left"></i>
+                  {{ t('imageEditor.resize.resetSize') }}
+                </button>
+              </div>
+
+              <!-- Export -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-file-export"></i>
+                  {{ t('imageEditor.sections.export') }}
+                </div>
+                <div class="export-row">
+                  <select id="exportFormat" v-model="selectedFormat" class="ctrl-select">
+                    <option
+                      v-for="format in availableFormats"
+                      :key="format.mimeType"
+                      :value="format.mimeType"
+                    >{{ format.name }}</option>
+                  </select>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    :disabled="isDownloading"
+                    @click="downloadImage"
+                  >
+                    <i :class="isDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'"></i>
+                    {{ isDownloading ? t('imageEditor.export.downloading') : t('imageEditor.export.downloadButton') }}
+                  </button>
                 </div>
               </div>
 
             </div>
           </div>
-          
+
+          <!-- Footer -->
           <div class="modal-footer">
             <button type="button" class="btn" @click="closeEditor">
               {{ t('imageEditor.footer.cancel') }}
             </button>
             <button type="button" class="btn" @click="resetToOriginal">
-              <i class="fa-solid fa-arrow-rotate-left"></i> {{ t('imageEditor.footer.reset') }}
+              <i class="fa-solid fa-arrow-rotate-left"></i>
+              {{ t('imageEditor.footer.reset') }}
             </button>
             <button type="button" class="btn btn-primary" @click="saveChanges">
-              <i class="fa-solid fa-check"></i> {{ t('imageEditor.footer.save') }}
+              <i class="fa-solid fa-check"></i>
+              {{ t('imageEditor.footer.save') }}
             </button>
           </div>
+
         </div>
       </div>
     </Transition>
@@ -280,6 +283,7 @@ const emit = defineEmits<{
 }>()
 
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
+const previewAreaRef = ref<HTMLElement | null>(null)
 const fileName = ref('')
 const resizeWidth = ref(0)
 const resizeHeight = ref(0)
@@ -287,7 +291,6 @@ const keepAspectRatio = ref(true)
 const selectedFormat = ref('image/png')
 const isDownloading = ref(false)
 
-// Reaktive Variablen für die aktuelle Canvas-Größe
 const currentWidth = ref(0)
 const currentHeight = ref(0)
 
@@ -308,28 +311,21 @@ const dimensions = computed(() => {
 
 const fileSize = computed(() => {
   if (!originalImageObj) return '0 KB'
-
   const originalSize = originalImageObj.file.size
   const originalPixels = originalImageObj.canvas.width * originalImageObj.canvas.height
-
-  // Berechne geschätzte Größe basierend auf den neuen Dimensionen
   const newWidth = resizeWidth.value || originalImageObj.canvas.width
   const newHeight = resizeHeight.value || originalImageObj.canvas.height
   const newPixels = newWidth * newHeight
-
-  // Geschätzte Größe basierend auf Pixel-Verhältnis
   const estimatedSize = Math.round(originalSize * (newPixels / originalPixels))
-
   return ImageProcessor.formatFileSize(estimatedSize)
 })
 
-const availableFormats = computed(() => {
-  return ImageProcessor.availableFormats.filter(format =>
+const availableFormats = computed(() =>
+  ImageProcessor.availableFormats.filter(format =>
     ImageProcessor.supportsFormat(format.mimeType)
   )
-})
+)
 
-// Computed CSS filter string based on image filters
 const filterStyle = computed(() => {
   if (!props.image) return {}
   const f = props.image.filters || defaultFilters
@@ -348,97 +344,66 @@ const filterStyle = computed(() => {
   }
 })
 
-// Computed CSS transform style (border, radius, shadow)
 const transformStyle = computed(() => {
   if (!props.image) return {}
-  const t = props.image.transforms || defaultTransforms
+  const tr = props.image.transforms || defaultTransforms
   const style: Record<string, string> = {}
-  if (t.borderWidth > 0) {
-    style.border = `${t.borderWidth}px solid ${t.borderColor}`
-  }
-  if (t.borderRadius > 0) {
-    const pct = (t.borderRadius / 200) * 50
-    style.borderRadius = `${pct}%`
-  }
-  if (t.shadowBlur > 0) {
-    const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
-    style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
+  if (tr.borderWidth > 0) style.border = `${tr.borderWidth}px solid ${tr.borderColor}`
+  if (tr.borderRadius > 0) style.borderRadius = `${(tr.borderRadius / 200) * 50}%`
+  if (tr.shadowBlur > 0) {
+    const rgba = ImageProcessor.hexToRgba(tr.shadowColor, tr.shadowOpacity / 100)
+    style.boxShadow = `${tr.shadowOffsetX}px ${tr.shadowOffsetY}px ${tr.shadowBlur}px ${rgba}`
   }
   return style
 })
 
 watch(() => props.image, (newImage) => {
-  if (newImage && props.isOpen) {
-    initializeEditor(newImage)
-  }
+  if (newImage && props.isOpen) initializeEditor(newImage)
 }, { immediate: true })
 
 watch(() => props.isOpen, (isOpen) => {
-  if (isOpen && props.image) {
-    nextTick(() => {
-      initializeEditor(props.image!)
-    })
-  }
+  if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
 })
 
 function initializeEditor(image: ImageObject) {
   if (!image) return
-
-  // Store original image reference
   originalImageObj = image
 
-  // Create working canvas copy
   workingCanvas = document.createElement('canvas')
   workingCanvas.width = image.canvas.width
   workingCanvas.height = image.canvas.height
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.drawImage(image.canvas, 0, 0)
-  }
+  workingCanvas.getContext('2d')?.drawImage(image.canvas, 0, 0)
 
-  // Create original canvas backup
   originalCanvas = document.createElement('canvas')
   originalCanvas.width = image.canvas.width
   originalCanvas.height = image.canvas.height
-  const originalCtx = originalCanvas.getContext('2d')
-  if (originalCtx) {
-    originalCtx.drawImage(image.canvas, 0, 0)
-  }
+  originalCanvas.getContext('2d')?.drawImage(image.canvas, 0, 0)
 
-  // Initialize UI
   fileName.value = image.outputName || ImageProcessor.getFileNameWithoutExtension(image.file.name)
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
   aspectRatio = workingCanvas.width / workingCanvas.height
 
-  // Set format dropdown
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
   const format = availableFormats.value.find(f => f.ext === ext)
-  if (format) {
-    selectedFormat.value = format.mimeType
-  }
+  if (format) selectedFormat.value = format.mimeType
 
-  // Initial preview update
-  nextTick(() => {
-    updatePreview()
-  })
+  nextTick(() => updatePreview())
 }
 
 function updatePreview() {
   if (!previewCanvas.value || !workingCanvas) return
 
-  // Reaktive Größen-Variablen aktualisieren
   currentWidth.value = workingCanvas.width
   currentHeight.value = workingCanvas.height
 
-  const container = previewCanvas.value.parentElement
-  if (!container) return
+  const panel = previewAreaRef.value
+  const maxW = panel ? panel.clientWidth - 48 : 500
+  const maxH = panel ? panel.clientHeight - 80 : 500
+  const scale = Math.min(maxW / workingCanvas.width, maxH / workingCanvas.height, 1)
 
-  const maxSize = Math.min(container.clientWidth - 32, 600)
-  const scale = Math.min(maxSize / workingCanvas.width, maxSize / workingCanvas.height, 1)
-
-  previewCanvas.value.width = Math.floor(workingCanvas.width * scale)
-  previewCanvas.value.height = Math.floor(workingCanvas.height * scale)
+  previewCanvas.value.width = Math.max(1, Math.floor(workingCanvas.width * scale))
+  previewCanvas.value.height = Math.max(1, Math.floor(workingCanvas.height * scale))
 
   const ctx = previewCanvas.value.getContext('2d')
   if (ctx) {
@@ -446,92 +411,62 @@ function updatePreview() {
     ctx.drawImage(workingCanvas, 0, 0, previewCanvas.value.width, previewCanvas.value.height)
   }
 
-  // Update resize inputs
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
 }
 
 function rotate(degrees: number) {
   if (!workingCanvas) return
-
   const tempCanvas = document.createElement('canvas')
   const tempCtx = tempCanvas.getContext('2d')
   if (!tempCtx) return
-
   const w = workingCanvas.width
   const h = workingCanvas.height
-
   if (Math.abs(degrees) === 90) {
-    tempCanvas.width = h
-    tempCanvas.height = w
+    tempCanvas.width = h; tempCanvas.height = w
     tempCtx.translate(h / 2, w / 2)
     tempCtx.rotate((degrees * Math.PI) / 180)
     tempCtx.drawImage(workingCanvas, -w / 2, -h / 2)
-    
-    workingCanvas.width = h
-    workingCanvas.height = w
+    workingCanvas.width = h; workingCanvas.height = w
   } else {
-    tempCanvas.width = w
-    tempCanvas.height = h
+    tempCanvas.width = w; tempCanvas.height = h
     tempCtx.translate(w / 2, h / 2)
     tempCtx.rotate((degrees * Math.PI) / 180)
     tempCtx.drawImage(workingCanvas, -w / 2, -h / 2)
   }
-
   const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
-    ctx.drawImage(tempCanvas, 0, 0)
-  }
-
-  // Recalculate aspect ratio
+  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
   aspectRatio = workingCanvas.width / workingCanvas.height
   updatePreview()
 }
 
 function flip(direction: 'horizontal' | 'vertical') {
   if (!workingCanvas) return
-
   const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = workingCanvas.width
-  tempCanvas.height = workingCanvas.height
+  tempCanvas.width = workingCanvas.width; tempCanvas.height = workingCanvas.height
   const tempCtx = tempCanvas.getContext('2d')
   if (!tempCtx) return
-
   tempCtx.save()
   if (direction === 'horizontal') {
-    tempCtx.scale(-1, 1)
-    tempCtx.drawImage(workingCanvas, -workingCanvas.width, 0)
+    tempCtx.scale(-1, 1); tempCtx.drawImage(workingCanvas, -workingCanvas.width, 0)
   } else {
-    tempCtx.scale(1, -1)
-    tempCtx.drawImage(workingCanvas, 0, -workingCanvas.height)
+    tempCtx.scale(1, -1); tempCtx.drawImage(workingCanvas, 0, -workingCanvas.height)
   }
   tempCtx.restore()
-
   const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
-    ctx.drawImage(tempCanvas, 0, 0)
-  }
-
+  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
   updatePreview()
 }
 
 function onResizeWidthChange() {
-  if (keepAspectRatio.value && workingCanvas) {
-    const value = resizeWidth.value || 0
-    if (value > 0) {
-      resizeHeight.value = Math.round(value / aspectRatio)
-    }
+  if (keepAspectRatio.value && resizeWidth.value > 0) {
+    resizeHeight.value = Math.round(resizeWidth.value / aspectRatio)
   }
 }
 
 function onResizeHeightChange() {
-  if (keepAspectRatio.value && workingCanvas) {
-    const value = resizeHeight.value || 0
-    if (value > 0) {
-      resizeWidth.value = Math.round(value * aspectRatio)
-    }
+  if (keepAspectRatio.value && resizeHeight.value > 0) {
+    resizeWidth.value = Math.round(resizeHeight.value * aspectRatio)
   }
 }
 
@@ -544,20 +479,11 @@ function resetSize() {
 
 async function downloadImage() {
   if (!workingCanvas || !originalImageObj) return
-
   isDownloading.value = true
-
   try {
     const format = availableFormats.value.find(f => f.mimeType === selectedFormat.value)
     if (!format) throw new Error('Ungültiges Format')
-
-    // Create temporary image object and apply filters + transforms for export
-    const tempImageObj: ImageObject = {
-      ...originalImageObj,
-      canvas: workingCanvas,
-      ctx: workingCanvas.getContext('2d')!
-    }
-
+    const tempImageObj: ImageObject = { ...originalImageObj, canvas: workingCanvas, ctx: workingCanvas.getContext('2d')! }
     const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
     const blob = await ImageProcessor.convertToFormat(
       { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
@@ -565,17 +491,12 @@ async function downloadImage() {
     )
     const fileBase = fileName.value.trim() || ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
     const downloadFileName = `${ImageProcessor.safeBaseName(fileBase)}.${format.ext}`
-
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url
-    a.download = downloadFileName
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
+    a.href = url; a.download = downloadFileName
+    document.body.appendChild(a); a.click(); a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (error) {
-    console.error('Download error:', error)
     const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
     alert(t('alerts.downloadError', { error: errorMessage }))
   } finally {
@@ -585,118 +506,61 @@ async function downloadImage() {
 
 function resetToOriginal() {
   if (!originalCanvas || !workingCanvas) return
-
-  workingCanvas.width = originalCanvas.width
-  workingCanvas.height = originalCanvas.height
+  workingCanvas.width = originalCanvas.width; workingCanvas.height = originalCanvas.height
   const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
-    ctx.drawImage(originalCanvas, 0, 0)
-  }
-
-  if (originalImageObj) {
-    fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
-  }
-
+  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(originalCanvas, 0, 0) }
+  if (originalImageObj) fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
   aspectRatio = workingCanvas.width / workingCanvas.height
-  resizeWidth.value = workingCanvas.width
-  resizeHeight.value = workingCanvas.height
-
   updatePreview()
 }
 
 function saveChanges() {
   if (!props.image || !workingCanvas) return
-
-  // Größenänderung anwenden, falls geändert
   const newWidth = resizeWidth.value || workingCanvas.width
   const newHeight = resizeHeight.value || workingCanvas.height
-
-  if (newWidth > 0 && newHeight > 0 &&
-      (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)) {
+  if (newWidth > 0 && newHeight > 0 && (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)) {
     const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = newWidth
-    tempCanvas.height = newHeight
+    tempCanvas.width = newWidth; tempCanvas.height = newHeight
     const tempCtx = tempCanvas.getContext('2d')
     if (tempCtx) {
       tempCtx.drawImage(workingCanvas, 0, 0, workingCanvas.width, workingCanvas.height, 0, 0, newWidth, newHeight)
-
-      workingCanvas.width = newWidth
-      workingCanvas.height = newHeight
+      workingCanvas.width = newWidth; workingCanvas.height = newHeight
       const ctx = workingCanvas.getContext('2d')
-      if (ctx) {
-        ctx.clearRect(0, 0, newWidth, newHeight)
-        ctx.drawImage(tempCanvas, 0, 0)
-      }
+      if (ctx) { ctx.clearRect(0, 0, newWidth, newHeight); ctx.drawImage(tempCanvas, 0, 0) }
     }
   }
-
-  // Copy working canvas back to original image object.
-  // Intentional deep mutation: the store holds ImageObject references and
-  // the parent expects the canvas to be updated in-place before 'save' is emitted.
   /* eslint-disable vue/no-mutating-props */
-  props.image.canvas.width = workingCanvas.width
-  props.image.canvas.height = workingCanvas.height
+  props.image.canvas.width = workingCanvas.width; props.image.canvas.height = workingCanvas.height
   const ctx = props.image.canvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
-    ctx.drawImage(workingCanvas, 0, 0)
-  }
-
-  // Update filename if changed
+  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(workingCanvas, 0, 0) }
   const newName = fileName.value.trim()
-  if (newName) {
-    props.image.outputName = ImageProcessor.safeBaseName(newName)
-  }
+  if (newName) props.image.outputName = ImageProcessor.safeBaseName(newName)
   /* eslint-enable vue/no-mutating-props */
-
   emit('save', props.image)
   toast.success(t('toast.changesApplied'))
   closeEditor()
 }
 
 // Crop functions
-function startCropMode() {
-  cropLockedRatio.value = null
-  isCropMode.value = true
-}
-
-function cancelCropMode() {
-  isCropMode.value = false
-}
-
-function setCropRatio(ratio: number | null) {
-  cropLockedRatio.value = ratio
-}
-
-function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) {
-  cropNorm.value = rect
-}
+function startCropMode() { cropLockedRatio.value = null; isCropMode.value = true }
+function cancelCropMode() { isCropMode.value = false }
+function setCropRatio(ratio: number | null) { cropLockedRatio.value = ratio }
+function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) { cropNorm.value = rect }
 
 function applyCrop() {
   if (!workingCanvas) return
-
   const x = Math.round(cropNorm.value.x * workingCanvas.width)
   const y = Math.round(cropNorm.value.y * workingCanvas.height)
   const w = Math.max(1, Math.round(cropNorm.value.w * workingCanvas.width))
   const h = Math.max(1, Math.round(cropNorm.value.h * workingCanvas.height))
-
   const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = w
-  tempCanvas.height = h
+  tempCanvas.width = w; tempCanvas.height = h
   const tempCtx = tempCanvas.getContext('2d')
   if (!tempCtx) return
-
   tempCtx.drawImage(workingCanvas, x, y, w, h, 0, 0, w, h)
-
-  workingCanvas.width = w
-  workingCanvas.height = h
+  workingCanvas.width = w; workingCanvas.height = h
   const ctx = workingCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, w, h)
-    ctx.drawImage(tempCanvas, 0, 0)
-  }
-
+  if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
   aspectRatio = w / h
   isCropMode.value = false
   updatePreview()
@@ -709,14 +573,12 @@ function closeEditor() {
 </script>
 
 <style scoped>
+/* ── Overlay ─────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -724,219 +586,67 @@ function closeEditor() {
   padding: var(--space-4);
 }
 
+/* ── Modal container ─────────────────────────────────────── */
 .modal-container {
-  background: var(--panel);
+  background: var(--bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
-  max-width: 900px;
+  max-width: 1100px;
   width: 100%;
-  max-height: 90vh;
+  height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
+/* ── Header ──────────────────────────────────────────────── */
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--space-4);
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  height: 52px;
+  flex-shrink: 0;
   border-bottom: 1px solid var(--border-color);
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-5);
-}
-
-.editor-sections {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.editor-section {
   background: var(--panel);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: var(--space-5);
 }
 
-.editor-section h3 {
-  margin: 0 0 var(--space-4) 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.preview-container {
+.header-left {
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 200px;
-  background: var(--bg);
-  border: 2px dashed var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  gap: var(--space-3);
+  min-width: 0;
 }
 
-.canvas-crop-wrapper {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-}
-
-.editor-preview-canvas {
-  max-width: 100%;
-  max-height: 400px;
-  border-radius: var(--radius-md);
-  display: block;
-}
-
-.image-info {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--space-3);
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.input-group label {
-  font-weight: 500;
-  color: var(--text);
-  font-size: 0.9rem;
-}
-
-.input-group input[type="text"],
-.input-group input[type="number"],
-.input-group select {
-  padding: var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
+.header-icon {
+  color: var(--accent);
   font-size: 1rem;
 }
 
-.help-text {
+.modal-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.header-filename {
+  font-size: 0.8rem;
   color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.transform-controls,
-.resize-controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.control-group label {
-  font-weight: 500;
-  color: var(--text);
-  font-size: 0.9rem;
-}
-
-.button-group {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.checkbox-group label {
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-top: 1px solid var(--border-color);
-}
-
-.btn {
-  padding: var(--space-3) var(--space-4);
+  background: var(--bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  background: var(--btn);
-  color: var(--text);
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
+  padding: 2px 10px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.btn:hover:not(:disabled) {
-  background: var(--panel);
-  border-color: var(--accent);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-sm {
-  padding: var(--space-2) var(--space-3);
-  font-size: 0.85rem;
-}
-
-.btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--accent) 80%, black);
-  border-color: color-mix(in oklab, var(--accent) 80%, black);
-}
-
-.image-action-btn {
-  width: 36px;
-  height: 36px;
+.icon-btn {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -945,50 +655,290 @@ function closeEditor() {
   color: var(--muted);
   cursor: pointer;
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: all 0.15s;
+  flex-shrink: 0;
 }
 
-.image-action-btn:hover {
+.icon-btn:hover { background: var(--bg); color: var(--text); }
+
+/* ── Body ────────────────────────────────────────────────── */
+.editor-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Preview panel (left) ────────────────────────────────── */
+.preview-panel {
+  flex: 0 0 58%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  gap: var(--space-2);
+  background: var(--bg);
+  border-right: 1px solid var(--border-color);
+  min-width: 0;
+}
+
+.preview-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--bg) 60%, var(--panel) 40%);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  padding: var(--space-3);
+}
+
+.canvas-crop-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.preview-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-md);
+}
+
+.image-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--muted);
+  padding: 0 var(--space-1);
+  gap: var(--space-3);
+}
+
+.image-meta i { margin-right: 4px; opacity: 0.6; }
+
+/* ── Controls panel (right) ──────────────────────────────── */
+.controls-panel {
+  flex: 0 0 42%;
+  overflow-y: auto;
   background: var(--panel);
+  display: flex;
+  flex-direction: column;
+}
+
+.ctrl-section {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ctrl-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+.ctrl-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.ctrl-input:focus { outline: none; border-color: var(--accent); }
+
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ctrl-sublabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-width: 68px;
+  flex-shrink: 0;
+}
+
+.btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
+.btn-row { display: flex; gap: var(--space-2); }
+
+/* Size row */
+.size-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 12px;
+}
+
+.size-input {
+  width: 68px;
+  padding: 5px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.size-input:focus { outline: none; border-color: var(--accent); }
+
+.size-unit { font-size: 0.75rem; color: var(--muted); }
+
+.link-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.link-btn:hover { border-color: var(--accent); color: var(--accent); }
+.link-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
+
+/* Export row */
+.export-row { display: flex; gap: var(--space-2); align-items: center; }
+
+.ctrl-select {
+  flex: 1;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+.btn-xs { padding: 3px 8px; font-size: 0.78rem; }
+.btn-icon-sm { padding: 5px 10px; font-size: 0.8rem; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--border-color);
   color: var(--text);
 }
 
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
+.btn-primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 82%, black);
+  border-color: color-mix(in oklab, var(--accent) 82%, black);
+}
+
+.btn-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border-color);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+.modal-enter-active,
+.modal-leave-active { transition: opacity 0.25s ease; }
 
 .modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
+.modal-leave-to { opacity: 0; }
 
 .modal-enter-active .modal-container,
-.modal-leave-active .modal-container {
-  transition: transform 0.3s ease;
-}
+.modal-leave-active .modal-container { transition: transform 0.25s ease; }
 
 .modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.95);
+.modal-leave-to .modal-container { transform: scale(0.97) translateY(10px); }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .editor-body { flex-direction: column; }
+
+  .preview-panel {
+    flex: 0 0 auto;
+    height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .controls-panel { flex: 1; }
+
+  .modal-container {
+    height: 95vh;
+    border-radius: var(--radius-xl);
+  }
+
+  .header-filename { display: none; }
+
+  .size-row { flex-wrap: wrap; }
 }
 
-@media (max-width: 768px) {
-  .modal-container {
-    max-height: 95vh;
-  }
-
-  .input-row {
-    grid-template-columns: 1fr;
-  }
-
-  .button-group {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-    justify-content: center;
-  }
+@media (max-width: 480px) {
+  .modal-overlay { padding: 0; }
+  .modal-container { height: 100dvh; border-radius: 0; }
 }
 </style>
