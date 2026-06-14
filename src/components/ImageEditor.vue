@@ -21,13 +21,72 @@
 
             <!-- Preview Panel -->
             <div ref="previewAreaRef" class="preview-panel">
+
+              <!-- Compare toolbar -->
+              <div v-if="!isCropMode" class="compare-toolbar">
+                <button
+                  class="cmp-btn"
+                  :class="{ active: compareMode === 'before' }"
+                  :title="t('imageEditor.compare.before')"
+                  @click="compareMode = 'before'"
+                >
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                  {{ t('imageEditor.compare.before') }}
+                </button>
+                <span class="cmp-sep">|</span>
+                <button
+                  class="cmp-btn"
+                  :class="{ active: compareMode === 'split' }"
+                  :title="t('imageEditor.compare.split')"
+                  @click="compareMode = 'split'"
+                >
+                  <i class="fa-solid fa-columns"></i>
+                  {{ t('imageEditor.compare.split') }}
+                </button>
+                <span class="cmp-sep">|</span>
+                <button
+                  class="cmp-btn"
+                  :class="{ active: compareMode === 'after' }"
+                  :title="t('imageEditor.compare.after')"
+                  @click="compareMode = 'after'"
+                >
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  {{ t('imageEditor.compare.after') }}
+                </button>
+              </div>
+
               <div class="preview-area">
-                <div class="canvas-crop-wrapper">
+                <div ref="canvasWrapperRef" class="canvas-crop-wrapper">
+
+                  <!-- Edited canvas (base, determines wrapper size) -->
                   <canvas
                     ref="previewCanvas"
-                    class="preview-canvas"
-                    :style="[filterStyle, transformStyle]"
+                    class="preview-canvas edited-canvas"
+                    :style="[filterStyle, transformStyle, editedCanvasStyle]"
                   ></canvas>
+
+                  <!-- Original canvas (on top, for before/split comparison) -->
+                  <canvas
+                    ref="originalPreviewCanvas"
+                    class="preview-canvas original-canvas"
+                    :style="originalCanvasStyle"
+                  ></canvas>
+
+                  <!-- Split divider -->
+                  <template v-if="compareMode === 'split'">
+                    <div class="split-line" :style="{ left: splitDividerPos + '%' }"></div>
+                    <div
+                      class="split-handle"
+                      :style="{ left: splitDividerPos + '%' }"
+                      @mousedown.prevent="startSplitDrag"
+                      @touchstart.prevent="startSplitDrag"
+                    >
+                      <i class="fa-solid fa-left-right"></i>
+                    </div>
+                    <span class="split-label split-label-l">{{ t('imageEditor.compare.before') }}</span>
+                    <span class="split-label split-label-r">{{ t('imageEditor.compare.after') }}</span>
+                  </template>
+
                   <CropTool
                     v-if="isCropMode"
                     :image-pixel-width="currentWidth"
@@ -37,6 +96,7 @@
                   />
                 </div>
               </div>
+
               <div class="image-meta">
                 <span><i class="fa-solid fa-expand"></i> {{ dimensions }}</span>
                 <span><i class="fa-solid fa-weight-hanging"></i> {{ fileSize }}</span>
@@ -59,6 +119,37 @@
                   class="ctrl-input"
                   :placeholder="t('imageEditor.fileName.placeholder')"
                 >
+              </div>
+
+              <!-- Filter -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-sliders"></i>
+                  {{ t('imageEditor.sections.filters') }}
+                </div>
+                <div
+                  v-for="fd in FILTER_DEFS"
+                  :key="fd.key"
+                  class="filter-row"
+                >
+                  <label class="filter-label">{{ t(`imageEditor.filters.${fd.key}`) }}</label>
+                  <div class="filter-slider-wrap">
+                    <input
+                      type="range"
+                      class="filter-slider"
+                      :min="fd.min"
+                      :max="fd.max"
+                      :step="fd.step"
+                      :value="localFilters[fd.key]"
+                      @input="onFilterInput(fd.key, $event)"
+                    >
+                    <span class="filter-value">{{ localFilters[fd.key] }}{{ fd.unit }}</span>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-xs btn-ghost" @click="resetFilters">
+                  <i class="fa-solid fa-arrow-rotate-left"></i>
+                  {{ t('imageEditor.filters.reset') }}
+                </button>
               </div>
 
               <!-- Zuschneiden -->
@@ -271,9 +362,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { ImageObject } from '@/lib/core/types'
+import type { ImageObject, ImageFilters } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
@@ -289,6 +380,19 @@ const CROP_RATIO_PRESETS = [
   { label: '16:9', ratio: 16 / 9 },
 ] as const
 
+type FilterKey = keyof Omit<ImageFilters, 'invert'>
+
+const FILTER_DEFS: Array<{ key: FilterKey; min: number; max: number; step: number; unit: string }> = [
+  { key: 'brightness', min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'contrast',   min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'saturation', min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'hue',        min: -180, max: 180, step: 1, unit: '°' },
+  { key: 'grayscale',  min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'sepia',      min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'blur',       min: 0, max: 20,  step: 0.5, unit: 'px' },
+  { key: 'opacity',    min: 0, max: 100, step: 1, unit: '%' },
+]
+
 interface Props {
   image: ImageObject | null
   isOpen: boolean
@@ -300,17 +404,24 @@ const emit = defineEmits<{
   save: [image: ImageObject]
 }>()
 
+// Canvas refs
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
+const originalPreviewCanvas = ref<HTMLCanvasElement | null>(null)
 const previewAreaRef = ref<HTMLElement | null>(null)
+const canvasWrapperRef = ref<HTMLElement | null>(null)
+
+// Form state
 const fileName = ref('')
 const resizeWidth = ref(0)
 const resizeHeight = ref(0)
 const keepAspectRatio = ref(true)
 const selectedFormat = ref('image/png')
 const isDownloading = ref(false)
-
 const currentWidth = ref(0)
 const currentHeight = ref(0)
+
+// Filter state (local copy, baked on save)
+const localFilters = ref<ImageFilters>({ ...defaultFilters })
 
 // Crop state
 const isCropMode = ref(false)
@@ -320,10 +431,17 @@ const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
 // Two-step save state
 const changesApplied = ref(false)
 
+// Compare mode state
+const compareMode = ref<'before' | 'split' | 'after'>('after')
+const splitDividerPos = ref(50)
+let isDraggingSplit = false
+
 let workingCanvas: HTMLCanvasElement | null = null
 let originalCanvas: HTMLCanvasElement | null = null
 let originalImageObj: ImageObject | null = null
 let aspectRatio = 1
+
+// ── Computed ──────────────────────────────────────────────────────
 
 const dimensions = computed(() => {
   if (currentWidth.value === 0 || currentHeight.value === 0) return '0 × 0 px'
@@ -348,20 +466,19 @@ const availableFormats = computed(() =>
 )
 
 const filterStyle = computed(() => {
-  if (!props.image) return {}
-  const f = props.image.filters || defaultFilters
+  const f = localFilters.value
   return {
-    filter: `
-      brightness(${f.brightness}%)
-      contrast(${f.contrast}%)
-      saturate(${f.saturation}%)
-      hue-rotate(${f.hue}deg)
-      blur(${f.blur}px)
-      grayscale(${f.grayscale}%)
-      sepia(${f.sepia}%)
-      invert(${f.invert}%)
-    `.trim(),
-    opacity: f.opacity / 100
+    filter: [
+      `brightness(${f.brightness}%)`,
+      `contrast(${f.contrast}%)`,
+      `saturate(${f.saturation}%)`,
+      `hue-rotate(${f.hue}deg)`,
+      `blur(${f.blur}px)`,
+      `grayscale(${f.grayscale}%)`,
+      `sepia(${f.sepia}%)`,
+      `invert(${f.invert}%)`,
+    ].join(' '),
+    opacity: f.opacity / 100,
   }
 })
 
@@ -378,21 +495,41 @@ const transformStyle = computed(() => {
   return style
 })
 
+// Original canvas: on top, visible in 'before' and 'split' modes
+const originalCanvasStyle = computed(() => {
+  if (compareMode.value === 'after') return { display: 'none' }
+  if (compareMode.value === 'before') return {}
+  // split: clip original to left portion, revealing edited canvas on the right
+  return { clipPath: `inset(0 ${100 - splitDividerPos.value}% 0 0)` }
+})
+
+// Edited canvas: hidden in 'before' mode (original covers it anyway, but hide for clarity)
+const editedCanvasStyle = computed(() => {
+  if (compareMode.value === 'before') return { opacity: '0' }
+  return {}
+})
+
+// ── Watchers ──────────────────────────────────────────────────────
+
 watch(() => props.image, (newImage) => {
   if (newImage && props.isOpen) initializeEditor(newImage)
 }, { immediate: true })
 
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
-  if (!isOpen) changesApplied.value = false
+  if (!isOpen) {
+    changesApplied.value = false
+    compareMode.value = 'after'
+  }
 })
 
-// Resize input changes invalidate the applied state
 watch([resizeWidth, resizeHeight], () => {
   if (resizeWidth.value !== currentWidth.value || resizeHeight.value !== currentHeight.value) {
     changesApplied.value = false
   }
 })
+
+// ── Init ──────────────────────────────────────────────────────────
 
 function initializeEditor(image: ImageObject) {
   if (!image) return
@@ -413,12 +550,17 @@ function initializeEditor(image: ImageObject) {
   resizeHeight.value = workingCanvas.height
   aspectRatio = workingCanvas.width / workingCanvas.height
 
+  // Copy existing filters from the image object
+  localFilters.value = { ...(image.filters || defaultFilters) }
+
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
   const format = availableFormats.value.find(f => f.ext === ext)
   if (format) selectedFormat.value = format.mimeType
 
   nextTick(() => updatePreview())
 }
+
+// ── Preview ───────────────────────────────────────────────────────
 
 function updatePreview() {
   if (!previewCanvas.value || !workingCanvas) return
@@ -431,18 +573,37 @@ function updatePreview() {
   const maxH = panel ? panel.clientHeight - 80 : 500
   const scale = Math.min(maxW / workingCanvas.width, maxH / workingCanvas.height, 1)
 
-  previewCanvas.value.width = Math.max(1, Math.floor(workingCanvas.width * scale))
-  previewCanvas.value.height = Math.max(1, Math.floor(workingCanvas.height * scale))
+  const dw = Math.max(1, Math.floor(workingCanvas.width * scale))
+  const dh = Math.max(1, Math.floor(workingCanvas.height * scale))
+
+  previewCanvas.value.width = dw
+  previewCanvas.value.height = dh
 
   const ctx = previewCanvas.value.getContext('2d')
   if (ctx) {
-    ctx.clearRect(0, 0, previewCanvas.value.width, previewCanvas.value.height)
-    ctx.drawImage(workingCanvas, 0, 0, previewCanvas.value.width, previewCanvas.value.height)
+    ctx.clearRect(0, 0, dw, dh)
+    ctx.drawImage(workingCanvas, 0, 0, dw, dh)
   }
 
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
+
+  updateOriginalPreview(dw, dh)
 }
+
+function updateOriginalPreview(dw: number, dh: number) {
+  if (!originalPreviewCanvas.value || !originalCanvas) return
+  const target = originalPreviewCanvas.value
+  target.width = dw
+  target.height = dh
+  const ctx = target.getContext('2d')
+  if (ctx) {
+    ctx.clearRect(0, 0, dw, dh)
+    ctx.drawImage(originalCanvas, 0, 0, dw, dh)
+  }
+}
+
+// ── Transforms ───────────────────────────────────────────────────
 
 function rotate(degrees: number) {
   if (!workingCanvas) return
@@ -508,6 +669,96 @@ function resetSize() {
   }
 }
 
+// ── Filters ───────────────────────────────────────────────────────
+
+function onFilterInput(key: FilterKey, event: Event) {
+  const value = Number((event.target as HTMLInputElement).value)
+  localFilters.value = { ...localFilters.value, [key]: value }
+  changesApplied.value = false
+}
+
+function resetFilters() {
+  localFilters.value = { ...defaultFilters }
+  changesApplied.value = false
+}
+
+// ── Crop ─────────────────────────────────────────────────────────
+
+function startCropMode() {
+  cropLockedRatio.value = null
+  isCropMode.value = true
+  compareMode.value = 'after'
+}
+
+function cancelCropMode() { isCropMode.value = false }
+function setCropRatio(ratio: number | null) { cropLockedRatio.value = ratio }
+function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) { cropNorm.value = rect }
+
+function applyCrop() {
+  if (!workingCanvas) return
+  const x = Math.round(cropNorm.value.x * workingCanvas.width)
+  const y = Math.round(cropNorm.value.y * workingCanvas.height)
+  const w = Math.max(1, Math.round(cropNorm.value.w * workingCanvas.width))
+  const h = Math.max(1, Math.round(cropNorm.value.h * workingCanvas.height))
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = w; tempCanvas.height = h
+  const tempCtx = tempCanvas.getContext('2d')
+  if (!tempCtx) return
+  tempCtx.drawImage(workingCanvas, x, y, w, h, 0, 0, w, h)
+  workingCanvas.width = w; workingCanvas.height = h
+  const ctx = workingCanvas.getContext('2d')
+  if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
+  aspectRatio = w / h
+  isCropMode.value = false
+  changesApplied.value = false
+  updatePreview()
+}
+
+// ── Split compare drag ────────────────────────────────────────────
+
+function startSplitDrag(event: MouseEvent | TouchEvent) {
+  isDraggingSplit = true
+  document.addEventListener('mousemove', onSplitMouseMove)
+  document.addEventListener('mouseup', stopSplitDrag)
+  document.addEventListener('touchmove', onSplitTouchMove, { passive: false })
+  document.addEventListener('touchend', stopSplitDrag)
+}
+
+function onSplitMouseMove(event: MouseEvent) {
+  if (!isDraggingSplit) return
+  moveSplitTo(event.clientX)
+}
+
+function onSplitTouchMove(event: TouchEvent) {
+  if (!isDraggingSplit) return
+  event.preventDefault()
+  moveSplitTo(event.touches[0].clientX)
+}
+
+function moveSplitTo(clientX: number) {
+  if (!canvasWrapperRef.value) return
+  const rect = canvasWrapperRef.value.getBoundingClientRect()
+  const pos = ((clientX - rect.left) / rect.width) * 100
+  splitDividerPos.value = Math.max(2, Math.min(98, pos))
+}
+
+function stopSplitDrag() {
+  isDraggingSplit = false
+  document.removeEventListener('mousemove', onSplitMouseMove)
+  document.removeEventListener('mouseup', stopSplitDrag)
+  document.removeEventListener('touchmove', onSplitTouchMove)
+  document.removeEventListener('touchend', stopSplitDrag)
+}
+
+onUnmounted(() => {
+  document.removeEventListener('mousemove', onSplitMouseMove)
+  document.removeEventListener('mouseup', stopSplitDrag)
+  document.removeEventListener('touchmove', onSplitTouchMove)
+  document.removeEventListener('touchend', stopSplitDrag)
+})
+
+// ── Save / Reset ──────────────────────────────────────────────────
+
 async function downloadImage() {
   if (!workingCanvas || !originalImageObj) return
   isDownloading.value = true
@@ -542,6 +793,8 @@ function resetToOriginal() {
   if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(originalCanvas, 0, 0) }
   if (originalImageObj) fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
   aspectRatio = workingCanvas.width / workingCanvas.height
+  localFilters.value = { ...defaultFilters }
+  changesApplied.value = false
   updatePreview()
 }
 
@@ -578,37 +831,12 @@ function saveChanges() {
   if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(workingCanvas, 0, 0) }
   const newName = fileName.value.trim()
   if (newName) props.image.outputName = ImageProcessor.safeBaseName(newName)
+  props.image.filters = { ...localFilters.value }
   /* eslint-enable vue/no-mutating-props */
 
   emit('save', props.image)
   toast.success(t('toast.changesSaved'))
   closeEditor()
-}
-
-// Crop functions
-function startCropMode() { cropLockedRatio.value = null; isCropMode.value = true }
-function cancelCropMode() { isCropMode.value = false }
-function setCropRatio(ratio: number | null) { cropLockedRatio.value = ratio }
-function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) { cropNorm.value = rect }
-
-function applyCrop() {
-  if (!workingCanvas) return
-  const x = Math.round(cropNorm.value.x * workingCanvas.width)
-  const y = Math.round(cropNorm.value.y * workingCanvas.height)
-  const w = Math.max(1, Math.round(cropNorm.value.w * workingCanvas.width))
-  const h = Math.max(1, Math.round(cropNorm.value.h * workingCanvas.height))
-  const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = w; tempCanvas.height = h
-  const tempCtx = tempCanvas.getContext('2d')
-  if (!tempCtx) return
-  tempCtx.drawImage(workingCanvas, x, y, w, h, 0, 0, w, h)
-  workingCanvas.width = w; workingCanvas.height = h
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
-  aspectRatio = w / h
-  isCropMode.value = false
-  changesApplied.value = false
-  updatePreview()
 }
 
 function closeEditor() {
@@ -664,10 +892,7 @@ function closeEditor() {
   min-width: 0;
 }
 
-.header-icon {
-  color: var(--accent);
-  font-size: 1rem;
-}
+.header-icon { color: var(--accent); font-size: 1rem; }
 
 .modal-title {
   font-size: 0.95rem;
@@ -703,7 +928,6 @@ function closeEditor() {
   transition: all 0.15s;
   flex-shrink: 0;
 }
-
 .icon-btn:hover { background: var(--bg); color: var(--text); }
 
 /* ── Body ────────────────────────────────────────────────── */
@@ -718,13 +942,46 @@ function closeEditor() {
   flex: 0 0 58%;
   display: flex;
   flex-direction: column;
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   gap: var(--space-2);
   background: var(--bg);
   border-right: 1px solid var(--border-color);
   min-width: 0;
 }
 
+/* Compare toolbar */
+.compare-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.cmp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cmp-btn:hover { color: var(--text); border-color: var(--accent); }
+.cmp-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+.cmp-sep {
+  color: var(--border-color);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+/* Preview area */
 .preview-area {
   flex: 1;
   min-height: 0;
@@ -738,6 +995,7 @@ function closeEditor() {
   padding: var(--space-3);
 }
 
+/* Canvas wrapper — inline-block so it sizes to the edited canvas */
 .canvas-crop-wrapper {
   position: relative;
   display: inline-block;
@@ -745,13 +1003,80 @@ function closeEditor() {
   max-height: 100%;
 }
 
-.preview-canvas {
+/* Edited canvas (determines wrapper size) */
+.edited-canvas {
   display: block;
   max-width: 100%;
   max-height: 100%;
   border-radius: var(--radius-md);
+  position: relative;
+  z-index: 1;
 }
 
+/* Original canvas (absolute, on top of edited, used for comparison) */
+.original-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
+
+/* Split divider line */
+.split-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  z-index: 3;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* Split drag handle */
+.split-handle {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: #333;
+  font-size: 13px;
+  user-select: none;
+}
+
+/* Split labels */
+.split-label {
+  position: absolute;
+  top: 8px;
+  padding: 2px 7px;
+  background: rgba(0, 0, 0, 0.52);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 3;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.split-label-l { left: 8px; }
+.split-label-r { right: 8px; }
+
+/* Image meta */
 .image-meta {
   display: flex;
   justify-content: space-between;
@@ -760,7 +1085,6 @@ function closeEditor() {
   padding: 0 var(--space-1);
   gap: var(--space-3);
 }
-
 .image-meta i { margin-right: 4px; opacity: 0.6; }
 
 /* ── Controls panel (right) ──────────────────────────────── */
@@ -802,14 +1126,9 @@ function closeEditor() {
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
-
 .ctrl-input:focus { outline: none; border-color: var(--accent); }
 
-.ctrl-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
+.ctrl-row { display: flex; align-items: center; gap: var(--space-2); }
 
 .ctrl-sublabel {
   font-size: 0.78rem;
@@ -821,12 +1140,70 @@ function closeEditor() {
 .btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
 .btn-row { display: flex; gap: var(--space-2); }
 
-/* Size row */
-.size-row {
+/* ── Filter sliders ──────────────────────────────────────── */
+.filter-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
+
+.filter-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-width: 84px;
+  flex-shrink: 0;
+}
+
+.filter-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 2px;
+  background: var(--border-color);
+  outline: none;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.filter-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.filter-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+.filter-value {
+  font-size: 0.73rem;
+  color: var(--muted);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* Size row */
+.size-row { display: flex; align-items: center; gap: 6px; }
 
 .size-label {
   font-size: 0.78rem;
@@ -846,9 +1223,7 @@ function closeEditor() {
   text-align: center;
   transition: border-color 0.15s;
 }
-
 .size-input:focus { outline: none; border-color: var(--accent); }
-
 .size-unit { font-size: 0.75rem; color: var(--muted); }
 
 .link-btn {
@@ -865,7 +1240,6 @@ function closeEditor() {
   transition: all 0.15s;
   flex-shrink: 0;
 }
-
 .link-btn:hover { border-color: var(--accent); color: var(--accent); }
 .link-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
 
@@ -899,7 +1273,6 @@ function closeEditor() {
   gap: 6px;
   white-space: nowrap;
 }
-
 .btn:hover:not(:disabled) { border-color: var(--accent); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -940,26 +1313,15 @@ function closeEditor() {
   color: white;
   font-weight: 600;
 }
-
 .btn-save:hover:not(:disabled) {
   background: color-mix(in oklab, var(--green, #22c55e) 85%, black);
   border-color: color-mix(in oklab, var(--green, #22c55e) 85%, black);
 }
 
 .btn-swap-enter-active,
-.btn-swap-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.btn-swap-enter-from {
-  opacity: 0;
-  transform: translateY(4px);
-}
-
-.btn-swap-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
+.btn-swap-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.btn-swap-enter-from { opacity: 0; transform: translateY(4px); }
+.btn-swap-leave-to { opacity: 0; transform: translateY(-4px); }
 
 /* ── Footer ──────────────────────────────────────────────── */
 .modal-footer {
@@ -976,13 +1338,10 @@ function closeEditor() {
 /* ── Animations ──────────────────────────────────────────── */
 .modal-enter-active,
 .modal-leave-active { transition: opacity 0.25s ease; }
-
 .modal-enter-from,
 .modal-leave-to { opacity: 0; }
-
 .modal-enter-active .modal-container,
 .modal-leave-active .modal-container { transition: transform 0.25s ease; }
-
 .modal-enter-from .modal-container,
 .modal-leave-to .modal-container { transform: scale(0.97) translateY(10px); }
 
@@ -992,7 +1351,7 @@ function closeEditor() {
 
   .preview-panel {
     flex: 0 0 auto;
-    height: 42vh;
+    height: 45vh;
     border-right: none;
     border-bottom: 1px solid var(--border-color);
   }
@@ -1005,7 +1364,6 @@ function closeEditor() {
   }
 
   .header-filename { display: none; }
-
   .size-row { flex-wrap: wrap; }
 }
 

@@ -679,10 +679,27 @@
     "sections": {
       "preview": "Vorschau",
       "fileName": "Dateiname",
+      "filters": "Filter",
       "transformations": "Transformationen",
       "resize": "Größe ändern",
       "export": "Exportieren",
       "crop": "Zuschneiden"
+    },
+    "compare": {
+      "before": "Vorher",
+      "split": "Vergleich",
+      "after": "Nachher"
+    },
+    "filters": {
+      "brightness": "Helligkeit",
+      "contrast": "Kontrast",
+      "saturation": "Sättigung",
+      "hue": "Farbton",
+      "grayscale": "Graustufen",
+      "sepia": "Sepia",
+      "blur": "Weichzeichner",
+      "opacity": "Deckkraft",
+      "reset": "Filter zurücksetzen"
     },
     "fileName": {
       "label": "Neuer Name:",
