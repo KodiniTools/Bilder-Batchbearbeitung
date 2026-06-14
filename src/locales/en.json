@@ -157,7 +157,9 @@
   "upload": {
     "text": "Drag and drop images here or click",
     "button": "Select Files",
-    "folderButton": "Select Folder"
+    "folderButton": "Select Folder",
+    "pasteHint": "Paste from clipboard",
+    "pasteHintTooltip": "Ctrl+V: Paste image from clipboard"
   },
   "emptyState": {
     "title": "No images loaded",

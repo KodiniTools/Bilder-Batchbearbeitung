@@ -332,7 +332,9 @@
   "upload": {
     "text": "Bilder hierher ziehen oder klicken",
     "button": "Dateien auswählen",
-    "folderButton": "Ordner auswählen"
+    "folderButton": "Ordner auswählen",
+    "pasteHint": "Aus Zwischenablage einfügen",
+    "pasteHintTooltip": "Ctrl+V: Bild aus Zwischenablage einfügen"
   },
   "emptyState": {
     "title": "Keine Bilder geladen",
