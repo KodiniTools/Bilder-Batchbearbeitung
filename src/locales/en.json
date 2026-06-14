@@ -201,7 +201,8 @@
     "cropped": "{count} image(s) cropped",
     "reset": "{count} image(s) reset",
     "bulkRenamed": "{count} image(s) renamed",
-    "changesApplied": "Changes have been applied"
+    "changesApplied": "Changes have been applied",
+    "changesSaved": "Image saved"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
@@ -539,7 +540,8 @@
     "footer": {
       "cancel": "Cancel",
       "reset": "Reset",
-      "save": "Apply changes"
+      "save": "Save",
+      "apply": "Apply changes"
     },
     "crop": {
       "start": "Start cropping",

@@ -240,10 +240,28 @@
               <i class="fa-solid fa-arrow-rotate-left"></i>
               {{ t('imageEditor.footer.reset') }}
             </button>
-            <button type="button" class="btn btn-primary" @click="saveChanges">
-              <i class="fa-solid fa-check"></i>
-              {{ t('imageEditor.footer.save') }}
-            </button>
+            <Transition name="btn-swap" mode="out-in">
+              <button
+                v-if="!changesApplied"
+                key="apply"
+                type="button"
+                class="btn btn-primary"
+                @click="applyChanges"
+              >
+                <i class="fa-solid fa-eye"></i>
+                {{ t('imageEditor.footer.apply') }}
+              </button>
+              <button
+                v-else
+                key="save"
+                type="button"
+                class="btn btn-save"
+                @click="saveChanges"
+              >
+                <i class="fa-solid fa-floppy-disk"></i>
+                {{ t('imageEditor.footer.save') }}
+              </button>
+            </Transition>
           </div>
 
         </div>
@@ -298,6 +316,9 @@ const currentHeight = ref(0)
 const isCropMode = ref(false)
 const cropLockedRatio = ref<number | null>(null)
 const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
+
+// Two-step save state
+const changesApplied = ref(false)
 
 let workingCanvas: HTMLCanvasElement | null = null
 let originalCanvas: HTMLCanvasElement | null = null
@@ -363,6 +384,14 @@ watch(() => props.image, (newImage) => {
 
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
+  if (!isOpen) changesApplied.value = false
+})
+
+// Resize input changes invalidate the applied state
+watch([resizeWidth, resizeHeight], () => {
+  if (resizeWidth.value !== currentWidth.value || resizeHeight.value !== currentHeight.value) {
+    changesApplied.value = false
+  }
 })
 
 function initializeEditor(image: ImageObject) {
@@ -417,6 +446,7 @@ function updatePreview() {
 
 function rotate(degrees: number) {
   if (!workingCanvas) return
+  changesApplied.value = false
   const tempCanvas = document.createElement('canvas')
   const tempCtx = tempCanvas.getContext('2d')
   if (!tempCtx) return
@@ -442,6 +472,7 @@ function rotate(degrees: number) {
 
 function flip(direction: 'horizontal' | 'vertical') {
   if (!workingCanvas) return
+  changesApplied.value = false
   const tempCanvas = document.createElement('canvas')
   tempCanvas.width = workingCanvas.width; tempCanvas.height = workingCanvas.height
   const tempCtx = tempCanvas.getContext('2d')
@@ -514,10 +545,12 @@ function resetToOriginal() {
   updatePreview()
 }
 
-function saveChanges() {
-  if (!props.image || !workingCanvas) return
+function applyChanges() {
+  if (!workingCanvas) return
+
   const newWidth = resizeWidth.value || workingCanvas.width
   const newHeight = resizeHeight.value || workingCanvas.height
+
   if (newWidth > 0 && newHeight > 0 && (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)) {
     const tempCanvas = document.createElement('canvas')
     tempCanvas.width = newWidth; tempCanvas.height = newHeight
@@ -528,16 +561,27 @@ function saveChanges() {
       const ctx = workingCanvas.getContext('2d')
       if (ctx) { ctx.clearRect(0, 0, newWidth, newHeight); ctx.drawImage(tempCanvas, 0, 0) }
     }
+    aspectRatio = newWidth / newHeight
   }
+
+  updatePreview()
+  changesApplied.value = true
+}
+
+function saveChanges() {
+  if (!props.image || !workingCanvas) return
+
   /* eslint-disable vue/no-mutating-props */
-  props.image.canvas.width = workingCanvas.width; props.image.canvas.height = workingCanvas.height
+  props.image.canvas.width = workingCanvas.width
+  props.image.canvas.height = workingCanvas.height
   const ctx = props.image.canvas.getContext('2d')
   if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(workingCanvas, 0, 0) }
   const newName = fileName.value.trim()
   if (newName) props.image.outputName = ImageProcessor.safeBaseName(newName)
   /* eslint-enable vue/no-mutating-props */
+
   emit('save', props.image)
-  toast.success(t('toast.changesApplied'))
+  toast.success(t('toast.changesSaved'))
   closeEditor()
 }
 
@@ -563,6 +607,7 @@ function applyCrop() {
   if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
   aspectRatio = w / h
   isCropMode.value = false
+  changesApplied.value = false
   updatePreview()
 }
 
@@ -887,6 +932,33 @@ function closeEditor() {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
+}
+
+.btn-save {
+  background: var(--green, #22c55e);
+  border-color: var(--green, #22c55e);
+  color: white;
+  font-weight: 600;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--green, #22c55e) 85%, black);
+  border-color: color-mix(in oklab, var(--green, #22c55e) 85%, black);
+}
+
+.btn-swap-enter-active,
+.btn-swap-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.btn-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.btn-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 /* ── Footer ──────────────────────────────────────────────── */

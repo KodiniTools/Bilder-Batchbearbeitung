@@ -376,7 +376,8 @@
     "cropped": "{count} Bild(er) zugeschnitten",
     "reset": "{count} Bild(er) zurückgesetzt",
     "bulkRenamed": "{count} Bild(er) umbenannt",
-    "changesApplied": "Änderungen wurden übernommen"
+    "changesApplied": "Änderungen wurden übernommen",
+    "changesSaved": "Bild gespeichert"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
@@ -714,7 +715,8 @@
     "footer": {
       "cancel": "Abbrechen",
       "reset": "Zurücksetzen",
-      "save": "Änderungen übernehmen"
+      "save": "Speichern",
+      "apply": "Änderungen übernehmen"
     },
     "crop": {
       "start": "Zuschneiden starten",
