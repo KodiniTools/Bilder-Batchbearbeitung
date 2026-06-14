@@ -202,7 +202,9 @@
     "reset": "{count} image(s) reset",
     "bulkRenamed": "{count} image(s) renamed",
     "changesApplied": "Changes have been applied",
-    "changesSaved": "Image saved"
+    "changesSaved": "Image saved",
+    "pastedFromClipboard": "Image pasted from clipboard",
+    "pastedFromClipboardMultiple": "{count} images pasted from clipboard"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",

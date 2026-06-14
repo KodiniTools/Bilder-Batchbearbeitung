@@ -377,7 +377,9 @@
     "reset": "{count} Bild(er) zurückgesetzt",
     "bulkRenamed": "{count} Bild(er) umbenannt",
     "changesApplied": "Änderungen wurden übernommen",
-    "changesSaved": "Bild gespeichert"
+    "changesSaved": "Bild gespeichert",
+    "pastedFromClipboard": "Bild aus Zwischenablage eingefügt",
+    "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
