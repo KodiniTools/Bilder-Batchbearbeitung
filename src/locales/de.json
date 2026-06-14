@@ -362,7 +362,8 @@
     "zipProgress": "Verarbeite Bild {current} von {total}...",
     "pdf": "Erstelle PDF...",
     "pdfMulti": "Erstelle PDF mit {count} Bildern...",
-    "progress": "{current} von {total}"
+    "progress": "{current} von {total}",
+    "resizing": "Bild {current} von {total} wird skaliert…"
   },
   "toast": {
     "pdfSuccess": "PDF mit {count} Bildern erfolgreich erstellt",

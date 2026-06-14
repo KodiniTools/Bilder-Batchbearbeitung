@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
@@ -437,6 +437,29 @@ async function handlePaste(event: ClipboardEvent) {
       : t('toast.pastedFromClipboardMultiple', { count: imageFiles.length })
   )
 }
+
+watch(
+  () => imageStore.resizeProgress,
+  (progress) => {
+    if (!progress.active) {
+      loadingIndicator.value?.hide()
+      return
+    }
+    if (progress.total <= 1) return
+    if (progress.current === 0) {
+      loadingIndicator.value?.showWithProgress(
+        t('loading.resizing', { current: 0, total: progress.total }),
+        progress.total
+      )
+    } else {
+      loadingIndicator.value?.updateProgress(
+        progress.current,
+        t('loading.resizing', { current: progress.current, total: progress.total })
+      )
+    }
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
