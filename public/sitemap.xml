@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/app</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/app"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/app?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/faq</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/faq"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/faq?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/blog</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/blog"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/blog?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/learn</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/learn"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/learn?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/downloads</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/downloads"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/downloads?lang=en"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

@@ -1,0 +1,22 @@
+{
+  "name": "Bilderserie Bearbeiten",
+  "short_name": "KodiniTools",
+  "description": "Mehrere Bilder gleichzeitig bearbeiten, konvertieren und exportieren – direkt im Browser.",
+  "start_url": "/bilderseriebearbeiten/app",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "/bilderseriebearbeiten/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/bilderseriebearbeiten/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
