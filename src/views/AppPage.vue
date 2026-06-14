@@ -406,6 +406,38 @@ function handleKeyboard(event: KeyboardEvent) {
   }
 }
 
+async function handlePaste(event: ClipboardEvent) {
+  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value || isWizardOpen.value) return
+  const target = event.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+
+  const items = event.clipboardData?.items
+  if (!items) return
+
+  const imageFiles: File[] = []
+  for (const item of Array.from(items)) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (file) {
+        const ext = file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'png'
+        const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+        const namedFile = new File([file], `clipboard-${ts}.${ext}`, { type: file.type })
+        imageFiles.push(namedFile)
+      }
+    }
+  }
+
+  if (imageFiles.length === 0) return
+  event.preventDefault()
+
+  await imageStore.addImages(imageFiles)
+  toast.success(
+    imageFiles.length === 1
+      ? t('toast.pastedFromClipboard')
+      : t('toast.pastedFromClipboardMultiple', { count: imageFiles.length })
+  )
+}
+
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
@@ -417,10 +449,12 @@ onMounted(() => {
   }
 
   window.addEventListener('keydown', handleKeyboard)
+  window.addEventListener('paste', handlePaste as EventListener)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyboard)
+  window.removeEventListener('paste', handlePaste as EventListener)
 })
 </script>
 
