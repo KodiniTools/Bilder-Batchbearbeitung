@@ -504,6 +504,7 @@
     "sections": {
       "preview": "Preview",
       "fileName": "File Name",
+      "text": "Text",
       "filters": "Filters",
       "transformations": "Transformations",
       "resize": "Resize",
@@ -548,6 +549,22 @@
       "reset": "Reset",
       "save": "Save",
       "apply": "Apply changes"
+    },
+    "text": {
+      "add": "Add text",
+      "contentPlaceholder": "Enter multi-line text…",
+      "fontSize": "Font size",
+      "fontFamily": "Font",
+      "color": "Color",
+      "style": "Style",
+      "bold": "Bold",
+      "italic": "Italic",
+      "alignLeft": "Align left",
+      "alignCenter": "Center",
+      "alignRight": "Align right",
+      "opacity": "Opacity",
+      "delete": "Delete text",
+      "hint": "Add text and position it on the image."
     },
     "compare": {
       "before": "Before",

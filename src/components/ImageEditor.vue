@@ -87,6 +87,16 @@
                     <span class="split-label split-label-r">{{ t('imageEditor.compare.after') }}</span>
                   </template>
 
+                  <!-- Text overlay (only in 'after' mode, not during crop) -->
+                  <TextOverlay
+                    v-if="!isCropMode && compareMode === 'after'"
+                    :items="textItems"
+                    :selected-id="selectedTextId"
+                    @update:selected-id="selectedTextId = $event"
+                    @update:items="textItems = $event"
+                    @delete-item="deleteTextItem"
+                  />
+
                   <CropTool
                     v-if="isCropMode"
                     :image-pixel-width="currentWidth"
@@ -119,6 +129,149 @@
                   class="ctrl-input"
                   :placeholder="t('imageEditor.fileName.placeholder')"
                 >
+              </div>
+
+              <!-- Text -->
+              <div class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-font"></i>
+                  {{ t('imageEditor.sections.text') }}
+                  <button type="button" class="btn btn-xs btn-primary text-add-btn" @click="addTextItem">
+                    <i class="fa-solid fa-plus"></i>
+                    {{ t('imageEditor.text.add') }}
+                  </button>
+                </div>
+
+                <!-- Selected text properties -->
+                <template v-if="selectedText">
+                  <textarea
+                    class="ctrl-textarea"
+                    :placeholder="t('imageEditor.text.contentPlaceholder')"
+                    :value="selectedText.text"
+                    rows="3"
+                    @input="updateSelectedText({ text: ($event.target as HTMLTextAreaElement).value })"
+                  ></textarea>
+
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.fontSize') }}</span>
+                    <input
+                      type="number"
+                      class="size-input"
+                      min="6"
+                      max="300"
+                      :value="selectedText.fontSize"
+                      @input="updateSelectedText({ fontSize: +($event.target as HTMLInputElement).value })"
+                    >
+                    <span class="size-unit">px</span>
+                  </div>
+
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.fontFamily') }}</span>
+                    <select
+                      class="ctrl-select ctrl-select-sm"
+                      :value="selectedText.fontFamily"
+                      @change="updateSelectedText({ fontFamily: ($event.target as HTMLSelectElement).value })"
+                    >
+                      <option v-for="f in FONT_FAMILIES" :key="f.value" :value="f.value">{{ f.label }}</option>
+                    </select>
+                  </div>
+
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.color') }}</span>
+                    <input
+                      type="color"
+                      class="color-input"
+                      :value="selectedText.color"
+                      @input="updateSelectedText({ color: ($event.target as HTMLInputElement).value })"
+                    >
+                  </div>
+
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.style') }}</span>
+                    <div class="btn-cluster">
+                      <button
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': selectedText.bold }"
+                        :title="t('imageEditor.text.bold')"
+                        @click="updateSelectedText({ bold: !selectedText.bold })"
+                      ><b>B</b></button>
+                      <button
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': selectedText.italic }"
+                        :title="t('imageEditor.text.italic')"
+                        @click="updateSelectedText({ italic: !selectedText.italic })"
+                      ><i>I</i></button>
+                      <button
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': selectedText.align === 'left' }"
+                        :title="t('imageEditor.text.alignLeft')"
+                        @click="updateSelectedText({ align: 'left' })"
+                      ><i class="fa-solid fa-align-left"></i></button>
+                      <button
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': selectedText.align === 'center' }"
+                        :title="t('imageEditor.text.alignCenter')"
+                        @click="updateSelectedText({ align: 'center' })"
+                      ><i class="fa-solid fa-align-center"></i></button>
+                      <button
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{ 'btn-active': selectedText.align === 'right' }"
+                        :title="t('imageEditor.text.alignRight')"
+                        @click="updateSelectedText({ align: 'right' })"
+                      ><i class="fa-solid fa-align-right"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.opacity') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="0"
+                        max="100"
+                        step="1"
+                        :value="selectedText.opacity"
+                        @input="updateSelectedText({ opacity: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.opacity }}%</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="btn btn-xs btn-ghost"
+                    style="color: #ef4444; align-self: flex-start;"
+                    @click="deleteTextItem(selectedText.id)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                    {{ t('imageEditor.text.delete') }}
+                  </button>
+                </template>
+
+                <!-- Text items list -->
+                <div v-if="textItems.length > 0 && !selectedText" class="text-list">
+                  <button
+                    v-for="item in textItems"
+                    :key="item.id"
+                    type="button"
+                    class="text-list-item"
+                    @click="selectedTextId = item.id"
+                  >
+                    <i class="fa-solid fa-font"></i>
+                    <span class="text-list-preview">{{ item.text || '…' }}</span>
+                  </button>
+                </div>
+
+                <p v-if="textItems.length === 0" class="text-hint">
+                  <i class="fa-solid fa-circle-info"></i>
+                  {{ t('imageEditor.text.hint') }}
+                </p>
               </div>
 
               <!-- Filter -->
@@ -364,14 +517,24 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { ImageObject, ImageFilters } from '@/lib/core/types'
+import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
 import CropTool from './CropTool.vue'
+import TextOverlay from './TextOverlay.vue'
 
 const { t } = useI18n()
 const toast = useToast()
+
+const FONT_FAMILIES: { label: string; value: string }[] = [
+  { label: 'Arial',           value: 'Arial, sans-serif' },
+  { label: 'Georgia',         value: 'Georgia, serif' },
+  { label: 'Verdana',         value: 'Verdana, sans-serif' },
+  { label: 'Times New Roman', value: '"Times New Roman", serif' },
+  { label: 'Courier New',     value: '"Courier New", monospace' },
+  { label: 'Impact',          value: 'Impact, sans-serif' },
+]
 
 const CROP_RATIO_PRESETS = [
   { label: t('imageEditor.crop.ratioFree'), ratio: null },
@@ -430,6 +593,21 @@ const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
 
 // Two-step save state
 const changesApplied = ref(false)
+
+// Text overlay state
+const textItems = ref<TextItem[]>([])
+const selectedTextId = ref<string | null>(null)
+
+const selectedText = computed(() =>
+  textItems.value.find(i => i.id === selectedTextId.value) ?? null
+)
+
+function updateSelectedText(patch: Partial<TextItem>) {
+  if (!selectedTextId.value) return
+  textItems.value = textItems.value.map(i =>
+    i.id === selectedTextId.value ? { ...i, ...patch } : i
+  )
+}
 
 // Compare mode state
 const compareMode = ref<'before' | 'split' | 'after'>('after')
@@ -552,6 +730,10 @@ function initializeEditor(image: ImageObject) {
 
   // Copy existing filters from the image object
   localFilters.value = { ...(image.filters || defaultFilters) }
+
+  // Reset text overlay
+  textItems.value = []
+  selectedTextId.value = null
 
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
   const format = availableFormats.value.find(f => f.ext === ext)
@@ -794,6 +976,8 @@ function resetToOriginal() {
   if (originalImageObj) fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
   aspectRatio = workingCanvas.width / workingCanvas.height
   localFilters.value = { ...defaultFilters }
+  textItems.value = []
+  selectedTextId.value = null
   changesApplied.value = false
   updatePreview()
 }
@@ -822,8 +1006,46 @@ function applyChanges() {
   changesApplied.value = true
 }
 
+function bakeTextToCanvas() {
+  if (!workingCanvas || textItems.value.length === 0) return
+  const ctx = workingCanvas.getContext('2d')
+  if (!ctx) return
+  const pw = previewCanvas.value?.width ?? workingCanvas.width
+  const scale = workingCanvas.width / pw
+
+  for (const item of textItems.value) {
+    if (!item.text.trim()) continue
+    const x = (item.x / 100) * workingCanvas.width
+    const y = (item.y / 100) * workingCanvas.height
+    const bakeFontSize = Math.max(1, Math.round(item.fontSize * scale))
+    const lineHeight = bakeFontSize * 1.35
+
+    ctx.save()
+    ctx.globalAlpha = item.opacity / 100
+    ctx.fillStyle = item.color
+    ctx.font = [
+      item.italic ? 'italic' : '',
+      item.bold ? 'bold' : '',
+      `${bakeFontSize}px`,
+      item.fontFamily,
+    ].filter(Boolean).join(' ')
+    ctx.textAlign = item.align
+    ctx.textBaseline = 'top'
+
+    item.text.split('\n').forEach((line, i) => {
+      ctx.fillText(line, x, y + i * lineHeight)
+    })
+    ctx.restore()
+  }
+}
+
 function saveChanges() {
   if (!props.image || !workingCanvas) return
+
+  // Bake any pending text items into the canvas before saving
+  bakeTextToCanvas()
+  textItems.value = []
+  selectedTextId.value = null
 
   /* eslint-disable vue/no-mutating-props */
   props.image.canvas.width = workingCanvas.width
@@ -840,8 +1062,34 @@ function saveChanges() {
   closeEditor()
 }
 
+function addTextItem() {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
+  const newItem: TextItem = {
+    id,
+    text: '',
+    x: 10,
+    y: 10,
+    fontSize: 36,
+    fontFamily: 'Arial, sans-serif',
+    color: '#ffffff',
+    bold: false,
+    italic: false,
+    align: 'left',
+    opacity: 100,
+  }
+  textItems.value = [...textItems.value, newItem]
+  selectedTextId.value = id
+}
+
+function deleteTextItem(id: string) {
+  textItems.value = textItems.value.filter(i => i.id !== id)
+  if (selectedTextId.value === id) selectedTextId.value = null
+}
+
 function closeEditor() {
   isCropMode.value = false
+  textItems.value = []
+  selectedTextId.value = null
   emit('close')
 }
 </script>
@@ -1132,6 +1380,82 @@ function closeEditor() {
 
 .btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
 .btn-row { display: flex; gap: var(--space-2); }
+
+/* ── Text section ────────────────────────────────────────── */
+.text-add-btn {
+  margin-left: auto;
+}
+
+.ctrl-textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  min-height: 60px;
+}
+.ctrl-textarea:focus { outline: none; border-color: var(--accent); }
+
+.ctrl-select-sm {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.color-input {
+  width: 36px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.text-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 5px var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.text-list-item:hover { border-color: var(--accent); }
+.text-list-item i { color: var(--muted); flex-shrink: 0; }
+
+.text-list-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+}
+.text-hint i { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
 
 /* ── Filter sliders ──────────────────────────────────────── */
 .filter-row {

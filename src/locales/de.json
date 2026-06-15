@@ -679,11 +679,28 @@
     "sections": {
       "preview": "Vorschau",
       "fileName": "Dateiname",
+      "text": "Text",
       "filters": "Filter",
       "transformations": "Transformationen",
       "resize": "Größe ändern",
       "export": "Exportieren",
       "crop": "Zuschneiden"
+    },
+    "text": {
+      "add": "Text hinzufügen",
+      "contentPlaceholder": "Mehrzeiligen Text eingeben…",
+      "fontSize": "Schriftgröße",
+      "fontFamily": "Schriftart",
+      "color": "Farbe",
+      "style": "Stil",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "alignLeft": "Linksbündig",
+      "alignCenter": "Zentriert",
+      "alignRight": "Rechtsbündig",
+      "opacity": "Deckkraft",
+      "delete": "Text löschen",
+      "hint": "Text hinzufügen und auf dem Bild positionieren."
     },
     "compare": {
       "before": "Vorher",
