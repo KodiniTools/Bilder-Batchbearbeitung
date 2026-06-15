@@ -156,445 +156,58 @@
                 >
               </div>
 
-              <!-- Text -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-font"></i>
-                  {{ t('imageEditor.sections.text') }}
-                  <button type="button" class="btn btn-xs btn-primary text-add-btn" @click="addTextItem">
-                    <i class="fa-solid fa-plus"></i>
-                    {{ t('imageEditor.text.add') }}
-                  </button>
-                </div>
+              <EditorTextSection
+                :text-items="textItems"
+                :selected-text-id="selectedTextId"
+                :selected-text="selectedText"
+                :font-families="FONT_FAMILIES"
+                @add="addTextItem"
+                @delete="deleteTextItem"
+                @update-text="updateSelectedText"
+                @update:selected-text-id="selectedTextId = $event"
+              />
 
-                <!-- Selected text properties -->
-                <template v-if="selectedText">
-                  <textarea
-                    class="ctrl-textarea"
-                    :placeholder="t('imageEditor.text.contentPlaceholder')"
-                    :value="selectedText.text"
-                    rows="3"
-                    @input="updateSelectedText({ text: ($event.target as HTMLTextAreaElement).value })"
-                  ></textarea>
+              <EditorFiltersSection
+                :local-filters="localFilters"
+                :filter-defs="FILTER_DEFS"
+                @filter-input="onFilterInputFromChild"
+                @reset="resetFilters"
+              />
 
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.fontSize') }}</span>
-                    <input
-                      type="number"
-                      class="size-input"
-                      min="6"
-                      max="300"
-                      :value="selectedText.fontSize"
-                      @input="updateSelectedText({ fontSize: +($event.target as HTMLInputElement).value })"
-                    >
-                    <span class="size-unit">px</span>
-                  </div>
+              <EditorCropSection
+                :is-crop-mode="isCropMode"
+                :crop-locked-ratio="cropLockedRatio"
+                :crop-presets="CROP_RATIO_PRESETS"
+                @start="startCropMode"
+                @apply="applyCrop"
+                @cancel="cancelCropMode"
+                @set-ratio="setCropRatio"
+              />
 
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.fontFamily') }}</span>
-                    <select
-                      class="ctrl-select ctrl-select-sm"
-                      :value="selectedText.fontFamily"
-                      @change="updateSelectedText({ fontFamily: ($event.target as HTMLSelectElement).value })"
-                    >
-                      <option v-for="f in FONT_FAMILIES" :key="f.value" :value="f.value">{{ f.label }}</option>
-                    </select>
-                  </div>
+              <EditorTransformSection
+                @rotate="rotate"
+                @flip="onFlip"
+              />
 
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.color') }}</span>
-                    <input
-                      type="color"
-                      class="color-input"
-                      :value="selectedText.color"
-                      @input="updateSelectedText({ color: ($event.target as HTMLInputElement).value })"
-                    >
-                  </div>
+              <EditorResizeSection
+                :resize-width="resizeWidth"
+                :resize-height="resizeHeight"
+                :keep-aspect-ratio="keepAspectRatio"
+                @update:resize-width="resizeWidth = $event"
+                @update:resize-height="resizeHeight = $event"
+                @update:keep-aspect-ratio="keepAspectRatio = $event"
+                @width-change="onResizeWidthChange"
+                @height-change="onResizeHeightChange"
+                @reset-size="resetSize"
+              />
 
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.style') }}</span>
-                    <div class="btn-cluster">
-                      <button
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': selectedText.bold }"
-                        :title="t('imageEditor.text.bold')"
-                        @click="updateSelectedText({ bold: !selectedText.bold })"
-                      ><b>B</b></button>
-                      <button
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': selectedText.italic }"
-                        :title="t('imageEditor.text.italic')"
-                        @click="updateSelectedText({ italic: !selectedText.italic })"
-                      ><i>I</i></button>
-                      <button
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': selectedText.align === 'left' }"
-                        :title="t('imageEditor.text.alignLeft')"
-                        @click="updateSelectedText({ align: 'left' })"
-                      ><i class="fa-solid fa-align-left"></i></button>
-                      <button
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': selectedText.align === 'center' }"
-                        :title="t('imageEditor.text.alignCenter')"
-                        @click="updateSelectedText({ align: 'center' })"
-                      ><i class="fa-solid fa-align-center"></i></button>
-                      <button
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': selectedText.align === 'right' }"
-                        :title="t('imageEditor.text.alignRight')"
-                        @click="updateSelectedText({ align: 'right' })"
-                      ><i class="fa-solid fa-align-right"></i></button>
-                    </div>
-                  </div>
-
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.opacity') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="0"
-                        max="100"
-                        step="1"
-                        :value="selectedText.opacity"
-                        @input="updateSelectedText({ opacity: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.opacity }}%</span>
-                    </div>
-                  </div>
-
-                  <!-- Stroke (Umrandung) -->
-                  <div class="ctrl-subheader">{{ t('imageEditor.text.stroke') }}</div>
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.strokeColor') }}</span>
-                    <input
-                      type="color"
-                      class="color-input"
-                      :value="selectedText.strokeColor"
-                      @input="updateSelectedText({ strokeColor: ($event.target as HTMLInputElement).value })"
-                    >
-                  </div>
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.strokeWidth') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="0"
-                        max="20"
-                        step="0.5"
-                        :value="selectedText.strokeWidth"
-                        @input="updateSelectedText({ strokeWidth: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.strokeWidth }}px</span>
-                    </div>
-                  </div>
-
-                  <!-- Shadow (Schatten) -->
-                  <div class="ctrl-subheader">{{ t('imageEditor.text.shadow') }}</div>
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.text.shadowColor') }}</span>
-                    <input
-                      type="color"
-                      class="color-input"
-                      :value="selectedText.shadowColor"
-                      @input="updateSelectedText({ shadowColor: ($event.target as HTMLInputElement).value })"
-                    >
-                  </div>
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.shadowOpacity') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="0"
-                        max="100"
-                        step="1"
-                        :value="selectedText.shadowOpacity"
-                        @input="updateSelectedText({ shadowOpacity: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.shadowOpacity }}%</span>
-                    </div>
-                  </div>
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.shadowBlur') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="0"
-                        max="30"
-                        step="1"
-                        :value="selectedText.shadowBlur"
-                        @input="updateSelectedText({ shadowBlur: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.shadowBlur }}px</span>
-                    </div>
-                  </div>
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.shadowOffsetX') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="-20"
-                        max="20"
-                        step="1"
-                        :value="selectedText.shadowOffsetX"
-                        @input="updateSelectedText({ shadowOffsetX: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.shadowOffsetX }}px</span>
-                    </div>
-                  </div>
-                  <div class="filter-row">
-                    <label class="filter-label">{{ t('imageEditor.text.shadowOffsetY') }}</label>
-                    <div class="filter-slider-wrap">
-                      <input
-                        type="range"
-                        class="filter-slider"
-                        min="-20"
-                        max="20"
-                        step="1"
-                        :value="selectedText.shadowOffsetY"
-                        @input="updateSelectedText({ shadowOffsetY: +($event.target as HTMLInputElement).value })"
-                      >
-                      <span class="filter-value">{{ selectedText.shadowOffsetY }}px</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    class="btn btn-xs btn-ghost"
-                    style="color: #ef4444; align-self: flex-start;"
-                    @click="deleteTextItem(selectedText.id)"
-                  >
-                    <i class="fa-solid fa-trash"></i>
-                    {{ t('imageEditor.text.delete') }}
-                  </button>
-                </template>
-
-                <!-- Text items list -->
-                <div v-if="textItems.length > 0 && !selectedText" class="text-list">
-                  <button
-                    v-for="item in textItems"
-                    :key="item.id"
-                    type="button"
-                    class="text-list-item"
-                    @click="selectedTextId = item.id"
-                  >
-                    <i class="fa-solid fa-font"></i>
-                    <span class="text-list-preview">{{ item.text || '…' }}</span>
-                  </button>
-                </div>
-
-                <p v-if="textItems.length === 0" class="text-hint">
-                  <i class="fa-solid fa-circle-info"></i>
-                  {{ t('imageEditor.text.hint') }}
-                </p>
-              </div>
-
-              <!-- Filter -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-sliders"></i>
-                  {{ t('imageEditor.sections.filters') }}
-                </div>
-                <div
-                  v-for="fd in FILTER_DEFS"
-                  :key="fd.key"
-                  class="filter-row"
-                >
-                  <label class="filter-label">{{ t(`imageEditor.filters.${fd.key}`) }}</label>
-                  <div class="filter-slider-wrap">
-                    <input
-                      type="range"
-                      class="filter-slider"
-                      :min="fd.min"
-                      :max="fd.max"
-                      :step="fd.step"
-                      :value="localFilters[fd.key]"
-                      @input="onFilterInput(fd.key, $event)"
-                    >
-                    <span class="filter-value">{{ localFilters[fd.key] }}{{ fd.unit }}</span>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-xs btn-ghost" @click="resetFilters">
-                  <i class="fa-solid fa-arrow-rotate-left"></i>
-                  {{ t('imageEditor.filters.reset') }}
-                </button>
-              </div>
-
-              <!-- Zuschneiden -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-crop-simple"></i>
-                  {{ t('imageEditor.sections.crop') }}
-                </div>
-                <div v-if="!isCropMode">
-                  <button type="button" class="btn btn-sm" @click="startCropMode">
-                    <i class="fa-solid fa-crop-simple"></i>
-                    {{ t('imageEditor.crop.start') }}
-                  </button>
-                </div>
-                <template v-else>
-                  <div class="ctrl-row">
-                    <span class="ctrl-sublabel">{{ t('imageEditor.crop.ratio') }}</span>
-                    <div class="btn-cluster">
-                      <button
-                        v-for="preset in CROP_RATIO_PRESETS"
-                        :key="preset.label"
-                        type="button"
-                        class="btn btn-xs"
-                        :class="{ 'btn-active': cropLockedRatio === preset.ratio }"
-                        @click="setCropRatio(preset.ratio)"
-                      >{{ preset.label }}</button>
-                    </div>
-                  </div>
-                  <div class="btn-row">
-                    <button type="button" class="btn btn-sm btn-primary" @click="applyCrop">
-                      <i class="fa-solid fa-check"></i>
-                      {{ t('imageEditor.crop.apply') }}
-                    </button>
-                    <button type="button" class="btn btn-sm" @click="cancelCropMode">
-                      {{ t('imageEditor.crop.cancel') }}
-                    </button>
-                  </div>
-                </template>
-              </div>
-
-              <!-- Transformationen -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-rotate"></i>
-                  {{ t('imageEditor.sections.transformations') }}
-                </div>
-                <div class="ctrl-row">
-                  <span class="ctrl-sublabel">{{ t('imageEditor.transformations.rotate.label') }}</span>
-                  <div class="btn-cluster">
-                    <button
-                      type="button"
-                      class="btn btn-icon-sm"
-                      :title="t('imageEditor.transformations.rotate.left90')"
-                      @click="rotate(-90)"
-                    >
-                      <i class="fa-solid fa-rotate-left"></i> −90°
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-icon-sm"
-                      :title="t('imageEditor.transformations.rotate.rotate180')"
-                      @click="rotate(180)"
-                    >180°</button>
-                    <button
-                      type="button"
-                      class="btn btn-icon-sm"
-                      :title="t('imageEditor.transformations.rotate.right90')"
-                      @click="rotate(90)"
-                    >
-                      +90° <i class="fa-solid fa-rotate-right"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="ctrl-row">
-                  <span class="ctrl-sublabel">{{ t('imageEditor.transformations.flip.label') }}</span>
-                  <div class="btn-cluster">
-                    <button
-                      type="button"
-                      class="btn btn-icon-sm"
-                      :title="t('imageEditor.transformations.flip.horizontalTitle')"
-                      @click="flip('horizontal')"
-                    >
-                      <i class="fa-solid fa-left-right"></i>
-                      {{ t('imageEditor.transformations.flip.horizontal') }}
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-icon-sm"
-                      :title="t('imageEditor.transformations.flip.verticalTitle')"
-                      @click="flip('vertical')"
-                    >
-                      <i class="fa-solid fa-up-down"></i>
-                      {{ t('imageEditor.transformations.flip.vertical') }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Größe ändern -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-expand"></i>
-                  {{ t('imageEditor.sections.resize') }}
-                </div>
-                <div class="size-row">
-                  <label class="size-label" for="resizeWidth">B</label>
-                  <input
-                    id="resizeWidth"
-                    v-model.number="resizeWidth"
-                    type="number"
-                    class="size-input"
-                    min="1"
-                    max="5000"
-                    @input="onResizeWidthChange"
-                  >
-                  <span class="size-unit">px</span>
-                  <button
-                    type="button"
-                    class="link-btn"
-                    :class="{ active: keepAspectRatio }"
-                    :title="t('imageEditor.resize.keepAspectRatio')"
-                    @click="keepAspectRatio = !keepAspectRatio"
-                  >
-                    <i :class="keepAspectRatio ? 'fa-solid fa-link' : 'fa-solid fa-link-slash'"></i>
-                  </button>
-                  <label class="size-label" for="resizeHeight">H</label>
-                  <input
-                    id="resizeHeight"
-                    v-model.number="resizeHeight"
-                    type="number"
-                    class="size-input"
-                    min="1"
-                    max="5000"
-                    @input="onResizeHeightChange"
-                  >
-                  <span class="size-unit">px</span>
-                </div>
-                <button type="button" class="btn btn-xs btn-ghost" @click="resetSize">
-                  <i class="fa-solid fa-arrow-rotate-left"></i>
-                  {{ t('imageEditor.resize.resetSize') }}
-                </button>
-              </div>
-
-              <!-- Export -->
-              <div class="ctrl-section">
-                <div class="ctrl-header">
-                  <i class="fa-solid fa-file-export"></i>
-                  {{ t('imageEditor.sections.export') }}
-                </div>
-                <div class="export-row">
-                  <select id="exportFormat" v-model="selectedFormat" class="ctrl-select">
-                    <option
-                      v-for="format in availableFormats"
-                      :key="format.mimeType"
-                      :value="format.mimeType"
-                    >{{ format.name }}</option>
-                  </select>
-                  <button
-                    type="button"
-                    class="btn btn-sm"
-                    :disabled="isDownloading"
-                    @click="downloadImage"
-                  >
-                    <i :class="isDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'"></i>
-                    {{ isDownloading ? t('imageEditor.export.downloading') : t('imageEditor.export.downloadButton') }}
-                  </button>
-                </div>
-              </div>
+              <EditorExportSection
+                :available-formats="availableFormats"
+                :selected-format="selectedFormat"
+                :is-downloading="isDownloading"
+                @update:selected-format="selectedFormat = $event"
+                @download="downloadImage"
+              />
 
             </div>
           </div>
@@ -645,8 +258,16 @@ import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
+import { useEditorHistory } from '@/composables/useEditorHistory'
+import { useEditorCanvas } from '@/composables/useEditorCanvas'
 import CropTool from './CropTool.vue'
 import TextOverlay from './TextOverlay.vue'
+import EditorFiltersSection from './editor/EditorFiltersSection.vue'
+import EditorTextSection from './editor/EditorTextSection.vue'
+import EditorCropSection from './editor/EditorCropSection.vue'
+import EditorTransformSection from './editor/EditorTransformSection.vue'
+import EditorResizeSection from './editor/EditorResizeSection.vue'
+import EditorExportSection from './editor/EditorExportSection.vue'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -704,19 +325,15 @@ const resizeHeight = ref(0)
 const keepAspectRatio = ref(true)
 const selectedFormat = ref('image/png')
 const isDownloading = ref(false)
-const currentWidth = ref(0)
-const currentHeight = ref(0)
 
 // Filter state (local copy, baked on save)
 const localFilters = ref<ImageFilters>({ ...defaultFilters })
 
-// Crop state
-const isCropMode = ref(false)
-const cropLockedRatio = ref<number | null>(null)
-const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
-
 // Two-step save state
 const changesApplied = ref(false)
+
+// Compare mode state
+const compareMode = ref<'before' | 'split' | 'after'>('after')
 
 // Text overlay state
 const textItems = ref<TextItem[]>([])
@@ -726,6 +343,49 @@ const selectedText = computed(() =>
   textItems.value.find(i => i.id === selectedTextId.value) ?? null
 )
 
+// ── Canvas composable ─────────────────────────────────────────────
+const {
+  currentWidth,
+  currentHeight,
+  isCropMode,
+  cropLockedRatio,
+  splitDividerPos,
+  init: initCanvas,
+  updatePreview,
+  rotate,
+  flip,
+  startCropMode: startCropModeCanvas,
+  cancelCropMode,
+  setCropRatio,
+  onCropUpdate,
+  applyCrop,
+  startSplitDrag,
+  dispose: disposeCanvas,
+  getWorkingCanvas,
+  getOriginalCanvas,
+  getOriginalImageObj,
+  getAspectRatio,
+  setAspectRatio,
+} = useEditorCanvas(
+  previewCanvas,
+  originalPreviewCanvas,
+  previewAreaRef,
+  canvasWrapperRef,
+  changesApplied,
+)
+
+// ── History composable ────────────────────────────────────────────
+const {
+  canUndo,
+  canRedo,
+  snapshotNow,
+  schedule: schedulePushHistory,
+  undo,
+  redo,
+  init: initHistory,
+  dispose: disposeHistory,
+} = useEditorHistory(localFilters, textItems, changesApplied)
+
 function updateSelectedText(patch: Partial<TextItem>) {
   if (!selectedTextId.value) return
   textItems.value = textItems.value.map(i =>
@@ -734,55 +394,16 @@ function updateSelectedText(patch: Partial<TextItem>) {
   schedulePushHistory()
 }
 
-// ── Undo / Redo ───────────────────────────────────────────────────
-
-interface HistorySnapshot {
-  filters: ImageFilters
-  texts: TextItem[]
+function startCropMode() {
+  startCropModeCanvas()
+  compareMode.value = 'after'
 }
 
-const history = ref<HistorySnapshot[]>([])
-const historyIndex = ref(-1)
-let historyTimer: ReturnType<typeof setTimeout> | null = null
-
-const canUndo = computed(() => historyIndex.value > 0)
-const canRedo = computed(() => historyIndex.value < history.value.length - 1)
-
-function snapshotNow() {
-  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
-  const snap: HistorySnapshot = {
-    filters: { ...localFilters.value },
-    texts: textItems.value.map(t => ({ ...t })),
-  }
-  history.value = history.value.slice(0, historyIndex.value + 1)
-  history.value.push(snap)
-  historyIndex.value = history.value.length - 1
+function onFlip(direction: string) {
+  flip(direction as 'horizontal' | 'vertical')
 }
 
-function schedulePushHistory() {
-  if (historyTimer) clearTimeout(historyTimer)
-  historyTimer = setTimeout(snapshotNow, 350)
-}
-
-function restoreSnapshot(snap: HistorySnapshot) {
-  localFilters.value = { ...snap.filters }
-  textItems.value = snap.texts.map(t => ({ ...t }))
-  changesApplied.value = false
-}
-
-function undo() {
-  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
-  if (!canUndo.value) return
-  historyIndex.value--
-  restoreSnapshot(history.value[historyIndex.value])
-}
-
-function redo() {
-  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
-  if (!canRedo.value) return
-  historyIndex.value++
-  restoreSnapshot(history.value[historyIndex.value])
-}
+// ── Keyboard undo / redo ──────────────────────────────────────────
 
 function handleUndoRedo(e: KeyboardEvent) {
   if (!props.isOpen) return
@@ -800,18 +421,9 @@ watch(() => props.isOpen, (open) => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleUndoRedo)
-  if (historyTimer) clearTimeout(historyTimer)
+  disposeHistory()
+  disposeCanvas()
 })
-
-// Compare mode state
-const compareMode = ref<'before' | 'split' | 'after'>('after')
-const splitDividerPos = ref(50)
-let isDraggingSplit = false
-
-let workingCanvas: HTMLCanvasElement | null = null
-let originalCanvas: HTMLCanvasElement | null = null
-let originalImageObj: ImageObject | null = null
-let aspectRatio = 1
 
 // ── Computed ──────────────────────────────────────────────────────
 
@@ -821,6 +433,7 @@ const dimensions = computed(() => {
 })
 
 const fileSize = computed(() => {
+  const originalImageObj = getOriginalImageObj()
   if (!originalImageObj) return '0 KB'
   const originalSize = originalImageObj.file.size
   const originalPixels = originalImageObj.canvas.width * originalImageObj.canvas.height
@@ -906,22 +519,13 @@ watch([resizeWidth, resizeHeight], () => {
 
 function initializeEditor(image: ImageObject) {
   if (!image) return
-  originalImageObj = image
 
-  workingCanvas = document.createElement('canvas')
-  workingCanvas.width = image.canvas.width
-  workingCanvas.height = image.canvas.height
-  workingCanvas.getContext('2d')?.drawImage(image.canvas, 0, 0)
-
-  originalCanvas = document.createElement('canvas')
-  originalCanvas.width = image.canvas.width
-  originalCanvas.height = image.canvas.height
-  originalCanvas.getContext('2d')?.drawImage(image.canvas, 0, 0)
+  initCanvas(image)
+  const workingCanvas = getWorkingCanvas()!
 
   fileName.value = image.outputName || ImageProcessor.getFileNameWithoutExtension(image.file.name)
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
-  aspectRatio = workingCanvas.width / workingCanvas.height
 
   // Copy existing filters from the image object
   localFilters.value = { ...(image.filters || defaultFilters) }
@@ -931,9 +535,7 @@ function initializeEditor(image: ImageObject) {
   selectedTextId.value = null
 
   // Reset undo/redo history
-  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
-  history.value = [{ filters: { ...localFilters.value }, texts: [] }]
-  historyIndex.value = 0
+  initHistory(localFilters.value)
 
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
   const format = availableFormats.value.find(f => f.ext === ext)
@@ -942,109 +544,22 @@ function initializeEditor(image: ImageObject) {
   nextTick(() => updatePreview())
 }
 
-// ── Preview ───────────────────────────────────────────────────────
-
-function updatePreview() {
-  if (!previewCanvas.value || !workingCanvas) return
-
-  currentWidth.value = workingCanvas.width
-  currentHeight.value = workingCanvas.height
-
-  const panel = previewAreaRef.value
-  const maxW = panel ? panel.clientWidth - 48 : 500
-  const maxH = panel ? panel.clientHeight - 80 : 500
-  const scale = Math.min(maxW / workingCanvas.width, maxH / workingCanvas.height, 1)
-
-  const dw = Math.max(1, Math.floor(workingCanvas.width * scale))
-  const dh = Math.max(1, Math.floor(workingCanvas.height * scale))
-
-  previewCanvas.value.width = dw
-  previewCanvas.value.height = dh
-
-  const ctx = previewCanvas.value.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, dw, dh)
-    ctx.drawImage(workingCanvas, 0, 0, dw, dh)
-  }
-
-  resizeWidth.value = workingCanvas.width
-  resizeHeight.value = workingCanvas.height
-
-  updateOriginalPreview(dw, dh)
-}
-
-function updateOriginalPreview(dw: number, dh: number) {
-  if (!originalPreviewCanvas.value || !originalCanvas) return
-  const target = originalPreviewCanvas.value
-  target.width = dw
-  target.height = dh
-  const ctx = target.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, dw, dh)
-    ctx.drawImage(originalCanvas, 0, 0, dw, dh)
-  }
-}
-
-// ── Transforms ───────────────────────────────────────────────────
-
-function rotate(degrees: number) {
-  if (!workingCanvas) return
-  changesApplied.value = false
-  const tempCanvas = document.createElement('canvas')
-  const tempCtx = tempCanvas.getContext('2d')
-  if (!tempCtx) return
-  const w = workingCanvas.width
-  const h = workingCanvas.height
-  if (Math.abs(degrees) === 90) {
-    tempCanvas.width = h; tempCanvas.height = w
-    tempCtx.translate(h / 2, w / 2)
-    tempCtx.rotate((degrees * Math.PI) / 180)
-    tempCtx.drawImage(workingCanvas, -w / 2, -h / 2)
-    workingCanvas.width = h; workingCanvas.height = w
-  } else {
-    tempCanvas.width = w; tempCanvas.height = h
-    tempCtx.translate(w / 2, h / 2)
-    tempCtx.rotate((degrees * Math.PI) / 180)
-    tempCtx.drawImage(workingCanvas, -w / 2, -h / 2)
-  }
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
-  aspectRatio = workingCanvas.width / workingCanvas.height
-  updatePreview()
-}
-
-function flip(direction: 'horizontal' | 'vertical') {
-  if (!workingCanvas) return
-  changesApplied.value = false
-  const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = workingCanvas.width; tempCanvas.height = workingCanvas.height
-  const tempCtx = tempCanvas.getContext('2d')
-  if (!tempCtx) return
-  tempCtx.save()
-  if (direction === 'horizontal') {
-    tempCtx.scale(-1, 1); tempCtx.drawImage(workingCanvas, -workingCanvas.width, 0)
-  } else {
-    tempCtx.scale(1, -1); tempCtx.drawImage(workingCanvas, 0, -workingCanvas.height)
-  }
-  tempCtx.restore()
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
-  updatePreview()
-}
+// ── Resize ────────────────────────────────────────────────────────
 
 function onResizeWidthChange() {
   if (keepAspectRatio.value && resizeWidth.value > 0) {
-    resizeHeight.value = Math.round(resizeWidth.value / aspectRatio)
+    resizeHeight.value = Math.round(resizeWidth.value / getAspectRatio())
   }
 }
 
 function onResizeHeightChange() {
   if (keepAspectRatio.value && resizeHeight.value > 0) {
-    resizeWidth.value = Math.round(resizeHeight.value * aspectRatio)
+    resizeWidth.value = Math.round(resizeHeight.value * getAspectRatio())
   }
 }
 
 function resetSize() {
+  const originalCanvas = getOriginalCanvas()
   if (originalCanvas) {
     resizeWidth.value = originalCanvas.width
     resizeHeight.value = originalCanvas.height
@@ -1060,90 +575,21 @@ function onFilterInput(key: FilterKey, event: Event) {
   schedulePushHistory()
 }
 
+function onFilterInputFromChild(key: string, event: Event) {
+  onFilterInput(key as FilterKey, event)
+}
+
 function resetFilters() {
   localFilters.value = { ...defaultFilters }
   changesApplied.value = false
   snapshotNow()
 }
 
-// ── Crop ─────────────────────────────────────────────────────────
-
-function startCropMode() {
-  cropLockedRatio.value = null
-  isCropMode.value = true
-  compareMode.value = 'after'
-}
-
-function cancelCropMode() { isCropMode.value = false }
-function setCropRatio(ratio: number | null) { cropLockedRatio.value = ratio }
-function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) { cropNorm.value = rect }
-
-function applyCrop() {
-  if (!workingCanvas) return
-  const x = Math.round(cropNorm.value.x * workingCanvas.width)
-  const y = Math.round(cropNorm.value.y * workingCanvas.height)
-  const w = Math.max(1, Math.round(cropNorm.value.w * workingCanvas.width))
-  const h = Math.max(1, Math.round(cropNorm.value.h * workingCanvas.height))
-  const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = w; tempCanvas.height = h
-  const tempCtx = tempCanvas.getContext('2d')
-  if (!tempCtx) return
-  tempCtx.drawImage(workingCanvas, x, y, w, h, 0, 0, w, h)
-  workingCanvas.width = w; workingCanvas.height = h
-  const ctx = workingCanvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
-  aspectRatio = w / h
-  isCropMode.value = false
-  changesApplied.value = false
-  updatePreview()
-}
-
-// ── Split compare drag ────────────────────────────────────────────
-
-function startSplitDrag(event: MouseEvent | TouchEvent) {
-  isDraggingSplit = true
-  document.addEventListener('mousemove', onSplitMouseMove)
-  document.addEventListener('mouseup', stopSplitDrag)
-  document.addEventListener('touchmove', onSplitTouchMove, { passive: false })
-  document.addEventListener('touchend', stopSplitDrag)
-}
-
-function onSplitMouseMove(event: MouseEvent) {
-  if (!isDraggingSplit) return
-  moveSplitTo(event.clientX)
-}
-
-function onSplitTouchMove(event: TouchEvent) {
-  if (!isDraggingSplit) return
-  event.preventDefault()
-  moveSplitTo(event.touches[0].clientX)
-}
-
-function moveSplitTo(clientX: number) {
-  if (!canvasWrapperRef.value) return
-  const rect = canvasWrapperRef.value.getBoundingClientRect()
-  const pos = ((clientX - rect.left) / rect.width) * 100
-  splitDividerPos.value = Math.max(2, Math.min(98, pos))
-}
-
-function stopSplitDrag() {
-  isDraggingSplit = false
-  document.removeEventListener('mousemove', onSplitMouseMove)
-  document.removeEventListener('mouseup', stopSplitDrag)
-  document.removeEventListener('touchmove', onSplitTouchMove)
-  document.removeEventListener('touchend', stopSplitDrag)
-}
-
-onUnmounted(() => {
-  document.removeEventListener('mousemove', onSplitMouseMove)
-  document.removeEventListener('mouseup', stopSplitDrag)
-  document.removeEventListener('touchmove', onSplitTouchMove)
-  document.removeEventListener('touchend', stopSplitDrag)
-})
-
 // ── Save / Reset ──────────────────────────────────────────────────
 
 async function downloadImage() {
+  const workingCanvas = getWorkingCanvas()
+  const originalImageObj = getOriginalImageObj()
   if (!workingCanvas || !originalImageObj) return
   isDownloading.value = true
   try {
@@ -1195,23 +641,25 @@ async function downloadImage() {
 }
 
 function resetToOriginal() {
+  const originalCanvas = getOriginalCanvas()
+  const workingCanvas = getWorkingCanvas()
   if (!originalCanvas || !workingCanvas) return
   workingCanvas.width = originalCanvas.width; workingCanvas.height = originalCanvas.height
   const ctx = workingCanvas.getContext('2d')
   if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(originalCanvas, 0, 0) }
+  const originalImageObj = getOriginalImageObj()
   if (originalImageObj) fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
-  aspectRatio = workingCanvas.width / workingCanvas.height
+  setAspectRatio(workingCanvas.width / workingCanvas.height)
   localFilters.value = { ...defaultFilters }
   textItems.value = []
   selectedTextId.value = null
   changesApplied.value = false
-  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
-  history.value = [{ filters: { ...defaultFilters }, texts: [] }]
-  historyIndex.value = 0
+  initHistory(defaultFilters)
   updatePreview()
 }
 
 function applyChanges() {
+  const workingCanvas = getWorkingCanvas()
   if (!workingCanvas) return
 
   const newWidth = resizeWidth.value || workingCanvas.width
@@ -1227,7 +675,7 @@ function applyChanges() {
       const ctx = workingCanvas.getContext('2d')
       if (ctx) { ctx.clearRect(0, 0, newWidth, newHeight); ctx.drawImage(tempCanvas, 0, 0) }
     }
-    aspectRatio = newWidth / newHeight
+    setAspectRatio(newWidth / newHeight)
   }
 
   updatePreview()
@@ -1236,6 +684,7 @@ function applyChanges() {
 }
 
 function bakeTextToCanvas() {
+  const workingCanvas = getWorkingCanvas()
   if (!workingCanvas || textItems.value.length === 0) return
   const ctx = workingCanvas.getContext('2d')
   if (!ctx) return
@@ -1294,6 +743,7 @@ function bakeTextToCanvas() {
 }
 
 function saveChanges() {
+  const workingCanvas = getWorkingCanvas()
   if (!props.image || !workingCanvas) return
 
   // Bake any pending text items into the canvas before saving
@@ -1640,253 +1090,19 @@ function closeEditor() {
   white-space: nowrap;
 }
 
-.ctrl-section {
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--border-color);
+/* ── Footer ──────────────────────────────────────────────── */
+.modal-footer {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.ctrl-header {
-  display: flex;
+  justify-content: flex-end;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--muted);
-}
-
-.ctrl-input {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.875rem;
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-}
-.ctrl-input:focus { outline: none; border-color: var(--accent); }
-
-.ctrl-row { display: flex; align-items: center; gap: var(--space-2); }
-
-.ctrl-sublabel {
-  font-size: 0.78rem;
-  color: var(--muted);
-  min-width: 68px;
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border-color);
+  background: var(--panel);
   flex-shrink: 0;
 }
 
-.btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
-.btn-row { display: flex; gap: var(--space-2); }
-
-/* ── Text section ────────────────────────────────────────── */
-.text-add-btn {
-  margin-left: auto;
-}
-
-.ctrl-subheader {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  margin-top: var(--space-1);
-}
-
-.ctrl-textarea {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.875rem;
-  resize: vertical;
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-  min-height: 60px;
-}
-.ctrl-textarea:focus { outline: none; border-color: var(--accent); }
-
-.ctrl-select-sm {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.8rem;
-}
-
-.color-input {
-  width: 36px;
-  height: 28px;
-  padding: 2px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  cursor: pointer;
-}
-
-.text-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.text-list-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 5px var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.8rem;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s;
-}
-.text-list-item:hover { border-color: var(--accent); }
-.text-list-item i { color: var(--muted); flex-shrink: 0; }
-
-.text-list-preview {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.text-hint {
-  font-size: 0.78rem;
-  color: var(--muted);
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin: 0;
-}
-.text-hint i { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
-
-/* ── Filter sliders ──────────────────────────────────────── */
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.filter-label {
-  font-size: 0.78rem;
-  color: var(--muted);
-  min-width: 84px;
-  flex-shrink: 0;
-}
-
-.filter-slider-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: 1;
-  min-width: 0;
-}
-
-.filter-slider {
-  flex: 1;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  border-radius: 2px;
-  background: var(--border-color);
-  outline: none;
-  cursor: pointer;
-  min-width: 0;
-}
-
-.filter-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-.filter-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: none;
-}
-
-.filter-value {
-  font-size: 0.73rem;
-  color: var(--muted);
-  min-width: 38px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-
-/* Size row */
-.size-row { display: flex; align-items: center; gap: 6px; }
-
-.size-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--muted);
-  min-width: 12px;
-}
-
-.size-input {
-  width: 68px;
-  padding: 5px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.875rem;
-  text-align: center;
-  transition: border-color 0.15s;
-}
-.size-input:focus { outline: none; border-color: var(--accent); }
-.size-unit { font-size: 0.75rem; color: var(--muted); }
-
-.link-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-.link-btn:hover { border-color: var(--accent); color: var(--accent); }
-.link-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
-
-/* Export row */
-.export-row { display: flex; gap: var(--space-2); align-items: center; }
-
-.ctrl-select {
-  flex: 1;
-  padding: 6px var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.875rem;
-  min-width: 0;
-}
-
-/* ── Buttons ─────────────────────────────────────────────── */
+/* ── Footer / inline buttons ─────────────────────────────── */
 .btn {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-color);
@@ -1905,21 +1121,6 @@ function closeEditor() {
 .btn:hover:not(:disabled) { border-color: var(--accent); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn-sm { padding: 6px 12px; font-size: 0.82rem; }
-.btn-xs { padding: 3px 8px; font-size: 0.78rem; }
-.btn-icon-sm { padding: 5px 10px; font-size: 0.8rem; }
-
-.btn-ghost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--muted);
-}
-.btn-ghost:hover:not(:disabled) {
-  background: var(--bg);
-  border-color: var(--border-color);
-  color: var(--text);
-}
-
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -1928,12 +1129,6 @@ function closeEditor() {
 .btn-primary:hover:not(:disabled) {
   background: color-mix(in oklab, var(--accent) 82%, black);
   border-color: color-mix(in oklab, var(--accent) 82%, black);
-}
-
-.btn-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
 }
 
 .btn-save {
@@ -1951,18 +1146,6 @@ function closeEditor() {
 .btn-swap-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
 .btn-swap-enter-from { opacity: 0; transform: translateY(4px); }
 .btn-swap-leave-to { opacity: 0; transform: translateY(-4px); }
-
-/* ── Footer ──────────────────────────────────────────────── */
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px solid var(--border-color);
-  background: var(--panel);
-  flex-shrink: 0;
-}
 
 /* ── Animations ──────────────────────────────────────────── */
 .modal-enter-active,
@@ -1993,7 +1176,6 @@ function closeEditor() {
   }
 
   .header-filename { display: none; }
-  .size-row { flex-wrap: wrap; }
 }
 
 @media (max-width: 480px) {
