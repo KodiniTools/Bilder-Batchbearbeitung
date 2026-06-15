@@ -831,11 +831,12 @@ const fileSize = computed(() => {
   return ImageProcessor.formatFileSize(estimatedSize)
 })
 
-const availableFormats = computed(() =>
-  ImageProcessor.availableFormats.filter(format =>
+const availableFormats = computed(() => {
+  const imageFormats = ImageProcessor.availableFormats.filter(format =>
     ImageProcessor.supportsFormat(format.mimeType)
   )
-)
+  return [...imageFormats, { name: 'PDF', mimeType: 'application/pdf', ext: 'pdf' }]
+})
 
 const filterStyle = computed(() => {
   const f = localFilters.value
@@ -1146,19 +1147,43 @@ async function downloadImage() {
   if (!workingCanvas || !originalImageObj) return
   isDownloading.value = true
   try {
+    const fileBase = fileName.value.trim() || ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
+    const safeBase = ImageProcessor.safeBaseName(fileBase)
+
+    // Build export canvas with current filters applied
+    const tempImageObj: ImageObject = {
+      ...originalImageObj,
+      canvas: workingCanvas,
+      ctx: workingCanvas.getContext('2d')!,
+      filters: { ...localFilters.value },
+    }
+    const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
+
+    if (selectedFormat.value === 'application/pdf') {
+      const { default: jsPDF } = await import('jspdf')
+      const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92)
+      const w = exportCanvas.width
+      const h = exportCanvas.height
+      const pdf = new jsPDF({
+        orientation: w >= h ? 'l' : 'p',
+        unit: 'px',
+        format: [w, h],
+        hotfixes: ['px_scaling'],
+      })
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, w, h)
+      pdf.save(`${safeBase}.pdf`)
+      return
+    }
+
     const format = availableFormats.value.find(f => f.mimeType === selectedFormat.value)
     if (!format) throw new Error('Ungültiges Format')
-    const tempImageObj: ImageObject = { ...originalImageObj, canvas: workingCanvas, ctx: workingCanvas.getContext('2d')! }
-    const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
     const blob = await ImageProcessor.convertToFormat(
       { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
       format
     )
-    const fileBase = fileName.value.trim() || ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
-    const downloadFileName = `${ImageProcessor.safeBaseName(fileBase)}.${format.ext}`
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = downloadFileName
+    a.href = url; a.download = `${safeBase}.${format.ext}`
     document.body.appendChild(a); a.click(); a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (error) {
