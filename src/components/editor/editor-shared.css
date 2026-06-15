@@ -1,0 +1,316 @@
+/* Shared styles for ImageEditor control sub-components.
+   Imported via `@import './editor-shared.css'` inside each component's
+   <style scoped> block so the selectors are scoped to that component. */
+
+/* ── Control sections ────────────────────────────────────── */
+.ctrl-section {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ctrl-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+.ctrl-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.ctrl-input:focus { outline: none; border-color: var(--accent); }
+
+.ctrl-row { display: flex; align-items: center; gap: var(--space-2); }
+
+.ctrl-sublabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-width: 68px;
+  flex-shrink: 0;
+}
+
+.btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
+.btn-row { display: flex; gap: var(--space-2); }
+
+/* ── Text section ────────────────────────────────────────── */
+.text-add-btn {
+  margin-left: auto;
+}
+
+.ctrl-subheader {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-top: var(--space-1);
+}
+
+.ctrl-textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  min-height: 60px;
+}
+.ctrl-textarea:focus { outline: none; border-color: var(--accent); }
+
+.ctrl-select-sm {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.color-input {
+  width: 36px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.text-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 5px var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.text-list-item:hover { border-color: var(--accent); }
+.text-list-item i { color: var(--muted); flex-shrink: 0; }
+
+.text-list-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+}
+.text-hint i { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+
+/* ── Filter sliders ──────────────────────────────────────── */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-width: 84px;
+  flex-shrink: 0;
+}
+
+.filter-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 2px;
+  background: var(--border-color);
+  outline: none;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.filter-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.filter-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+.filter-value {
+  font-size: 0.73rem;
+  color: var(--muted);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ── Size row ────────────────────────────────────────────── */
+.size-row { display: flex; align-items: center; gap: 6px; }
+
+.size-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 12px;
+}
+
+.size-input {
+  width: 68px;
+  padding: 5px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+.size-input:focus { outline: none; border-color: var(--accent); }
+.size-unit { font-size: 0.75rem; color: var(--muted); }
+
+.link-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.link-btn:hover { border-color: var(--accent); color: var(--accent); }
+.link-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
+
+/* ── Export row ──────────────────────────────────────────── */
+.export-row { display: flex; gap: var(--space-2); align-items: center; }
+
+.ctrl-select {
+  flex: 1;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+.btn-xs { padding: 3px 8px; font-size: 0.78rem; }
+.btn-icon-sm { padding: 5px 10px; font-size: 0.8rem; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--border-color);
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 82%, black);
+  border-color: color-mix(in oklab, var(--accent) 82%, black);
+}
+
+.btn-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.btn-save {
+  background: var(--green, #22c55e);
+  border-color: var(--green, #22c55e);
+  color: white;
+  font-weight: 600;
+}
+.btn-save:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--green, #22c55e) 85%, black);
+  border-color: color-mix(in oklab, var(--green, #22c55e) 85%, black);
+}
+
+.btn-swap-enter-active,
+.btn-swap-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.btn-swap-enter-from { opacity: 0; transform: translateY(4px); }
+.btn-swap-leave-to { opacity: 0; transform: translateY(-4px); }
