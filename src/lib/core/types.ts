@@ -99,6 +99,13 @@ export interface TextItem {
   italic: boolean
   align: 'left' | 'center' | 'right'
   opacity: number    // 0–100
+  strokeWidth: number  // 0–20, default 0
+  strokeColor: string  // hex, default '#000000'
+  shadowColor: string  // hex, default '#000000'
+  shadowOpacity: number // 0–100, default 60
+  shadowBlur: number   // 0–30, default 0
+  shadowOffsetX: number // -20–20, default 2
+  shadowOffsetY: number // -20–20, default 2
 }
 
 export interface WatermarkSettings {
