@@ -113,7 +113,22 @@ function itemPositionStyle(item: TextItem) {
   }
 }
 
+function hexToRgba(hex: string, opacity: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`
+}
+
 function textBodyStyle(item: TextItem) {
+  const sc = item.shadowColor ?? '#000000'
+  const so = item.shadowOpacity ?? 60
+  const sb = item.shadowBlur ?? 0
+  const sx = item.shadowOffsetX ?? 2
+  const sy = item.shadowOffsetY ?? 2
+  const hasTextShadow = sb > 0 || sx !== 0 || sy !== 0
+  const textShadow = hasTextShadow ? `${sx}px ${sy}px ${sb}px ${hexToRgba(sc, so)}` : 'none'
+  const sw = item.strokeWidth ?? 0
   return {
     fontSize:   item.fontSize + 'px',
     fontFamily: item.fontFamily,
@@ -122,8 +137,9 @@ function textBodyStyle(item: TextItem) {
     fontStyle:  item.italic ? 'italic' : 'normal',
     textAlign:  item.align,
     opacity:    item.opacity / 100,
-    textShadow: '1px 1px 3px rgba(0,0,0,0.55)',
+    textShadow,
     lineHeight: 1.35,
+    WebkitTextStroke: sw > 0 ? `${sw}px ${item.strokeColor ?? '#000000'}` : '0',
   }
 }
 </script>

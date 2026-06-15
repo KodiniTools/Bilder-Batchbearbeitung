@@ -243,6 +243,105 @@
                     </div>
                   </div>
 
+                  <!-- Stroke (Umrandung) -->
+                  <div class="ctrl-subheader">{{ t('imageEditor.text.stroke') }}</div>
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.strokeColor') }}</span>
+                    <input
+                      type="color"
+                      class="color-input"
+                      :value="selectedText.strokeColor"
+                      @input="updateSelectedText({ strokeColor: ($event.target as HTMLInputElement).value })"
+                    >
+                  </div>
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.strokeWidth') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="0"
+                        max="20"
+                        step="0.5"
+                        :value="selectedText.strokeWidth"
+                        @input="updateSelectedText({ strokeWidth: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.strokeWidth }}px</span>
+                    </div>
+                  </div>
+
+                  <!-- Shadow (Schatten) -->
+                  <div class="ctrl-subheader">{{ t('imageEditor.text.shadow') }}</div>
+                  <div class="ctrl-row">
+                    <span class="ctrl-sublabel">{{ t('imageEditor.text.shadowColor') }}</span>
+                    <input
+                      type="color"
+                      class="color-input"
+                      :value="selectedText.shadowColor"
+                      @input="updateSelectedText({ shadowColor: ($event.target as HTMLInputElement).value })"
+                    >
+                  </div>
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.shadowOpacity') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="0"
+                        max="100"
+                        step="1"
+                        :value="selectedText.shadowOpacity"
+                        @input="updateSelectedText({ shadowOpacity: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.shadowOpacity }}%</span>
+                    </div>
+                  </div>
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.shadowBlur') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="0"
+                        max="30"
+                        step="1"
+                        :value="selectedText.shadowBlur"
+                        @input="updateSelectedText({ shadowBlur: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.shadowBlur }}px</span>
+                    </div>
+                  </div>
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.shadowOffsetX') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="-20"
+                        max="20"
+                        step="1"
+                        :value="selectedText.shadowOffsetX"
+                        @input="updateSelectedText({ shadowOffsetX: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.shadowOffsetX }}px</span>
+                    </div>
+                  </div>
+                  <div class="filter-row">
+                    <label class="filter-label">{{ t('imageEditor.text.shadowOffsetY') }}</label>
+                    <div class="filter-slider-wrap">
+                      <input
+                        type="range"
+                        class="filter-slider"
+                        min="-20"
+                        max="20"
+                        step="1"
+                        :value="selectedText.shadowOffsetY"
+                        @input="updateSelectedText({ shadowOffsetY: +($event.target as HTMLInputElement).value })"
+                      >
+                      <span class="filter-value">{{ selectedText.shadowOffsetY }}px</span>
+                    </div>
+                  </div>
+
                   <button
                     type="button"
                     class="btn btn-xs btn-ghost"
@@ -1022,7 +1121,6 @@ function bakeTextToCanvas() {
 
     ctx.save()
     ctx.globalAlpha = item.opacity / 100
-    ctx.fillStyle = item.color
     ctx.font = [
       item.italic ? 'italic' : '',
       item.bold ? 'bold' : '',
@@ -1032,6 +1130,32 @@ function bakeTextToCanvas() {
     ctx.textAlign = item.align
     ctx.textBaseline = 'top'
 
+    // Shadow
+    const sc = item.shadowColor ?? '#000000'
+    const sr = parseInt(sc.slice(1, 3), 16)
+    const sg = parseInt(sc.slice(3, 5), 16)
+    const sb = parseInt(sc.slice(5, 7), 16)
+    ctx.shadowColor = `rgba(${sr}, ${sg}, ${sb}, ${(item.shadowOpacity ?? 60) / 100})`
+    ctx.shadowBlur = (item.shadowBlur ?? 0) * scale
+    ctx.shadowOffsetX = (item.shadowOffsetX ?? 2) * scale
+    ctx.shadowOffsetY = (item.shadowOffsetY ?? 2) * scale
+
+    // Stroke first (rendered behind fill)
+    if ((item.strokeWidth ?? 0) > 0) {
+      ctx.strokeStyle = item.strokeColor ?? '#000000'
+      ctx.lineWidth = (item.strokeWidth!) * 2 * scale
+      ctx.lineJoin = 'round'
+      item.text.split('\n').forEach((line, i) => {
+        ctx.strokeText(line, x, y + i * lineHeight)
+      })
+      // Clear shadow so fill doesn't double it
+      ctx.shadowColor = 'transparent'
+      ctx.shadowBlur = 0
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+    }
+
+    ctx.fillStyle = item.color
     item.text.split('\n').forEach((line, i) => {
       ctx.fillText(line, x, y + i * lineHeight)
     })
@@ -1076,6 +1200,13 @@ function addTextItem() {
     italic: false,
     align: 'left',
     opacity: 100,
+    strokeWidth: 0,
+    strokeColor: '#000000',
+    shadowColor: '#000000',
+    shadowOpacity: 60,
+    shadowBlur: 0,
+    shadowOffsetX: 2,
+    shadowOffsetY: 2,
   }
   textItems.value = [...textItems.value, newItem]
   selectedTextId.value = id
@@ -1384,6 +1515,15 @@ function closeEditor() {
 /* ── Text section ────────────────────────────────────────── */
 .text-add-btn {
   margin-left: auto;
+}
+
+.ctrl-subheader {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-top: var(--space-1);
 }
 
 .ctrl-textarea {
