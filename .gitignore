@@ -31,3 +31,6 @@ vue-image-editor-Backup/
 
 # Electron build output
 release/
+
+# Claude Code agent worktrees
+.claude/
