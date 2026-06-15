@@ -87,6 +87,20 @@ export interface EditorState {
   originalCanvas: HTMLCanvasElement | null
 }
 
+export interface TextItem {
+  id: string
+  text: string        // multi-line (newlines preserved)
+  x: number          // % from left edge (0–100)
+  y: number          // % from top edge (0–100)
+  fontSize: number   // px at preview-canvas scale
+  fontFamily: string // CSS font stack
+  color: string      // hex color
+  bold: boolean
+  italic: boolean
+  align: 'left' | 'center' | 'right'
+  opacity: number    // 0–100
+}
+
 export interface WatermarkSettings {
   enabled: boolean
   text: string
