@@ -116,6 +116,31 @@
             <!-- Controls Panel -->
             <div class="controls-panel">
 
+              <!-- Undo / Redo bar -->
+              <div class="undo-redo-bar">
+                <button
+                  type="button"
+                  class="undo-redo-btn"
+                  :disabled="!canUndo"
+                  :title="t('imageEditor.undoRedo.undoTitle')"
+                  @click="undo"
+                >
+                  <i class="fa-solid fa-rotate-left"></i>
+                  {{ t('imageEditor.undoRedo.undo') }}
+                </button>
+                <button
+                  type="button"
+                  class="undo-redo-btn"
+                  :disabled="!canRedo"
+                  :title="t('imageEditor.undoRedo.redoTitle')"
+                  @click="redo"
+                >
+                  <i class="fa-solid fa-rotate-right"></i>
+                  {{ t('imageEditor.undoRedo.redo') }}
+                </button>
+                <span class="undo-redo-hint">{{ t('imageEditor.undoRedo.hint') }}</span>
+              </div>
+
               <!-- Dateiname -->
               <div class="ctrl-section">
                 <div class="ctrl-header">
@@ -706,7 +731,77 @@ function updateSelectedText(patch: Partial<TextItem>) {
   textItems.value = textItems.value.map(i =>
     i.id === selectedTextId.value ? { ...i, ...patch } : i
   )
+  schedulePushHistory()
 }
+
+// ── Undo / Redo ───────────────────────────────────────────────────
+
+interface HistorySnapshot {
+  filters: ImageFilters
+  texts: TextItem[]
+}
+
+const history = ref<HistorySnapshot[]>([])
+const historyIndex = ref(-1)
+let historyTimer: ReturnType<typeof setTimeout> | null = null
+
+const canUndo = computed(() => historyIndex.value > 0)
+const canRedo = computed(() => historyIndex.value < history.value.length - 1)
+
+function snapshotNow() {
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  const snap: HistorySnapshot = {
+    filters: { ...localFilters.value },
+    texts: textItems.value.map(t => ({ ...t })),
+  }
+  history.value = history.value.slice(0, historyIndex.value + 1)
+  history.value.push(snap)
+  historyIndex.value = history.value.length - 1
+}
+
+function schedulePushHistory() {
+  if (historyTimer) clearTimeout(historyTimer)
+  historyTimer = setTimeout(snapshotNow, 350)
+}
+
+function restoreSnapshot(snap: HistorySnapshot) {
+  localFilters.value = { ...snap.filters }
+  textItems.value = snap.texts.map(t => ({ ...t }))
+  changesApplied.value = false
+}
+
+function undo() {
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  if (!canUndo.value) return
+  historyIndex.value--
+  restoreSnapshot(history.value[historyIndex.value])
+}
+
+function redo() {
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  if (!canRedo.value) return
+  historyIndex.value++
+  restoreSnapshot(history.value[historyIndex.value])
+}
+
+function handleUndoRedo(e: KeyboardEvent) {
+  if (!props.isOpen) return
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault(); undo()
+  } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+    e.preventDefault(); redo()
+  }
+}
+
+watch(() => props.isOpen, (open) => {
+  if (open) document.addEventListener('keydown', handleUndoRedo)
+  else document.removeEventListener('keydown', handleUndoRedo)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleUndoRedo)
+  if (historyTimer) clearTimeout(historyTimer)
+})
 
 // Compare mode state
 const compareMode = ref<'before' | 'split' | 'after'>('after')
@@ -834,6 +929,11 @@ function initializeEditor(image: ImageObject) {
   textItems.value = []
   selectedTextId.value = null
 
+  // Reset undo/redo history
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  history.value = [{ filters: { ...localFilters.value }, texts: [] }]
+  historyIndex.value = 0
+
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
   const format = availableFormats.value.find(f => f.ext === ext)
   if (format) selectedFormat.value = format.mimeType
@@ -956,11 +1056,13 @@ function onFilterInput(key: FilterKey, event: Event) {
   const value = Number((event.target as HTMLInputElement).value)
   localFilters.value = { ...localFilters.value, [key]: value }
   changesApplied.value = false
+  schedulePushHistory()
 }
 
 function resetFilters() {
   localFilters.value = { ...defaultFilters }
   changesApplied.value = false
+  snapshotNow()
 }
 
 // ── Crop ─────────────────────────────────────────────────────────
@@ -1078,6 +1180,9 @@ function resetToOriginal() {
   textItems.value = []
   selectedTextId.value = null
   changesApplied.value = false
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  history.value = [{ filters: { ...defaultFilters }, texts: [] }]
+  historyIndex.value = 0
   updatePreview()
 }
 
@@ -1210,11 +1315,13 @@ function addTextItem() {
   }
   textItems.value = [...textItems.value, newItem]
   selectedTextId.value = id
+  snapshotNow()
 }
 
 function deleteTextItem(id: string) {
   textItems.value = textItems.value.filter(i => i.id !== id)
   if (selectedTextId.value === id) selectedTextId.value = null
+  snapshotNow()
 }
 
 function closeEditor() {
@@ -1466,6 +1573,46 @@ function closeEditor() {
   background: var(--panel);
   display: flex;
   flex-direction: column;
+}
+
+/* Undo / Redo bar */
+.undo-redo-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+  background: color-mix(in oklab, var(--panel) 85%, var(--bg) 15%);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  flex-shrink: 0;
+}
+
+.undo-redo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.undo-redo-btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+.undo-redo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.undo-redo-hint {
+  font-size: 0.67rem;
+  color: var(--muted);
+  opacity: 0.65;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .ctrl-section {

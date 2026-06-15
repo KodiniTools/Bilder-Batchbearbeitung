@@ -772,6 +772,13 @@
       "cancel": "Abbrechen",
       "ratio": "Seitenverhältnis",
       "ratioFree": "Frei"
+    },
+    "undoRedo": {
+      "undo": "Rückgängig",
+      "undoTitle": "Rückgängig (Strg+Z)",
+      "redo": "Wiederholen",
+      "redoTitle": "Wiederholen (Strg+Y)",
+      "hint": "Strg+Z / Strg+Y"
     }
   },
   "bulkRename": {
