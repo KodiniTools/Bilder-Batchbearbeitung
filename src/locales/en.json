@@ -597,6 +597,13 @@
       "cancel": "Cancel",
       "ratio": "Aspect ratio",
       "ratioFree": "Free"
+    },
+    "undoRedo": {
+      "undo": "Undo",
+      "undoTitle": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoTitle": "Redo (Ctrl+Y)",
+      "hint": "Ctrl+Z / Ctrl+Y"
     }
   },
   "bulkRename": {
