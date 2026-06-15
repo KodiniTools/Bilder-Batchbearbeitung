@@ -808,6 +808,8 @@ function closeEditor() {
 </script>
 
 <style scoped>
+@import './editor/editor-shared.css';
+
 /* ── Overlay ─────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
