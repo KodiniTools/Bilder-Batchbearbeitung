@@ -409,29 +409,30 @@ const handleReset = () => {
   box-shadow: 0 2px 8px color-mix(in oklab, var(--red) 15%, transparent);
 }
 
-/* Batch Edit Button with selection indicator */
+/* Batch Edit Button – neutral ohne Auswahl, grün mit Auswahl */
 .btn-batch-edit {
-  background: color-mix(in oklab, var(--red) 10%, transparent);
-  border: 2px solid var(--red);
-  color: var(--red);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--red) 15%, transparent);
+  background: var(--btn);
+  border: 1px solid var(--border-color);
+  color: var(--muted);
 }
 
-.btn-batch-edit:hover {
-  background: color-mix(in oklab, var(--red) 20%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--red) 20%, transparent);
+.btn-batch-edit:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 15%, transparent);
 }
 
 .btn-batch-edit.has-selection {
-  background: color-mix(in oklab, var(--green) 10%, transparent);
-  border-color: var(--green);
+  background: color-mix(in oklab, var(--green) 12%, transparent);
+  border-color: color-mix(in oklab, var(--green) 50%, transparent);
   color: var(--green);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 15%, transparent);
 }
 
 .btn-batch-edit.has-selection:hover {
   background: color-mix(in oklab, var(--green) 20%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
+  border-color: var(--green);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--green) 20%, transparent);
 }
 
 /* SVG Button */

@@ -30,7 +30,7 @@
   --cyan: #06b6d4;
 
   /* Light Theme (Standard) */
-  --bg: #F5F4D6;
+  --bg: #F8F7F4;
   --panel: #FFFFFF;
   --text: var(--color-dark);
   --muted: var(--color-gray);
