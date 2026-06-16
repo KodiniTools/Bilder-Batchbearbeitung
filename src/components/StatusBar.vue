@@ -11,6 +11,17 @@ const toast = useToast()
 // Dropdown für Seitenverhältnis
 const isAspectRatioDropdownOpen = ref(false)
 
+// Dropdown für PDF-Export
+const isPdfDropdownOpen = ref(false)
+
+const togglePdfDropdown = () => {
+  isPdfDropdownOpen.value = !isPdfDropdownOpen.value
+}
+
+const closePdfDropdown = () => {
+  isPdfDropdownOpen.value = false
+}
+
 const emit = defineEmits<{
   'export-pdf': ['all' | 'selected']
   'export-zip': []
@@ -231,23 +242,40 @@ const handleReset = () => {
 
     <!-- Export Section -->
     <div class="toolbar-section export-section">
-      <div class="btn-group">
-        <button
-          class="btn btn-icon"
-          :disabled="!imageStore.hasSelection"
-          :title="t('statusBar.tooltips.exportSelectedPdf')"
-          @click="handleExportPdf('selected')"
-        >
-          <i class="fa-solid fa-file-pdf"></i>
-        </button>
-        <button
-          class="btn btn-icon"
-          :title="t('statusBar.tooltips.exportAllPdf')"
-          @click="handleExportPdf('all')"
-        >
-          <i class="fa-solid fa-file-pdf"></i>
-          <i class="fa-solid fa-asterisk btn-badge"></i>
-        </button>
+      <!-- PDF Split-Button mit Dropdown -->
+      <div class="dropdown-wrapper">
+        <div class="btn-group btn-group-split">
+          <button
+            class="btn btn-icon"
+            :title="t('statusBar.tooltips.exportAllPdf')"
+            @click="handleExportPdf('all')"
+          >
+            <i class="fa-solid fa-file-pdf"></i>
+          </button>
+          <button
+            class="btn btn-icon btn-chevron"
+            :title="t('statusBar.tooltips.exportSelectedPdf')"
+            :class="{ active: isPdfDropdownOpen }"
+            @click="togglePdfDropdown"
+          >
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+        <div v-if="isPdfDropdownOpen" class="dropdown-menu" @mouseleave="closePdfDropdown">
+          <button class="dropdown-item" @click="handleExportPdf('all'); closePdfDropdown()">
+            <i class="fa-solid fa-images"></i>
+            <span>{{ t('statusBar.tooltips.exportAllPdf') }}</span>
+          </button>
+          <button
+            class="dropdown-item"
+            :class="{ 'dropdown-item--disabled': !imageStore.hasSelection }"
+            :disabled="!imageStore.hasSelection"
+            @click="handleExportPdf('selected'); closePdfDropdown()"
+          >
+            <i class="fa-solid fa-check-double"></i>
+            <span>{{ t('statusBar.tooltips.exportSelectedPdf') }}</span>
+          </button>
+        </div>
       </div>
 
       <button
@@ -487,14 +515,29 @@ const handleReset = () => {
   box-shadow: none;
 }
 
-/* Badge for "All" PDF button */
-.btn-badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  font-size: 0.5rem;
-  color: var(--accent);
-  opacity: 0.8;
+/* Split-Button Chevron */
+.btn-group-split {
+  gap: 1px;
+}
+
+.btn-chevron {
+  width: 22px !important;
+  padding: 0;
+}
+
+.btn-chevron i {
+  font-size: 0.65rem;
+  transition: transform 0.2s var(--ease-smooth);
+}
+
+.btn-chevron.active i {
+  transform: rotate(180deg);
+}
+
+/* Disabled dropdown item */
+.dropdown-item--disabled {
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 /* Export Section */

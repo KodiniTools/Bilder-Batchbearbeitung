@@ -347,7 +347,7 @@ onUnmounted(() => {
   padding: var(--space-4);
   background: var(--panel);
   border: 2px solid var(--border-color);
-  border-radius: var(--radius-2xl);
+  border-radius: 0;
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.08),
     0 2px 6px rgba(0, 0, 0, 0.04),
