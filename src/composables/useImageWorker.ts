@@ -56,8 +56,11 @@ function rejectAllPending(entry: PoolEntry, reason: string): void {
   entry.busy = false
 }
 
+let poolInitialized = false
+
 function initPool(): void {
-  if (pool.length > 0 || !isSupported()) return
+  if (poolInitialized || !isSupported()) return
+  poolInitialized = true
 
   pool = Array.from({ length: POOL_SIZE }, () => {
     const worker = createWorker()
@@ -83,8 +86,17 @@ function initPool(): void {
 
     worker.onerror = (err) => {
       console.error('[ImageWorker] Worker-Fehler — falle auf Hauptthread zurück:', err)
-      rejectAllPending(entry, 'Worker-Fehler: ' + err.message)
-      processQueue(entry)
+      // Worker permanent aus Pool entfernen und beenden
+      const idx = pool.indexOf(entry)
+      if (idx !== -1) pool.splice(idx, 1)
+      entry.worker.terminate()
+      // Alle laufenden Operationen dieses Workers rejekten
+      rejectAllPending(entry, 'Worker-Fehler: ' + (err as ErrorEvent).message)
+      // Queue sofort leeren – nicht an kaputte Worker weiterleiten
+      while (pendingQueue.length > 0) {
+        const queued = pendingQueue.shift()!
+        queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
+      }
     }
 
     return entry
