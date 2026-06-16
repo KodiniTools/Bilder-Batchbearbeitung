@@ -11,6 +11,10 @@ import type {
   CropParams,
 } from '@/workers/image.worker'
 
+// ?worker lässt Vite den Worker korrekt als separaten Chunk bundeln –
+// behebt den URL-Auflösungsfehler mit @/-Alias im Production-Build.
+import ImageWorker from '@/workers/image.worker.ts?worker'
+
 type PendingResolve = (result: WorkerResult) => void
 type PendingReject = (error: Error) => void
 
@@ -44,7 +48,7 @@ function isSupported(): boolean {
 }
 
 function createWorker(): Worker {
-  return new Worker(new URL('@/workers/image.worker.ts', import.meta.url), { type: 'module' })
+  return new ImageWorker()
 }
 
 function rejectAllPending(entry: PoolEntry, reason: string): void {
