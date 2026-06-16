@@ -11,6 +11,10 @@ import type {
   CropParams,
 } from '@/workers/image.worker'
 
+// ?worker lässt Vite den Worker korrekt als separaten Chunk bundeln –
+// behebt den URL-Auflösungsfehler mit @/-Alias im Production-Build.
+import ImageWorker from '@/workers/image.worker.ts?worker'
+
 type PendingResolve = (result: WorkerResult) => void
 type PendingReject = (error: Error) => void
 
@@ -37,13 +41,14 @@ const TIMEOUT_MS = 15_000
 let pool: PoolEntry[] = []
 const pendingQueue: QueueEntry[] = []
 const pendingById = new Map<string, PendingEntry>()
+let workerPoolFailed = false
 
 function isSupported(): boolean {
   return typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined'
 }
 
 function createWorker(): Worker {
-  return new Worker(new URL('@/workers/image.worker.ts', import.meta.url), { type: 'module' })
+  return new ImageWorker()
 }
 
 function rejectAllPending(entry: PoolEntry, reason: string): void {
@@ -97,6 +102,11 @@ function initPool(): void {
         const queued = pendingQueue.shift()!
         queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
       }
+      // Späte dispatch()-Aufrufe (nach createImageBitmap) sofort rejecten,
+      // damit sie nicht ewig in der nun leeren Queue hängen.
+      if (pool.length === 0) {
+        workerPoolFailed = true
+      }
     }
 
     return entry
@@ -134,6 +144,11 @@ function dispatch(
   bitmap: ImageBitmap,
   params: unknown
 ): Promise<WorkerResult> {
+  // Pool permanent ausgefallen – sofort rejecten statt ewig in Queue hängen
+  if (workerPoolFailed) {
+    bitmap.close()
+    return Promise.reject(new Error('Worker-Pool nicht verfügbar'))
+  }
   return new Promise((resolve, reject) => {
     const freeEntry = pool.find((e) => !e.busy)
     const request = { operation, bitmap, params }
