@@ -95,11 +95,13 @@ const handleDrop = async (event: DragEvent) => {
       {{ t('upload.text') }}
     </div>
     <div class="upload-buttons">
-      <button type="button" class="btn upload-btn icon-only" :title="t('upload.button')" :aria-label="t('upload.button')" @click.stop="fileInput?.click()">
-        <i class="fa-solid fa-file-arrow-up"></i>
+      <button type="button" class="btn upload-btn pill-btn" :title="t('upload.button')" :aria-label="t('upload.button')" @click.stop="fileInput?.click()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        <span>{{ t('upload.button') }}</span>
       </button>
-      <button type="button" class="btn upload-btn icon-only folder-btn" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')" @click.stop="folderInput?.click()">
+      <button type="button" class="btn upload-btn pill-btn folder-btn" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')" @click.stop="folderInput?.click()">
         <i class="fa-solid fa-folder-open"></i>
+        <span>{{ t('upload.folderButton') }}</span>
       </button>
     </div>
     <div class="paste-hint" :title="t('upload.pasteHintTooltip')">
@@ -201,32 +203,38 @@ const handleDrop = async (event: DragEvent) => {
   margin-top: 0;
 }
 
-.upload-btn.icon-only {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 1.4rem;
+.upload-btn.pill-btn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 8px;
   background: var(--accent);
   color: var(--accent-text);
   border: none;
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
+  transition: all 0.25s var(--ease-smooth);
 }
 
-.upload-btn.icon-only:hover {
+.upload-btn.pill-btn:hover {
   background: var(--accent-hover, var(--accent));
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 45%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .folder-btn {
-  background: var(--green, #22c55e);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--green, #22c55e) 35%, transparent);
+  background: color-mix(in oklab, var(--panel) 100%, transparent);
+  color: var(--text);
+  border: 1.5px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--shadow-color) 10%, transparent);
 }
 
 .folder-btn:hover {
-  background: color-mix(in oklab, var(--green, #22c55e) 85%, white);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--green, #22c55e) 45%, transparent);
+  background: var(--btn-hover);
+  border-color: var(--accent) !important;
+  color: var(--accent);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 15%, transparent);
 }
 
 .btn {
@@ -273,10 +281,10 @@ const handleDrop = async (event: DragEvent) => {
     font-size: 0.9rem;
   }
 
-  .upload-btn.icon-only {
-    width: 48px;
-    height: 48px;
-    font-size: 1.2rem;
+  .upload-btn.pill-btn {
+    height: 40px;
+    padding: 0 14px;
+    font-size: 0.82rem;
   }
 }
 
