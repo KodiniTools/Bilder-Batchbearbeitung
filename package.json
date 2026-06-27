@@ -52,37 +52,82 @@
   "build": {
     "appId": "com.kodinitools.bilderserie-bearbeiten",
     "productName": "Bilderserie Bearbeiten",
+    "copyright": "Copyright © 2024–2025 KodiniTools",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "electron"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "!electron/icon.png"
     ],
+    "extraMetadata": {
+      "main": "electron/main.cjs"
+    },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         },
         {
           "target": "zip",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ],
-      "icon": "electron/icon.ico"
+      "icon": "electron/icon.ico",
+      "requestedExecutionLevel": "asInvoker",
+      "artifactName": "${productName} Setup ${version}.${ext}",
+      "fileAssociations": [
+        {
+          "ext": ["jpg", "jpeg"],
+          "name": "JPEG Image",
+          "description": "JPEG Bilddatei",
+          "role": "Viewer"
+        },
+        {
+          "ext": ["png"],
+          "name": "PNG Image",
+          "description": "PNG Bilddatei",
+          "role": "Viewer"
+        },
+        {
+          "ext": ["webp"],
+          "name": "WebP Image",
+          "description": "WebP Bilddatei",
+          "role": "Viewer"
+        },
+        {
+          "ext": ["gif"],
+          "name": "GIF Image",
+          "description": "GIF Bilddatei",
+          "role": "Viewer"
+        },
+        {
+          "ext": ["bmp"],
+          "name": "BMP Image",
+          "description": "BMP Bilddatei",
+          "role": "Viewer"
+        }
+      ]
     },
     "publish": null,
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Bilderserie Bearbeiten"
-    }
+      "shortcutName": "Bilderserie Bearbeiten",
+      "runAfterFinish": true,
+      "installerLanguages": ["de_DE", "en_US"],
+      "language": "1031",
+      "menuCategory": "KodiniTools",
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "${productName} Setup ${version}.${ext}"
+    },
+    "compression": "maximum"
   }
 }
