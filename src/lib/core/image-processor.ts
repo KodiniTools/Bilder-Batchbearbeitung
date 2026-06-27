@@ -82,7 +82,8 @@ export class ImageProcessor {
             originalWidth: image.width,
             originalHeight: image.height,
             selected: false,
-            outputName: this.getFileNameWithoutExtension(file.name)
+            outputName: this.getFileNameWithoutExtension(file.name),
+            version: 0
           }
 
           resolve(imageObj)

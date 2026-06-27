@@ -64,6 +64,7 @@ export interface ImageObject {
   originalHeight: number
   selected: boolean
   outputName: string
+  version: number
   filters?: ImageFilters
   transforms?: ImageTransforms
   watermark?: WatermarkSettings

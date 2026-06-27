@@ -117,6 +117,7 @@ export const useImageStore = defineStore('images', () => {
   function notifyImagesUpdated(ids: Set<string>): void {
     images.value.forEach((img, i) => {
       if (ids.has(img.id)) {
+        img.version = (img.version ?? 0) + 1
         images.value.splice(i, 1, img)
       }
     })
