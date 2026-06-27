@@ -23,10 +23,8 @@ function handleOpenPreview(image: ImageObject) {
   emit('open-preview', image)
 }
 
-// Generate unique key for each image based on dimensions and name
-// This forces re-render when image is edited
 function getImageKey(image: ImageObject): string {
-  return `${image.id}-${image.canvas.width}x${image.canvas.height}-${image.outputName || ''}`
+  return `${image.id}-${image.version}`
 }
 
 // Drag & Drop Handlers

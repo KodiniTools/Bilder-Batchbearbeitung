@@ -19,6 +19,7 @@ const emit = defineEmits<{
 
 const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
+const displayCanvas = ref<HTMLCanvasElement | null>(null)
 
 // Computed CSS filter string based on image filters
 const filterStyle = computed(() => {
@@ -96,6 +97,11 @@ function createTransparentCanvas(width: number, height: number): HTMLCanvasEleme
   c.height = height
   return c
 }
+
+// Wenn das Bild bearbeitet wurde (version erhöht), Display-Canvas neu synchronisieren
+watch(() => props.image.version, () => {
+  nextTick(() => syncDisplayCanvas())
+})
 
 // Wasserzeichen-Canvas aktualisieren wenn sich Einstellungen ändern
 watch(() => props.image.watermark, () => {
@@ -188,27 +194,32 @@ const handleEditKeydown = (event: KeyboardEvent) => {
   }
 }
 
-// Canvas-Dimensionen überwachen (MutationObserver erkennt width/height-Attributänderungen)
+// Kopiert den Inhalt von props.image.canvas in den sichtbaren displayCanvas im Template.
+// Verhindert Probleme, die entstehen wenn das Canvas-Element im DOM verschoben wird.
+function syncDisplayCanvas() {
+  const src = props.image.canvas
+  const dst = displayCanvas.value
+  if (!src || !dst) return
+  dst.width = src.width
+  dst.height = src.height
+  const ctx = dst.getContext('2d')
+  if (!ctx) return
+  ctx.drawImage(src, 0, 0)
+  updateDimensions()
+}
+
 let mutationObserver: MutationObserver | null = null
 
 onMounted(() => {
-  // Append the actual canvas from the image object
-  if (previewContainer.value && props.image.canvas) {
-    // Clear any existing content
-    previewContainer.value.innerHTML = ''
-    // Append the actual canvas
-    previewContainer.value.appendChild(props.image.canvas)
-    // Initiale Dimensionen setzen
-    updateDimensions()
-    // MutationObserver auf Canvas-Attribute (width, height)
+  if (props.image.canvas) {
+    syncDisplayCanvas()
     mutationObserver = new MutationObserver(() => {
-      updateDimensions()
+      syncDisplayCanvas()
     })
     mutationObserver.observe(props.image.canvas, {
       attributes: true,
       attributeFilter: ['width', 'height']
     })
-    // Wasserzeichen-Canvas wird NACH dem v-if gerendert (ref wird erst verfügbar)
     if (watermarkActive.value) {
       nextTick(() => renderWatermarkPreview())
     }
@@ -239,7 +250,7 @@ onUnmounted(() => {
         class="image-preview"
         :style="[filterStyle, transformStyle]"
       >
-        <!-- Canvas wird hier von onMounted eingefügt -->
+        <canvas ref="displayCanvas"></canvas>
       </div>
       <canvas
         v-if="watermarkActive"
