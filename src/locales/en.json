@@ -188,7 +188,8 @@
     "pdf": "Creating PDF...",
     "pdfMulti": "Creating PDF with {count} images...",
     "progress": "{current} of {total}",
-    "resizing": "Scaling image {current} of {total}…"
+    "resizing": "Scaling image {current} of {total}…",
+    "cropping": "Cropping image {current} of {total}…"
   },
   "toast": {
     "pdfSuccess": "PDF with {count} images created successfully",
