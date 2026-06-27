@@ -172,12 +172,19 @@ onUnmounted(() => {
   <Transition name="preview">
     <div v-if="isOpen" class="preview-overlay" @click="handleClose">
       <div class="preview-container" @click.stop>
+        <button
+          class="preview-close-float"
+          aria-label="Schließen"
+          @click="handleClose"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
         <div class="preview-header">
           <div class="preview-title">
             <i class="fa-solid fa-eye"></i>
             Bildvorschau
           </div>
-          <button 
+          <button
             class="preview-close-btn"
             aria-label="Schließen"
             @click="handleClose"
@@ -220,6 +227,7 @@ onUnmounted(() => {
 }
 
 .preview-container {
+  position: relative;
   max-width: 95vw;
   max-height: 95vh;
   background: var(--panel);
@@ -272,6 +280,31 @@ onUnmounted(() => {
   color: white;
   transform: scale(1.1);
   border-color: var(--accent);
+}
+
+.preview-close-float {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-spring);
+}
+
+.preview-close-float:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.1);
 }
 
 .preview-content {
