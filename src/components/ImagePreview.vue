@@ -171,28 +171,7 @@ onUnmounted(() => {
 <template>
   <Transition name="preview">
     <div v-if="isOpen" class="preview-overlay" @click="handleClose">
-      <button
-        class="preview-close-float"
-        aria-label="Schließen"
-        @click.stop="handleClose"
-      >
-        <i class="fa-solid fa-xmark"></i>
-      </button>
       <div class="preview-container" @click.stop>
-        <div class="preview-header">
-          <div class="preview-title">
-            <i class="fa-solid fa-eye"></i>
-            Bildvorschau
-          </div>
-          <button
-            class="preview-close-btn"
-            aria-label="Schließen"
-            @click="handleClose"
-          >
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-        
         <div class="preview-content">
           <div class="preview-canvas-wrapper">
             <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
@@ -201,6 +180,13 @@ onUnmounted(() => {
               ref="watermarkCanvasRef"
               class="watermark-canvas"
             ></canvas>
+            <button
+              class="preview-close-float"
+              aria-label="Schließen"
+              @click.stop="handleClose"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
         
@@ -283,16 +269,16 @@ onUnmounted(() => {
 }
 
 .preview-close-float {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 10001;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
   width: 44px;
   height: 44px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.60);
   backdrop-filter: blur(8px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
