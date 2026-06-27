@@ -1,9 +1,14 @@
-name: Build Windows App
+name: Build Windows Installer
 
 on:
   push:
     branches: [main, master]
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-windows:
@@ -22,12 +27,53 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Extract version from package.json
+        id: pkg
+        shell: bash
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
       - name: Build Electron app for Windows
         run: npm run dist:win
+        env:
+          # Prevents electron-builder from trying to publish
+          GH_TOKEN: ''
 
-      - name: Upload Windows installer
+      - name: Upload NSIS installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Bilderserie-Bearbeiten-Windows-x64
+          name: Bilderserie-Bearbeiten-Windows-Setup-v${{ steps.pkg.outputs.version }}
           path: release/*.exe
-          retention-days: 30
+          retention-days: 90
+
+      - name: Upload portable ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bilderserie-Bearbeiten-Windows-Portable-v${{ steps.pkg.outputs.version }}
+          path: release/*.zip
+          retention-days: 90
+
+      # Create a GitHub Release only when pushing a version tag (v*)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Bilderserie Bearbeiten v${{ steps.pkg.outputs.version }}
+          body: |
+            ## Bilderserie Bearbeiten v${{ steps.pkg.outputs.version }}
+
+            ### Download
+            - **Installer (.exe)** – empfohlen für die meisten Nutzer
+            - **Portable (.zip)** – kein Setup erforderlich, direkt ausführbar
+
+            ### Änderungen
+            Siehe [CHANGELOG](https://github.com/${{ github.repository }}/commits/main) für Details.
+
+            ---
+            *Datenschutz: Alle Bildoperationen laufen lokal im Gerät – keine Uploads auf Server.*
+          files: |
+            release/*.exe
+            release/*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

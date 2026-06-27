@@ -1,6 +1,12 @@
-const { contextBridge } = require('electron')
+const { contextBridge, ipcRenderer } = require('electron')
 
-// Expose minimal API to renderer if needed in the future
 contextBridge.exposeInMainWorld('electronAPI', {
-  isElectron: true
+  isElectron: true,
+
+  // Open a URL in the system's default browser
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
+
+  // App metadata
+  getVersion: () => ipcRenderer.invoke('get-version'),
+  getPlatform: () => ipcRenderer.invoke('get-platform')
 })
