@@ -171,14 +171,14 @@ onUnmounted(() => {
 <template>
   <Transition name="preview">
     <div v-if="isOpen" class="preview-overlay" @click="handleClose">
+      <button
+        class="preview-close-float"
+        aria-label="Schließen"
+        @click.stop="handleClose"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
       <div class="preview-container" @click.stop>
-        <button
-          class="preview-close-float"
-          aria-label="Schließen"
-          @click="handleClose"
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
         <div class="preview-header">
           <div class="preview-title">
             <i class="fa-solid fa-eye"></i>
@@ -218,7 +218,7 @@ onUnmounted(() => {
 .preview-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 10000;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(8px);
   display: grid;
@@ -283,28 +283,30 @@ onUnmounted(() => {
 }
 
 .preview-close-float {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  z-index: 10;
-  width: 40px;
-  height: 40px;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10001;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.2s var(--ease-spring);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .preview-close-float:hover {
   background: var(--accent);
   border-color: var(--accent);
   transform: scale(1.1);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 50%, transparent);
 }
 
 .preview-content {
