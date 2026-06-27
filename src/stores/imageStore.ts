@@ -13,6 +13,7 @@ export const useImageStore = defineStore('images', () => {
   const images = ref<ImageObject[]>([])
   const currentImageIndex = ref(0)
   const resizeProgress = reactive({ active: false, current: 0, total: 0 })
+  const cropProgress = reactive({ active: false, current: 0, total: 0 })
 
   // Getters
   const imageCount = computed(() => images.value.length)
@@ -153,13 +154,34 @@ export const useImageStore = defineStore('images', () => {
   async function cropSelectedImagesToAspectRatio(aspectRatio: number): Promise<void> {
     const selected = images.value.filter((img) => img.selected)
     const ids = new Set(selected.map((img) => img.id))
-    const workerOk =
-      workerSupported &&
-      (await processBatch(selected.map((img) => img.canvas), 'crop', { aspectRatio }))
-    if (!workerOk) {
-      selected.forEach((img) => ImageProcessor.cropToAspectRatio(img, aspectRatio))
+    let workerOk = false
+
+    cropProgress.active = true
+    cropProgress.current = 0
+    cropProgress.total = selected.length
+
+    if (workerSupported) {
+      const results = await Promise.all(
+        selected.map(async (img) => {
+          const result = await processCanvas(img.canvas, 'crop', { aspectRatio })
+          cropProgress.current++
+          return result
+        })
+      )
+      workerOk = results.every(Boolean)
     }
+
+    if (!workerOk) {
+      cropProgress.current = 0
+      for (const img of selected) {
+        ImageProcessor.cropToAspectRatio(img, aspectRatio)
+        cropProgress.current++
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
+    }
+
     notifyImagesUpdated(ids)
+    cropProgress.active = false
   }
 
   // Alle Bearbeitungen der ausgewählten Bilder rückgängig machen
@@ -305,6 +327,7 @@ export const useImageStore = defineStore('images', () => {
     images,
     currentImageIndex,
     resizeProgress,
+    cropProgress,
     
     // Getters
     imageCount,

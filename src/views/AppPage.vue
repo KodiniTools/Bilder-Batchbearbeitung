@@ -461,6 +461,29 @@ watch(
   { deep: true }
 )
 
+watch(
+  () => imageStore.cropProgress,
+  (progress) => {
+    if (!progress.active) {
+      loadingIndicator.value?.hide()
+      return
+    }
+    if (progress.total <= 1) return
+    if (progress.current === 0) {
+      loadingIndicator.value?.showWithProgress(
+        t('loading.cropping', { current: 0, total: progress.total }),
+        progress.total
+      )
+    } else {
+      loadingIndicator.value?.updateProgress(
+        progress.current,
+        t('loading.cropping', { current: progress.current, total: progress.total })
+      )
+    }
+  },
+  { deep: true }
+)
+
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
