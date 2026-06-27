@@ -78,7 +78,6 @@
       ],
       "icon": "electron/icon.ico",
       "requestedExecutionLevel": "asInvoker",
-      "artifactName": "${productName} Setup ${version}.${ext}",
       "fileAssociations": [
         {
           "ext": ["jpg", "jpeg"],

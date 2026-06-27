@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
+import { readFileSync } from 'node:fs'
+
+const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 // Electron build config – uses relative paths for file:// protocol
 export default defineConfig({
@@ -10,6 +13,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(version)
   },
   worker: {
     format: 'es'
