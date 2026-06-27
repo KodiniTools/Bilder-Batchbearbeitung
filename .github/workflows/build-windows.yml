@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -29,25 +29,27 @@ jobs:
 
       - name: Extract version from package.json
         id: pkg
-        shell: bash
-        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          "version=$version" >> $env:GITHUB_OUTPUT
 
       - name: Build Electron app for Windows
         run: npm run dist:win
         env:
           GH_TOKEN: ''
 
-      # Write a version.json next to the release files so the website can
-      # display the current version without parsing filenames
       - name: Create version.json
-        shell: bash
+        shell: pwsh
         run: |
-          echo '{
-            "version": "${{ steps.pkg.outputs.version }}",
-            "installer": "Bilderserie Bearbeiten Setup ${{ steps.pkg.outputs.version }}.exe",
-            "portable": "Bilderserie Bearbeiten-${{ steps.pkg.outputs.version }}-win.zip",
-            "builtAt": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"
-          }' > release/version.json
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $builtAt = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+          @{
+            version   = $version
+            installer = "Bilderserie Bearbeiten Setup $version.exe"
+            portable  = "Bilderserie Bearbeiten-$version-win.zip"
+            builtAt   = $builtAt
+          } | ConvertTo-Json | Set-Content release/version.json
 
       - name: Upload NSIS installer artifact
         uses: actions/upload-artifact@v4
@@ -66,16 +68,16 @@ jobs:
       # Deploy .exe, .zip and version.json to the web server via SCP.
       # Required GitHub Secrets:
       #   SERVER_HOST     – hostname or IP of kodinitools.com
-      #   SERVER_USER     – SSH username (e.g. deploy)
-      #   SERVER_SSH_KEY  – private SSH key (paste the full PEM content)
-      #   SERVER_PORT     – SSH port (default 22; set secret to 22 if unchanged)
+      #   SERVER_USER     – SSH username (e.g. root)
+      #   SERVER_SSH_KEY  – private SSH key (full PEM content)
+      #   SERVER_PORT     – SSH port (22)
       - name: Deploy release files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
+          port: ${{ secrets.SERVER_PORT }}
           source: 'release/*.exe,release/*.zip,release/version.json'
           target: '/var/www/kodinitools.com/bilderseriebearbeiten/release/'
           strip_components: 1
