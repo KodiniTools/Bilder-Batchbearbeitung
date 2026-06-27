@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const RELEASE_BASE = 'https://kodinitools.com/bilderseriebearbeiten/release'
-const APP_VERSION = '1.0.0'
+const APP_VERSION = __APP_VERSION__
 
 const installerUrl = `${RELEASE_BASE}/Bilderserie%20Bearbeiten%20Setup%20${APP_VERSION}.exe`
 const portableUrl = `${RELEASE_BASE}/Bilderserie%20Bearbeiten-${APP_VERSION}-win.zip`
