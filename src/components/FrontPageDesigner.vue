@@ -80,7 +80,7 @@
           <div class="canvas-container">
             <!-- Zoom Controls -->
             <div class="zoom-controls">
-              <button :disabled="zoomLevel <= 0.5" :title="t('frontPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
+              <button :disabled="zoomLevel <= 0.25" :title="t('frontPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
               <span>{{ Math.round(zoomLevel * 100) }}%</span>
               <button :disabled="zoomLevel >= 2" :title="t('frontPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
               <button :title="t('frontPageDesigner.zoom.reset')" @click="resetZoom">
@@ -94,7 +94,7 @@
             </div>
 
             <div class="canvas-scroll-area">
-              <div class="canvas-wrapper">
+              <div ref="canvasWrapperRef" class="canvas-wrapper">
                 <div class="canvas-inner">
                   <div
                     ref="canvasRef"
@@ -275,7 +275,7 @@ export interface FrontPageElement {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FrontPageDesignerElement from './FrontPageDesignerElement.vue'
 import FrontPageDesignerProperties from './FrontPageDesignerProperties.vue'
@@ -302,8 +302,9 @@ const imageInput = ref<HTMLInputElement | null>(null)
 const elements = ref<FrontPageElement[]>([])
 const selectedElementId = ref<string | null>(null)
 const editingTextId = ref<string | null>(null)
-const zoomLevel = ref(1)
+const zoomLevel = ref(0.7)
 const showPreview = ref(false)
+const canvasWrapperRef = ref<HTMLElement | null>(null)
 
 // Drag & Resize State
 const isDragging = ref(false)
@@ -338,6 +339,16 @@ watch(() => props.orientation, () => {
   }
 })
 
+// Auto-fit wenn Orientierung wechselt
+watch(() => props.orientation, () => {
+  nextTick(() => fitZoom())
+})
+
+// Auto-fit wenn Modal geöffnet wird
+watch(() => props.modelValue, (open) => {
+  if (open) nextTick(() => fitZoom())
+})
+
 // Initialize
 onMounted(() => {
   if (props.initialElements && props.initialElements.length > 0) {
@@ -346,6 +357,7 @@ onMounted(() => {
 
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
+  nextTick(() => fitZoom())
 })
 
 onUnmounted(() => {
@@ -549,15 +561,23 @@ function maintainAspectRatio() {
 
 // Zoom controls
 function zoomIn() {
-  zoomLevel.value = Math.min(2, zoomLevel.value + 0.1)
+  zoomLevel.value = Math.min(2, Math.round((zoomLevel.value + 0.1) * 10) / 10)
 }
 
 function zoomOut() {
-  zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1)
+  zoomLevel.value = Math.max(0.25, Math.round((zoomLevel.value - 0.1) * 10) / 10)
+}
+
+function fitZoom() {
+  if (!canvasWrapperRef.value) return
+  const wrapper = canvasWrapperRef.value
+  const availW = wrapper.clientWidth - 80
+  const availH = wrapper.clientHeight - 80
+  zoomLevel.value = Math.round(Math.min(availW / canvasW.value, availH / canvasH.value, 1) * 100) / 100
 }
 
 function resetZoom() {
-  zoomLevel.value = 1
+  fitZoom()
 }
 
 // Save & Close
@@ -782,6 +802,9 @@ function closeDesigner() {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);

@@ -405,7 +405,7 @@
             <div class="canvas-area">
               <!-- Zoom Controls -->
               <div class="zoom-controls">
-                <button :disabled="zoomLevel <= 0.5" :title="t('commentPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
+                <button :disabled="zoomLevel <= 0.25" :title="t('commentPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
                 <span>{{ Math.round(zoomLevel * 100) }}%</span>
                 <button :disabled="zoomLevel >= 2" :title="t('commentPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
                 <button :title="t('commentPageDesigner.zoom.reset')" @click="resetZoom">
@@ -418,7 +418,7 @@
                 </button>
               </div>
 
-              <div class="canvas-wrapper">
+              <div ref="canvasWrapperRef" class="canvas-wrapper">
                 <div class="canvas-inner">
                 <div
                     ref="canvasRef"
@@ -747,6 +747,7 @@ watch(() => props.modelValue, (newVal) => {
     selectedElement.value = null;
     editingTextId.value = null;
     currentPageIndex.value = 0;
+    nextTick(() => fitToScreen());
 
     if (props.initialElements && props.initialElements.length > 0) {
       // Group elements by their page number
@@ -779,6 +780,11 @@ watch(() => props.modelValue, (newVal) => {
   }
 });
 
+// Auto-fit bei Orientierungswechsel
+watch(() => props.orientation, () => {
+  nextTick(() => fitToScreen());
+});
+
 // Computed: Get current page elements
 const currentElements = computed(() => pages.value[currentPageIndex.value].elements);
 
@@ -793,8 +799,9 @@ const footerPreviewText = computed(() => {
 // Element management
 const selectedElement = ref(null);
 const canvasRef = ref(null);
+const canvasWrapperRef = ref(null);
 const imageInput = ref(null);
-const zoomLevel = ref(1);
+const zoomLevel = ref(0.7);
 const editingTextId = ref(null);
 const inlineTextareaRef = ref(null);
 
@@ -1054,19 +1061,23 @@ function handleMouseUp() {
 
 // Zoom controls
 function zoomIn() {
-  if (zoomLevel.value < 2) {
-    zoomLevel.value = Math.min(2, zoomLevel.value + 0.1);
-  }
+  zoomLevel.value = Math.min(2, Math.round((zoomLevel.value + 0.1) * 10) / 10);
 }
 
 function zoomOut() {
-  if (zoomLevel.value > 0.5) {
-    zoomLevel.value = Math.max(0.5, zoomLevel.value - 0.1);
-  }
+  zoomLevel.value = Math.max(0.25, Math.round((zoomLevel.value - 0.1) * 10) / 10);
+}
+
+function fitToScreen() {
+  if (!canvasWrapperRef.value) return;
+  const wrapper = canvasWrapperRef.value;
+  const availW = wrapper.clientWidth - 80;
+  const availH = wrapper.clientHeight - 80;
+  zoomLevel.value = Math.round(Math.min(availW / pageWidth.value, availH / pageHeight.value, 1) * 100) / 100;
 }
 
 function resetZoom() {
-  zoomLevel.value = 1;
+  fitToScreen();
 }
 
 // Close handler - FIXED for v-model
@@ -1689,6 +1700,9 @@ onUnmounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
