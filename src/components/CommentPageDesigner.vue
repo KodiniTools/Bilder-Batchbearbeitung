@@ -419,7 +419,7 @@
               </div>
 
               <div ref="canvasWrapperRef" class="canvas-wrapper">
-                <div class="canvas-inner">
+                <div class="canvas-inner" :style="{ paddingTop: canvasVerticalPadding + 'px', paddingBottom: canvasVerticalPadding + 'px' }">
                 <div
                     ref="canvasRef"
                     class="canvas"
@@ -427,6 +427,7 @@
                     width: pageWidth + 'px',
                     height: pageHeight + 'px',
                     transform: `scale(${zoomLevel})`,
+                    transformOrigin: 'top left',
                     marginRight: `${pageWidth * (zoomLevel - 1)}px`,
                     marginBottom: `${pageHeight * (zoomLevel - 1)}px`
                   }"
@@ -714,6 +715,14 @@ const emit = defineEmits(['update:modelValue', 'save']);
 // Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
 const pageWidth = computed(() => props.orientation === 'landscape' ? 1123 : 794);
 const pageHeight = computed(() => props.orientation === 'landscape' ? 794 : 1123);
+
+// Vertikales Padding für Zentrierung beim Fit-Zoom
+const canvasVerticalPadding = computed(() => {
+  if (!canvasWrapperRef.value) return 40;
+  const wrapperH = canvasWrapperRef.value.clientHeight;
+  const scaledH = pageHeight.value * zoomLevel.value;
+  return Math.max(40, (wrapperH - scaledH) / 2);
+});
 
 // Vorschau-State
 const showPreview = ref(false);
@@ -1700,9 +1709,6 @@ onUnmounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
@@ -1714,7 +1720,9 @@ onUnmounted(() => {
 .canvas-inner {
   width: fit-content;
   margin: 0 auto;
-  padding: 40px;
+  padding-left: 40px;
+  padding-right: 40px;
+  /* padding-top / padding-bottom werden dynamisch per :style gesetzt */
 }
 
 .canvas {
