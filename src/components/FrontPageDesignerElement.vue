@@ -43,12 +43,14 @@
     </template>
 
     <template v-if="element.type === 'image'">
-      <img
-        :src="element.src"
-        :alt="element.alt || t('frontPageDesigner.properties.typeImage')"
-        class="image-content"
-        draggable="false"
-      >
+      <div class="image-wrapper">
+        <img
+          :src="element.src"
+          :alt="element.alt || t('frontPageDesigner.properties.typeImage')"
+          class="image-content"
+          draggable="false"
+        >
+      </div>
     </template>
 
     <div v-if="isSelected" class="resize-handles">
@@ -164,7 +166,9 @@ watch(() => props.isEditing, (val) => {
   white-space: pre-wrap;
 }
 
-.element-image {
+.image-wrapper {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
