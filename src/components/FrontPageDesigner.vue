@@ -95,7 +95,7 @@
 
             <div class="canvas-scroll-area">
               <div ref="canvasWrapperRef" class="canvas-wrapper">
-                <div class="canvas-inner">
+                <div class="canvas-inner" :style="{ paddingTop: canvasVerticalPadding + 'px', paddingBottom: canvasVerticalPadding + 'px' }">
                   <div
                     ref="canvasRef"
                     class="canvas"
@@ -103,6 +103,7 @@
                       width: `${canvasW}px`,
                       height: `${canvasH}px`,
                       transform: `scale(${zoomLevel})`,
+                      transformOrigin: 'top left',
                       marginRight: `${canvasW * (zoomLevel - 1)}px`,
                       marginBottom: `${canvasH * (zoomLevel - 1)}px`
                     }"
@@ -316,6 +317,14 @@ const elementStartPos = ref({ x: 0, y: 0, width: 0, height: 0 })
 // Canvas-Dimensionen abhängig von Orientierung
 const canvasW = computed(() => props.orientation === 'landscape' ? 1123 : 794)
 const canvasH = computed(() => props.orientation === 'landscape' ? 794 : 1123)
+
+// Vertikales Padding damit Canvas beim Fit-Zoom vertikal zentriert erscheint
+const canvasVerticalPadding = computed(() => {
+  if (!canvasWrapperRef.value) return 40
+  const wrapperH = canvasWrapperRef.value.clientHeight
+  const scaledH = canvasH.value * zoomLevel.value
+  return Math.max(40, (wrapperH - scaledH) / 2)
+})
 
 // Vorschau-Skalierung: Canvas in ~80vh × ~85vw einpassen
 const previewScale = computed(() => {
@@ -802,9 +811,6 @@ function closeDesigner() {
 .canvas-wrapper {
   flex: 1;
   overflow: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background:
     linear-gradient(90deg, var(--border-color) 1px, transparent 1px),
     linear-gradient(var(--border-color) 1px, transparent 1px);
@@ -816,7 +822,9 @@ function closeDesigner() {
 .canvas-inner {
   width: fit-content;
   margin: 0 auto;
-  padding: 40px;
+  padding-left: 40px;
+  padding-right: 40px;
+  /* padding-top / padding-bottom werden dynamisch per :style gesetzt */
 }
 
 .canvas {
