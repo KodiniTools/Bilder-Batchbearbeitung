@@ -39,86 +39,6 @@
           <div class="modal-body">
             <!-- Left Sidebar - Tools & Settings -->
             <div class="sidebar">
-              <!-- Page Management Section -->
-              <div class="tool-section page-section">
-                <h3>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                  </svg>
-                  {{ t('commentPageDesigner.pageManagement.title') }}
-                </h3>
-
-                <!-- Current Page Info -->
-                <div class="current-page-info">
-                  <span class="page-number">{{ t('commentPageDesigner.pageManagement.pageOf', { current: currentPageIndex + 1, total: pages.length }) }}</span>
-                  <span class="element-count">{{ t('commentPageDesigner.pageManagement.elementCount', { count: currentElements.length }, currentElements.length) }}</span>
-                </div>
-
-                <!-- Page Navigation -->
-                <div class="page-navigation">
-                  <button
-                      :disabled="currentPageIndex === 0"
-                      class="nav-btn"
-                      :title="t('commentPageDesigner.pageManagement.previousPage')"
-                      @click="previousPage"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </button>
-
-                  <div class="page-thumbnails">
-                    <button
-                        v-for="(page, index) in pages"
-                        :key="page.id"
-                        :class="['page-thumb', { active: index === currentPageIndex }]"
-                        :title="t('commentPageDesigner.pageManagement.pageTitle', { number: index + 1 })"
-                        @click="goToPage(index)"
-                    >
-                      {{ index + 1 }}
-                    </button>
-                  </div>
-
-                  <button
-                      :disabled="currentPageIndex === pages.length - 1"
-                      class="nav-btn"
-                      :title="t('commentPageDesigner.pageManagement.nextPage')"
-                      @click="nextPage"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </button>
-                </div>
-
-                <!-- Page Actions -->
-                <div class="page-actions">
-                  <button class="tool-btn primary" :title="t('commentPageDesigner.pageManagement.addPageTooltip')" @click="addNewPage">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14 2 14 8 20 8"/>
-                      <line x1="12" y1="18" x2="12" y2="12"></line>
-                      <line x1="9" y1="15" x2="15" y2="15"></line>
-                    </svg>
-                    {{ t('commentPageDesigner.pageManagement.addPageButton') }}
-                  </button>
-
-                  <button
-                      class="tool-btn danger"
-                      :disabled="pages.length === 1"
-                      :title="t('commentPageDesigner.pageManagement.deletePageTooltip')"
-                      @click="deletePage"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                    {{ t('commentPageDesigner.pageManagement.deletePageButton') }}
-                  </button>
-                </div>
-              </div>
-
               <!-- Element Tools Section -->
               <div class="tool-section">
                 <h3>
@@ -403,6 +323,73 @@
 
             <!-- Canvas Area -->
             <div class="canvas-area">
+              <!-- Page Navigation Toolbar -->
+              <div class="page-toolbar">
+                <div class="page-toolbar-left">
+                  <button
+                      :disabled="currentPageIndex === 0"
+                      class="ptb-btn"
+                      :title="t('commentPageDesigner.pageManagement.previousPage')"
+                      @click="previousPage"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
+
+                  <div class="ptb-thumbs">
+                    <button
+                        v-for="(page, index) in pages"
+                        :key="page.id"
+                        :class="['ptb-thumb', { active: index === currentPageIndex }]"
+                        :title="t('commentPageDesigner.pageManagement.pageTitle', { number: index + 1 })"
+                        @click="goToPage(index)"
+                    >{{ index + 1 }}</button>
+                  </div>
+
+                  <button
+                      :disabled="currentPageIndex === pages.length - 1"
+                      class="ptb-btn"
+                      :title="t('commentPageDesigner.pageManagement.nextPage')"
+                      @click="nextPage"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </button>
+
+                  <span class="ptb-info">
+                    {{ t('commentPageDesigner.pageManagement.pageOf', { current: currentPageIndex + 1, total: pages.length }) }}
+                    <span class="ptb-elem-count">· {{ t('commentPageDesigner.pageManagement.elementCount', { count: currentElements.length }, currentElements.length) }}</span>
+                  </span>
+                </div>
+
+                <div class="page-toolbar-right">
+                  <button class="ptb-action primary" :title="t('commentPageDesigner.pageManagement.addPageTooltip')" @click="addNewPage">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="12" y1="18" x2="12" y2="12"></line>
+                      <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    {{ t('commentPageDesigner.pageManagement.addPageButton') }}
+                  </button>
+
+                  <button
+                      class="ptb-action danger"
+                      :disabled="pages.length === 1"
+                      :title="t('commentPageDesigner.pageManagement.deletePageTooltip')"
+                      @click="deletePage"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    {{ t('commentPageDesigner.pageManagement.deletePageButton') }}
+                  </button>
+                </div>
+              </div>
+
               <!-- Zoom Controls -->
               <div class="zoom-controls">
                 <button :disabled="zoomLevel <= 0.25" :title="t('commentPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
@@ -1251,117 +1238,154 @@ onUnmounted(() => {
   padding: 14px;
 }
 
-/* Page Section */
-.page-section {
-  background: var(--bg);
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.page-section h3 {
+/* Page Toolbar (above canvas) */
+.page-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.current-page-info {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-  border-radius: 8px;
-  margin-bottom: 12px;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
-.page-number {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--accent-text);
-}
-
-.element-count {
-  font-size: 12px;
-  color: var(--accent-text);
-  opacity: 0.85;
-}
-
-.page-navigation {
+.page-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
-.nav-btn {
-  width: 36px;
-  height: 36px;
+.page-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ptb-btn {
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--border-color);
   background: var(--bg);
   color: var(--text);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.nav-btn:hover:not(:disabled) {
+.ptb-btn:hover:not(:disabled) {
   background: var(--accent);
   color: var(--accent-text);
   border-color: var(--accent);
 }
 
-.nav-btn:disabled {
+.ptb-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.page-thumbnails {
-  flex: 1;
+.ptb-thumbs {
   display: flex;
   gap: 4px;
   overflow-x: auto;
   padding: 2px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
-.page-thumb {
-  min-width: 32px;
-  height: 36px;
-  padding: 0 8px;
+.ptb-thumb {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
   border: 1px solid var(--border-color);
   background: var(--bg);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--muted);
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.page-thumb:hover {
+.ptb-thumb:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.page-thumb.active {
+.ptb-thumb.active {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   color: var(--accent-text);
   border-color: transparent;
   font-weight: 600;
 }
 
-.page-actions {
-  display: flex;
-  gap: 8px;
+.ptb-info {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  padding-left: 4px;
 }
 
-.page-actions .tool-btn {
-  flex: 1;
+.ptb-elem-count {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.ptb-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.ptb-action:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ptb-action.primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+
+.ptb-action.primary:hover:not(:disabled) {
+  opacity: 0.9;
+  color: var(--accent-text);
+}
+
+.ptb-action.danger {
+  border-color: var(--red, #e53e3e);
+  color: var(--red, #e53e3e);
+}
+
+.ptb-action.danger:hover:not(:disabled) {
+  background: var(--red, #e53e3e);
+  color: white;
+}
+
+.ptb-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* Tool Section */
