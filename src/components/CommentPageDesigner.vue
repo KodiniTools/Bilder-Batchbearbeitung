@@ -1872,13 +1872,13 @@ onUnmounted(() => {
   position: absolute;
   width: 16px;
   height: 16px;
-  background: white;
-  border: 3px solid var(--accent);
+  background: var(--accent);
+  border: 2.5px solid white;
   border-radius: 50%;
   pointer-events: all;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 1.5px var(--accent), 0 2px 6px rgba(0,0,0,0.5);
   transform: translate(-50%, -50%);
-  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .resize-handle::after {
@@ -1889,9 +1889,8 @@ onUnmounted(() => {
 }
 
 .resize-handle:hover {
-  background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 2px 8px rgba(0,0,0,0.4);
-  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 0 1.5px var(--accent), 0 0 0 5px rgba(102, 126, 234, 0.35), 0 2px 8px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%) scale(1.3);
 }
 
 /* Ecken */
