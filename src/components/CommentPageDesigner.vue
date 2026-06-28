@@ -1864,21 +1864,34 @@ onUnmounted(() => {
 /* Resize handles for text elements (4 corners, like FrontPageDesigner) */
 .resize-handles {
   position: absolute;
-  inset: -7px;
+  inset: -10px;
   pointer-events: none;
 }
 
-/* Gemeinsamer Stil — identisch mit FrontPageDesigner */
 .resize-handle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: white;
-  border: 2px solid var(--accent);
+  border: 3px solid var(--accent);
   border-radius: 50%;
   pointer-events: all;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   transform: translate(-50%, -50%);
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+
+.resize-handle:hover {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 2px 8px rgba(0,0,0,0.4);
+  transform: translate(-50%, -50%) scale(1.25);
 }
 
 /* Ecken */
