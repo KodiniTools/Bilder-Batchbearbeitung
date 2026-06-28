@@ -1015,22 +1015,53 @@ function handleMouseMove(event) {
   if (isTextResizing && selectedElement.value) {
     const dx = (event.clientX / zoomLevel.value) - dragStartX;
     const dy = (event.clientY / zoomLevel.value) - dragStartY;
+    const dir = resizeDirection;
+    const el = selectedElement.value;
 
-    if (resizeDirection.includes('e')) {
-      selectedElement.value.width = Math.max(80, elementStartWidth + dx);
-    }
-    if (resizeDirection.includes('w')) {
-      const newWidth = Math.max(80, elementStartWidth - dx);
-      selectedElement.value.x = elementStartX + (elementStartWidth - newWidth);
-      selectedElement.value.width = newWidth;
-    }
-    if (resizeDirection.includes('s')) {
-      selectedElement.value.height = Math.max(30, elementStartHeight + dy);
-    }
-    if (resizeDirection.includes('n')) {
-      const newHeight = Math.max(30, elementStartHeight - dy);
-      selectedElement.value.y = elementStartY + (elementStartHeight - newHeight);
-      selectedElement.value.height = newHeight;
+    const isImage = el.type === 'image' && elementStartHeight > 0;
+    const ratio = isImage ? elementStartWidth / elementStartHeight : null;
+
+    if (ratio) {
+      // Aspect-ratio-locked resize for images
+      const hasHorizontal = dir.includes('e') || dir.includes('w');
+      let newW, newH;
+
+      if (hasHorizontal) {
+        const rawW = dir.includes('e') ? elementStartWidth + dx : elementStartWidth - dx;
+        newW = Math.max(50, rawW);
+        newH = Math.round(newW / ratio);
+      } else {
+        const rawH = dir.includes('s') ? elementStartHeight + dy : elementStartHeight - dy;
+        newH = Math.max(30, rawH);
+        newW = Math.round(newH * ratio);
+      }
+
+      if (dir.includes('w')) {
+        el.x = elementStartX + (elementStartWidth - newW);
+      }
+      if (dir.includes('n')) {
+        el.y = elementStartY + (elementStartHeight - newH);
+      }
+      el.width = newW;
+      el.height = newH;
+    } else {
+      // Free resize for text elements
+      if (dir.includes('e')) {
+        el.width = Math.max(80, elementStartWidth + dx);
+      }
+      if (dir.includes('w')) {
+        const newWidth = Math.max(80, elementStartWidth - dx);
+        el.x = elementStartX + (elementStartWidth - newWidth);
+        el.width = newWidth;
+      }
+      if (dir.includes('s')) {
+        el.height = Math.max(30, elementStartHeight + dy);
+      }
+      if (dir.includes('n')) {
+        const newHeight = Math.max(30, elementStartHeight - dy);
+        el.y = elementStartY + (elementStartHeight - newHeight);
+        el.height = newHeight;
+      }
     }
   } else if (isDragging && selectedElement.value && !isResizing && !editingTextId.value) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
