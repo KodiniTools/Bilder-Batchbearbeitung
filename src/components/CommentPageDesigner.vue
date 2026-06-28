@@ -13,6 +13,11 @@
               {{ t('commentPageDesigner.title') }}
             </h2>
 
+            <!-- Orientation Badge -->
+            <div class="orientation-badge" :class="orientation">
+              {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+            </div>
+
             <!-- Page Counter Badge -->
             <div class="page-badge">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -568,15 +573,19 @@ const props = defineProps({
   initialElements: {
     type: Array,
     default: () => []
+  },
+  orientation: {
+    type: String,
+    default: 'portrait'
   }
 });
 
 // Emits - FIXED to use v-model and @save
 const emit = defineEmits(['update:modelValue', 'save']);
 
-// Canvas dimensions (A4 aspect ratio)
-const pageWidth = 794;
-const pageHeight = 1123;
+// Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
+const pageWidth = computed(() => props.orientation === 'landscape' ? 1123 : 794);
+const pageHeight = computed(() => props.orientation === 'landscape' ? 794 : 1123);
 
 // Multi-Page State
 const pages = ref([
@@ -723,8 +732,8 @@ function addTextElement() {
     id: generateId(),
     type: 'text',
     content: 'Neuer Text',
-    x: Math.random() * (pageWidth - 350),
-    y: Math.random() * (pageHeight - 100),
+    x: Math.random() * (pageWidth.value - 350),
+    y: Math.random() * (pageHeight.value - 100),
     width: 300,
     height: 60,
     fontSize: 24,
@@ -754,8 +763,8 @@ function handleImageUpload(event) {
       id: generateId(),
       type: 'image',
       src: e.target.result,
-      x: Math.random() * (pageWidth - 300),
-      y: Math.random() * (pageHeight - 300),
+      x: Math.random() * (pageWidth.value - 300),
+      y: Math.random() * (pageHeight.value - 300),
       width: 200,
       opacity: 1,
       zIndex: currentElements.value.length
@@ -883,8 +892,8 @@ function handleMouseMove(event) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
     const deltaY = (event.clientY / zoomLevel.value) - dragStartY;
 
-    selectedElement.value.x = Math.max(0, Math.min(pageWidth - 50, elementStartX + deltaX));
-    selectedElement.value.y = Math.max(0, Math.min(pageHeight - 50, elementStartY + deltaY));
+    selectedElement.value.x = Math.max(0, Math.min(pageWidth.value - 50, elementStartX + deltaX));
+    selectedElement.value.y = Math.max(0, Math.min(pageHeight.value - 50, elementStartY + deltaY));
   } else if (isResizing && selectedElement.value) {
     const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
     selectedElement.value.width = Math.max(50, Math.min(500, elementStartWidth + deltaX));
@@ -1020,6 +1029,18 @@ onUnmounted(() => {
   font-weight: 600;
   margin: 0;
   flex: 1;
+}
+
+.orientation-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  white-space: nowrap;
 }
 
 .page-badge {

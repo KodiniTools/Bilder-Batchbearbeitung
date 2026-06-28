@@ -321,6 +321,7 @@
     <CommentPageDesigner
       v-model="showCommentPageDesigner"
       :initial-elements="settings.commentPageElements"
+      :orientation="settings.orientation || 'portrait'"
       @save="handleCommentPageDesignerSave"
     />
   </Teleport>
