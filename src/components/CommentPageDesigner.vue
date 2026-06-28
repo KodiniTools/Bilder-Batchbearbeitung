@@ -447,8 +447,8 @@
                       position: 'absolute',
                       left: element.x + 'px',
                       top: element.y + 'px',
-                      width: element.type === 'text' && element.width ? element.width + 'px' : undefined,
-                      height: element.type === 'text' && element.height ? element.height + 'px' : undefined,
+                      width: element.width ? element.width + 'px' : undefined,
+                      height: element.height ? element.height + 'px' : undefined,
                       zIndex: element.zIndex,
                       cursor: 'move'
                     }"
@@ -499,29 +499,25 @@
                         class="element-image"
                         :style="{
                         width: element.width + 'px',
+                        height: element.height ? element.height + 'px' : 'auto',
                         opacity: element.opacity
                       }"
                     >
-                      <img :src="element.src" alt="Uploaded image">
+                      <img :src="element.src" alt="Uploaded image" draggable="false">
                     </div>
 
-                    <!-- Resize Handles for text elements (4 corners) -->
-                    <div v-if="selectedElement?.id === element.id && element.type === 'text'" class="resize-handles">
-                      <div class="resize-handle-corner nw" @mousedown.stop="startTextResize($event, 'nw')"></div>
-                      <div class="resize-handle-corner ne" @mousedown.stop="startTextResize($event, 'ne')"></div>
-                      <div class="resize-handle-corner sw" @mousedown.stop="startTextResize($event, 'sw')"></div>
-                      <div class="resize-handle-corner se" @mousedown.stop="startTextResize($event, 'se')"></div>
-                    </div>
-
-                    <!-- Resize Handle for image elements -->
-                    <div
-                        v-if="selectedElement?.id === element.id && element.type === 'image'"
-                        class="resize-handle"
-                        @mousedown.stop="startResize($event)"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
-                      </svg>
+                    <!-- 8 Resize-Handles (Ecken + Kanten) für alle Elemente -->
+                    <div v-if="selectedElement?.id === element.id" class="resize-handles">
+                      <!-- Ecken -->
+                      <div class="resize-handle nw" @mousedown.stop="startTextResize($event, 'nw')"></div>
+                      <div class="resize-handle ne" @mousedown.stop="startTextResize($event, 'ne')"></div>
+                      <div class="resize-handle sw" @mousedown.stop="startTextResize($event, 'sw')"></div>
+                      <div class="resize-handle se" @mousedown.stop="startTextResize($event, 'se')"></div>
+                      <!-- Kanten -->
+                      <div class="resize-handle n"  @mousedown.stop="startTextResize($event, 'n')"></div>
+                      <div class="resize-handle s"  @mousedown.stop="startTextResize($event, 's')"></div>
+                      <div class="resize-handle e"  @mousedown.stop="startTextResize($event, 'e')"></div>
+                      <div class="resize-handle w"  @mousedown.stop="startTextResize($event, 'w')"></div>
                     </div>
                   </div>
                 </div>
@@ -920,19 +916,27 @@ function handleImageUpload(event) {
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    const newElement = {
-      id: generateId(),
-      type: 'image',
-      src: e.target.result,
-      x: Math.random() * (pageWidth.value - 300),
-      y: Math.random() * (pageHeight.value - 300),
-      width: 200,
-      opacity: 1,
-      zIndex: currentElements.value.length
+    const img = new Image();
+    img.onload = () => {
+      const maxW = Math.min(400, pageWidth.value * 0.5);
+      const ratio = img.height / img.width;
+      const w = Math.min(img.width, maxW);
+      const h = Math.round(w * ratio);
+      const newElement = {
+        id: generateId(),
+        type: 'image',
+        src: e.target.result,
+        x: Math.max(0, Math.round(Math.random() * (pageWidth.value - w - 40))),
+        y: Math.max(0, Math.round(Math.random() * (pageHeight.value - h - 40))),
+        width: w,
+        height: h,
+        opacity: 1,
+        zIndex: currentElements.value.length
+      };
+      currentElements.value.push(newElement);
+      selectedElement.value = newElement;
     };
-    
-    currentElements.value.push(newElement);
-    selectedElement.value = newElement;
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
   
@@ -1007,14 +1011,6 @@ function moveToBack() {
   selectedElement.value.zIndex = minZ - 1;
 }
 
-function startResize(event) {
-  if (!selectedElement.value) return;
-  isResizing = true;
-  dragStartX = event.clientX / zoomLevel.value;
-  elementStartWidth = selectedElement.value.width;
-  event.stopPropagation();
-}
-
 function startTextResize(event, direction) {
   if (!selectedElement.value) return;
   isTextResizing = true;
@@ -1024,7 +1020,7 @@ function startTextResize(event, direction) {
   elementStartX = selectedElement.value.x;
   elementStartY = selectedElement.value.y;
   elementStartWidth = selectedElement.value.width || 300;
-  elementStartHeight = selectedElement.value.height || 60;
+  elementStartHeight = selectedElement.value.height || selectedElement.value.width || 60;
   event.stopPropagation();
 }
 
@@ -1055,9 +1051,6 @@ function handleMouseMove(event) {
 
     selectedElement.value.x = Math.max(0, Math.min(pageWidth.value - 50, elementStartX + deltaX));
     selectedElement.value.y = Math.max(0, Math.min(pageHeight.value - 50, elementStartY + deltaY));
-  } else if (isResizing && selectedElement.value) {
-    const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
-    selectedElement.value.width = Math.max(50, Math.min(500, elementStartWidth + deltaX));
   }
 }
 
@@ -1847,11 +1840,12 @@ onUnmounted(() => {
 /* Resize handles for text elements (4 corners, like FrontPageDesigner) */
 .resize-handles {
   position: absolute;
-  inset: -6px;
+  inset: -7px;
   pointer-events: none;
 }
 
-.resize-handle-corner {
+/* Gemeinsamer Stil — identisch mit FrontPageDesigner */
+.resize-handle {
   position: absolute;
   width: 12px;
   height: 12px;
@@ -1859,32 +1853,24 @@ onUnmounted(() => {
   border: 2px solid var(--accent);
   border-radius: 50%;
   pointer-events: all;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  transform: translate(-50%, -50%);
 }
 
-.resize-handle-corner.nw { top: 0; left: 0; cursor: nw-resize; }
-.resize-handle-corner.ne { top: 0; right: 0; cursor: ne-resize; }
-.resize-handle-corner.sw { bottom: 0; left: 0; cursor: sw-resize; }
-.resize-handle-corner.se { bottom: 0; right: 0; cursor: se-resize; }
+/* Ecken */
+.resize-handle.nw { top: 0;    left: 0;    cursor: nw-resize; }
+.resize-handle.ne { top: 0;    left: 100%; cursor: ne-resize; }
+.resize-handle.sw { top: 100%; left: 0;    cursor: sw-resize; }
+.resize-handle.se { top: 100%; left: 100%; cursor: se-resize; }
 
-/* Resize handle for image elements (single bottom-right handle) */
-.resize-handle {
-  position: absolute;
-  right: -8px;
-  bottom: -8px;
-  width: 20px;
-  height: 20px;
-  background: var(--accent);
-  border: 2px solid var(--bg);
-  border-radius: 50%;
-  cursor: nwse-resize;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px var(--shadow-color);
-}
+/* Kanten */
+.resize-handle.n  { top: 0;    left: 50%;  cursor: n-resize; }
+.resize-handle.s  { top: 100%; left: 50%;  cursor: s-resize; }
+.resize-handle.e  { top: 50%;  left: 100%; cursor: e-resize; }
+.resize-handle.w  { top: 50%;  left: 0;    cursor: w-resize; }
 
 .resize-handle svg {
-  color: var(--accent-text);
+  display: none;
 }
 
 /* Footer */

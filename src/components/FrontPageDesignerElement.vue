@@ -52,10 +52,16 @@
     </template>
 
     <div v-if="isSelected" class="resize-handles">
+      <!-- Ecken -->
       <div class="resize-handle nw" @mousedown.stop="emit('resizeStart', $event, element.id, 'nw')"></div>
       <div class="resize-handle ne" @mousedown.stop="emit('resizeStart', $event, element.id, 'ne')"></div>
       <div class="resize-handle sw" @mousedown.stop="emit('resizeStart', $event, element.id, 'sw')"></div>
       <div class="resize-handle se" @mousedown.stop="emit('resizeStart', $event, element.id, 'se')"></div>
+      <!-- Kanten -->
+      <div class="resize-handle n"  @mousedown.stop="emit('resizeStart', $event, element.id, 'n')"></div>
+      <div class="resize-handle s"  @mousedown.stop="emit('resizeStart', $event, element.id, 's')"></div>
+      <div class="resize-handle e"  @mousedown.stop="emit('resizeStart', $event, element.id, 'e')"></div>
+      <div class="resize-handle w"  @mousedown.stop="emit('resizeStart', $event, element.id, 'w')"></div>
     </div>
 
     <button
@@ -171,10 +177,11 @@ watch(() => props.isEditing, (val) => {
 
 .resize-handles {
   position: absolute;
-  inset: -6px;
+  inset: -7px;
   pointer-events: none;
 }
 
+/* Gemeinsamer Stil für alle Handles */
 .resize-handle {
   position: absolute;
   width: 12px;
@@ -183,32 +190,21 @@ watch(() => props.isEditing, (val) => {
   border: 2px solid var(--accent);
   border-radius: 50%;
   pointer-events: all;
-  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  transform: translate(-50%, -50%);
 }
 
-.resize-handle.nw {
-  top: 0;
-  left: 0;
-  cursor: nw-resize;
-}
+/* Ecken */
+.resize-handle.nw { top: 0;   left: 0;   cursor: nw-resize; }
+.resize-handle.ne { top: 0;   left: 100%; cursor: ne-resize; }
+.resize-handle.sw { top: 100%; left: 0;   cursor: sw-resize; }
+.resize-handle.se { top: 100%; left: 100%; cursor: se-resize; }
 
-.resize-handle.ne {
-  top: 0;
-  right: 0;
-  cursor: ne-resize;
-}
-
-.resize-handle.sw {
-  bottom: 0;
-  left: 0;
-  cursor: sw-resize;
-}
-
-.resize-handle.se {
-  bottom: 0;
-  right: 0;
-  cursor: se-resize;
-}
+/* Kanten */
+.resize-handle.n  { top: 0;    left: 50%;  cursor: n-resize;  }
+.resize-handle.s  { top: 100%; left: 50%;  cursor: s-resize;  }
+.resize-handle.e  { top: 50%;  left: 100%; cursor: e-resize;  }
+.resize-handle.w  { top: 50%;  left: 0;    cursor: w-resize;  }
 
 .delete-element-btn {
   position: absolute;
