@@ -177,27 +177,42 @@ watch(() => props.isEditing, (val) => {
 
 .resize-handles {
   position: absolute;
-  inset: -7px;
+  inset: -10px;
   pointer-events: none;
 }
 
 /* Gemeinsamer Stil für alle Handles */
 .resize-handle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: white;
-  border: 2px solid var(--accent);
+  border: 3px solid var(--accent);
   border-radius: 50%;
   pointer-events: all;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   transform: translate(-50%, -50%);
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+/* Larger invisible hit area */
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+
+.resize-handle:hover {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 102, 126, 234), 0.3), 0 2px 8px rgba(0,0,0,0.4);
+  transform: translate(-50%, -50%) scale(1.25);
 }
 
 /* Ecken */
-.resize-handle.nw { top: 0;   left: 0;   cursor: nw-resize; }
-.resize-handle.ne { top: 0;   left: 100%; cursor: ne-resize; }
-.resize-handle.sw { top: 100%; left: 0;   cursor: sw-resize; }
+.resize-handle.nw { top: 0;    left: 0;    cursor: nw-resize; }
+.resize-handle.ne { top: 0;    left: 100%; cursor: ne-resize; }
+.resize-handle.sw { top: 100%; left: 0;    cursor: sw-resize; }
 .resize-handle.se { top: 100%; left: 100%; cursor: se-resize; }
 
 /* Kanten */
