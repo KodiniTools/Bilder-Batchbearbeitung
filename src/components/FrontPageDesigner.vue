@@ -533,22 +533,58 @@ function handleMouseMove(event: MouseEvent) {
 
     const dx = event.clientX / zoomLevel.value - dragStart.value.x
     const dy = event.clientY / zoomLevel.value - dragStart.value.y
+    const dir = resizeDirection.value
+    const startW = elementStartPos.value.width
+    const startH = elementStartPos.value.height
+    const startX = elementStartPos.value.x
+    const startY = elementStartPos.value.y
 
-    if (resizeDirection.value.includes('e')) {
-      element.width = Math.max(50, elementStartPos.value.width + dx)
-    }
-    if (resizeDirection.value.includes('w')) {
-      const newWidth = Math.max(50, elementStartPos.value.width - dx)
-      element.x = elementStartPos.value.x + (elementStartPos.value.width - newWidth)
-      element.width = newWidth
-    }
-    if (resizeDirection.value.includes('s')) {
-      element.height = Math.max(30, elementStartPos.value.height + dy)
-    }
-    if (resizeDirection.value.includes('n')) {
-      const newHeight = Math.max(30, elementStartPos.value.height - dy)
-      element.y = elementStartPos.value.y + (elementStartPos.value.height - newHeight)
-      element.height = newHeight
+    const isImage = element.type === 'image' && startH > 0
+    const ratio = isImage ? startW / startH : null
+
+    if (ratio) {
+      // Aspect-ratio-locked resize for images
+      const hasHorizontal = dir.includes('e') || dir.includes('w')
+      let newW: number, newH: number
+
+      if (hasHorizontal) {
+        // Width drives height
+        const rawW = dir.includes('e') ? startW + dx : startW - dx
+        newW = Math.max(50, rawW)
+        newH = Math.round(newW / ratio)
+      } else {
+        // Height drives width (pure n / s handles)
+        const rawH = dir.includes('s') ? startH + dy : startH - dy
+        newH = Math.max(30, rawH)
+        newW = Math.round(newH * ratio)
+      }
+
+      if (dir.includes('w')) {
+        element.x = startX + (startW - newW)
+      }
+      if (dir.includes('n')) {
+        element.y = startY + (startH - newH)
+      }
+      element.width = newW
+      element.height = newH
+    } else {
+      // Free resize for text elements
+      if (dir.includes('e')) {
+        element.width = Math.max(50, startW + dx)
+      }
+      if (dir.includes('w')) {
+        const newWidth = Math.max(50, startW - dx)
+        element.x = startX + (startW - newWidth)
+        element.width = newWidth
+      }
+      if (dir.includes('s')) {
+        element.height = Math.max(30, startH + dy)
+      }
+      if (dir.includes('n')) {
+        const newHeight = Math.max(30, startH - dy)
+        element.y = startY + (startH - newHeight)
+        element.height = newHeight
+      }
     }
   }
 }
