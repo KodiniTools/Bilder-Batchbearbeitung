@@ -144,7 +144,7 @@ export async function exportMultipleImagesAsPdf(
   // Prüfe ob benutzerdefinierte Startseite aktiviert ist UND Elemente vorhanden sind
   if (includeCustomFrontPage && frontPageElements.length > 0) {
     console.log('✨ Erstelle benutzerdefinierte Startseite...')
-    await createCustomFrontPage(pdf, frontPageElements, jpegQuality, maxImageDimension, orientation)
+    await createCustomFrontPage(pdf, frontPageElements, jpegQuality, maxImageDimension, orientation, author)
     pageAdded = true
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
@@ -314,7 +314,8 @@ async function createCustomFrontPage(
   elements: FrontPageElement[],
   jpegQuality: number,
   _maxImageDimension: number,
-  orientation: 'portrait' | 'landscape' = 'portrait'
+  orientation: 'portrait' | 'landscape' = 'portrait',
+  author?: string
 ): Promise<void> {
   if (elements.length === 0) return
 
@@ -352,6 +353,19 @@ async function createCustomFrontPage(
     } catch (error) {
       console.error('❌ Fehler beim Canvas-Rendern:', element.id, error)
     }
+  }
+
+  // Autorenname am unteren Rand einzeichnen (falls vorhanden)
+  if (author?.trim()) {
+    const fontSize = 13
+    ctx.save()
+    ctx.font = `${fontSize}px Helvetica, Arial, sans-serif`
+    ctx.fillStyle = '#666666'
+    ctx.textBaseline = 'bottom'
+    const text = `Autor: ${author.trim()}`
+    const textWidth = ctx.measureText(text).width
+    ctx.fillText(text, (canvasWidth - textWidth) / 2, canvasHeight - 16)
+    ctx.restore()
   }
 
   // Canvas als JPEG in PDF einfügen
