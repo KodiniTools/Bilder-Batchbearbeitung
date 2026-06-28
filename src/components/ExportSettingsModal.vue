@@ -313,6 +313,7 @@
     <FrontPageDesigner
       v-model="showFrontPageDesigner"
       :initial-elements="settings.frontPageElements"
+      :orientation="settings.orientation || 'portrait'"
       @save="handleFrontPageDesignerSave"
     />
 

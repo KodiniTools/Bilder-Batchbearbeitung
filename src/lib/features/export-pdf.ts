@@ -321,15 +321,9 @@ async function createCustomFrontPage(
   console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite (Canvas-Rendering)')
 
   // Canvas-Dimensionen passend zur PDF-Orientierung (A4 bei 96 DPI)
-  // Designer arbeitet immer im Hochformat (794×1123); für Querformat skalieren wir proportional.
-  const designWidth = 794
-  const designHeight = 1123
-  const canvasWidth = orientation === 'landscape' ? designHeight : designWidth
-  const canvasHeight = orientation === 'landscape' ? designWidth : designHeight
-
-  // Skalierungsfaktoren von Designer-Koordinaten auf Canvas-Koordinaten
-  const scaleX = canvasWidth / designWidth
-  const scaleY = canvasHeight / designHeight
+  // Der FrontPageDesigner verwendet dieselben Dimensionen, daher stimmen Element-Koordinaten exakt.
+  const canvasWidth = orientation === 'landscape' ? 1123 : 794
+  const canvasHeight = orientation === 'landscape' ? 794 : 1123
 
   // Offscreen-Canvas erstellen
   const canvas = document.createElement('canvas')
@@ -339,11 +333,11 @@ async function createCustomFrontPage(
   canvas.height = canvasHeight * scale
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ctx = canvas.getContext('2d')! // guaranteed on a freshly created canvas element
-  ctx.scale(scale * scaleX, scale * scaleY)
+  ctx.scale(scale, scale)
 
-  // Weißer Hintergrund (Koordinaten im Design-Raum 794×1123)
+  // Weißer Hintergrund
   ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, designWidth, designHeight)
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
   // Sortiere Elemente nach y-Position
   const sortedElements = [...elements].sort((a, b) => a.y - b.y)

@@ -12,7 +12,12 @@
               </svg>
               <div>
                 <h2>{{ t('frontPageDesigner.title') }}</h2>
-                <p>{{ t('frontPageDesigner.subtitle') }}</p>
+                <p>
+                  {{ t('frontPageDesigner.subtitle') }}
+                  <span class="orientation-badge" :class="orientation">
+                    {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+                  </span>
+                </p>
               </div>
             </div>
             <button class="close-btn" :title="t('frontPageDesigner.close')" @click="closeDesigner">×</button>
@@ -95,9 +100,11 @@
                     ref="canvasRef"
                     class="canvas"
                     :style="{
+                      width: `${canvasW}px`,
+                      height: `${canvasH}px`,
                       transform: `scale(${zoomLevel})`,
-                      marginRight: `${794 * (zoomLevel - 1)}px`,
-                      marginBottom: `${1123 * (zoomLevel - 1)}px`
+                      marginRight: `${canvasW * (zoomLevel - 1)}px`,
+                      marginBottom: `${canvasH * (zoomLevel - 1)}px`
                     }"
                     @click="deselectAll"
                   >
@@ -187,7 +194,7 @@ export interface FrontPageElement {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FrontPageDesignerElement from './FrontPageDesignerElement.vue'
 import FrontPageDesignerProperties from './FrontPageDesignerProperties.vue'
@@ -197,6 +204,7 @@ const { t } = useI18n()
 interface Props {
   modelValue: boolean
   initialElements?: FrontPageElement[]
+  orientation?: 'portrait' | 'landscape'
 }
 
 const props = defineProps<Props>()
@@ -222,10 +230,24 @@ const resizeDirection = ref<string>('')
 const dragStart = ref({ x: 0, y: 0 })
 const elementStartPos = ref({ x: 0, y: 0, width: 0, height: 0 })
 
+// Canvas-Dimensionen abhängig von Orientierung
+const canvasW = computed(() => props.orientation === 'landscape' ? 1123 : 794)
+const canvasH = computed(() => props.orientation === 'landscape' ? 794 : 1123)
+
 // Computed
 const selectedElement = computed(() =>
   elements.value.find(el => el.id === selectedElementId.value)
 )
+
+// Elemente zurücksetzen wenn Orientierung wechselt (Layout würde sonst nicht passen)
+watch(() => props.orientation, () => {
+  if (elements.value.length > 0) {
+    if (confirm('Die Orientierung hat sich geändert. Elemente zurücksetzen?')) {
+      elements.value = []
+      selectedElementId.value = null
+    }
+  }
+})
 
 // Initialize
 onMounted(() => {
@@ -519,6 +541,21 @@ function closeDesigner() {
   margin: 0;
   font-size: 0.875rem;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.orientation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
 }
 
 .close-btn {
@@ -671,8 +708,6 @@ function closeDesigner() {
 }
 
 .canvas {
-  width: 794px; /* A4 width in pixels at 96 DPI */
-  height: 1123px; /* A4 height in pixels at 96 DPI */
   background: white;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
