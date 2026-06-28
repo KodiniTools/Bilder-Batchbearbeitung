@@ -144,7 +144,7 @@ export async function exportMultipleImagesAsPdf(
   // Prüfe ob benutzerdefinierte Startseite aktiviert ist UND Elemente vorhanden sind
   if (includeCustomFrontPage && frontPageElements.length > 0) {
     console.log('✨ Erstelle benutzerdefinierte Startseite...')
-    await createCustomFrontPage(pdf, frontPageElements, jpegQuality, maxImageDimension)
+    await createCustomFrontPage(pdf, frontPageElements, jpegQuality, maxImageDimension, orientation)
     pageAdded = true
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
@@ -313,15 +313,23 @@ async function createCustomFrontPage(
   pdf: jsPDF,
   elements: FrontPageElement[],
   jpegQuality: number,
-  _maxImageDimension: number
+  _maxImageDimension: number,
+  orientation: 'portrait' | 'landscape' = 'portrait'
 ): Promise<void> {
   if (elements.length === 0) return
 
   console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite (Canvas-Rendering)')
 
-  // Canvas-Dimensionen vom FrontPageDesigner (A4 bei 96 DPI)
-  const canvasWidth = 794
-  const canvasHeight = 1123
+  // Canvas-Dimensionen passend zur PDF-Orientierung (A4 bei 96 DPI)
+  // Designer arbeitet immer im Hochformat (794×1123); für Querformat skalieren wir proportional.
+  const designWidth = 794
+  const designHeight = 1123
+  const canvasWidth = orientation === 'landscape' ? designHeight : designWidth
+  const canvasHeight = orientation === 'landscape' ? designWidth : designHeight
+
+  // Skalierungsfaktoren von Designer-Koordinaten auf Canvas-Koordinaten
+  const scaleX = canvasWidth / designWidth
+  const scaleY = canvasHeight / designHeight
 
   // Offscreen-Canvas erstellen
   const canvas = document.createElement('canvas')
@@ -331,11 +339,11 @@ async function createCustomFrontPage(
   canvas.height = canvasHeight * scale
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ctx = canvas.getContext('2d')! // guaranteed on a freshly created canvas element
-  ctx.scale(scale, scale)
+  ctx.scale(scale * scaleX, scale * scaleY)
 
-  // Weißer Hintergrund
+  // Weißer Hintergrund (Koordinaten im Design-Raum 794×1123)
   ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+  ctx.fillRect(0, 0, designWidth, designHeight)
 
   // Sortiere Elemente nach y-Position
   const sortedElements = [...elements].sort((a, b) => a.y - b.y)
