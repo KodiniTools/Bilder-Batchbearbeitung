@@ -142,6 +142,13 @@
               <button class="btn-secondary" @click="closeDesigner">
                 {{ t('frontPageDesigner.footer.cancel') }}
               </button>
+              <button class="btn-preview" :disabled="elements.length === 0" @click="showPreview = true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Vorschau
+              </button>
               <button class="btn-primary" @click="saveAndClose">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="20 6 9 17 4 12"></polyline>
@@ -149,6 +156,80 @@
                 {{ t('frontPageDesigner.footer.save') }}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Vorschau-Modal -->
+    <Transition name="preview-fade">
+      <div v-if="showPreview" class="preview-overlay" @click.self="showPreview = false">
+        <div class="preview-modal">
+          <div class="preview-header">
+            <div class="preview-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              Vorschau — Startseite
+              <span class="orientation-badge" :class="orientation">
+                {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+              </span>
+            </div>
+            <button class="preview-close-btn" @click="showPreview = false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="preview-body">
+            <div class="preview-page-wrapper">
+              <div
+                class="preview-canvas"
+                :style="{
+                  width: canvasW + 'px',
+                  height: canvasH + 'px',
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top center'
+                }"
+              >
+                <div
+                  v-for="element in elements"
+                  :key="element.id"
+                  class="preview-element"
+                  :style="{
+                    position: 'absolute',
+                    left: element.x + 'px',
+                    top: element.y + 'px',
+                    width: element.width + 'px',
+                    height: element.height + 'px',
+                    fontSize: element.fontSize + 'px',
+                    fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
+                    fontWeight: element.fontWeight,
+                    textAlign: element.textAlign,
+                    color: element.color
+                  }"
+                >
+                  <template v-if="element.type === 'text'">
+                    <div class="preview-text-content">{{ element.content }}</div>
+                  </template>
+                  <template v-else-if="element.type === 'image'">
+                    <img :src="element.src" :alt="element.alt" class="preview-image-content" draggable="false">
+                  </template>
+                </div>
+              </div>
+              <div class="preview-page-shadow" :style="{ width: canvasW * previewScale + 'px', height: canvasH * previewScale + 'px' }"></div>
+            </div>
+          </div>
+          <div class="preview-footer">
+            <button class="btn-secondary" @click="showPreview = false">Schließen &amp; weiter bearbeiten</button>
+            <button class="btn-primary" @click="showPreview = false; saveAndClose()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Speichern
+            </button>
           </div>
         </div>
       </div>
@@ -222,6 +303,7 @@ const elements = ref<FrontPageElement[]>([])
 const selectedElementId = ref<string | null>(null)
 const editingTextId = ref<string | null>(null)
 const zoomLevel = ref(1)
+const showPreview = ref(false)
 
 // Drag & Resize State
 const isDragging = ref(false)
@@ -233,6 +315,13 @@ const elementStartPos = ref({ x: 0, y: 0, width: 0, height: 0 })
 // Canvas-Dimensionen abhängig von Orientierung
 const canvasW = computed(() => props.orientation === 'landscape' ? 1123 : 794)
 const canvasH = computed(() => props.orientation === 'landscape' ? 794 : 1123)
+
+// Vorschau-Skalierung: Canvas in ~80vh × ~85vw einpassen
+const previewScale = computed(() => {
+  const maxW = window.innerWidth * 0.75
+  const maxH = window.innerHeight * 0.72
+  return Math.min(maxW / canvasW.value, maxH / canvasH.value, 1)
+})
 
 // Computed
 const selectedElement = computed(() =>
@@ -769,6 +858,151 @@ function closeDesigner() {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.btn-preview {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+}
+.btn-preview:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+.btn-preview:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Vorschau-Overlay */
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.preview-modal {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+  gap: var(--space-3);
+}
+
+.preview-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.preview-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  transition: color 0.15s;
+}
+.preview-close-btn:hover { color: var(--text); }
+
+.preview-body {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.preview-page-wrapper {
+  position: relative;
+}
+
+.preview-canvas {
+  background: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+.preview-page-shadow {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.preview-element {
+  pointer-events: none;
+  user-select: none;
+}
+
+.preview-text-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 8px;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
+.preview-image-content {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.preview-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Transitions */
+.preview-fade-enter-active,
+.preview-fade-leave-active {
+  transition: opacity 0.2s;
+}
+.preview-fade-enter-from,
+.preview-fade-leave-to {
+  opacity: 0;
 }
 
 /* Transitions */
