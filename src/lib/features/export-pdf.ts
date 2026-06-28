@@ -166,7 +166,7 @@ export async function exportMultipleImagesAsPdf(
     // Automatisch page-Nummern hinzufügen wenn nicht vorhanden
     const elementsWithPages = assignPageNumbersIfMissing(commentPageElements)
     
-    await createCommentPagesFromElements(pdf, elementsWithPages, jpegQuality, maxImageDimension)
+    await createCommentPagesFromElements(pdf, elementsWithPages, jpegQuality, maxImageDimension, orientation)
     pageAdded = true
   }
 
@@ -564,7 +564,8 @@ async function createCommentPagesFromElements(
   pdf: jsPDF,
   elements: CanvasElement[],
   jpegQuality: number,
-  maxImageDimension: number
+  maxImageDimension: number,
+  orientation: 'portrait' | 'landscape' = 'portrait'
 ): Promise<void> {
   if (elements.length === 0) return
 
@@ -599,7 +600,7 @@ async function createCommentPagesFromElements(
 
     console.log(`  📝 Rendere Seite ${pageNum} mit ${pageElements.length} Elementen`)
     
-    await renderSingleCommentPage(pdf, pageElements, pageNum, pageNumbers.length, jpegQuality, maxImageDimension)
+    await renderSingleCommentPage(pdf, pageElements, pageNum, pageNumbers.length, jpegQuality, maxImageDimension, orientation)
   }
 }
 
@@ -612,14 +613,15 @@ async function renderSingleCommentPage(
   pageNumber: number,
   totalPages: number,
   jpegQuality: number,
-  maxImageDimension: number
+  maxImageDimension: number,
+  orientation: 'portrait' | 'landscape' = 'portrait'
 ): Promise<void> {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
 
-  // Canvas-Dimensionen vom Designer (A4 bei 96 DPI)
-  const canvasWidth = 794 // pixels
-  const canvasHeight = 1123 // pixels
+  // Canvas-Dimensionen passend zur Orientierung (A4 bei 96 DPI) — muss mit CommentPageDesigner übereinstimmen
+  const canvasWidth = orientation === 'landscape' ? 1123 : 794
+  const canvasHeight = orientation === 'landscape' ? 794 : 1123
 
   // Umrechnungsfaktoren von Pixel zu mm
   const scaleX = pageWidth / canvasWidth
