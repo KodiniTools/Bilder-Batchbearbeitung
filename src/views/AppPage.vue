@@ -98,6 +98,10 @@ function closePreview() {
   previewImage.value = null
 }
 
+function navigatePreview(image: ImageObject) {
+  previewImage.value = image
+}
+
 function saveEditorChanges(image: ImageObject) {
   imageStore.updateImage(image)
 }
@@ -537,7 +541,9 @@ onUnmounted(() => {
     <ImagePreview
       :image="previewImage"
       :is-open="isPreviewOpen"
+      :images="imageStore.images"
       @close="closePreview"
+      @navigate="navigatePreview"
     />
 
     <ExportSettingsModal
