@@ -7,11 +7,36 @@ import { ImageProcessor } from '@/lib/core/image-processor'
 const props = defineProps<{
   image: ImageObject | null
   isOpen: boolean
+  images?: ImageObject[]
 }>()
 
 const emit = defineEmits<{
   close: []
+  navigate: [image: ImageObject]
 }>()
+
+// Gallery navigation
+const galleryImages = computed(() => props.images ?? [])
+
+const currentIndex = computed(() => {
+  if (!props.image) return -1
+  return galleryImages.value.findIndex(img => img.id === props.image!.id)
+})
+
+const hasGallery = computed(() => galleryImages.value.length > 1 && currentIndex.value !== -1)
+
+const canGoPrev = computed(() => hasGallery.value && currentIndex.value > 0)
+const canGoNext = computed(() => hasGallery.value && currentIndex.value < galleryImages.value.length - 1)
+
+function goPrev() {
+  if (!canGoPrev.value) return
+  emit('navigate', galleryImages.value[currentIndex.value - 1])
+}
+
+function goNext() {
+  if (!canGoNext.value) return
+  emit('navigate', galleryImages.value[currentIndex.value + 1])
+}
 
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
 
@@ -135,8 +160,13 @@ function handleClose() {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && props.isOpen) {
+  if (!props.isOpen) return
+  if (event.key === 'Escape') {
     handleClose()
+  } else if (event.key === 'ArrowLeft') {
+    goPrev()
+  } else if (event.key === 'ArrowRight') {
+    goNext()
   }
 }
 
@@ -187,12 +217,32 @@ onUnmounted(() => {
             >
               <i class="fa-solid fa-xmark"></i>
             </button>
+
+            <button
+              v-if="hasGallery"
+              class="preview-nav preview-nav-prev"
+              aria-label="Vorheriges Bild"
+              :disabled="!canGoPrev"
+              @click.stop="goPrev"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button
+              v-if="hasGallery"
+              class="preview-nav preview-nav-next"
+              aria-label="Nächstes Bild"
+              :disabled="!canGoNext"
+              @click.stop="goNext"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
         </div>
-        
+
         <div v-if="image" class="preview-info">
           <span>{{ image.canvas.width }} × {{ image.canvas.height }} px</span>
           <span class="format-badge">{{ imageFormat }}</span>
+          <span v-if="hasGallery" class="preview-counter">{{ currentIndex + 1 }} / {{ galleryImages.length }}</span>
           <span>{{ image.outputName || image.file.name }}</span>
         </div>
       </div>
@@ -293,6 +343,58 @@ onUnmounted(() => {
   border-color: var(--accent);
   transform: scale(1.1);
   box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 50%, transparent);
+}
+
+/* Galerie-Navigation (vor / nächst) */
+.preview-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-spring);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.preview-nav-prev {
+  left: 12px;
+}
+
+.preview-nav-next {
+  right: 12px;
+}
+
+.preview-nav:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 50%, transparent);
+}
+
+.preview-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.preview-counter {
+  padding: var(--space-2) var(--space-3);
+  background: var(--btn);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .preview-content {
