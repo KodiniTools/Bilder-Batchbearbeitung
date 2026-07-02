@@ -88,227 +88,15 @@
               </div>
 
               <!-- Element Properties -->
-              <div v-if="selectedElement" class="properties-section">
-                <h3>{{ t('commentPageDesigner.properties.title') }}</h3>
-
-                <div class="property-group">
-                  <label>{{ t('commentPageDesigner.properties.elementType') }}</label>
-                  <div class="property-value">{{ selectedElement.type === 'text' ? t('commentPageDesigner.properties.typeText') : t('commentPageDesigner.properties.typeImage') }}</div>
-                </div>
-
-                <!-- Text Properties -->
-                <template v-if="selectedElement.type === 'text'">
-                  <div class="property-group">
-                    <label for="text-content">{{ t('commentPageDesigner.properties.textLabel') }}</label>
-                    <textarea
-                        id="text-content"
-                        v-model="selectedElement.content"
-                        rows="4"
-                        :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
-                    ></textarea>
-                    <div class="inline-edit-hint">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                      </svg>
-                      {{ t('commentPageDesigner.properties.inlineEditHint') }}
-                    </div>
-                  </div>
-
-                  <div class="property-group">
-                    <label>{{ t('commentPageDesigner.properties.fontFamily') }}</label>
-                    <select v-model="selectedElement.fontFamily" class="property-select font-select">
-                      <option
-                        v-for="font in CUSTOM_FONT_FAMILIES"
-                        :key="font"
-                        :value="font"
-                        :style="{ fontFamily: font }"
-                      >{{ font }}</option>
-                    </select>
-                  </div>
-
-                  <div class="property-group">
-                    <label for="font-size">{{ t('commentPageDesigner.properties.fontSize', { size: selectedElement.fontSize }) }}</label>
-                    <input
-                        id="font-size"
-                        v-model.number="selectedElement.fontSize"
-                        type="range"
-                        min="10"
-                        max="72"
-                        step="1"
-                    >
-                  </div>
-
-                  <div class="property-group">
-                    <label for="text-color">{{ t('commentPageDesigner.properties.textColor') }}</label>
-                    <input
-                        id="text-color"
-                        v-model="selectedElement.color"
-                        type="color"
-                    >
-                  </div>
-
-                  <div class="property-group">
-                    <label>{{ t('commentPageDesigner.properties.textAlignment') }}</label>
-                    <div class="align-buttons">
-                      <button
-                          :class="{ active: selectedElement.align === 'left' }"
-                          :title="t('commentPageDesigner.properties.alignLeft')"
-                          @click="selectedElement.align = 'left'"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="17" y1="10" x2="3" y2="10"></line>
-                          <line x1="21" y1="6" x2="3" y2="6"></line>
-                          <line x1="21" y1="14" x2="3" y2="14"></line>
-                          <line x1="17" y1="18" x2="3" y2="18"></line>
-                        </svg>
-                      </button>
-                      <button
-                          :class="{ active: selectedElement.align === 'center' }"
-                          :title="t('commentPageDesigner.properties.alignCenter')"
-                          @click="selectedElement.align = 'center'"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="18" y1="10" x2="6" y2="10"></line>
-                          <line x1="21" y1="6" x2="3" y2="6"></line>
-                          <line x1="21" y1="14" x2="3" y2="14"></line>
-                          <line x1="18" y1="18" x2="6" y2="18"></line>
-                        </svg>
-                      </button>
-                      <button
-                          :class="{ active: selectedElement.align === 'right' }"
-                          :title="t('commentPageDesigner.properties.alignRight')"
-                          @click="selectedElement.align = 'right'"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="21" y1="10" x2="7" y2="10"></line>
-                          <line x1="21" y1="6" x2="3" y2="6"></line>
-                          <line x1="21" y1="14" x2="3" y2="14"></line>
-                          <line x1="21" y1="18" x2="7" y2="18"></line>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="property-group">
-                    <label>
-                      <input v-model="selectedElement.bold" type="checkbox">
-                      {{ t('commentPageDesigner.properties.bold') }}
-                    </label>
-                    <label>
-                      <input v-model="selectedElement.italic" type="checkbox">
-                      {{ t('commentPageDesigner.properties.italic') }}
-                    </label>
-                  </div>
-
-                  <div class="property-group">
-                    <label for="text-width">{{ t('commentPageDesigner.properties.width', { width: selectedElement.width }) }}</label>
-                    <input
-                        id="text-width"
-                        v-model.number="selectedElement.width"
-                        type="range"
-                        min="80"
-                        :max="pageWidth"
-                        step="10"
-                    >
-                  </div>
-
-                  <div class="property-group">
-                    <label for="text-height">{{ t('commentPageDesigner.properties.height', { height: selectedElement.height }) }}</label>
-                    <input
-                        id="text-height"
-                        v-model.number="selectedElement.height"
-                        type="range"
-                        min="30"
-                        :max="pageHeight"
-                        step="10"
-                    >
-                  </div>
-                </template>
-
-                <!-- Image Properties -->
-                <template v-if="selectedElement.type === 'image'">
-                  <div class="property-group">
-                    <label for="img-width">{{ t('commentPageDesigner.properties.width', { width: selectedElement.width }) }}</label>
-                    <input
-                        id="img-width"
-                        v-model.number="selectedElement.width"
-                        type="range"
-                        min="50"
-                        max="500"
-                        step="10"
-                    >
-                  </div>
-
-                  <div class="property-group">
-                    <label for="img-opacity">{{ t('commentPageDesigner.properties.opacity', { opacity: Math.round(selectedElement.opacity * 100) }) }}</label>
-                    <input
-                        id="img-opacity"
-                        v-model.number="selectedElement.opacity"
-                        type="range"
-                        min="0.1"
-                        max="1"
-                        step="0.1"
-                    >
-                  </div>
-                </template>
-
-                <!-- Position -->
-                <div class="property-group">
-                  <label>{{ t('commentPageDesigner.properties.position') }}</label>
-                  <div class="position-inputs">
-                    <div>
-                      <span>X:</span>
-                      <input
-                          v-model.number="selectedElement.x"
-                          type="number"
-                          min="0"
-                          :max="pageWidth"
-                          step="1"
-                      > px
-                    </div>
-                    <div>
-                      <span>Y:</span>
-                      <input
-                          v-model.number="selectedElement.y"
-                          type="number"
-                          min="0"
-                          :max="pageHeight"
-                          step="1"
-                      > px
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Z-Index (Layer) -->
-                <div class="property-group">
-                  <label>{{ t('commentPageDesigner.properties.layer') }}</label>
-                  <div class="layer-buttons">
-                    <button :title="t('commentPageDesigner.properties.toFrontTooltip')" @click="moveToFront">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="18 15 12 9 6 15"></polyline>
-                      </svg>
-                      {{ t('commentPageDesigner.properties.toFrontButton') }}
-                    </button>
-                    <button :title="t('commentPageDesigner.properties.toBackTooltip')" @click="moveToBack">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                      {{ t('commentPageDesigner.properties.toBackButton') }}
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Delete Button -->
-                <button class="delete-element-btn" @click="deleteSelectedElement">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                  {{ t('commentPageDesigner.properties.deleteElement') }}
-                </button>
-              </div>
+              <CommentPageDesignerProperties
+                  v-if="selectedElement"
+                  :element="selectedElement"
+                  :page-width="pageWidth"
+                  :page-height="pageHeight"
+                  @move-to-front="moveToFront"
+                  @move-to-back="moveToBack"
+                  @delete="deleteSelectedElement"
+              />
 
               <!-- Info when no element selected -->
               <div v-else-if="currentElements.length > 0" class="no-selection">
@@ -426,87 +214,17 @@
                   </div>
 
                   <!-- Render elements for current page -->
-                  <div
+                  <CommentPageDesignerElement
                       v-for="element in currentElements"
                       :key="element.id"
-                      :class="['canvas-element', { selected: selectedElement?.id === element.id, editing: editingTextId === element.id }]"
-                      :style="{
-                      position: 'absolute',
-                      left: element.x + 'px',
-                      top: element.y + 'px',
-                      width: element.width ? element.width + 'px' : undefined,
-                      height: element.height ? element.height + 'px' : undefined,
-                      zIndex: element.zIndex,
-                      cursor: 'move'
-                    }"
-                      @mousedown.stop="selectElement(element, $event)"
-                  >
-                    <!-- Text Element -->
-                    <div
-                        v-if="element.type === 'text'"
-                        class="element-text"
-                        :style="{
-                        fontSize: element.fontSize + 'px',
-                        fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
-                        color: element.color,
-                        textAlign: element.align,
-                        fontWeight: element.bold ? 'bold' : 'normal',
-                        fontStyle: element.italic ? 'italic' : 'normal'
-                      }"
-                    >
-                      <div
-                          v-if="editingTextId !== element.id"
-                          class="text-content"
-                          @click.stop
-                          @dblclick.stop="startInlineEdit(element)"
-                      >{{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}</div>
-                      <textarea
-                          v-else
-                          ref="inlineTextareaRef"
-                          v-model="element.content"
-                          class="inline-text-editor"
-                          :style="{
-                            fontSize: element.fontSize + 'px',
-                            fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
-                            color: element.color,
-                            textAlign: element.align,
-                            fontWeight: element.bold ? 'bold' : 'normal',
-                            fontStyle: element.italic ? 'italic' : 'normal'
-                          }"
-                          @click.stop
-                          @mousedown.stop
-                          @blur="stopInlineEdit"
-                          @keydown.esc="stopInlineEdit"
-                      ></textarea>
-                    </div>
-
-                    <!-- Image Element -->
-                    <div
-                        v-if="element.type === 'image'"
-                        class="element-image"
-                        :style="{
-                        width: element.width + 'px',
-                        height: element.height ? element.height + 'px' : 'auto',
-                        opacity: element.opacity
-                      }"
-                    >
-                      <img :src="element.src" alt="Uploaded image" draggable="false">
-                    </div>
-
-                    <!-- 8 Resize-Handles (Ecken + Kanten) für alle Elemente -->
-                    <div v-if="selectedElement?.id === element.id" class="resize-handles">
-                      <!-- Ecken -->
-                      <div class="resize-handle nw" @mousedown.stop="startTextResize($event, 'nw')"></div>
-                      <div class="resize-handle ne" @mousedown.stop="startTextResize($event, 'ne')"></div>
-                      <div class="resize-handle sw" @mousedown.stop="startTextResize($event, 'sw')"></div>
-                      <div class="resize-handle se" @mousedown.stop="startTextResize($event, 'se')"></div>
-                      <!-- Kanten -->
-                      <div class="resize-handle n"  @mousedown.stop="startTextResize($event, 'n')"></div>
-                      <div class="resize-handle s"  @mousedown.stop="startTextResize($event, 's')"></div>
-                      <div class="resize-handle e"  @mousedown.stop="startTextResize($event, 'e')"></div>
-                      <div class="resize-handle w"  @mousedown.stop="startTextResize($event, 'w')"></div>
-                    </div>
-                  </div>
+                      :element="element"
+                      :selected="selectedElement?.id === element.id"
+                      :editing="editingTextId === element.id"
+                      @select="selectElement"
+                      @edit-start="startInlineEdit"
+                      @edit-stop="stopInlineEdit"
+                      @resize-start="startTextResize"
+                  />
                 </div>
                 </div>
               </div>
@@ -546,137 +264,32 @@
         </div>
       </div>
     </Transition>
-
-    <!-- Vorschau-Modal -->
-    <Transition name="preview-fade">
-      <div v-if="showPreview" class="preview-overlay" @click.self="showPreview = false">
-        <div class="preview-modal">
-          <div class="preview-header">
-            <div class="preview-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              Vorschau — Kommentarseiten
-              <span class="orientation-badge" :class="orientation">
-                {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
-              </span>
-            </div>
-
-            <!-- Seitennavigation in Vorschau -->
-            <div class="preview-page-nav">
-              <button :disabled="previewPageIndex === 0" class="preview-nav-btn" @click="previewPageIndex--">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-              <span class="preview-page-info">Seite {{ previewPageIndex + 1 }} von {{ pages.length }}</span>
-              <button :disabled="previewPageIndex === pages.length - 1" class="preview-nav-btn" @click="previewPageIndex++">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
-            </div>
-
-            <button class="preview-close-btn" @click="showPreview = false">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-
-          <div class="preview-body">
-            <div class="preview-page-wrapper">
-              <div
-                class="preview-canvas"
-                :style="{
-                  width: pageWidth + 'px',
-                  height: pageHeight + 'px',
-                  transform: `scale(${previewScale})`,
-                  transformOrigin: 'top center'
-                }"
-              >
-                <!-- Elemente der aktuellen Vorschauseite -->
-                <template v-for="element in previewElements" :key="element.id">
-                  <!-- Text -->
-                  <div
-                    v-if="element.type === 'text'"
-                    class="preview-element"
-                    :style="{
-                      position: 'absolute',
-                      left: element.x + 'px',
-                      top: element.y + 'px',
-                      width: element.width ? element.width + 'px' : 'auto',
-                      height: element.height ? element.height + 'px' : 'auto',
-                      fontSize: element.fontSize + 'px',
-                      fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, sans-serif',
-                      color: element.color,
-                      textAlign: element.align,
-                      fontWeight: element.bold ? 'bold' : 'normal',
-                      fontStyle: element.italic ? 'italic' : 'normal'
-                    }"
-                  >
-                    <div class="preview-text-content">{{ element.content }}</div>
-                  </div>
-                  <!-- Bild -->
-                  <div
-                    v-else-if="element.type === 'image'"
-                    class="preview-element"
-                    :style="{
-                      position: 'absolute',
-                      left: element.x + 'px',
-                      top: element.y + 'px',
-                      width: element.width + 'px',
-                      opacity: element.opacity
-                    }"
-                  >
-                    <img :src="element.src" class="preview-image-content" draggable="false">
-                  </div>
-                </template>
-
-                <!-- Footer-Vorschau wie im Editor -->
-                <div class="canvas-footer-preview">
-                  {{ new Date().toLocaleDateString('de-DE') }} · Kommentarseite {{ previewPageIndex + 1 }}{{ pages.length > 1 ? ` von ${pages.length}` : '' }}
-                </div>
-              </div>
-              <div class="preview-page-shadow" :style="{ width: pageWidth * previewScale + 'px', height: pageHeight * previewScale + 'px' }"></div>
-            </div>
-          </div>
-
-          <!-- Seiten-Dots -->
-          <div v-if="pages.length > 1" class="preview-dots">
-            <button
-              v-for="(page, i) in pages"
-              :key="page.id"
-              :class="['preview-dot', { active: i === previewPageIndex }]"
-              :title="`Seite ${i + 1}`"
-              @click="previewPageIndex = i"
-            ></button>
-          </div>
-
-          <div class="preview-footer">
-            <button class="btn-secondary" @click="showPreview = false">Schließen &amp; weiter bearbeiten</button>
-            <button class="btn-primary" @click="showPreview = false; handleSave()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Speichern
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
   </Teleport>
+
+  <!-- Vorschau-Modal -->
+  <CommentPageDesignerPreview
+      v-model="showPreview"
+      :pages="pages"
+      :page-width="pageWidth"
+      :page-height="pageHeight"
+      :orientation="orientation"
+      :initial-page="currentPageIndex"
+      @save="handleSave"
+  />
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
+import CommentPageDesignerElement from './CommentPageDesignerElement.vue'
+import CommentPageDesignerProperties from './CommentPageDesignerProperties.vue'
+import CommentPageDesignerPreview from './CommentPageDesignerPreview.vue'
+import { useCommentPages } from '@/composables/useCommentPages'
+import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
+
 const { t } = useI18n()
 
-// Props - FIXED to use v-model
+// Props — v-model based public API
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -690,474 +303,129 @@ const props = defineProps({
     type: String,
     default: 'portrait'
   }
-});
+})
 
-// Emits - FIXED to use v-model and @save
-const emit = defineEmits(['update:modelValue', 'save']);
+// Emits — v-model and @save
+const emit = defineEmits(['update:modelValue', 'save'])
 
 // Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
-const pageWidth = computed(() => props.orientation === 'landscape' ? 1123 : 794);
-const pageHeight = computed(() => props.orientation === 'landscape' ? 794 : 1123);
+const pageWidth = computed(() => props.orientation === 'landscape' ? 1123 : 794)
+const pageHeight = computed(() => props.orientation === 'landscape' ? 794 : 1123)
 
-// Vertikales Padding für Zentrierung beim Fit-Zoom
-const canvasVerticalPadding = computed(() => {
-  if (!canvasWrapperRef.value) return 40;
-  const wrapperH = canvasWrapperRef.value.clientHeight;
-  const scaledH = pageHeight.value * zoomLevel.value;
-  return Math.max(40, (wrapperH - scaledH) / 2);
-});
+// Template refs
+const canvasRef = ref(null)
+const canvasWrapperRef = ref(null)
+const imageInput = ref(null)
 
 // Vorschau-State
-const showPreview = ref(false);
-const previewPageIndex = ref(0);
+const showPreview = ref(false)
 
-const previewScale = computed(() => {
-  const maxW = window.innerWidth * 0.75;
-  const maxH = window.innerHeight * 0.68;
-  return Math.min(maxW / pageWidth.value, maxH / pageHeight.value, 1);
-});
+// Document state + element/page operations
+const {
+  pages,
+  currentPageIndex,
+  selectedElement,
+  editingTextId,
+  currentElements,
+  getTotalElementCount,
+  initFromElements,
+  exportElements,
+  addNewPage,
+  deletePage,
+  previousPage,
+  nextPage,
+  goToPage,
+  addTextElement,
+  triggerImageUpload,
+  handleImageUpload,
+  clearCurrentPage,
+  deleteSelectedElement,
+  moveToFront,
+  moveToBack,
+  startInlineEdit,
+  stopInlineEdit,
+  handleCanvasClick
+} = useCommentPages({ pageWidth, pageHeight, imageInput, canvasRef })
 
-const previewElements = computed(() => pages.value[previewPageIndex.value]?.elements || []);
-
-function openPreview() {
-  previewPageIndex.value = currentPageIndex.value;
-  showPreview.value = true;
-}
-
-// Multi-Page State
-const pages = ref([
-  {
-    id: generateId(),
-    elements: []
-  }
-]);
-const currentPageIndex = ref(0);
-
-// Load initial elements when modal opens — distribute by page number
-watch(() => props.modelValue, (newVal) => {
-  if (newVal) {
-    selectedElement.value = null;
-    editingTextId.value = null;
-    currentPageIndex.value = 0;
-    nextTick(() => fitToScreen());
-
-    if (props.initialElements && props.initialElements.length > 0) {
-      // Group elements by their page number
-      const elementsByPage = new Map();
-      const elements = JSON.parse(JSON.stringify(props.initialElements));
-
-      elements.forEach(el => {
-        // Backward compatibility: add width/height for text elements that don't have them
-        if (el.type === 'text') {
-          if (!el.width) el.width = 300;
-          if (!el.height) el.height = 60;
-        }
-        const pageNum = el.page || 1;
-        if (!elementsByPage.has(pageNum)) {
-          elementsByPage.set(pageNum, []);
-        }
-        elementsByPage.get(pageNum).push(el);
-      });
-
-      // Create pages with their respective elements
-      const pageNumbers = Array.from(elementsByPage.keys()).sort((a, b) => a - b);
-      pages.value = pageNumbers.map(pageNum => ({
-        id: generateId(),
-        elements: elementsByPage.get(pageNum)
-      }));
-    } else {
-      // No initial elements — start fresh with one empty page
-      pages.value = [{ id: generateId(), elements: [] }];
-    }
-  }
-});
-
-// Auto-fit bei Orientierungswechsel
-watch(() => props.orientation, () => {
-  nextTick(() => fitToScreen());
-});
-
-// Computed: Get current page elements
-const currentElements = computed(() => pages.value[currentPageIndex.value].elements);
+// Direct manipulation: drag / resize / zoom
+const {
+  zoomLevel,
+  canvasVerticalPadding,
+  selectElement,
+  startTextResize,
+  zoomIn,
+  zoomOut,
+  fitToScreen,
+  resetZoom
+} = useCanvasInteraction({ selectedElement, editingTextId, pageWidth, pageHeight, canvasWrapperRef })
 
 // Footer preview text (matches PDF export footer)
 const footerPreviewText = computed(() => {
-  const dateStr = new Date().toLocaleDateString('de-DE');
-  const pageNum = currentPageIndex.value + 1;
-  const total = pages.value.length;
-  return `Erstellt am ${dateStr} \u2022 Kommentarseite ${pageNum}${total > 1 ? ` von ${total}` : ''}`;
-});
+  const dateStr = new Date().toLocaleDateString('de-DE')
+  const pageNum = currentPageIndex.value + 1
+  const total = pages.value.length
+  return `Erstellt am ${dateStr} • Kommentarseite ${pageNum}${total > 1 ? ` von ${total}` : ''}`
+})
 
-// Element management
-const selectedElement = ref(null);
-const canvasRef = ref(null);
-const canvasWrapperRef = ref(null);
-const imageInput = ref(null);
-const zoomLevel = ref(0.7);
-const editingTextId = ref(null);
-const inlineTextareaRef = ref(null);
-
-// Dragging state
-let isDragging = false;
-let isResizing = false;
-let isTextResizing = false;
-let resizeDirection = '';
-let dragStartX = 0;
-let dragStartY = 0;
-let elementStartX = 0;
-let elementStartY = 0;
-let elementStartWidth = 0;
-let elementStartHeight = 0;
-
-// Generate unique ID
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+function openPreview() {
+  showPreview.value = true
 }
 
-// Get total element count across all pages
-function getTotalElementCount() {
-  return pages.value.reduce((total, page) => total + page.elements.length, 0);
-}
-
-// Page Management Functions
-function addNewPage() {
-  const newPage = {
-    id: generateId(),
-    elements: []
-  };
-  pages.value.push(newPage);
-  currentPageIndex.value = pages.value.length - 1;
-  selectedElement.value = null;
-}
-
-function deletePage() {
-  if (pages.value.length === 1) {
-    alert(t('alerts.cannotDeleteLastPage'));
-    return;
+// Load initial elements when the modal opens — distribute by page number
+watch(() => props.modelValue, (newVal) => {
+  if (newVal) {
+    initFromElements(props.initialElements)
+    nextTick(() => fitToScreen())
   }
+})
 
-  if (confirm(t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }))) {
-    pages.value.splice(currentPageIndex.value, 1);
+// Auto-fit on orientation change
+watch(() => props.orientation, () => {
+  nextTick(() => fitToScreen())
+})
 
-    if (currentPageIndex.value >= pages.value.length) {
-      currentPageIndex.value = pages.value.length - 1;
-    }
-
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function previousPage() {
-  if (currentPageIndex.value > 0) {
-    currentPageIndex.value--;
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function nextPage() {
-  if (currentPageIndex.value < pages.value.length - 1) {
-    currentPageIndex.value++;
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function goToPage(index) {
-  currentPageIndex.value = index;
-  selectedElement.value = null;
-  editingTextId.value = null;
-}
-
-// Element Functions
-function addTextElement() {
-  const newElement = {
-    id: generateId(),
-    type: 'text',
-    content: 'Neuer Text',
-    x: Math.random() * (pageWidth.value - 350),
-    y: Math.random() * (pageHeight.value - 100),
-    width: 300,
-    height: 60,
-    fontSize: 24,
-    fontFamily: 'Helvetica',
-    color: '#000000',
-    align: 'left',
-    bold: false,
-    italic: false,
-    zIndex: currentElements.value.length
-  };
-
-  currentElements.value.push(newElement);
-  selectedElement.value = newElement;
-}
-
-function triggerImageUpload() {
-  imageInput.value?.click();
-}
-
-function handleImageUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const maxW = Math.min(400, pageWidth.value * 0.5);
-      const ratio = img.height / img.width;
-      const w = Math.min(img.width, maxW);
-      const h = Math.round(w * ratio);
-      const newElement = {
-        id: generateId(),
-        type: 'image',
-        src: e.target.result,
-        x: Math.max(0, Math.round(Math.random() * (pageWidth.value - w - 40))),
-        y: Math.max(0, Math.round(Math.random() * (pageHeight.value - h - 40))),
-        width: w,
-        height: h,
-        opacity: 1,
-        zIndex: currentElements.value.length
-      };
-      currentElements.value.push(newElement);
-      selectedElement.value = newElement;
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-  
-  event.target.value = '';
-}
-
-function clearCurrentPage() {
-  if (confirm(t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }))) {
-    currentElements.value.length = 0;
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function selectElement(element, event) {
-  if (editingTextId.value) return;
-  selectedElement.value = element;
-  isDragging = true;
-  dragStartX = event.clientX / zoomLevel.value;
-  dragStartY = event.clientY / zoomLevel.value;
-  elementStartX = element.x;
-  elementStartY = element.y;
-}
-
-// Inline text editing on canvas
-function startInlineEdit(element) {
-  if (element.type !== 'text') return;
-  editingTextId.value = element.id;
-  selectedElement.value = element;
-  nextTick(() => {
-    const textarea = Array.isArray(inlineTextareaRef.value)
-        ? inlineTextareaRef.value[0]
-        : inlineTextareaRef.value;
-    if (textarea) {
-      textarea.focus();
-      textarea.select();
-    }
-  });
-}
-
-function stopInlineEdit() {
-  editingTextId.value = null;
-}
-
-function handleCanvasClick(event) {
-  if (event.target === canvasRef.value || event.target.classList.contains('canvas-grid')) {
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function deleteSelectedElement() {
-  if (!selectedElement.value) return;
-
-  const index = currentElements.value.findIndex(el => el.id === selectedElement.value.id);
-  if (index !== -1) {
-    currentElements.value.splice(index, 1);
-    selectedElement.value = null;
-    editingTextId.value = null;
-  }
-}
-
-function moveToFront() {
-  if (!selectedElement.value) return;
-  const maxZ = Math.max(...currentElements.value.map(el => el.zIndex), 0);
-  selectedElement.value.zIndex = maxZ + 1;
-}
-
-function moveToBack() {
-  if (!selectedElement.value) return;
-  const minZ = Math.min(...currentElements.value.map(el => el.zIndex), 0);
-  selectedElement.value.zIndex = minZ - 1;
-}
-
-function startTextResize(event, direction) {
-  if (!selectedElement.value) return;
-  isTextResizing = true;
-  resizeDirection = direction;
-  dragStartX = event.clientX / zoomLevel.value;
-  dragStartY = event.clientY / zoomLevel.value;
-  elementStartX = selectedElement.value.x;
-  elementStartY = selectedElement.value.y;
-  elementStartWidth = selectedElement.value.width || 300;
-  elementStartHeight = selectedElement.value.height || selectedElement.value.width || 60;
-  event.stopPropagation();
-}
-
-function handleMouseMove(event) {
-  if (isTextResizing && selectedElement.value) {
-    const dx = (event.clientX / zoomLevel.value) - dragStartX;
-    const dy = (event.clientY / zoomLevel.value) - dragStartY;
-    const dir = resizeDirection;
-    const el = selectedElement.value;
-
-    const isImage = el.type === 'image' && elementStartHeight > 0;
-    const ratio = isImage ? elementStartWidth / elementStartHeight : null;
-
-    if (ratio) {
-      // Aspect-ratio-locked resize for images
-      const hasHorizontal = dir.includes('e') || dir.includes('w');
-      let newW, newH;
-
-      if (hasHorizontal) {
-        const rawW = dir.includes('e') ? elementStartWidth + dx : elementStartWidth - dx;
-        newW = Math.max(50, rawW);
-        newH = Math.round(newW / ratio);
-      } else {
-        const rawH = dir.includes('s') ? elementStartHeight + dy : elementStartHeight - dy;
-        newH = Math.max(30, rawH);
-        newW = Math.round(newH * ratio);
-      }
-
-      if (dir.includes('w')) {
-        el.x = elementStartX + (elementStartWidth - newW);
-      }
-      if (dir.includes('n')) {
-        el.y = elementStartY + (elementStartHeight - newH);
-      }
-      el.width = newW;
-      el.height = newH;
-    } else {
-      // Free resize for text elements
-      if (dir.includes('e')) {
-        el.width = Math.max(80, elementStartWidth + dx);
-      }
-      if (dir.includes('w')) {
-        const newWidth = Math.max(80, elementStartWidth - dx);
-        el.x = elementStartX + (elementStartWidth - newWidth);
-        el.width = newWidth;
-      }
-      if (dir.includes('s')) {
-        el.height = Math.max(30, elementStartHeight + dy);
-      }
-      if (dir.includes('n')) {
-        const newHeight = Math.max(30, elementStartHeight - dy);
-        el.y = elementStartY + (elementStartHeight - newHeight);
-        el.height = newHeight;
-      }
-    }
-  } else if (isDragging && selectedElement.value && !isResizing && !editingTextId.value) {
-    const deltaX = (event.clientX / zoomLevel.value) - dragStartX;
-    const deltaY = (event.clientY / zoomLevel.value) - dragStartY;
-
-    selectedElement.value.x = Math.max(0, Math.min(pageWidth.value - 50, elementStartX + deltaX));
-    selectedElement.value.y = Math.max(0, Math.min(pageHeight.value - 50, elementStartY + deltaY));
-  }
-}
-
-function handleMouseUp() {
-  isDragging = false;
-  isResizing = false;
-  isTextResizing = false;
-  resizeDirection = '';
-}
-
-// Zoom controls
-function zoomIn() {
-  zoomLevel.value = Math.min(2, Math.round((zoomLevel.value + 0.1) * 10) / 10);
-}
-
-function zoomOut() {
-  zoomLevel.value = Math.max(0.25, Math.round((zoomLevel.value - 0.1) * 10) / 10);
-}
-
-function fitToScreen() {
-  if (!canvasWrapperRef.value) return;
-  const wrapper = canvasWrapperRef.value;
-  const availW = wrapper.clientWidth - 80;
-  const availH = wrapper.clientHeight - 80;
-  zoomLevel.value = Math.round(Math.min(availW / pageWidth.value, availH / pageHeight.value, 1) * 100) / 100;
-}
-
-function resetZoom() {
-  fitToScreen();
-}
-
-// Close handler - FIXED for v-model
+// Close handler — v-model
 function handleClose() {
-  emit('update:modelValue', false);
+  emit('update:modelValue', false)
 }
 
 function handleSave() {
-  const allElements = pages.value.flatMap((page, pageIndex) => {
-    return page.elements.map(element => ({
-      ...element,
-      page: pageIndex + 1
-    }))
-  })
-
-  console.log('💾 Speichere Elemente:', allElements.length, 'von', pages.value.length, 'Seiten')
-  console.log('📄 Verteilung:', pages.value.map((page, index) =>
-      `Seite ${index + 1}: ${page.elements.length} Element(e)`
-  ).join(', '))
-
-  emit('save', allElements)
+  emit('save', exportElements())
   emit('update:modelValue', false)
 }
+
 // Keyboard shortcuts
 function handleKeyDown(event) {
   // Don't handle shortcuts while editing text inline
-  if (editingTextId.value) return;
+  if (editingTextId.value) return
 
   if ((event.key === 'Delete' || event.key === 'Backspace') && selectedElement.value) {
-    event.preventDefault();
-    deleteSelectedElement();
+    event.preventDefault()
+    deleteSelectedElement()
   }
 
   if (event.ctrlKey && event.key === 'ArrowLeft') {
-    event.preventDefault();
-    previousPage();
+    event.preventDefault()
+    previousPage()
   }
   if (event.ctrlKey && event.key === 'ArrowRight') {
-    event.preventDefault();
-    nextPage();
+    event.preventDefault()
+    nextPage()
   }
 
   if (event.ctrlKey && event.key === 'n') {
-    event.preventDefault();
-    addNewPage();
+    event.preventDefault()
+    addNewPage()
   }
 }
 
-// Lifecycle hooks
 onMounted(() => {
-  document.addEventListener('mousemove', handleMouseMove);
-  document.addEventListener('mouseup', handleMouseUp);
-  document.addEventListener('keydown', handleKeyDown);
-});
+  document.addEventListener('keydown', handleKeyDown)
+})
 
 onUnmounted(() => {
-  document.removeEventListener('mousemove', handleMouseMove);
-  document.removeEventListener('mouseup', handleMouseUp);
-  document.removeEventListener('keydown', handleKeyDown);
-});
+  document.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>
@@ -1491,179 +759,6 @@ onUnmounted(() => {
   border-color: var(--red);
 }
 
-/* Properties Section */
-.properties-section {
-  background: var(--bg);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 1px 3px var(--shadow-color);
-  border: 1px solid var(--border-color);
-}
-
-.properties-section h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 12px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.property-group {
-  margin-bottom: 16px;
-}
-
-.property-group:last-child {
-  margin-bottom: 0;
-}
-
-.property-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.property-value {
-  padding: 8px 12px;
-  background: var(--panel);
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--text);
-}
-
-.property-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--panel);
-  color: var(--text);
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.property-select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.font-select option {
-  padding: 4px 8px;
-  font-size: 14px;
-}
-
-.property-group textarea,
-.property-group input[type="number"] {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  background: var(--panel);
-  color: var(--text);
-  transition: border-color 0.2s;
-}
-
-.property-group textarea:focus,
-.property-group input[type="number"]:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.property-group input[type="range"] {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border-color);
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.property-group input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-.property-group input[type="color"] {
-  width: 100%;
-  height: 40px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.align-buttons,
-.layer-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.align-buttons button,
-.layer-buttons button {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--panel);
-  color: var(--text);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 12px;
-}
-
-.align-buttons button:hover,
-.layer-buttons button:hover {
-  background: var(--bg);
-  border-color: var(--accent);
-}
-
-.align-buttons button.active {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
-}
-
-.property-group label input[type="checkbox"] {
-  margin-right: 6px;
-}
-
-.delete-element-btn {
-  width: 100%;
-  padding: 10px 16px;
-  background: color-mix(in oklab, var(--red) 15%, var(--bg));
-  border: 1px solid color-mix(in oklab, var(--red) 40%, var(--border-color));
-  color: var(--red);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.delete-element-btn:hover {
-  background: color-mix(in oklab, var(--red) 25%, var(--bg));
-  border-color: var(--red);
-}
-
 .no-selection {
   display: flex;
   flex-direction: column;
@@ -1682,23 +777,6 @@ onUnmounted(() => {
 .no-selection p {
   margin: 0;
   font-size: 13px;
-}
-
-.position-inputs {
-  display: flex;
-  gap: 12px;
-}
-
-.position-inputs > div {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.position-inputs input {
-  width: 70px;
 }
 
 /* Canvas Area */
@@ -1800,144 +878,6 @@ onUnmounted(() => {
   color: rgb(150, 150, 150);
   pointer-events: none;
   user-select: none;
-}
-
-/* Canvas Elements */
-.canvas-element {
-  transition: box-shadow 0.2s;
-  user-select: none;
-}
-
-.canvas-element.selected {
-  box-shadow: 0 0 0 2px var(--accent);
-  border-radius: 4px;
-}
-
-.canvas-element.selected::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border: 1px dashed var(--accent);
-  border-radius: 4px;
-  pointer-events: none;
-}
-
-.element-text {
-  width: 100%;
-  height: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.element-image {
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.element-image img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.text-content {
-  width: 100%;
-  height: 100%;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow: hidden;
-  line-height: 1.5;
-  cursor: text;
-}
-
-.inline-text-editor {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  resize: none;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  text-align: inherit;
-  color: inherit;
-  background: rgba(102, 126, 234, 0.06);
-  box-sizing: border-box;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow: hidden;
-}
-
-.canvas-element.editing {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 12px color-mix(in oklab, var(--accent) 25%, transparent);
-  border-radius: 4px;
-}
-
-.canvas-element.editing::before {
-  border-style: solid;
-  border-color: var(--accent);
-}
-
-.inline-edit-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-/* Resize handles for text elements (4 corners, like FrontPageDesigner) */
-.resize-handles {
-  position: absolute;
-  inset: -10px;
-  pointer-events: none;
-}
-
-.resize-handle {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background: var(--accent);
-  border: 2.5px solid white;
-  border-radius: 50%;
-  pointer-events: all;
-  box-shadow: 0 0 0 1.5px var(--accent), 0 2px 6px rgba(0,0,0,0.5);
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.resize-handle::after {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-}
-
-.resize-handle:hover {
-  box-shadow: 0 0 0 1.5px var(--accent), 0 0 0 5px rgba(102, 126, 234, 0.35), 0 2px 8px rgba(0,0,0,0.5);
-  transform: translate(-50%, -50%) scale(1.3);
-}
-
-/* Ecken */
-.resize-handle.nw { top: 0;    left: 0;    cursor: nw-resize; }
-.resize-handle.ne { top: 0;    left: 100%; cursor: ne-resize; }
-.resize-handle.sw { top: 100%; left: 0;    cursor: sw-resize; }
-.resize-handle.se { top: 100%; left: 100%; cursor: se-resize; }
-
-/* Kanten */
-.resize-handle.n  { top: 0;    left: 50%;  cursor: n-resize; }
-.resize-handle.s  { top: 100%; left: 50%;  cursor: s-resize; }
-.resize-handle.e  { top: 50%;  left: 100%; cursor: e-resize; }
-.resize-handle.w  { top: 50%;  left: 0;    cursor: w-resize; }
-
-.resize-handle svg {
-  display: none;
 }
 
 /* Footer */
@@ -2111,174 +1051,5 @@ onUnmounted(() => {
 .btn-preview:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.preview-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.78);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-
-.preview-modal {
-  background: var(--panel, #1e1e2e);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  max-width: 95vw;
-  max-height: 95vh;
-  overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
-}
-
-.preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border-color, #333);
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.preview-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text, #fff);
-}
-
-.preview-page-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.preview-nav-btn {
-  background: none;
-  border: 1px solid var(--border-color, #444);
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--text, #fff);
-  padding: 4px 8px;
-  display: flex;
-  transition: background 0.15s;
-}
-.preview-nav-btn:hover:not(:disabled) { background: var(--bg, #111); }
-.preview-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.preview-page-info {
-  font-size: 0.875rem;
-  color: var(--muted, #aaa);
-  white-space: nowrap;
-}
-
-.preview-close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--muted, #888);
-  padding: 4px;
-  border-radius: 6px;
-  display: flex;
-  transition: color 0.15s;
-}
-.preview-close-btn:hover { color: var(--text, #fff); }
-
-.preview-body {
-  flex: 1;
-  overflow: auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 24px;
-}
-
-.preview-page-wrapper {
-  position: relative;
-}
-
-.preview-canvas {
-  background: white;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-
-.preview-page-shadow {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  background: rgba(0,0,0,0.18);
-  border-radius: 2px;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.preview-element {
-  pointer-events: none;
-  user-select: none;
-}
-
-.preview-text-content {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  white-space: pre-wrap;
-  word-break: break-word;
-  padding: 8px;
-  box-sizing: border-box;
-  line-height: 1.5;
-}
-
-.preview-image-content {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.preview-dots {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 0 4px;
-}
-
-.preview-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: none;
-  background: var(--border-color, #444);
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.2s, transform 0.2s;
-}
-.preview-dot.active {
-  background: var(--accent);
-  transform: scale(1.3);
-}
-
-.preview-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 14px 20px;
-  border-top: 1px solid var(--border-color, #333);
-}
-
-.preview-fade-enter-active,
-.preview-fade-leave-active {
-  transition: opacity 0.2s;
-}
-.preview-fade-enter-from,
-.preview-fade-leave-to {
-  opacity: 0;
 }
 </style>
