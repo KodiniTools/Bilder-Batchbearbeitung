@@ -5,6 +5,7 @@ import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import type { ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
+import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 
 const props = defineProps<{
@@ -172,6 +173,16 @@ function resetSlider(key: keyof ImageFilters, defaultValue: number) {
   filters.value[key] = defaultValue
 }
 
+// Preset (One-Click-Look) auf die Auswahl anwenden
+const presets = FILTER_PRESETS
+function applyPreset(presetKey: string) {
+  const preset = FILTER_PRESETS.find(p => p.key === presetKey)
+  if (!preset) return
+  // Vollständig setzen (nicht mergen), damit der Look exakt übernommen wird.
+  // Der filters-Watcher überträgt die Änderung debounced auf die Auswahl.
+  filters.value = { ...defaultFilters, ...preset.filters }
+}
+
 // Reset all filters, transforms, and watermark
 function resetFilters() {
   filters.value = { ...defaultFilters }
@@ -190,15 +201,18 @@ function close() {
 
 // Filter slider config
 const sliderConfig = [
-  { key: 'brightness', icon: 'fa-sun', min: 0, max: 200, default: 100 },
-  { key: 'contrast', icon: 'fa-circle-half-stroke', min: 0, max: 200, default: 100 },
-  { key: 'saturation', icon: 'fa-droplet', min: 0, max: 200, default: 100 },
-  { key: 'hue', icon: 'fa-palette', min: 0, max: 360, default: 0 },
-  { key: 'opacity', icon: 'fa-eye', min: 0, max: 100, default: 100 },
-  { key: 'blur', icon: 'fa-water', min: 0, max: 20, default: 0 },
-  { key: 'grayscale', icon: 'fa-swatchbook', min: 0, max: 100, default: 0 },
-  { key: 'sepia', icon: 'fa-image', min: 0, max: 100, default: 0 },
-  { key: 'invert', icon: 'fa-right-left', min: 0, max: 100, default: 0 }
+  { key: 'brightness', icon: 'fa-sun', min: 0, max: 200, default: 100, unit: '%' },
+  { key: 'contrast', icon: 'fa-circle-half-stroke', min: 0, max: 200, default: 100, unit: '%' },
+  { key: 'saturation', icon: 'fa-droplet', min: 0, max: 200, default: 100, unit: '%' },
+  { key: 'vibrance', icon: 'fa-wand-sparkles', min: -100, max: 100, default: 0, unit: '' },
+  { key: 'temperature', icon: 'fa-temperature-half', min: -100, max: 100, default: 0, unit: '' },
+  { key: 'hue', icon: 'fa-palette', min: 0, max: 360, default: 0, unit: '°' },
+  { key: 'opacity', icon: 'fa-eye', min: 0, max: 100, default: 100, unit: '%' },
+  { key: 'blur', icon: 'fa-water', min: 0, max: 20, default: 0, unit: 'px' },
+  { key: 'grayscale', icon: 'fa-swatchbook', min: 0, max: 100, default: 0, unit: '%' },
+  { key: 'sepia', icon: 'fa-image', min: 0, max: 100, default: 0, unit: '%' },
+  { key: 'vignette', icon: 'fa-circle-dot', min: 0, max: 100, default: 0, unit: '%' },
+  { key: 'invert', icon: 'fa-right-left', min: 0, max: 100, default: 0, unit: '%' }
 ] as const
 </script>
 
@@ -221,6 +235,21 @@ const sliderConfig = [
       </div>
 
       <div class="panel-content">
+        <div class="preset-block">
+          <span class="preset-label">{{ t('batchEdit.presets.label') }}</span>
+          <div class="preset-chips">
+            <button
+              v-for="preset in presets"
+              :key="preset.key"
+              type="button"
+              class="preset-chip"
+              @click="applyPreset(preset.key)"
+            >{{ t(`batchEdit.presets.${preset.key}`) }}</button>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
         <div class="sliders-container">
           <div
             v-for="slider in sliderConfig"
@@ -230,7 +259,7 @@ const sliderConfig = [
             <label class="slider-label">
               <i :class="['fa-solid', slider.icon]"></i>
               <span>{{ t(`batchEdit.filters.${slider.key}`) }}</span>
-              <span class="slider-value">{{ filters[slider.key] }}{{ slider.key === 'hue' ? '°' : slider.key === 'blur' ? 'px' : '%' }}</span>
+              <span class="slider-value">{{ filters[slider.key] }}{{ slider.unit }}</span>
             </label>
             <div class="slider-wrapper">
               <input
@@ -762,6 +791,48 @@ const sliderConfig = [
   flex: 1;
   overflow-y: auto;
   padding: var(--space-4);
+}
+
+.preset-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.preset-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-chip {
+  padding: 5px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s var(--ease-smooth);
+}
+
+.preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.preset-chip:active {
+  transform: translateY(0);
 }
 
 .sliders-container {

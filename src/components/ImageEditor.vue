@@ -299,6 +299,7 @@ import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
 import { useImageStore } from '@/stores/imageStore'
@@ -350,18 +351,6 @@ const FILTER_DEFS: Array<{ key: FilterKey; min: number; max: number; step: numbe
   { key: 'opacity',     min: 0, max: 100, step: 1, unit: '%' },
 ]
 
-// One-click looks — combinations of existing filter values.
-// Especially useful for batch work: apply the same look, then Save.
-const FILTER_PRESETS: Array<{ key: string; filters: Partial<ImageFilters> }> = [
-  { key: 'original', filters: {} },
-  { key: 'bw',       filters: { grayscale: 100, contrast: 110, brightness: 102 } },
-  { key: 'vintage',  filters: { sepia: 40, contrast: 95, saturation: 85, temperature: 22, vignette: 38 } },
-  { key: 'warm',     filters: { temperature: 45, saturation: 110, brightness: 102 } },
-  { key: 'cool',     filters: { temperature: -40, saturation: 105 } },
-  { key: 'vivid',    filters: { saturation: 135, contrast: 112, vibrance: 45 } },
-  { key: 'matte',    filters: { contrast: 88, saturation: 82, brightness: 106, vignette: 15 } },
-  { key: 'noir',     filters: { grayscale: 100, contrast: 135, brightness: 96, vignette: 45 } },
-]
 
 interface Props {
   image: ImageObject | null

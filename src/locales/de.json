@@ -847,12 +847,26 @@
       "brightness": "Helligkeit",
       "contrast": "Kontrast",
       "saturation": "Sättigung",
+      "vibrance": "Vibrance",
+      "temperature": "Wärme",
       "hue": "Farbton",
       "opacity": "Transparenz",
       "blur": "Weichzeichnung",
       "grayscale": "Graustufen",
       "sepia": "Sepia",
+      "vignette": "Vignette",
       "invert": "Invertieren"
+    },
+    "presets": {
+      "label": "Presets",
+      "original": "Original",
+      "bw": "S/W",
+      "vintage": "Vintage",
+      "warm": "Warm",
+      "cool": "Kühl",
+      "vivid": "Vivid",
+      "matte": "Matt",
+      "noir": "Noir"
     },
     "buttons": {
       "apply": "Anwenden",

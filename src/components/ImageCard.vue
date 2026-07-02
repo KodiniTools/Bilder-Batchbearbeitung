@@ -211,6 +211,11 @@ const handleEditKeydown = (event: KeyboardEvent) => {
 
 // Kopiert den Inhalt von props.image.canvas in den sichtbaren displayCanvas im Template.
 // Verhindert Probleme, die entstehen wenn das Canvas-Element im DOM verschoben wird.
+// Max. Kantenlänge für den gebackenen Thumbnail-Bake. Da die Kachel ohnehin
+// per CSS skaliert wird, reicht eine reduzierte Auflösung – das hält die
+// Pixel-Passage (getImageData) auch bei Live-Stapelbearbeitung flüssig.
+const THUMB_BAKE_MAX = 600
+
 function syncDisplayCanvas() {
   const src = props.image.canvas
   const dst = displayCanvas.value
@@ -218,15 +223,29 @@ function syncDisplayCanvas() {
   const ctx = dst.getContext('2d')
   if (!ctx) return
 
-  // When pixel-based filters are active, bake the full pipeline; otherwise use
-  // the raw canvas (fast path) and let CSS handle the remaining filters.
-  const source = hasPixelFilters.value
-    ? ImageProcessor.applyFiltersToCanvas(src, props.image.filters || defaultFilters)
-    : src
-  dst.width = source.width
-  dst.height = source.height
-  ctx.clearRect(0, 0, dst.width, dst.height)
-  ctx.drawImage(source, 0, 0)
+  if (hasPixelFilters.value) {
+    // Auf Thumbnail-Größe herunterskalieren, dann die volle Pipeline backen.
+    const scale = Math.min(THUMB_BAKE_MAX / src.width, THUMB_BAKE_MAX / src.height, 1)
+    let bakeSource: HTMLCanvasElement = src
+    if (scale < 1) {
+      const scaled = document.createElement('canvas')
+      scaled.width = Math.max(1, Math.round(src.width * scale))
+      scaled.height = Math.max(1, Math.round(src.height * scale))
+      scaled.getContext('2d')?.drawImage(src, 0, 0, scaled.width, scaled.height)
+      bakeSource = scaled
+    }
+    const baked = ImageProcessor.applyFiltersToCanvas(bakeSource, props.image.filters || defaultFilters)
+    dst.width = baked.width
+    dst.height = baked.height
+    ctx.clearRect(0, 0, dst.width, dst.height)
+    ctx.drawImage(baked, 0, 0)
+  } else {
+    // Schneller Pfad: rohes Canvas, CSS übernimmt die restlichen Filter.
+    dst.width = src.width
+    dst.height = src.height
+    ctx.clearRect(0, 0, dst.width, dst.height)
+    ctx.drawImage(src, 0, 0)
+  }
   updateDimensions()
 }
 
