@@ -21,8 +21,17 @@ const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
 const displayCanvas = ref<HTMLCanvasElement | null>(null)
 
+// Pixel-based filters (temperature/vibrance/vignette) can't be expressed in CSS,
+// so when any are active we bake the full pipeline into the display canvas and
+// skip the CSS filter to avoid double application.
+const hasPixelFilters = computed(() => {
+  const f = props.image.filters || defaultFilters
+  return f.temperature !== 0 || f.vibrance !== 0 || f.vignette !== 0
+})
+
 // Computed CSS filter string based on image filters
 const filterStyle = computed(() => {
+  if (hasPixelFilters.value) return {}
   const f = props.image.filters || defaultFilters
   return {
     filter: `
@@ -102,6 +111,12 @@ function createTransparentCanvas(width: number, height: number): HTMLCanvasEleme
 watch(() => props.image.version, () => {
   nextTick(() => syncDisplayCanvas())
 })
+
+// Bei Filteränderungen (z.B. Batch-Bearbeitung) das Display-Canvas neu backen,
+// damit Pixel-basierte Filter (Temperatur/Vibrance/Vignette) sichtbar werden
+watch(() => props.image.filters, () => {
+  nextTick(() => syncDisplayCanvas())
+}, { deep: true })
 
 // Wasserzeichen-Canvas aktualisieren wenn sich Einstellungen ändern
 watch(() => props.image.watermark, () => {
@@ -200,11 +215,18 @@ function syncDisplayCanvas() {
   const src = props.image.canvas
   const dst = displayCanvas.value
   if (!src || !dst) return
-  dst.width = src.width
-  dst.height = src.height
   const ctx = dst.getContext('2d')
   if (!ctx) return
-  ctx.drawImage(src, 0, 0)
+
+  // When pixel-based filters are active, bake the full pipeline; otherwise use
+  // the raw canvas (fast path) and let CSS handle the remaining filters.
+  const source = hasPixelFilters.value
+    ? ImageProcessor.applyFiltersToCanvas(src, props.image.filters || defaultFilters)
+    : src
+  dst.width = source.width
+  dst.height = source.height
+  ctx.clearRect(0, 0, dst.width, dst.height)
+  ctx.drawImage(source, 0, 0)
   updateDimensions()
 }
 

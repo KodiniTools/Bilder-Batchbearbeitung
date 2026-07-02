@@ -8,15 +8,18 @@ export interface ImageFormat {
 }
 
 export interface ImageFilters {
-  brightness: number  // 0-200, default 100
-  contrast: number    // 0-200, default 100
-  saturation: number  // 0-200, default 100
-  hue: number         // 0-360, default 0
-  opacity: number     // 0-100, default 100
-  blur: number        // 0-20, default 0
-  grayscale: number   // 0-100, default 0
-  sepia: number       // 0-100, default 0
-  invert: number      // 0-100, default 0
+  brightness: number   // 0-200, default 100
+  contrast: number     // 0-200, default 100
+  saturation: number   // 0-200, default 100
+  hue: number          // 0-360, default 0
+  opacity: number      // 0-100, default 100
+  blur: number         // 0-20, default 0
+  grayscale: number    // 0-100, default 0
+  sepia: number        // 0-100, default 0
+  invert: number       // 0-100, default 0
+  temperature: number  // -100 (kühl) .. 100 (warm), default 0
+  vibrance: number     // -100 .. 100, default 0
+  vignette: number     // 0-100, default 0
 }
 
 export const defaultFilters: ImageFilters = {
@@ -28,7 +31,10 @@ export const defaultFilters: ImageFilters = {
   blur: 0,
   grayscale: 0,
   sepia: 0,
-  invert: 0
+  invert: 0,
+  temperature: 0,
+  vibrance: 0,
+  vignette: 0
 }
 
 export interface ImageTransforms {

@@ -51,25 +51,6 @@ const imageFormat = computed(() => {
   return format.toUpperCase()
 })
 
-// Computed CSS filter string based on image filters
-const filterStyle = computed(() => {
-  if (!props.image) return {}
-  const f = props.image.filters || defaultFilters
-  return {
-    filter: `
-      brightness(${f.brightness}%)
-      contrast(${f.contrast}%)
-      saturate(${f.saturation}%)
-      hue-rotate(${f.hue}deg)
-      blur(${f.blur}px)
-      grayscale(${f.grayscale}%)
-      sepia(${f.sepia}%)
-      invert(${f.invert}%)
-    `.trim(),
-    opacity: f.opacity / 100
-  }
-})
-
 // Computed CSS transform style (border, radius, shadow)
 const transformStyle = computed(() => {
   if (!props.image) return {}
@@ -147,9 +128,15 @@ function updatePreview() {
   
   canvas.width = props.image.canvas.width * scale
   canvas.height = props.image.canvas.height * scale
-  
-  // Draw the image
-  ctx.drawImage(props.image.canvas, 0, 0, canvas.width, canvas.height)
+
+  // Draw the image with all filters baked in (matches the exported result)
+  const scaled = document.createElement('canvas')
+  scaled.width = canvas.width
+  scaled.height = canvas.height
+  scaled.getContext('2d')?.drawImage(props.image.canvas, 0, 0, canvas.width, canvas.height)
+  const filtered = ImageProcessor.applyFiltersToCanvas(scaled, props.image.filters || defaultFilters)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.drawImage(filtered, 0, 0)
 
   // Wasserzeichen auch aktualisieren
   nextTick(() => renderWatermarkPreview())
@@ -204,7 +191,7 @@ onUnmounted(() => {
       <div class="preview-container" @click.stop>
         <div class="preview-content">
           <div class="preview-canvas-wrapper">
-            <canvas ref="previewCanvas" :style="[filterStyle, transformStyle]"></canvas>
+            <canvas ref="previewCanvas" :style="[transformStyle]"></canvas>
             <canvas
               v-if="watermarkActive"
               ref="watermarkCanvasRef"

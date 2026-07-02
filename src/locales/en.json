@@ -530,6 +530,11 @@
         "horizontalTitle": "Flip horizontally",
         "vertical": "Vertical",
         "verticalTitle": "Flip vertically"
+      },
+      "straighten": {
+        "label": "Straighten:",
+        "apply": "Apply",
+        "reset": "Reset"
       }
     },
     "resize": {
@@ -585,12 +590,26 @@
       "brightness": "Brightness",
       "contrast": "Contrast",
       "saturation": "Saturation",
+      "vibrance": "Vibrance",
+      "temperature": "Warmth",
       "hue": "Hue",
       "grayscale": "Grayscale",
       "sepia": "Sepia",
+      "vignette": "Vignette",
       "blur": "Blur",
       "opacity": "Opacity",
       "reset": "Reset filters"
+    },
+    "presets": {
+      "label": "Presets",
+      "original": "Original",
+      "bw": "B&W",
+      "vintage": "Vintage",
+      "warm": "Warm",
+      "cool": "Cool",
+      "vivid": "Vivid",
+      "matte": "Matte",
+      "noir": "Noir"
     },
     "crop": {
       "start": "Start cropping",
