@@ -672,12 +672,26 @@
       "brightness": "Brightness",
       "contrast": "Contrast",
       "saturation": "Saturation",
+      "vibrance": "Vibrance",
+      "temperature": "Warmth",
       "hue": "Hue",
       "opacity": "Opacity",
       "blur": "Blur",
       "grayscale": "Grayscale",
       "sepia": "Sepia",
+      "vignette": "Vignette",
       "invert": "Invert"
+    },
+    "presets": {
+      "label": "Presets",
+      "original": "Original",
+      "bw": "B&W",
+      "vintage": "Vintage",
+      "warm": "Warm",
+      "cool": "Cool",
+      "vivid": "Vivid",
+      "matte": "Matte",
+      "noir": "Noir"
     },
     "buttons": {
       "apply": "Apply",
