@@ -611,6 +611,14 @@
       "matte": "Matte",
       "noir": "Noir"
     },
+    "batch": {
+      "title": "Apply to multiple images",
+      "hint": "Copies the current filters (incl. preset) to other images. Crop, size and text stay per-image.",
+      "applyAll": "All images ({count})",
+      "applySelected": "Selection ({count})",
+      "progress": "Applying … {current}/{total}",
+      "done": "Filters applied to {count} image(s)"
+    },
     "crop": {
       "start": "Start cropping",
       "apply": "Apply crop",

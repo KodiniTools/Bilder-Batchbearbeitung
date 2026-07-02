@@ -742,6 +742,14 @@
       "matte": "Matt",
       "noir": "Noir"
     },
+    "batch": {
+      "title": "Auf mehrere Bilder anwenden",
+      "hint": "Überträgt die aktuellen Filter (inkl. Preset) auf weitere Bilder. Zuschnitt, Größe und Text bleiben bildspezifisch.",
+      "applyAll": "Alle Bilder ({count})",
+      "applySelected": "Auswahl ({count})",
+      "progress": "Wende an … {current}/{total}",
+      "done": "Filter auf {count} Bild(er) übertragen"
+    },
     "fileName": {
       "label": "Neuer Name:",
       "placeholder": "Dateiname ohne Erweiterung",
