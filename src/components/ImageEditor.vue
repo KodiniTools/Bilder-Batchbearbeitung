@@ -176,6 +176,39 @@
                 @reset="resetFilters"
               />
 
+              <!-- Batch: aktuellen Look auf mehrere Bilder übertragen -->
+              <div v-if="imageStore.imageCount > 1" class="ctrl-section">
+                <div class="ctrl-header">
+                  <i class="fa-solid fa-layer-group"></i>
+                  {{ t('imageEditor.batch.title') }}
+                </div>
+                <p class="text-hint">
+                  <i class="fa-solid fa-circle-info"></i>
+                  {{ t('imageEditor.batch.hint') }}
+                </p>
+                <div class="btn-row">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    :disabled="isApplyingBatch"
+                    @click="applyEditToBatch('all')"
+                  >
+                    <i class="fa-solid fa-images"></i>
+                    {{ t('imageEditor.batch.applyAll', { count: imageStore.imageCount }) }}
+                  </button>
+                  <button
+                    v-if="imageStore.selectedCount > 0"
+                    type="button"
+                    class="btn btn-sm"
+                    :disabled="isApplyingBatch"
+                    @click="applyEditToBatch('selected')"
+                  >
+                    <i class="fa-solid fa-check-double"></i>
+                    {{ t('imageEditor.batch.applySelected', { count: imageStore.selectedCount }) }}
+                  </button>
+                </div>
+              </div>
+
               <EditorCropSection
                 :is-crop-mode="isCropMode"
                 :crop-locked-ratio="cropLockedRatio"
@@ -255,6 +288,9 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Batch-Fortschritt: liegt (später im DOM) über dem Editor-Modal -->
+    <LoadingIndicator ref="batchLoader" />
   </Teleport>
 </template>
 
@@ -265,8 +301,10 @@ import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useToast } from '@/composables/useToast'
+import { useImageStore } from '@/stores/imageStore'
 import { useEditorHistory } from '@/composables/useEditorHistory'
 import { useEditorCanvas } from '@/composables/useEditorCanvas'
+import LoadingIndicator from './LoadingIndicator.vue'
 import CropTool from './CropTool.vue'
 import TextOverlay from './TextOverlay.vue'
 import EditorFiltersSection from './editor/EditorFiltersSection.vue'
@@ -278,6 +316,7 @@ import EditorExportSection from './editor/EditorExportSection.vue'
 
 const { t } = useI18n()
 const toast = useToast()
+const imageStore = useImageStore()
 
 const FONT_FAMILIES: { label: string; value: string }[] = [
   { label: 'Arial',           value: 'Arial, sans-serif' },
@@ -630,6 +669,53 @@ function resetFilters() {
   localFilters.value = { ...defaultFilters }
   changesApplied.value = false
   snapshotNow()
+}
+
+// ── Batch: aktuellen Look/Filter auf mehrere Bilder übertragen ────
+
+const batchLoader = ref<InstanceType<typeof LoadingIndicator> | null>(null)
+const isApplyingBatch = ref(false)
+
+/**
+ * Überträgt die aktuellen (nicht-destruktiven) Filter-Einstellungen auf alle
+ * bzw. die ausgewählten Bilder. Geometrie (Zuschnitt/Größe/Text) bleibt
+ * bildspezifisch und wird bewusst NICHT mitkopiert.
+ */
+async function applyEditToBatch(mode: 'all' | 'selected') {
+  if (isApplyingBatch.value) return
+
+  const targets = (mode === 'all' ? imageStore.images : imageStore.selectedImages).slice()
+  if (targets.length === 0) return
+
+  const snapshot: ImageFilters = { ...defaultFilters, ...localFilters.value }
+  const total = targets.length
+  const showLoader = total > 1
+
+  isApplyingBatch.value = true
+  if (showLoader) {
+    batchLoader.value?.showWithProgress(
+      t('imageEditor.batch.progress', { current: 0, total }),
+      total,
+    )
+  }
+
+  try {
+    let done = 0
+    for (const img of targets) {
+      img.filters = { ...snapshot }
+      imageStore.updateImage(img)
+      done++
+      if (showLoader) {
+        batchLoader.value?.updateProgress(done, t('imageEditor.batch.progress', { current: done, total }))
+        // Yield so the grid can re-bake thumbnails and the bar can repaint
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
+    }
+    toast.success(t('imageEditor.batch.done', { count: total }))
+  } finally {
+    if (showLoader) batchLoader.value?.hide()
+    isApplyingBatch.value = false
+  }
 }
 
 // Re-bake the preview whenever any filter changes (live slider feedback)
