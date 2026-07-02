@@ -721,12 +721,26 @@
       "brightness": "Helligkeit",
       "contrast": "Kontrast",
       "saturation": "Sättigung",
+      "vibrance": "Vibrance",
+      "temperature": "Wärme",
       "hue": "Farbton",
       "grayscale": "Graustufen",
       "sepia": "Sepia",
+      "vignette": "Vignette",
       "blur": "Weichzeichner",
       "opacity": "Deckkraft",
       "reset": "Filter zurücksetzen"
+    },
+    "presets": {
+      "label": "Presets",
+      "original": "Original",
+      "bw": "S/W",
+      "vintage": "Vintage",
+      "warm": "Warm",
+      "cool": "Kühl",
+      "vivid": "Vivid",
+      "matte": "Matt",
+      "noir": "Noir"
     },
     "fileName": {
       "label": "Neuer Name:",
@@ -746,6 +760,11 @@
         "horizontalTitle": "Horizontal spiegeln",
         "vertical": "Vertikal",
         "verticalTitle": "Vertikal spiegeln"
+      },
+      "straighten": {
+        "label": "Begradigen:",
+        "apply": "Anwenden",
+        "reset": "Zurücksetzen"
       }
     },
     "resize": {

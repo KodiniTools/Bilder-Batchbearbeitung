@@ -1,7 +1,7 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageObject, ImageTransforms, WatermarkSettings } from './types'
+import type { ImageFormat, ImageFilters, ImageObject, ImageTransforms, WatermarkSettings } from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
 
 /**
@@ -395,53 +395,156 @@ export class ImageProcessor {
    * @returns Canvas mit angewendeten Filtern
    */
   static getCanvasWithFilters(imageObj: ImageObject): HTMLCanvasElement {
-    const { canvas } = imageObj
-    const filters = imageObj.filters || defaultFilters
+    return this.applyFiltersToCanvas(imageObj.canvas, imageObj.filters || defaultFilters)
+  }
 
-    // Prüfen ob Filter angewendet werden müssen
-    const hasFilters =
-      filters.brightness !== 100 ||
-      filters.contrast !== 100 ||
-      filters.saturation !== 100 ||
-      filters.hue !== 0 ||
-      filters.opacity !== 100 ||
-      filters.blur !== 0 ||
-      filters.grayscale !== 0 ||
-      filters.sepia !== 0 ||
-      filters.invert !== 0
+  /**
+   * Wendet alle Bildfilter auf ein beliebiges Quell-Canvas an und gibt ein neues
+   * Canvas zurück. Die per CSS ausdrückbaren Filter (Helligkeit, Kontrast, …)
+   * werden über `ctx.filter` gebacken; Temperatur/Vibrance über eine
+   * Pixel-Passage; die Vignette als radialer Verlauf.
+   *
+   * Zentrale Methode, damit Vorschau (Editor, Galerie, Grid) und Export exakt
+   * dasselbe Ergebnis liefern (WYSIWYG).
+   */
+  static applyFiltersToCanvas(
+    sourceCanvas: HTMLCanvasElement,
+    filters: ImageFilters
+  ): HTMLCanvasElement {
+    const f = { ...defaultFilters, ...filters }
 
-    if (!hasFilters) {
-      return canvas
+    const hasCssFilters =
+      f.brightness !== 100 ||
+      f.contrast !== 100 ||
+      f.saturation !== 100 ||
+      f.hue !== 0 ||
+      f.blur !== 0 ||
+      f.grayscale !== 0 ||
+      f.sepia !== 0 ||
+      f.invert !== 0
+    const hasOpacity = f.opacity !== 100
+    const hasColorPass = f.temperature !== 0 || f.vibrance !== 0
+    const hasVignette = f.vignette !== 0
+
+    if (!hasCssFilters && !hasOpacity && !hasColorPass && !hasVignette) {
+      return sourceCanvas
     }
 
-    // Neues Canvas mit Filtern erstellen
     const filteredCanvas = document.createElement('canvas')
-    filteredCanvas.width = canvas.width
-    filteredCanvas.height = canvas.height
+    filteredCanvas.width = sourceCanvas.width
+    filteredCanvas.height = sourceCanvas.height
     const ctx = filteredCanvas.getContext('2d')
 
     if (!ctx) {
-      return canvas
+      return sourceCanvas
     }
 
-    // CSS Filter String erstellen
+    // 1) Per-CSS ausdrückbare Filter + Deckkraft
     const filterString = [
-      `brightness(${filters.brightness}%)`,
-      `contrast(${filters.contrast}%)`,
-      `saturate(${filters.saturation}%)`,
-      `hue-rotate(${filters.hue}deg)`,
-      `blur(${filters.blur}px)`,
-      `grayscale(${filters.grayscale}%)`,
-      `sepia(${filters.sepia}%)`,
-      `invert(${filters.invert}%)`
+      `brightness(${f.brightness}%)`,
+      `contrast(${f.contrast}%)`,
+      `saturate(${f.saturation}%)`,
+      `hue-rotate(${f.hue}deg)`,
+      `blur(${f.blur}px)`,
+      `grayscale(${f.grayscale}%)`,
+      `sepia(${f.sepia}%)`,
+      `invert(${f.invert}%)`
     ].join(' ')
 
-    // Filter anwenden
     ctx.filter = filterString
-    ctx.globalAlpha = filters.opacity / 100
-    ctx.drawImage(canvas, 0, 0)
+    ctx.globalAlpha = f.opacity / 100
+    ctx.drawImage(sourceCanvas, 0, 0)
+    ctx.filter = 'none'
+    ctx.globalAlpha = 1
+
+    // 2) Pixel-Passage für Temperatur / Vibrance
+    if (hasColorPass) {
+      this.applyColorAdjustments(ctx, filteredCanvas.width, filteredCanvas.height, f.temperature, f.vibrance)
+    }
+
+    // 3) Vignette als radialer Verlauf
+    if (hasVignette) {
+      this.applyVignette(ctx, filteredCanvas.width, filteredCanvas.height, f.vignette)
+    }
 
     return filteredCanvas
+  }
+
+  /**
+   * Pixel-basierte Anpassung von Farbtemperatur und Vibrance.
+   * @param temperature -100 (kühl) .. 100 (warm)
+   * @param vibrance -100 .. 100 (schützt bereits gesättigte Farben)
+   */
+  private static applyColorAdjustments(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    temperature: number,
+    vibrance: number
+  ): void {
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const data = imageData.data
+
+    const t = temperature / 100          // -1 .. 1
+    const tempShift = t * 45             // max ±45 auf 0-255-Skala
+    const v = vibrance / 100             // -1 .. 1
+
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i]
+      let g = data[i + 1]
+      let b = data[i + 2]
+
+      // Temperatur: warm = mehr Rot / weniger Blau, kühl umgekehrt
+      if (t !== 0) {
+        r += tempShift
+        b -= tempShift
+      }
+
+      // Vibrance: wenig gesättigte Pixel stärker anheben, gesättigte schonen
+      if (v !== 0) {
+        const max = Math.max(r, g, b)
+        const min = Math.min(r, g, b)
+        const sat = max <= 0 ? 0 : (max - min) / max
+        const amt = v * (1 - sat)
+        r += (max - r) * amt
+        g += (max - g) * amt
+        b += (max - b) * amt
+      }
+
+      data[i] = r < 0 ? 0 : r > 255 ? 255 : r
+      data[i + 1] = g < 0 ? 0 : g > 255 ? 255 : g
+      data[i + 2] = b < 0 ? 0 : b > 255 ? 255 : b
+    }
+
+    ctx.putImageData(imageData, 0, 0)
+  }
+
+  /**
+   * Zeichnet eine Vignette (abgedunkelte Ränder) über das Bild.
+   * @param vignette 0-100 Stärke
+   */
+  private static applyVignette(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    vignette: number
+  ): void {
+    const strength = Math.max(0, Math.min(1, vignette / 100)) * 0.9
+    if (strength <= 0) return
+
+    const cx = width / 2
+    const cy = height / 2
+    const outer = Math.sqrt(cx * cx + cy * cy)
+    const inner = outer * 0.45
+
+    const gradient = ctx.createRadialGradient(cx, cy, inner, cx, cy, outer)
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
+    gradient.addColorStop(1, `rgba(0, 0, 0, ${strength})`)
+
+    ctx.save()
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, width, height)
+    ctx.restore()
   }
 
   /**

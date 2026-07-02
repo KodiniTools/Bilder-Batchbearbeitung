@@ -62,7 +62,7 @@
                   <canvas
                     ref="previewCanvas"
                     class="preview-canvas edited-canvas"
-                    :style="[filterStyle, transformStyle, editedCanvasStyle]"
+                    :style="[transformStyle, editedCanvasStyle]"
                   ></canvas>
 
                   <!-- Original canvas (on top, for before/split comparison) -->
@@ -170,7 +170,9 @@
               <EditorFiltersSection
                 :local-filters="localFilters"
                 :filter-defs="FILTER_DEFS"
+                :presets="FILTER_PRESETS"
                 @filter-input="onFilterInputFromChild"
+                @preset="applyPreset"
                 @reset="resetFilters"
               />
 
@@ -185,8 +187,13 @@
               />
 
               <EditorTransformSection
+                :straighten-angle="straightenAngle"
+                :is-straighten-mode="isStraightenMode"
                 @rotate="rotate"
                 @flip="onFlip"
+                @straighten="onStraightenInput"
+                @straighten-apply="onStraightenApply"
+                @straighten-reset="onStraightenReset"
               />
 
               <EditorResizeSection
@@ -291,14 +298,30 @@ const CROP_RATIO_PRESETS = [
 type FilterKey = keyof Omit<ImageFilters, 'invert'>
 
 const FILTER_DEFS: Array<{ key: FilterKey; min: number; max: number; step: number; unit: string }> = [
-  { key: 'brightness', min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'contrast',   min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'saturation', min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'hue',        min: -180, max: 180, step: 1, unit: '°' },
-  { key: 'grayscale',  min: 0, max: 100, step: 1, unit: '%' },
-  { key: 'sepia',      min: 0, max: 100, step: 1, unit: '%' },
-  { key: 'blur',       min: 0, max: 20,  step: 0.5, unit: 'px' },
-  { key: 'opacity',    min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'brightness',  min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'contrast',    min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'saturation',  min: 0, max: 200, step: 1, unit: '%' },
+  { key: 'vibrance',    min: -100, max: 100, step: 1, unit: '' },
+  { key: 'temperature', min: -100, max: 100, step: 1, unit: '' },
+  { key: 'hue',         min: -180, max: 180, step: 1, unit: '°' },
+  { key: 'grayscale',   min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'sepia',       min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'vignette',    min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'blur',        min: 0, max: 20,  step: 0.5, unit: 'px' },
+  { key: 'opacity',     min: 0, max: 100, step: 1, unit: '%' },
+]
+
+// One-click looks — combinations of existing filter values.
+// Especially useful for batch work: apply the same look, then Save.
+const FILTER_PRESETS: Array<{ key: string; filters: Partial<ImageFilters> }> = [
+  { key: 'original', filters: {} },
+  { key: 'bw',       filters: { grayscale: 100, contrast: 110, brightness: 102 } },
+  { key: 'vintage',  filters: { sepia: 40, contrast: 95, saturation: 85, temperature: 22, vignette: 38 } },
+  { key: 'warm',     filters: { temperature: 45, saturation: 110, brightness: 102 } },
+  { key: 'cool',     filters: { temperature: -40, saturation: 105 } },
+  { key: 'vivid',    filters: { saturation: 135, contrast: 112, vibrance: 45 } },
+  { key: 'matte',    filters: { contrast: 88, saturation: 82, brightness: 106, vignette: 15 } },
+  { key: 'noir',     filters: { grayscale: 100, contrast: 135, brightness: 96, vignette: 45 } },
 ]
 
 interface Props {
@@ -350,6 +373,8 @@ const {
   isCropMode,
   cropLockedRatio,
   splitDividerPos,
+  isStraightenMode,
+  straightenAngle,
   init: initCanvas,
   updatePreview,
   rotate,
@@ -359,6 +384,10 @@ const {
   setCropRatio,
   onCropUpdate,
   applyCrop,
+  startStraighten,
+  setStraightenAngle,
+  applyStraighten,
+  cancelStraighten,
   startSplitDrag,
   dispose: disposeCanvas,
   getWorkingCanvas,
@@ -372,7 +401,28 @@ const {
   previewAreaRef,
   canvasWrapperRef,
   changesApplied,
+  renderEditedPreview,
 )
+
+// Bakes the full filter pipeline (incl. temperature/vibrance/vignette) into the
+// edited preview canvas so the preview matches the exported result exactly.
+function renderEditedPreview() {
+  const pc = previewCanvas.value
+  const wc = getWorkingCanvas()
+  if (!pc || !wc || pc.width === 0 || pc.height === 0) return
+
+  const scaled = document.createElement('canvas')
+  scaled.width = pc.width
+  scaled.height = pc.height
+  scaled.getContext('2d')?.drawImage(wc, 0, 0, pc.width, pc.height)
+
+  const filtered = ImageProcessor.applyFiltersToCanvas(scaled, localFilters.value)
+  const ctx = pc.getContext('2d')
+  if (ctx) {
+    ctx.clearRect(0, 0, pc.width, pc.height)
+    ctx.drawImage(filtered, 0, 0)
+  }
+}
 
 // ── History composable ────────────────────────────────────────────
 const {
@@ -395,6 +445,8 @@ function updateSelectedText(patch: Partial<TextItem>) {
 }
 
 function startCropMode() {
+  // Finalize any in-progress straighten so its base snapshot isn't left stale
+  if (isStraightenMode.value) applyStraighten()
   startCropModeCanvas()
   compareMode.value = 'after'
 }
@@ -451,23 +503,6 @@ const availableFormats = computed(() => {
   return [...imageFormats, { name: 'PDF', mimeType: 'application/pdf', ext: 'pdf' }]
 })
 
-const filterStyle = computed(() => {
-  const f = localFilters.value
-  return {
-    filter: [
-      `brightness(${f.brightness}%)`,
-      `contrast(${f.contrast}%)`,
-      `saturate(${f.saturation}%)`,
-      `hue-rotate(${f.hue}deg)`,
-      `blur(${f.blur}px)`,
-      `grayscale(${f.grayscale}%)`,
-      `sepia(${f.sepia}%)`,
-      `invert(${f.invert}%)`,
-    ].join(' '),
-    opacity: f.opacity / 100,
-  }
-})
-
 const transformStyle = computed(() => {
   if (!props.image) return {}
   const tr = props.image.transforms || defaultTransforms
@@ -519,6 +554,10 @@ watch([resizeWidth, resizeHeight], () => {
 
 function initializeEditor(image: ImageObject) {
   if (!image) return
+
+  // Reset any in-progress straighten from a previous image
+  isStraightenMode.value = false
+  straightenAngle.value = 0
 
   initCanvas(image)
   const workingCanvas = getWorkingCanvas()!
@@ -579,10 +618,37 @@ function onFilterInputFromChild(key: string, event: Event) {
   onFilterInput(key as FilterKey, event)
 }
 
+function applyPreset(presetKey: string) {
+  const preset = FILTER_PRESETS.find(p => p.key === presetKey)
+  if (!preset) return
+  localFilters.value = { ...defaultFilters, ...preset.filters }
+  changesApplied.value = false
+  snapshotNow()
+}
+
 function resetFilters() {
   localFilters.value = { ...defaultFilters }
   changesApplied.value = false
   snapshotNow()
+}
+
+// Re-bake the preview whenever any filter changes (live slider feedback)
+watch(localFilters, () => renderEditedPreview(), { deep: true })
+
+// ── Straighten (free rotation) ────────────────────────────────────
+
+function onStraightenInput(deg: number) {
+  if (!isStraightenMode.value) startStraighten()
+  setStraightenAngle(deg)
+}
+
+function onStraightenApply() {
+  applyStraighten()
+  changesApplied.value = false
+}
+
+function onStraightenReset() {
+  cancelStraighten()
 }
 
 // ── Save / Reset ──────────────────────────────────────────────────
@@ -653,6 +719,8 @@ function resetToOriginal() {
   localFilters.value = { ...defaultFilters }
   textItems.value = []
   selectedTextId.value = null
+  isStraightenMode.value = false
+  straightenAngle.value = 0
   changesApplied.value = false
   initHistory(defaultFilters)
   updatePreview()

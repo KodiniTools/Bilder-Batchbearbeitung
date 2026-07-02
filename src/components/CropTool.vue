@@ -183,7 +183,6 @@ watch(() => props.lockedRatio, () => {
   const ch = cw / ratio
 
   let newH = ch
-  let newY = crop.value.y
   if (crop.value.y + newH > oh) {
     newH = oh - crop.value.y
     const newW = newH * ratio

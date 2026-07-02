@@ -7,12 +7,14 @@ export function useEditorCanvas(
   previewAreaRef: Ref<HTMLElement | null>,
   canvasWrapperRef: Ref<HTMLElement | null>,
   changesApplied: Ref<boolean>,
+  onEditedPreview?: () => void,
 ) {
   // Internal (non-reactive) canvases / state
   let _workingCanvas: HTMLCanvasElement | null = null
   let _originalCanvas: HTMLCanvasElement | null = null
   let _originalImageObj: ImageObject | null = null
   let _aspectRatio = 1
+  let _straightenBase: HTMLCanvasElement | null = null
 
   // Reactive state
   const currentWidth = ref(0)
@@ -21,6 +23,8 @@ export function useEditorCanvas(
   const cropLockedRatio = ref<number | null>(null)
   const cropNorm = ref({ x: 0, y: 0, w: 1, h: 1 })
   const splitDividerPos = ref(50)
+  const isStraightenMode = ref(false)
+  const straightenAngle = ref(0)
 
   let isDraggingSplit = false
 
@@ -67,6 +71,9 @@ export function useEditorCanvas(
     }
 
     updateOriginalPreview(dw, dh)
+
+    // Let the editor bake filters (incl. temperature/vibrance/vignette) on top
+    onEditedPreview?.()
   }
 
   function updateOriginalPreview(dw: number, dh: number) {
@@ -157,6 +164,119 @@ export function useEditorCanvas(
     updatePreview()
   }
 
+  // ── Straighten / free rotation ──────────────────────────────────
+  /**
+   * Größtes achsen-paralleles Rechteck, das nach Rotation eines w×h-Bildes
+   * um `angle` (rad) noch vollständig innerhalb des Bildes liegt.
+   * (Standard-Formel für "rotate & auto-crop".)
+   */
+  function rotatedRectWithMaxArea(w: number, h: number, angle: number) {
+    if (w <= 0 || h <= 0) return { w: 0, h: 0 }
+    const widthIsLonger = w >= h
+    const sideLong = widthIsLonger ? w : h
+    const sideShort = widthIsLonger ? h : w
+    const sinA = Math.abs(Math.sin(angle))
+    const cosA = Math.abs(Math.cos(angle))
+
+    let wr: number
+    let hr: number
+    if (sideShort <= 2 * sinA * cosA * sideLong || Math.abs(sinA - cosA) < 1e-10) {
+      const x = 0.5 * sideShort
+      if (widthIsLonger) { wr = x / sinA; hr = x / cosA }
+      else { wr = x / cosA; hr = x / sinA }
+    } else {
+      const cos2a = cosA * cosA - sinA * sinA
+      wr = (w * cosA - h * sinA) / cos2a
+      hr = (h * cosA - w * sinA) / cos2a
+    }
+    return { w: wr, h: hr }
+  }
+
+  function startStraighten() {
+    if (!_workingCanvas) return
+    _straightenBase = document.createElement('canvas')
+    _straightenBase.width = _workingCanvas.width
+    _straightenBase.height = _workingCanvas.height
+    _straightenBase.getContext('2d')?.drawImage(_workingCanvas, 0, 0)
+    straightenAngle.value = 0
+    isStraightenMode.value = true
+  }
+
+  /** Wendet den aktuellen Winkel an (immer ausgehend von der Basis, nicht kumulativ). */
+  function setStraightenAngle(deg: number) {
+    if (!isStraightenMode.value || !_straightenBase || !_workingCanvas) return
+    straightenAngle.value = deg
+
+    const base = _straightenBase
+    const bw = base.width
+    const bh = base.height
+    const ctx = _workingCanvas.getContext('2d')
+    if (!ctx) return
+
+    if (deg === 0) {
+      _workingCanvas.width = bw
+      _workingCanvas.height = bh
+      ctx.clearRect(0, 0, bw, bh)
+      ctx.drawImage(base, 0, 0)
+      _aspectRatio = bw / bh
+      changesApplied.value = false
+      updatePreview()
+      return
+    }
+
+    const a = (deg * Math.PI) / 180
+    const sin = Math.abs(Math.sin(a))
+    const cos = Math.abs(Math.cos(a))
+    const rotW = Math.ceil(bw * cos + bh * sin)
+    const rotH = Math.ceil(bw * sin + bh * cos)
+
+    const rot = document.createElement('canvas')
+    rot.width = rotW
+    rot.height = rotH
+    const rctx = rot.getContext('2d')
+    if (!rctx) return
+    rctx.translate(rotW / 2, rotH / 2)
+    rctx.rotate(a)
+    rctx.drawImage(base, -bw / 2, -bh / 2)
+
+    // Auto-Beschnitt auf größtes eingeschriebenes Rechteck
+    const inner = rotatedRectWithMaxArea(bw, bh, a)
+    const cropW = Math.max(1, Math.floor(inner.w))
+    const cropH = Math.max(1, Math.floor(inner.h))
+    const ox = Math.floor((rotW - cropW) / 2)
+    const oy = Math.floor((rotH - cropH) / 2)
+
+    _workingCanvas.width = cropW
+    _workingCanvas.height = cropH
+    ctx.clearRect(0, 0, cropW, cropH)
+    ctx.drawImage(rot, ox, oy, cropW, cropH, 0, 0, cropW, cropH)
+    _aspectRatio = cropW / cropH
+    changesApplied.value = false
+    updatePreview()
+  }
+
+  function applyStraighten() {
+    isStraightenMode.value = false
+    _straightenBase = null
+  }
+
+  function cancelStraighten() {
+    if (_straightenBase && _workingCanvas) {
+      _workingCanvas.width = _straightenBase.width
+      _workingCanvas.height = _straightenBase.height
+      const ctx = _workingCanvas.getContext('2d')
+      if (ctx) {
+        ctx.clearRect(0, 0, _workingCanvas.width, _workingCanvas.height)
+        ctx.drawImage(_straightenBase, 0, 0)
+      }
+      _aspectRatio = _workingCanvas.width / _workingCanvas.height
+    }
+    straightenAngle.value = 0
+    isStraightenMode.value = false
+    _straightenBase = null
+    updatePreview()
+  }
+
   // ── Split compare drag ──────────────────────────────────────────
   function startSplitDrag() {
     isDraggingSplit = true
@@ -211,6 +331,8 @@ export function useEditorCanvas(
     cropLockedRatio,
     cropNorm,
     splitDividerPos,
+    isStraightenMode,
+    straightenAngle,
     // functions
     init,
     updatePreview,
@@ -221,6 +343,10 @@ export function useEditorCanvas(
     setCropRatio,
     onCropUpdate,
     applyCrop,
+    startStraighten,
+    setStraightenAngle,
+    applyStraighten,
+    cancelStraighten,
     startSplitDrag,
     stopSplitDrag,
     dispose,
