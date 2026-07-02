@@ -90,6 +90,24 @@ const overlaySize = () => ({
   h: overlayRef.value?.clientHeight ?? 1,
 })
 
+/**
+ * The crop rectangle geometry is expressed in overlay (display) pixels, but the
+ * emitted crop is converted to image pixels via the overlay size. If the overlay
+ * aspect ratio does not exactly match the image aspect ratio (e.g. due to layout
+ * rounding), a "square" in display space would not be square in image space.
+ *
+ * This converts the desired pixel-space ratio (w/h) into the equivalent
+ * display-space ratio so the resulting crop has the correct ratio in real pixels.
+ */
+function getDisplayRatio(): number | null {
+  if (props.lockedRatio === null) return null
+  const { w, h } = overlaySize()
+  if (w <= 0 || h <= 0 || props.imagePixelWidth <= 0 || props.imagePixelHeight <= 0) {
+    return props.lockedRatio
+  }
+  return (props.lockedRatio * props.imagePixelHeight * w) / (props.imagePixelWidth * h)
+}
+
 const displayW = computed(() => {
   const { w } = overlaySize()
   return Math.max(1, Math.round((crop.value.w / w) * props.imagePixelWidth))
@@ -120,8 +138,8 @@ function clientToOverlay(clientX: number, clientY: number) {
 }
 
 function applyLockedRatio(left: number, top: number, right: number, bottom: number, sides: typeof HANDLE_SIDES[Handle]) {
-  if (props.lockedRatio === null) return { left, top, right, bottom }
-  const ratio = props.lockedRatio
+  const ratio = getDisplayRatio()
+  if (ratio === null) return { left, top, right, bottom }
   const hasW = sides.w || sides.e
   const hasH = sides.n || sides.s
 
@@ -140,8 +158,8 @@ function applyLockedRatio(left: number, top: number, right: number, bottom: numb
 
 function initFullCrop() {
   const { w, h } = overlaySize()
-  if (props.lockedRatio !== null) {
-    const ratio = props.lockedRatio
+  const ratio = getDisplayRatio()
+  if (ratio !== null) {
     if (w / h > ratio) {
       const cw = h * ratio
       crop.value = { x: (w - cw) / 2, y: 0, w: cw, h }
@@ -158,9 +176,9 @@ function initFullCrop() {
 watch(() => props.lockedRatio, () => {
   // Adjust existing crop rect to new ratio
   const { w: ow, h: oh } = overlaySize()
-  if (props.lockedRatio === null) return
+  const ratio = getDisplayRatio()
+  if (ratio === null) return
 
-  const ratio = props.lockedRatio
   const cw = crop.value.w
   const ch = cw / ratio
 
@@ -227,8 +245,8 @@ function onDocMouseMove(event: MouseEvent) {
     let w = cx - dragStart.x
     let h = cy - dragStart.y
 
-    if (props.lockedRatio !== null) {
-      const ratio = props.lockedRatio
+    const ratio = getDisplayRatio()
+    if (ratio !== null) {
       const signX = w >= 0 ? 1 : -1
       const signY = h >= 0 ? 1 : -1
       const aw = Math.abs(w)
