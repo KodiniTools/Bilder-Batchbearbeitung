@@ -5,6 +5,9 @@
   "author": "KodiniTools",
   "type": "module",
   "main": "electron/main.cjs",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -43,6 +43,16 @@ Voraussetzungen (Ubuntu/Debian):
 sudo apt update && sudo apt install -y git nodejs npm python3 python3-venv rsync curl
 ```
 
+> **Node ≥ 22.13.0** erforderlich (siehe `engines` in `package.json` /
+> `.nvmrc`). Ältere 22.x-Versionen bauen zwar, erzeugen aber
+> `EBADENGINE`-Warnungen. Aktuelle LTS installieren:
+>
+> ```bash
+> curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs
+> # oder per nvm (nutzt .nvmrc):
+> nvm install && nvm use
+> ```
+
 ## Laufende Deployments
 
 Nach jedem Merge in `main`:
