@@ -22,7 +22,7 @@ set -euo pipefail
 # ─── Konfiguration ─────────────────────────────────────────────────────────
 REPO_URL="${REPO_URL:-https://github.com/KodiniTools/Bilder-Batchbearbeitung.git}"
 BRANCH="${DEPLOY_BRANCH:-main}"
-SRC_DIR="${SRC_DIR:-/var/www/kodinitools.com/src/bilderseriebearbeiten}"
+SRC_DIR="${SRC_DIR:-/opt/bilderseriebearbeiten}"
 DEPLOY_DIR="${DEPLOY_DIR:-/var/www/kodinitools.com/bilderseriebearbeiten}"
 
 log()  { printf '\033[1;34m▶ %s\033[0m\n' "$*"; }
@@ -50,9 +50,10 @@ CURRENT_GROUP="$(id -gn)"
 
 log "Lege Ordner an…"
 sudo mkdir -p "$DEPLOY_DIR"
-sudo mkdir -p "$(dirname "$SRC_DIR")"
+sudo mkdir -p "$SRC_DIR"
 # Klon-Ordner gehört dem ausführenden User (git-Operationen ohne sudo).
-sudo chown "${CURRENT_USER}:${CURRENT_GROUP}" "$(dirname "$SRC_DIR")"
+# Nur der Klon-Ordner selbst, nicht das System-Parent (/opt).
+sudo chown "${CURRENT_USER}:${CURRENT_GROUP}" "$SRC_DIR"
 ok "Ordner vorbereitet: ${SRC_DIR} (Quelle) / ${DEPLOY_DIR} (Web-Root)."
 
 # ─── 2. Repository klonen oder aktualisieren ───────────────────────────────

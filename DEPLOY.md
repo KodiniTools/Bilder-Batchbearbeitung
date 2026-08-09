@@ -7,15 +7,15 @@ Produktions-Deployment von **Bilderserie Bearbeiten** auf den VPS
 
 | Zweck            | Pfad                                                  |
 | ---------------- | ----------------------------------------------------- |
-| Quellcode / Build | `/var/www/kodinitools.com/src/bilderseriebearbeiten`  |
+| Quellcode / Build | `/opt/bilderseriebearbeiten`                          |
 | Web-Root (SPA)    | `/var/www/kodinitools.com/bilderseriebearbeiten`      |
 | Backend (API)     | `/var/www/kodinitools.com/bilderseriebearbeiten/backend` |
 | systemd-Service   | `bilderseriebearbeiten-api` (Port 9003)               |
 | Favicon           | `/var/www/kodinitools.com/public/favicon.ico` (→ `/favicon.ico`) |
 
-Der **Quellcode-Ordner** (Klon + Build) und das **Web-Root** sind bewusst
-getrennt: `deploy.sh` baut im Quell-Ordner und synchronisiert nur das
-fertige `dist/` ins Web-Root.
+Der **Quellcode-Ordner** (Klon + Build, unter `/opt`) und das **Web-Root**
+(unter `/var/www`, das NGINX ausliefert) sind bewusst getrennt: `deploy.sh`
+baut im Quell-Ordner und synchronisiert nur das fertige `dist/` ins Web-Root.
 
 ## Erstinstallation
 
@@ -29,11 +29,11 @@ curl -fsSL https://raw.githubusercontent.com/KodiniTools/Bilder-Batchbearbeitung
 Oder manuell:
 
 ```bash
-sudo mkdir -p /var/www/kodinitools.com/src
-sudo chown "$USER":"$USER" /var/www/kodinitools.com/src
+sudo mkdir -p /opt/bilderseriebearbeiten
+sudo chown "$USER":"$USER" /opt/bilderseriebearbeiten
 git clone https://github.com/KodiniTools/Bilder-Batchbearbeitung.git \
-  /var/www/kodinitools.com/src/bilderseriebearbeiten
-cd /var/www/kodinitools.com/src/bilderseriebearbeiten
+  /opt/bilderseriebearbeiten
+cd /opt/bilderseriebearbeiten
 ./setup-server.sh
 ```
 
@@ -48,7 +48,7 @@ sudo apt update && sudo apt install -y git nodejs npm python3 python3-venv rsync
 Nach jedem Merge in `main`:
 
 ```bash
-cd /var/www/kodinitools.com/src/bilderseriebearbeiten
+cd /opt/bilderseriebearbeiten
 ./deploy.sh
 ```
 
