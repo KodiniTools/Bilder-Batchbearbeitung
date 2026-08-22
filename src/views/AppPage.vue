@@ -526,7 +526,12 @@ onUnmounted(() => {
 
       <DropZone />
 
-      <ImageGrid v-if="imageStore.hasImages" @open-editor="openEditor" @open-preview="openPreview" />
+      <ImageGrid
+        v-if="imageStore.hasImages"
+        :only-selected="isBatchEditPanelOpen"
+        @open-editor="openEditor"
+        @open-preview="openPreview"
+      />
     </main>
 
     <LoadingIndicator ref="loadingIndicator" />

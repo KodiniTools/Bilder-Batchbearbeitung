@@ -1,15 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import ImageCard from './ImageCard.vue'
 import type { ImageObject } from '@/lib/core/types'
 
 const imageStore = useImageStore()
 
+const props = withDefaults(
+  defineProps<{
+    /** Im Bearbeiten-Modus nur die ausgewählten Bilder anzeigen. */
+    onlySelected?: boolean
+  }>(),
+  {
+    onlySelected: false
+  }
+)
+
 const emit = defineEmits<{
   'open-editor': [ImageObject]
   'open-preview': [ImageObject]
 }>()
+
+// Angezeigte Bilder: im Bearbeiten-Modus nur die Auswahl, sonst alle.
+const displayedImages = computed(() =>
+  props.onlySelected ? imageStore.selectedImages : imageStore.images
+)
 
 // Drag & Drop State
 const draggedIndex = ref<number | null>(null)
@@ -65,7 +80,13 @@ function handleDragLeave() {
 function handleDrop(event: DragEvent, toIndex: number) {
   event.preventDefault()
   if (draggedIndex.value !== null && draggedIndex.value !== toIndex) {
-    imageStore.moveImage(draggedIndex.value, toIndex)
+    // Indizes beziehen sich auf die angezeigte Liste; für den Store auf die
+    // tatsächlichen Positionen abbilden (relevant im gefilterten Modus).
+    const fromStoreIndex = imageStore.images.indexOf(displayedImages.value[draggedIndex.value])
+    const toStoreIndex = imageStore.images.indexOf(displayedImages.value[toIndex])
+    if (fromStoreIndex !== -1 && toStoreIndex !== -1) {
+      imageStore.moveImage(fromStoreIndex, toStoreIndex)
+    }
   }
   draggedIndex.value = null
   dropTargetIndex.value = null
@@ -78,7 +99,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
   <div class="images-scroll-container">
     <section class="image-container">
       <div
-        v-for="(image, index) in imageStore.images"
+        v-for="(image, index) in displayedImages"
         :key="getImageKey(image)"
         class="drag-wrapper"
         :class="{
