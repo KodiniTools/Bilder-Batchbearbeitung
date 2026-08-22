@@ -32,5 +32,12 @@ vue-image-editor-Backup/
 # Electron build output
 release/
 
+# Python (backend)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
 # Claude Code agent worktrees
 .claude/
