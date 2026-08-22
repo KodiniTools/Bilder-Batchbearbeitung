@@ -353,7 +353,8 @@
     "edit": "Bearbeiten und Exportieren"
   },
   "accessibility": {
-    "dropzone": "Dateien hierher ziehen oder klicken, um Bilder auszuwählen"
+    "dropzone": "Dateien hierher ziehen oder klicken, um Bilder auszuwählen",
+    "scrollToTop": "Nach oben scrollen"
   },
   "loading": {
     "text": "Bitte warten…",

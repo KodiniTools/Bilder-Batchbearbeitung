@@ -178,7 +178,8 @@
     "edit": "Edit and Export"
   },
   "accessibility": {
-    "dropzone": "Drag files here or click to select images"
+    "dropzone": "Drag files here or click to select images",
+    "scrollToTop": "Scroll to top"
   },
   "loading": {
     "text": "Please wait…",
