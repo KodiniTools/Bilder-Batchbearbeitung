@@ -326,7 +326,9 @@
       "rotateLeft": "Ausgewählte Bilder 90° nach links drehen",
       "rotateRight": "Ausgewählte Bilder 90° nach rechts drehen",
       "flipH": "Ausgewählte Bilder horizontal spiegeln",
-      "flipV": "Ausgewählte Bilder vertikal spiegeln"
+      "flipV": "Ausgewählte Bilder vertikal spiegeln",
+      "undo": "Rückgängig (Strg+Z)",
+      "redo": "Wiederherstellen (Strg+Umschalt+Z)"
     }
   },
   "upload": {

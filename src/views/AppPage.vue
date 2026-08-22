@@ -384,6 +384,23 @@ function handleKeyboard(event: KeyboardEvent) {
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
   const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey
 
+  // Undo: Ctrl/Cmd+Z | Redo: Ctrl/Cmd+Shift+Z oder Ctrl+Y
+  if (ctrlOrCmd && event.key.toLowerCase() === 'z') {
+    event.preventDefault()
+    if (event.shiftKey) {
+      imageStore.redo()
+    } else {
+      imageStore.undo()
+    }
+    return
+  }
+
+  if (ctrlOrCmd && event.key.toLowerCase() === 'y') {
+    event.preventDefault()
+    imageStore.redo()
+    return
+  }
+
   if (ctrlOrCmd && event.key.toLowerCase() === 'a' && imageStore.hasImages) {
     event.preventDefault()
     imageStore.selectAllImages()

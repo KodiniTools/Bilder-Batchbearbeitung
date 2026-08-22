@@ -151,7 +151,9 @@
       "rotateLeft": "Rotate selected images 90° left",
       "rotateRight": "Rotate selected images 90° right",
       "flipH": "Flip selected images horizontally",
-      "flipV": "Flip selected images vertically"
+      "flipV": "Flip selected images vertically",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Shift+Z)"
     }
   },
   "upload": {

@@ -109,6 +109,15 @@ const handleReset = () => {
   imageStore.resetSelectedImages()
   toast.success(t('toast.reset', { count: imageStore.selectedCount }))
 }
+
+// Globale Undo/Redo-Funktion
+const handleUndo = () => {
+  imageStore.undo()
+}
+
+const handleRedo = () => {
+  imageStore.redo()
+}
 </script>
 
 <template>
@@ -123,6 +132,30 @@ const handleReset = () => {
         <i class="fa-solid fa-check-double"></i>
         <strong>{{ imageStore.selectedCount }}</strong>
       </span>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Undo/Redo (global) -->
+    <div class="toolbar-section">
+      <div class="btn-group">
+        <button
+          class="btn btn-icon"
+          :disabled="!imageStore.canUndo"
+          :title="t('statusBar.tooltips.undo')"
+          @click="handleUndo"
+        >
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        <button
+          class="btn btn-icon"
+          :disabled="!imageStore.canRedo"
+          :title="t('statusBar.tooltips.redo')"
+          @click="handleRedo"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
     </div>
 
     <div class="toolbar-divider"></div>
