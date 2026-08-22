@@ -13,6 +13,7 @@ import BulkRenameModal from '@/components/BulkRenameModal.vue'
 import BatchEditPanel from '@/components/BatchEditPanel.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import WizardNavigator from '@/components/WizardNavigator.vue'
+import ScrollToTopButton from '@/components/ScrollToTopButton.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
 import type { ImageObject } from '@/lib/core/types'
@@ -573,6 +574,8 @@ onUnmounted(() => {
       @close="closeWizard"
       @new-project="handleWizardNewProject"
     />
+
+    <ScrollToTopButton />
   </div>
 </template>
 
