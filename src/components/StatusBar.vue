@@ -145,7 +145,7 @@ const handleRedo = () => {
           :title="t('statusBar.tooltips.undo')"
           @click="handleUndo"
         >
-          <i class="fa-solid fa-rotate-left"></i>
+          <i class="fa-solid fa-reply"></i>
         </button>
         <button
           class="btn btn-icon"
@@ -153,7 +153,7 @@ const handleRedo = () => {
           :title="t('statusBar.tooltips.redo')"
           @click="handleRedo"
         >
-          <i class="fa-solid fa-rotate-right"></i>
+          <i class="fa-solid fa-share"></i>
         </button>
       </div>
     </div>
