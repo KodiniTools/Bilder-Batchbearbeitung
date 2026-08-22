@@ -254,7 +254,8 @@ async function handleExportConfirm(settings: ExportSettings) {
       try {
         const svgSettings = {
           colormode: settings.svgColormode || 'color',
-          filter_speckle: settings.svgFilterSpeckle || 4
+          filter_speckle: settings.svgFilterSpeckle || 4,
+          quality: settings.svgQuality || 'high'
         }
 
         if (total === 1) {

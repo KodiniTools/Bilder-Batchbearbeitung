@@ -350,6 +350,19 @@
       "fileNamePlaceholder": "images",
       "fileNameHint": "Automatically with date: {name}_2025-10-14.zip"
     },
+    "svg": {
+      "colormode": "Color mode",
+      "colormodeColor": "Color",
+      "colormodeBinary": "Black & white",
+      "quality": "Quality",
+      "qualityStandard": "Standard (original resolution)",
+      "qualityHigh": "High (sharper)",
+      "qualityUltra": "Ultra (maximum sharpness)",
+      "qualityHint": "Higher quality upscales small images before vectorization – sharper contours, slightly larger files.",
+      "detail": "Detail level",
+      "detailHint": "Lower = more detail, Higher = smoother curves",
+      "info": "SVG vectorization works best for logos, icons and simple graphics."
+    },
     "format": {
       "title": "Image Format",
       "png": "Lossless, high quality",

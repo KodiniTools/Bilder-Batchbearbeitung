@@ -298,6 +298,10 @@ export interface ExportSettings {
   zipName?: string
   format?: string
   quality?: number
+  // SVG-Export
+  svgColormode?: 'color' | 'binary'
+  svgFilterSpeckle?: number
+  svgQuality?: 'standard' | 'high' | 'ultra'
 }
 
 // ============================================================================

@@ -216,6 +216,16 @@
               </div>
 
               <div class="setting-group">
+                <label>{{ t('exportModal.svg.quality') || 'Qualität' }}:</label>
+                <select v-model="settings.svgQuality">
+                  <option value="standard">{{ t('exportModal.svg.qualityStandard') || 'Standard (Originalauflösung)' }}</option>
+                  <option value="high">{{ t('exportModal.svg.qualityHigh') || 'Hoch (schärfer)' }}</option>
+                  <option value="ultra">{{ t('exportModal.svg.qualityUltra') || 'Ultra (maximale Schärfe)' }}</option>
+                </select>
+                <p class="setting-hint">{{ t('exportModal.svg.qualityHint') || 'Höhere Qualität skaliert kleine Bilder vor der Vektorisierung hoch – schärfere Konturen, etwas größere Dateien.' }}</p>
+              </div>
+
+              <div class="setting-group">
                 <label>{{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}</label>
                 <input
                   v-model.number="settings.svgFilterSpeckle"
@@ -376,7 +386,8 @@ const settings = reactive({
 
   // SVG Settings
   svgColormode: 'color' as 'color' | 'binary',
-  svgFilterSpeckle: 4
+  svgFilterSpeckle: 4,
+  svgQuality: 'high' as 'standard' | 'high' | 'ultra'
 })
 
 // ✨ NEU: Front Page Designer Save Handler

@@ -525,6 +525,19 @@
       "fileNamePlaceholder": "Bilder",
       "fileNameHint": "Automatisch mit Datum: {name}_2025-10-14.zip"
     },
+    "svg": {
+      "colormode": "Farbmodus",
+      "colormodeColor": "Farbe",
+      "colormodeBinary": "Schwarz-Weiß",
+      "quality": "Qualität",
+      "qualityStandard": "Standard (Originalauflösung)",
+      "qualityHigh": "Hoch (schärfer)",
+      "qualityUltra": "Ultra (maximale Schärfe)",
+      "qualityHint": "Höhere Qualität skaliert kleine Bilder vor der Vektorisierung hoch – schärfere Konturen, etwas größere Dateien.",
+      "detail": "Detailgrad",
+      "detailHint": "Niedriger = mehr Details, Höher = glattere Kurven",
+      "info": "SVG-Vektorisierung funktioniert am besten bei Logos, Icons und einfachen Grafiken."
+    },
     "format": {
       "title": "Bildformat",
       "png": "Verlustfrei, hohe Qualität",

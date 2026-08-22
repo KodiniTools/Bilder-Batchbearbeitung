@@ -5,6 +5,7 @@ Converts raster images (PNG, JPG, WebP) to SVG using vtracer
 
 import os
 import io
+import re
 import uuid
 import asyncio
 import zipfile
@@ -49,17 +50,74 @@ MAX_FILE_SIZE = 20 * 1024 * 1024
 SUPPORTED_FORMATS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
 
 
+def enhance_svg(svg: str) -> str:
+    """
+    Enrich the vtracer SVG for crisp rendering and clean scaling across viewers:
+      - shape-rendering / text-rendering = geometricPrecision (no blurry auto AA)
+      - preserveAspectRatio for distortion-free scaling
+      - explicit width/height derived from the viewBox when missing
+    """
+    match = re.search(r"<svg\b[^>]*>", svg, re.IGNORECASE)
+    if not match:
+        return svg
+
+    open_tag = match.group(0)
+
+    def ensure_attr(tag: str, attr: str, value: str) -> str:
+        if re.search(rf"\b{re.escape(attr)}\s*=", tag, re.IGNORECASE):
+            return tag
+        return re.sub(r"<svg\b", f'<svg {attr}="{value}"', tag, count=1, flags=re.IGNORECASE)
+
+    open_tag = ensure_attr(open_tag, "xmlns", "http://www.w3.org/2000/svg")
+    open_tag = ensure_attr(open_tag, "shape-rendering", "geometricPrecision")
+    open_tag = ensure_attr(open_tag, "text-rendering", "geometricPrecision")
+    open_tag = ensure_attr(open_tag, "preserveAspectRatio", "xMidYMid meet")
+
+    view_box = re.search(r'viewBox\s*=\s*"([\d.\s-]+)"', open_tag, re.IGNORECASE)
+    if view_box:
+        parts = view_box.group(1).split()
+        if len(parts) == 4:
+            try:
+                w, h = float(parts[2]), float(parts[3])
+                if w > 0 and h > 0:
+                    open_tag = ensure_attr(open_tag, "width", _fmt_num(w))
+                    open_tag = ensure_attr(open_tag, "height", _fmt_num(h))
+            except ValueError:
+                pass
+
+    return svg.replace(match.group(0), open_tag, 1)
+
+
+def _fmt_num(value: float) -> str:
+    return str(int(value)) if value.is_integer() else str(value)
+
+
+def _run_vtracer(input_path: str, output_path: str, params: dict) -> None:
+    """
+    Call vtracer, falling back gracefully if the installed version does not
+    accept the newer keyword arguments (mode/hierarchical).
+    """
+    try:
+        vtracer.convert_image_to_svg_py(input_path, output_path, **params)
+    except TypeError:
+        # Retry without the parameters that older vtracer builds may lack.
+        fallback = {k: v for k, v in params.items() if k not in ("mode", "hierarchical")}
+        vtracer.convert_image_to_svg_py(input_path, output_path, **fallback)
+
+
 def convert_image_to_svg(
     image_bytes: bytes,
     colormode: str = "color",
     filter_speckle: int = 4,
-    color_precision: int = 6,
-    layer_difference: int = 16,
+    color_precision: int = 8,
+    layer_difference: int = 8,
     corner_threshold: int = 60,
     length_threshold: float = 4.0,
     max_iterations: int = 10,
     splice_threshold: int = 45,
-    path_precision: int = 3
+    path_precision: int = 6,
+    mode: str = "spline",
+    hierarchical: str = "stacked"
 ) -> str:
     """
     Convert image bytes to SVG string using vtracer.
@@ -87,25 +145,29 @@ def convert_image_to_svg(
         img.save(str(input_path), 'PNG')
 
         # Convert to SVG using vtracer
-        vtracer.convert_image_to_svg_py(
+        _run_vtracer(
             str(input_path),
             str(output_path),
-            colormode=colormode,
-            filter_speckle=filter_speckle,
-            color_precision=color_precision,
-            layer_difference=layer_difference,
-            corner_threshold=corner_threshold,
-            length_threshold=length_threshold,
-            max_iterations=max_iterations,
-            splice_threshold=splice_threshold,
-            path_precision=path_precision
+            {
+                "colormode": colormode,
+                "hierarchical": hierarchical,
+                "mode": mode,
+                "filter_speckle": filter_speckle,
+                "color_precision": color_precision,
+                "layer_difference": layer_difference,
+                "corner_threshold": corner_threshold,
+                "length_threshold": length_threshold,
+                "max_iterations": max_iterations,
+                "splice_threshold": splice_threshold,
+                "path_precision": path_precision,
+            },
         )
 
         # Read and return SVG content
         with open(output_path, 'r', encoding='utf-8') as f:
             svg_content = f.read()
 
-        return svg_content
+        return enhance_svg(svg_content)
 
     finally:
         # Cleanup temporary files
@@ -126,13 +188,15 @@ async def convert_single_image(
     file: UploadFile = File(...),
     colormode: str = Form(default="color"),
     filter_speckle: int = Form(default=4),
-    color_precision: int = Form(default=6),
-    layer_difference: int = Form(default=16),
+    color_precision: int = Form(default=8),
+    layer_difference: int = Form(default=8),
     corner_threshold: int = Form(default=60),
     length_threshold: float = Form(default=4.0),
     max_iterations: int = Form(default=10),
     splice_threshold: int = Form(default=45),
-    path_precision: int = Form(default=3)
+    path_precision: int = Form(default=6),
+    mode: str = Form(default="spline"),
+    hierarchical: str = Form(default="stacked")
 ):
     """
     Convert a single image to SVG.
@@ -176,7 +240,9 @@ async def convert_single_image(
             length_threshold,
             max_iterations,
             splice_threshold,
-            path_precision
+            path_precision,
+            mode,
+            hierarchical
         )
 
         # Generate output filename
@@ -199,13 +265,15 @@ async def convert_batch_images(
     files: list[UploadFile] = File(...),
     colormode: str = Form(default="color"),
     filter_speckle: int = Form(default=4),
-    color_precision: int = Form(default=6),
-    layer_difference: int = Form(default=16),
+    color_precision: int = Form(default=8),
+    layer_difference: int = Form(default=8),
     corner_threshold: int = Form(default=60),
     length_threshold: float = Form(default=4.0),
     max_iterations: int = Form(default=10),
     splice_threshold: int = Form(default=45),
-    path_precision: int = Form(default=3)
+    path_precision: int = Form(default=6),
+    mode: str = Form(default="spline"),
+    hierarchical: str = Form(default="stacked")
 ):
     """
     Convert multiple images to SVG and return as ZIP file.
@@ -251,7 +319,9 @@ async def convert_batch_images(
                 length_threshold,
                 max_iterations,
                 splice_threshold,
-                path_precision
+                path_precision,
+                mode,
+                hierarchical
             )
             return {"name": data["name"], "svg": svg, "error": None}
         except Exception as e:
