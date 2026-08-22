@@ -14,10 +14,38 @@ const props = withDefaults(
   }
 )
 
-const isVisible = ref(false)
+/** Basis-Abstand des Buttons zum jeweiligen unteren Bezugsrand (px). */
+const BASE_GAP = 24
 
-function handleScroll() {
+const isVisible = ref(false)
+const bottomOffset = ref(BASE_GAP)
+
+// Der globale Footer wird serverseitig (SSI-Partial) außerhalb von #app
+// eingebunden. Damit der Button nicht dahinter verschwindet, dockt er
+// oberhalb des Footers an, sobald dieser in den Viewport scrollt.
+let footerEl: HTMLElement | null = null
+
+function updateFooterEl() {
+  // Footer-Markup ist ein Server-Partial – gängige Varianten abdecken.
+  footerEl = document.querySelector('footer, .footer, #footer, [role="contentinfo"]')
+}
+
+function update() {
   isVisible.value = window.scrollY > props.threshold
+
+  if (!footerEl || !footerEl.isConnected) {
+    updateFooterEl()
+  }
+
+  let offset = BASE_GAP
+  if (footerEl) {
+    const footerTop = footerEl.getBoundingClientRect().top
+    const overlap = window.innerHeight - footerTop
+    if (overlap > 0) {
+      offset = BASE_GAP + overlap
+    }
+  }
+  bottomOffset.value = offset
 }
 
 function scrollToTop() {
@@ -29,12 +57,15 @@ function scrollToTop() {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  handleScroll()
+  updateFooterEl()
+  window.addEventListener('scroll', update, { passive: true })
+  window.addEventListener('resize', update, { passive: true })
+  update()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', update)
+  window.removeEventListener('resize', update)
 })
 </script>
 
@@ -44,6 +75,7 @@ onUnmounted(() => {
       v-show="isVisible"
       type="button"
       class="scroll-to-top"
+      :style="{ bottom: bottomOffset + 'px' }"
       :aria-label="t('accessibility.scrollToTop')"
       :title="t('accessibility.scrollToTop')"
       @click="scrollToTop"
@@ -57,8 +89,8 @@ onUnmounted(() => {
 .scroll-to-top {
   position: fixed;
   right: var(--space-5);
-  bottom: var(--space-5);
-  z-index: 90;
+  bottom: 24px;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +111,8 @@ onUnmounted(() => {
     opacity 0.25s var(--ease-smooth, ease),
     transform 0.25s var(--ease-smooth, ease),
     background 0.25s var(--ease-smooth, ease),
-    color 0.25s var(--ease-smooth, ease);
+    color 0.25s var(--ease-smooth, ease),
+    bottom 0.15s var(--ease-smooth, ease);
 }
 
 .scroll-to-top:hover {
@@ -118,7 +151,6 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .scroll-to-top {
     right: var(--space-3);
-    bottom: var(--space-3);
     width: 40px;
     height: 40px;
   }
