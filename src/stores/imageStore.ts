@@ -5,6 +5,7 @@ import type { ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } fr
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageWorker } from '@/composables/useImageWorker'
+import { createImageHistory } from './imageHistory'
 
 const { processBatch, processCanvas, supported: workerSupported } = useImageWorker()
 
@@ -14,6 +15,9 @@ export const useImageStore = defineStore('images', () => {
   const currentImageIndex = ref(0)
   const resizeProgress = reactive({ active: false, current: 0, total: 0 })
   const cropProgress = reactive({ active: false, current: 0, total: 0 })
+
+  // Globale Undo/Redo-Historie
+  const history = createImageHistory(images)
 
   // Getters
   const imageCount = computed(() => images.value.length)
@@ -43,17 +47,21 @@ export const useImageStore = defineStore('images', () => {
       return null
     }))
     await Promise.all(promises)
+    history.commit()
   }
 
   function removeImage(id: string): void {
     const index = images.value.findIndex(img => img.id === id)
     if (index !== -1) {
       images.value.splice(index, 1)
+      history.commit()
     }
   }
 
   function removeSelectedImages(): void {
+    if (!images.value.some(img => img.selected)) return
     images.value = images.value.filter(img => !img.selected)
+    history.commit()
   }
 
   function toggleImageSelection(id: string): void {
@@ -84,21 +92,28 @@ export const useImageStore = defineStore('images', () => {
     const image = images.value.find(img => img.id === id)
     if (image) {
       image.outputName = ImageProcessor.safeBaseName(newName)
+      history.commit()
     }
   }
 
   function updateImage(updatedImage: ImageObject): void {
     const index = images.value.findIndex(img => img.id === updatedImage.id)
     if (index > -1) {
+      // Version erhöhen, damit Canvas-Änderungen (z.B. aus dem Editor) für Vue
+      // und für die Undo/Redo-Historie eindeutig als Änderung erkennbar sind.
+      updatedImage.version = (updatedImage.version ?? 0) + 1
       // Trigger reactivity by replacing the array element
       // This ensures Vue detects the change
       images.value.splice(index, 1, updatedImage)
+      history.commit()
     }
   }
 
   function clearAllImages(): void {
+    if (images.value.length === 0) return
     images.value = []
     currentImageIndex.value = 0
+    history.commit()
   }
 
   // Drag & Drop: Bild von einem Index zu einem anderen verschieben
@@ -109,6 +124,7 @@ export const useImageStore = defineStore('images', () => {
 
     const [movedImage] = images.value.splice(fromIndex, 1)
     images.value.splice(toIndex, 0, movedImage)
+    history.commit()
   }
 
   // Triggert Vue-Reaktivität für betroffene Bilder nach Worker-Update.
@@ -136,6 +152,7 @@ export const useImageStore = defineStore('images', () => {
       selected.forEach((img) => ImageProcessor.rotateImage(img, degrees))
     }
     notifyImagesUpdated(ids)
+    history.commit()
   }
 
   // Batch-Flip für alle ausgewählten Bilder
@@ -149,6 +166,7 @@ export const useImageStore = defineStore('images', () => {
       selected.forEach((img) => ImageProcessor.flipImage(img, direction))
     }
     notifyImagesUpdated(ids)
+    history.commit()
   }
 
   // Batch-Zuschneiden auf Seitenverhältnis für alle ausgewählten Bilder
@@ -183,52 +201,69 @@ export const useImageStore = defineStore('images', () => {
 
     notifyImagesUpdated(ids)
     cropProgress.active = false
+    history.commit()
   }
 
   // Alle Bearbeitungen der ausgewählten Bilder rückgängig machen
   function resetSelectedImages(): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       ImageProcessor.resetToOriginal(img)
     })
+    // Canvas wurde destruktiv zurückgesetzt → version erhöhen, damit die
+    // Historie die Pixel-Änderung erfasst und die Vorschau neu rendert.
+    notifyImagesUpdated(new Set(selected.map(img => img.id)))
+    history.commit()
   }
 
   // Batch-Filter für alle ausgewählten Bilder anwenden
   function applyFiltersToSelectedImages(filters: Partial<ImageFilters>): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       if (!img.filters) {
         img.filters = { ...defaultFilters }
       }
       img.filters = { ...img.filters, ...filters }
     })
+    // Slider-Bewegungen zu einem Undo-Schritt zusammenfassen.
+    history.commit('filters')
   }
 
   // Filter für alle ausgewählten Bilder zurücksetzen
   function resetFiltersForSelectedImages(): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       img.filters = { ...defaultFilters }
     })
+    // Panel-„Zurücksetzen" ruft Filter/Transforms/Wasserzeichen nacheinander
+    // auf → über gemeinsamen Key zu einem Undo-Schritt zusammenfassen.
+    history.commit('panel-reset')
   }
 
   // Batch-Transforms für alle ausgewählten Bilder anwenden
   function applyTransformsToSelectedImages(transforms: Partial<ImageTransforms>): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       if (!img.transforms) {
         img.transforms = { ...defaultTransforms }
       }
       img.transforms = { ...img.transforms, ...transforms }
     })
+    history.commit('transforms')
   }
 
   // Transforms für alle ausgewählten Bilder zurücksetzen
   function resetTransformsForSelectedImages(): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       img.transforms = { ...defaultTransforms }
     })
+    history.commit('panel-reset')
   }
 
   // Batch-Umbenennung für alle ausgewählten Bilder
@@ -251,6 +286,7 @@ export const useImageStore = defineStore('images', () => {
       img.outputName = `${name}${separator}${number}`
     })
 
+    history.commit()
     return selectedInOrder.length
   }
 
@@ -296,31 +332,46 @@ export const useImageStore = defineStore('images', () => {
 
     notifyImagesUpdated(ids)
     resizeProgress.active = false
+    history.commit()
   }
 
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden
   function applyWatermarkToSelectedImages(watermark: Partial<WatermarkSettings>): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       if (!img.watermark) {
         img.watermark = { ...defaultWatermark }
       }
       img.watermark = { ...img.watermark, ...watermark }
     })
+    history.commit('watermark')
   }
 
   // Wasserzeichen für alle ausgewählten Bilder zurücksetzen
   function resetWatermarkForSelectedImages(): void {
     const selected = images.value.filter(img => img.selected)
+    if (selected.length === 0) return
     selected.forEach(img => {
       img.watermark = { ...defaultWatermark }
     })
+    history.commit('panel-reset')
   }
 
   // Reset store
   function $reset(): void {
     images.value = []
     currentImageIndex.value = 0
+    history.reset()
+  }
+
+  // ── Undo/Redo ────────────────────────────────────────────────────────────
+  function undo(): void {
+    history.undo()
+  }
+
+  function redo(): void {
+    history.redo()
   }
 
   return {
@@ -329,14 +380,16 @@ export const useImageStore = defineStore('images', () => {
     currentImageIndex,
     resizeProgress,
     cropProgress,
-    
+
     // Getters
     imageCount,
     selectedCount,
     selectedImages,
     hasImages,
     hasSelection,
-    
+    canUndo: history.canUndo,
+    canRedo: history.canRedo,
+
     // Actions
     addImage,
     addImages,
@@ -362,6 +415,8 @@ export const useImageStore = defineStore('images', () => {
     resizeSelectedImages,
     applyWatermarkToSelectedImages,
     resetWatermarkForSelectedImages,
+    undo,
+    redo,
     $reset
   }
 })
