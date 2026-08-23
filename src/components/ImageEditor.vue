@@ -171,7 +171,7 @@
                 :local-filters="localFilters"
                 :filter-defs="FILTER_DEFS"
                 :presets="FILTER_PRESETS"
-                @filter-input="onFilterInputFromChild"
+                @filter-change="onFilterChange"
                 @preset="applyPreset"
                 @reset="resetFilters"
               />
@@ -635,15 +635,10 @@ function resetSize() {
 
 // ── Filters ───────────────────────────────────────────────────────
 
-function onFilterInput(key: FilterKey, event: Event) {
-  const value = Number((event.target as HTMLInputElement).value)
+function onFilterChange(key: string, value: number) {
   localFilters.value = { ...localFilters.value, [key]: value }
   changesApplied.value = false
   schedulePushHistory()
-}
-
-function onFilterInputFromChild(key: string, event: Event) {
-  onFilterInput(key as FilterKey, event)
 }
 
 function applyPreset(presetKey: string) {
