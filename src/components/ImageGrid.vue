@@ -27,9 +27,11 @@ const displayedImages = computed(() =>
 )
 
 // Kachel-Mindestbreite je nach gewählter Anzeigegröße (klein/mittel/groß)
+// Werte bewusst gestaffelt, damit sich die Spaltenzahl auch im schmalen
+// Grid (geöffneter Sidebar, ~830px) zwischen mittel und groß unterscheidet.
 const CARD_MIN_WIDTH: Record<string, string> = {
-  small: '190px',
-  medium: '280px',
+  small: '180px',
+  medium: '260px',
   large: '400px'
 }
 const gridStyle = computed(() => ({
