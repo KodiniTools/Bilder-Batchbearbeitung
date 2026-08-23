@@ -7,6 +7,7 @@ import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/
 import type { ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
+import SliderRow from './SliderRow.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -168,11 +169,6 @@ function initResizeFromSelection() {
   }
 }
 
-// Reset single slider and apply
-function resetSlider(key: keyof ImageFilters, defaultValue: number) {
-  filters.value[key] = defaultValue
-}
-
 // Preset (One-Click-Look) auf die Auswahl anwenden
 const presets = FILTER_PRESETS
 function applyPreset(presetKey: string) {
@@ -251,37 +247,18 @@ const sliderConfig = [
         <div class="section-divider"></div>
 
         <div class="sliders-container">
-          <div
+          <SliderRow
             v-for="slider in sliderConfig"
             :key="slider.key"
-            class="slider-group"
-          >
-            <label class="slider-label">
-              <i :class="['fa-solid', slider.icon]"></i>
-              <span>{{ t(`batchEdit.filters.${slider.key}`) }}</span>
-              <span class="slider-value">{{ filters[slider.key] }}{{ slider.unit }}</span>
-            </label>
-            <div class="slider-wrapper">
-              <input
-                v-model.number="filters[slider.key]"
-                type="range"
-                :min="slider.min"
-                :max="slider.max"
-                class="slider"
-                :style="{
-                  '--progress': `${((filters[slider.key] - slider.min) / (slider.max - slider.min)) * 100}%`
-                }"
-              />
-              <button
-                class="btn-reset-slider"
-                :title="t('batchEdit.resetSlider')"
-                :class="{ 'is-visible': filters[slider.key] !== slider.default }"
-                @click="resetSlider(slider.key, slider.default)"
-              >
-                <i class="fa-solid fa-rotate-left"></i>
-              </button>
-            </div>
-          </div>
+            v-model="filters[slider.key]"
+            :label="t(`batchEdit.filters.${slider.key}`)"
+            :icon="slider.icon"
+            :min="slider.min"
+            :max="slider.max"
+            :default="slider.default"
+            :unit="slider.unit"
+            :reset-title="t('batchEdit.resetSlider')"
+          />
         </div>
 
         <div class="section-divider"></div>
@@ -358,30 +335,15 @@ const sliderConfig = [
               <i class="fa-solid fa-border-all"></i>
               {{ t('batchEdit.transforms.border.title') }}
             </h4>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.border.width') }}</span>
-                <span class="slider-value">{{ transforms.borderWidth }}px</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.borderWidth"
-                  type="range"
-                  min="0"
-                  max="50"
-                  class="slider"
-                  :style="{ '--progress': `${(transforms.borderWidth / 50) * 100}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.borderWidth !== 0 }"
-                  @click="transforms.borderWidth = 0"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
+            <SliderRow
+              v-model="transforms.borderWidth"
+              :label="t('batchEdit.transforms.border.width')"
+              :min="0"
+              :max="50"
+              :default="0"
+              unit="px"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
             <div class="color-group">
               <label>{{ t('batchEdit.transforms.border.color') }}</label>
               <div class="color-input-wrapper">
@@ -397,30 +359,15 @@ const sliderConfig = [
               <i class="fa-solid fa-vector-square"></i>
               {{ t('batchEdit.transforms.corners.title') }}
             </h4>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.corners.radius') }}</span>
-                <span class="slider-value">{{ transforms.borderRadius }}px</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.borderRadius"
-                  type="range"
-                  min="0"
-                  max="200"
-                  class="slider"
-                  :style="{ '--progress': `${(transforms.borderRadius / 200) * 100}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.borderRadius !== 0 }"
-                  @click="transforms.borderRadius = 0"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
+            <SliderRow
+              v-model="transforms.borderRadius"
+              :label="t('batchEdit.transforms.corners.radius')"
+              :min="0"
+              :max="200"
+              :default="0"
+              unit="px"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
           </div>
 
           <!-- Schatten -->
@@ -429,54 +376,24 @@ const sliderConfig = [
               <i class="fa-solid fa-clone"></i>
               {{ t('batchEdit.transforms.shadow.title') }}
             </h4>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.shadow.blur') }}</span>
-                <span class="slider-value">{{ transforms.shadowBlur }}px</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.shadowBlur"
-                  type="range"
-                  min="0"
-                  max="50"
-                  class="slider"
-                  :style="{ '--progress': `${(transforms.shadowBlur / 50) * 100}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.shadowBlur !== 0 }"
-                  @click="transforms.shadowBlur = 0"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.shadow.opacity') }}</span>
-                <span class="slider-value">{{ transforms.shadowOpacity }}%</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.shadowOpacity"
-                  type="range"
-                  min="0"
-                  max="100"
-                  class="slider"
-                  :style="{ '--progress': `${transforms.shadowOpacity}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.shadowOpacity !== 40 }"
-                  @click="transforms.shadowOpacity = 40"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
+            <SliderRow
+              v-model="transforms.shadowBlur"
+              :label="t('batchEdit.transforms.shadow.blur')"
+              :min="0"
+              :max="50"
+              :default="0"
+              unit="px"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
+            <SliderRow
+              v-model="transforms.shadowOpacity"
+              :label="t('batchEdit.transforms.shadow.opacity')"
+              :min="0"
+              :max="100"
+              :default="40"
+              unit="%"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
             <div class="color-group">
               <label>{{ t('batchEdit.transforms.shadow.color') }}</label>
               <div class="color-input-wrapper">
@@ -484,54 +401,24 @@ const sliderConfig = [
                 <span class="color-value">{{ transforms.shadowColor }}</span>
               </div>
             </div>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.shadow.offsetX') }}</span>
-                <span class="slider-value">{{ transforms.shadowOffsetX }}px</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.shadowOffsetX"
-                  type="range"
-                  min="-25"
-                  max="25"
-                  class="slider"
-                  :style="{ '--progress': `${((transforms.shadowOffsetX + 25) / 50) * 100}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.shadowOffsetX !== 5 }"
-                  @click="transforms.shadowOffsetX = 5"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
-            <div class="slider-group">
-              <label class="slider-label">
-                <span>{{ t('batchEdit.transforms.shadow.offsetY') }}</span>
-                <span class="slider-value">{{ transforms.shadowOffsetY }}px</span>
-              </label>
-              <div class="slider-wrapper">
-                <input
-                  v-model.number="transforms.shadowOffsetY"
-                  type="range"
-                  min="-25"
-                  max="25"
-                  class="slider"
-                  :style="{ '--progress': `${((transforms.shadowOffsetY + 25) / 50) * 100}%` }"
-                />
-                <button
-                  class="btn-reset-slider"
-                  :title="t('batchEdit.resetSlider')"
-                  :class="{ 'is-visible': transforms.shadowOffsetY !== 5 }"
-                  @click="transforms.shadowOffsetY = 5"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
-            </div>
+            <SliderRow
+              v-model="transforms.shadowOffsetX"
+              :label="t('batchEdit.transforms.shadow.offsetX')"
+              :min="-25"
+              :max="25"
+              :default="5"
+              unit="px"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
+            <SliderRow
+              v-model="transforms.shadowOffsetY"
+              :label="t('batchEdit.transforms.shadow.offsetY')"
+              :min="-25"
+              :max="25"
+              :default="5"
+              unit="px"
+              :reset-title="t('batchEdit.resetSlider')"
+            />
           </div>
         </div>
 
@@ -580,30 +467,15 @@ const sliderConfig = [
               </div>
 
               <!-- Schriftgröße -->
-              <div class="slider-group">
-                <label class="slider-label">
-                  <span>{{ t('batchEdit.watermark.fontSize') }}</span>
-                  <span class="slider-value">{{ watermark.fontSize }}px</span>
-                </label>
-                <div class="slider-wrapper">
-                  <input
-                    v-model.number="watermark.fontSize"
-                    type="range"
-                    min="10"
-                    max="200"
-                    class="slider"
-                    :style="{ '--progress': `${((watermark.fontSize - 10) / 190) * 100}%` }"
-                  />
-                  <button
-                    class="btn-reset-slider"
-                    :title="t('batchEdit.resetSlider')"
-                    :class="{ 'is-visible': watermark.fontSize !== 48 }"
-                    @click="watermark.fontSize = 48"
-                  >
-                    <i class="fa-solid fa-rotate-left"></i>
-                  </button>
-                </div>
-              </div>
+              <SliderRow
+                v-model="watermark.fontSize"
+                :label="t('batchEdit.watermark.fontSize')"
+                :min="10"
+                :max="200"
+                :default="48"
+                unit="px"
+                :reset-title="t('batchEdit.resetSlider')"
+              />
 
               <!-- Fett / Kursiv -->
               <div class="style-toggles">
@@ -635,56 +507,26 @@ const sliderConfig = [
               </div>
 
               <!-- Deckkraft -->
-              <div class="slider-group">
-                <label class="slider-label">
-                  <span>{{ t('batchEdit.watermark.opacity') }}</span>
-                  <span class="slider-value">{{ watermark.opacity }}%</span>
-                </label>
-                <div class="slider-wrapper">
-                  <input
-                    v-model.number="watermark.opacity"
-                    type="range"
-                    min="0"
-                    max="100"
-                    class="slider"
-                    :style="{ '--progress': `${watermark.opacity}%` }"
-                  />
-                  <button
-                    class="btn-reset-slider"
-                    :title="t('batchEdit.resetSlider')"
-                    :class="{ 'is-visible': watermark.opacity !== 50 }"
-                    @click="watermark.opacity = 50"
-                  >
-                    <i class="fa-solid fa-rotate-left"></i>
-                  </button>
-                </div>
-              </div>
+              <SliderRow
+                v-model="watermark.opacity"
+                :label="t('batchEdit.watermark.opacity')"
+                :min="0"
+                :max="100"
+                :default="50"
+                unit="%"
+                :reset-title="t('batchEdit.resetSlider')"
+              />
 
               <!-- Drehung -->
-              <div class="slider-group">
-                <label class="slider-label">
-                  <span>{{ t('batchEdit.watermark.rotation') }}</span>
-                  <span class="slider-value">{{ watermark.rotation }}°</span>
-                </label>
-                <div class="slider-wrapper">
-                  <input
-                    v-model.number="watermark.rotation"
-                    type="range"
-                    min="-180"
-                    max="180"
-                    class="slider"
-                    :style="{ '--progress': `${((watermark.rotation + 180) / 360) * 100}%` }"
-                  />
-                  <button
-                    class="btn-reset-slider"
-                    :title="t('batchEdit.resetSlider')"
-                    :class="{ 'is-visible': watermark.rotation !== -30 }"
-                    @click="watermark.rotation = -30"
-                  >
-                    <i class="fa-solid fa-rotate-left"></i>
-                  </button>
-                </div>
-              </div>
+              <SliderRow
+                v-model="watermark.rotation"
+                :label="t('batchEdit.watermark.rotation')"
+                :min="-180"
+                :max="180"
+                :default="-30"
+                unit="°"
+                :reset-title="t('batchEdit.resetSlider')"
+              />
 
               <!-- Position -->
               <div class="property-group">
@@ -839,126 +681,6 @@ const sliderConfig = [
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-.slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.slider-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.slider-label i {
-  width: 18px;
-  text-align: center;
-  color: var(--muted);
-}
-
-.slider-label .slider-value {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 10%, transparent);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  width: 60px;
-  min-width: 60px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.slider-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.slider {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  background: linear-gradient(
-    to right,
-    var(--accent) 0%,
-    var(--accent) var(--progress, 50%),
-    var(--border-color) var(--progress, 50%),
-    var(--border-color) 100%
-  );
-  cursor: pointer;
-  touch-action: none;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid var(--panel);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: grab;
-}
-
-.slider::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
-}
-
-.slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid var(--panel);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: grab;
-}
-
-.slider::-moz-range-thumb:active {
-  cursor: grabbing;
-}
-
-.btn-reset-slider {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: transparent;
-  border-radius: var(--radius-sm);
-  cursor: default;
-  font-size: 0.7rem;
-  pointer-events: none;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
-  opacity: 0;
-}
-
-.btn-reset-slider.is-visible {
-  background: color-mix(in oklab, var(--muted) 15%, transparent);
-  color: var(--muted);
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.btn-reset-slider.is-visible:hover {
-  background: color-mix(in oklab, var(--accent) 20%, transparent);
-  color: var(--accent);
 }
 
 .section-divider {
