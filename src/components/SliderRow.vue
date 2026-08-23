@@ -120,91 +120,94 @@ onUnmounted(stopHold)
 
 <template>
   <div class="slider-group">
-    <label class="slider-label">
+    <div class="slider-head">
       <i v-if="icon" :class="['fa-solid', icon]"></i>
-      <span class="slider-name">{{ label }}</span>
+      <span class="slider-name" :title="label">{{ label }}</span>
+    </div>
 
-      <div class="slider-controls">
-        <div class="num-spinner">
-          <input
-            class="spin-input"
-            type="number"
-            :min="min"
-            :max="max"
-            :step="step"
-            :value="modelValue"
-            @input="onSpinnerInput"
-            @change="onSpinnerChange"
-          />
-          <span v-if="unit" class="spin-unit">{{ unit }}</span>
-          <div class="spin-buttons">
-            <button
-              type="button"
-              class="spin-btn"
-              tabindex="-1"
-              :disabled="modelValue >= max"
-              @mousedown="startHold(1, $event)"
-              @touchstart.prevent="startHold(1, $event)"
-            >
-              <i class="fa-solid fa-chevron-up"></i>
-            </button>
-            <button
-              type="button"
-              class="spin-btn"
-              tabindex="-1"
-              :disabled="modelValue <= min"
-              @mousedown="startHold(-1, $event)"
-              @touchstart.prevent="startHold(-1, $event)"
-            >
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-          </div>
+    <input
+      class="slider"
+      type="range"
+      :min="min"
+      :max="max"
+      :step="step"
+      :value="modelValue"
+      :style="{ '--progress': `${progress}%` }"
+      @input="onRangeInput"
+    />
+
+    <div class="slider-controls">
+      <div class="num-spinner">
+        <input
+          class="spin-input"
+          type="number"
+          :min="min"
+          :max="max"
+          :step="step"
+          :value="modelValue"
+          @input="onSpinnerInput"
+          @change="onSpinnerChange"
+        />
+        <span v-if="unit" class="spin-unit">{{ unit }}</span>
+        <div class="spin-buttons">
+          <button
+            type="button"
+            class="spin-btn"
+            tabindex="-1"
+            :disabled="modelValue >= max"
+            @mousedown="startHold(1, $event)"
+            @touchstart.prevent="startHold(1, $event)"
+          >
+            <i class="fa-solid fa-chevron-up"></i>
+          </button>
+          <button
+            type="button"
+            class="spin-btn"
+            tabindex="-1"
+            :disabled="modelValue <= min"
+            @mousedown="startHold(-1, $event)"
+            @touchstart.prevent="startHold(-1, $event)"
+          >
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
         </div>
-
-        <button
-          class="btn-reset-slider"
-          :title="resetTitle"
-          :class="{ 'is-visible': isModified }"
-          @click="resetValue"
-        >
-          <i class="fa-solid fa-rotate-left"></i>
-        </button>
       </div>
-    </label>
 
-    <div class="slider-wrapper">
-      <input
-        class="slider"
-        type="range"
-        :min="min"
-        :max="max"
-        :step="step"
-        :value="modelValue"
-        :style="{ '--progress': `${progress}%` }"
-        @input="onRangeInput"
-      />
+      <button
+        class="btn-reset-slider"
+        :title="resetTitle"
+        :class="{ 'is-visible': isModified }"
+        @click="resetValue"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Alles in einer Reihe: Label · Slider · Spinner · Reset.
+   Der kurze Slider lässt Platz für Spinner und Reset-Button. */
 .slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.slider-label {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.slider-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
+  /* darf schrumpfen (Ellipsis) statt den Slider zu verdrängen */
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
-.slider-label > i {
-  width: 18px;
+.slider-head > i {
+  width: 16px;
   text-align: center;
   color: var(--muted);
   flex-shrink: 0;
@@ -216,10 +219,9 @@ onUnmounted(stopHold)
   white-space: nowrap;
 }
 
-/* Spinner + Reset-Button rechtsbündig; der Reset-Slot ist immer reserviert,
+/* Spinner + Reset-Button; der Reset-Slot ist immer reserviert,
    sodass bei Aktivierung Leerraum für den Button vorhanden ist. */
 .slider-controls {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -229,13 +231,14 @@ onUnmounted(stopHold)
 .num-spinner {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   height: 26px;
-  padding: 0 2px 0 6px;
+  padding: 0 2px 0 5px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg);
   transition: border-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .num-spinner:focus-within {
@@ -243,7 +246,7 @@ onUnmounted(stopHold)
 }
 
 .spin-input {
-  width: 34px;
+  width: 30px;
   border: none;
   background: transparent;
   color: var(--accent);
@@ -333,13 +336,9 @@ onUnmounted(stopHold)
   color: var(--accent);
 }
 
-.slider-wrapper {
-  display: flex;
-  align-items: center;
-}
-
 .slider {
-  flex: 1;
+  flex: 1 1 44px;
+  min-width: 44px;
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
