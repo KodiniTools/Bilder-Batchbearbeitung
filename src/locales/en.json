@@ -127,6 +127,12 @@
   "statusBar": {
     "images": "Images",
     "selected": "selected",
+    "gridSize": {
+      "label": "Image display size",
+      "small": "Small view",
+      "medium": "Medium view",
+      "large": "Large view"
+    },
     "buttons": {
       "selectAll": "Toggle All",
       "delete": "Delete",

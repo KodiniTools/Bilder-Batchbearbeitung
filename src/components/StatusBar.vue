@@ -189,6 +189,43 @@ const handleRedo = () => {
       </button>
     </div>
 
+    <!-- Grid-Größe (klein / mittel / groß) -->
+    <template v-if="imageStore.hasImages">
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-section">
+        <div class="btn-group" role="group" :aria-label="t('statusBar.gridSize.label')">
+          <button
+            class="btn btn-icon"
+            :class="{ active: imageStore.gridSize === 'small' }"
+            :title="t('statusBar.gridSize.small')"
+            :aria-pressed="imageStore.gridSize === 'small'"
+            @click="imageStore.setGridSize('small')"
+          >
+            <i class="fa-solid fa-table-cells"></i>
+          </button>
+          <button
+            class="btn btn-icon"
+            :class="{ active: imageStore.gridSize === 'medium' }"
+            :title="t('statusBar.gridSize.medium')"
+            :aria-pressed="imageStore.gridSize === 'medium'"
+            @click="imageStore.setGridSize('medium')"
+          >
+            <i class="fa-solid fa-table-cells-large"></i>
+          </button>
+          <button
+            class="btn btn-icon"
+            :class="{ active: imageStore.gridSize === 'large' }"
+            :title="t('statusBar.gridSize.large')"
+            :aria-pressed="imageStore.gridSize === 'large'"
+            @click="imageStore.setGridSize('large')"
+          >
+            <i class="fa-solid fa-square"></i>
+          </button>
+        </div>
+      </div>
+    </template>
+
     <!-- Transformations Section -->
     <template v-if="imageStore.hasSelection">
       <div class="toolbar-divider"></div>
@@ -546,6 +583,12 @@ const handleRedo = () => {
 .btn-group .btn-icon:hover:not(:disabled) {
   background: var(--btn);
   box-shadow: none;
+}
+
+/* Aktiver Zustand (z. B. gewählte Grid-Größe) */
+.btn-group .btn-icon.active {
+  background: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--accent);
 }
 
 /* Split-Button Chevron */

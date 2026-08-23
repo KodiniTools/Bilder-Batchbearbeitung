@@ -302,6 +302,12 @@
   "statusBar": {
     "images": "Bilder",
     "selected": "ausgewählt",
+    "gridSize": {
+      "label": "Anzeigegröße der Bilder",
+      "small": "Kleine Darstellung",
+      "medium": "Mittlere Darstellung",
+      "large": "Große Darstellung"
+    },
     "buttons": {
       "selectAll": "Alle umschalten",
       "delete": "Löschen",

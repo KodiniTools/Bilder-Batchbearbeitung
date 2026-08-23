@@ -26,6 +26,16 @@ const displayedImages = computed(() =>
   props.onlySelected ? imageStore.selectedImages : imageStore.images
 )
 
+// Kachel-Mindestbreite je nach gewählter Anzeigegröße (klein/mittel/groß)
+const CARD_MIN_WIDTH: Record<string, string> = {
+  small: '190px',
+  medium: '280px',
+  large: '400px'
+}
+const gridStyle = computed(() => ({
+  '--card-min': CARD_MIN_WIDTH[imageStore.gridSize] || CARD_MIN_WIDTH.medium
+}))
+
 // Drag & Drop State
 const draggedIndex = ref<number | null>(null)
 const dropTargetIndex = ref<number | null>(null)
@@ -97,7 +107,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
 
 <template>
   <div class="images-scroll-container">
-    <section class="image-container">
+    <section class="image-container" :style="gridStyle">
       <div
         v-for="(image, index) in displayedImages"
         :key="getImageKey(image)"
@@ -131,7 +141,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
 
 .image-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min, 280px)), 1fr));
   gap: var(--space-5);
 }
 

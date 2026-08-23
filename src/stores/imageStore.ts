@@ -9,12 +9,32 @@ import { createImageHistory } from './imageHistory'
 
 const { processBatch, processCanvas, supported: workerSupported } = useImageWorker()
 
+export type GridSize = 'small' | 'medium' | 'large'
+
 export const useImageStore = defineStore('images', () => {
   // State
   const images = ref<ImageObject[]>([])
   const currentImageIndex = ref(0)
   const resizeProgress = reactive({ active: false, current: 0, total: 0 })
   const cropProgress = reactive({ active: false, current: 0, total: 0 })
+
+  // Anzeigegröße der Bildkacheln im Grid (klein / mittel / groß), persistiert
+  const savedGridSize = (typeof localStorage !== 'undefined'
+    ? localStorage.getItem('gridSize')
+    : null) as GridSize | null
+  const gridSize = ref<GridSize>(
+    savedGridSize === 'small' || savedGridSize === 'medium' || savedGridSize === 'large'
+      ? savedGridSize
+      : 'medium'
+  )
+  function setGridSize(size: GridSize) {
+    gridSize.value = size
+    try {
+      localStorage.setItem('gridSize', size)
+    } catch {
+      /* localStorage nicht verfügbar – Auswahl gilt nur für die Sitzung */
+    }
+  }
 
   // Globale Undo/Redo-Historie
   const history = createImageHistory(images)
@@ -380,6 +400,7 @@ export const useImageStore = defineStore('images', () => {
     currentImageIndex,
     resizeProgress,
     cropProgress,
+    gridSize,
 
     // Getters
     imageCount,
@@ -403,6 +424,7 @@ export const useImageStore = defineStore('images', () => {
     updateImage,
     clearAllImages,
     moveImage,
+    setGridSize,
     rotateSelectedImages,
     flipSelectedImages,
     cropSelectedImagesToAspectRatio,
