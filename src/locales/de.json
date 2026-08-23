@@ -322,6 +322,7 @@
       "exportSelectedPdf": "Auswahl als PDF exportieren",
       "exportAllPdf": "Alle Bilder als PDF exportieren",
       "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
+      "exportSvg": "Als SVG exportieren (Vektorisierung)",
       "downloadZip": "Originale der Auswahl als ZIP herunterladen",
       "rotateLeft": "Ausgewählte Bilder 90° nach links drehen",
       "rotateRight": "Ausgewählte Bilder 90° nach rechts drehen",
@@ -367,12 +368,14 @@
     "pdfMulti": "Erstelle PDF mit {count} Bildern...",
     "progress": "{current} von {total}",
     "resizing": "Bild {current} von {total} wird skaliert…",
-    "cropping": "Bild {current} von {total} wird zugeschnitten…"
+    "cropping": "Bild {current} von {total} wird zugeschnitten…",
+    "svgProgress": "SVG-Konvertierung: {current}/{total}"
   },
   "toast": {
     "pdfSuccess": "PDF mit {count} Bildern erfolgreich erstellt",
     "zipSuccess": "ZIP mit {count} Bildern erfolgreich erstellt",
     "saveSuccess": "{count} Bilder erfolgreich gespeichert",
+    "svgSuccess": "{count} Bild(er) erfolgreich als SVG exportiert",
     "exportError": "Fehler beim Exportieren. Bitte erneut versuchen.",
     "imageAdded": "{count} Bild(er) hinzugefügt",
     "imageRemoved": "Bild entfernt",
@@ -398,6 +401,7 @@
     "noImagesToExport": "Keine Bilder zum Exportieren ausgewählt.",
     "noImagesAvailable": "Keine Bilder zum Exportieren vorhanden.",
     "noImagesToSave": "Keine Bilder zum Speichern ausgewählt.",
+    "svgServiceUnavailable": "Der SVG-Konvertierungsservice ist nicht verfügbar.",
     "cannotDeleteLastPage": "Sie können die letzte Seite nicht löschen.",
     "confirmDeletePage": "Möchten Sie Seite {page} wirklich löschen?",
     "downloadError": "Fehler beim Erstellen des Bildes: {error}",
@@ -465,6 +469,7 @@
       "pdfAll": "PDF exportieren (Alle Bilder)",
       "pdfSelected": "PDF exportieren (Ausgewählte)",
       "zip": "Als ZIP exportieren",
+      "svg": "Als SVG exportieren",
       "save": "Bilder speichern",
       "export": "Export"
     },
@@ -745,6 +750,7 @@
       "vignette": "Vignette",
       "blur": "Weichzeichner",
       "opacity": "Deckkraft",
+      "invert": "Invertieren",
       "reset": "Filter zurücksetzen"
     },
     "presets": {

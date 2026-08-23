@@ -147,6 +147,7 @@
       "exportSelectedPdf": "Export selection as PDF",
       "exportAllPdf": "Export all images as PDF",
       "saveSelected": "Save selected images in multiple formats",
+      "exportSvg": "Export as SVG (vectorization)",
       "downloadZip": "Download originals of selection as ZIP",
       "rotateLeft": "Rotate selected images 90° left",
       "rotateRight": "Rotate selected images 90° right",
@@ -192,12 +193,14 @@
     "pdfMulti": "Creating PDF with {count} images...",
     "progress": "{current} of {total}",
     "resizing": "Scaling image {current} of {total}…",
-    "cropping": "Cropping image {current} of {total}…"
+    "cropping": "Cropping image {current} of {total}…",
+    "svgProgress": "SVG conversion: {current}/{total}"
   },
   "toast": {
     "pdfSuccess": "PDF with {count} images created successfully",
     "zipSuccess": "ZIP with {count} images created successfully",
     "saveSuccess": "{count} images saved successfully",
+    "svgSuccess": "{count} image(s) successfully exported as SVG",
     "exportError": "Export failed. Please try again.",
     "imageAdded": "{count} image(s) added",
     "imageRemoved": "Image removed",
@@ -223,6 +226,7 @@
     "noImagesToExport": "No images selected to export.",
     "noImagesAvailable": "No images available to export.",
     "noImagesToSave": "No images selected to save.",
+    "svgServiceUnavailable": "The SVG conversion service is unavailable.",
     "cannotDeleteLastPage": "You cannot delete the last page.",
     "confirmDeletePage": "Do you really want to delete page {page}?",
     "downloadError": "Error creating the image: {error}",
@@ -290,6 +294,7 @@
       "pdfAll": "Export PDF (All Images)",
       "pdfSelected": "Export PDF (Selected)",
       "zip": "Export as ZIP",
+      "svg": "Export as SVG",
       "save": "Save Images",
       "export": "Export"
     },
@@ -614,6 +619,7 @@
       "vignette": "Vignette",
       "blur": "Blur",
       "opacity": "Opacity",
+      "invert": "Invert",
       "reset": "Reset filters"
     },
     "presets": {
