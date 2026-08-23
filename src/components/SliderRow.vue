@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onUnmounted } from 'vue'
 
 const props = withDefaults(defineProps<{
   modelValue: number
@@ -65,9 +65,57 @@ function stepBy(direction: 1 | -1) {
   emitValue(clamp(props.modelValue + direction * props.step))
 }
 
+// Press-and-hold: erst eine Verzögerung, dann fortlaufende Schritte,
+// die mit der Haltezeit leicht beschleunigen.
+let holdTimeout: ReturnType<typeof setTimeout> | null = null
+let holdInterval: ReturnType<typeof setInterval> | null = null
+
+function stopHold() {
+  if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null }
+  if (holdInterval) { clearInterval(holdInterval); holdInterval = null }
+  window.removeEventListener('mouseup', stopHold)
+  window.removeEventListener('touchend', stopHold)
+  window.removeEventListener('touchcancel', stopHold)
+}
+
+function startHold(direction: 1 | -1, event: Event) {
+  // Nur primäre Maustaste; bei Touch verhindern wir das nachgelagerte Klick-Event
+  if (event instanceof MouseEvent && event.button !== 0) return
+  if (event.type === 'touchstart') event.preventDefault()
+
+  stopHold()
+  stepBy(direction)
+
+  window.addEventListener('mouseup', stopHold)
+  window.addEventListener('touchend', stopHold)
+  window.addEventListener('touchcancel', stopHold)
+
+  holdTimeout = setTimeout(() => {
+    let delay = 90
+    const tick = () => {
+      // An der Grenze anhalten
+      if ((direction === 1 && props.modelValue >= props.max) ||
+          (direction === -1 && props.modelValue <= props.min)) {
+        stopHold()
+        return
+      }
+      stepBy(direction)
+      // sanft beschleunigen bis min. 30ms
+      if (delay > 30) {
+        delay = Math.max(30, delay - 8)
+        if (holdInterval) clearInterval(holdInterval)
+        holdInterval = setInterval(tick, delay)
+      }
+    }
+    holdInterval = setInterval(tick, delay)
+  }, 350)
+}
+
 function resetValue() {
   emitValue(props.default)
 }
+
+onUnmounted(stopHold)
 </script>
 
 <template>
@@ -95,7 +143,8 @@ function resetValue() {
               class="spin-btn"
               tabindex="-1"
               :disabled="modelValue >= max"
-              @click="stepBy(1)"
+              @mousedown="startHold(1, $event)"
+              @touchstart.prevent="startHold(1, $event)"
             >
               <i class="fa-solid fa-chevron-up"></i>
             </button>
@@ -104,7 +153,8 @@ function resetValue() {
               class="spin-btn"
               tabindex="-1"
               :disabled="modelValue <= min"
-              @click="stepBy(-1)"
+              @mousedown="startHold(-1, $event)"
+              @touchstart.prevent="startHold(-1, $event)"
             >
               <i class="fa-solid fa-chevron-down"></i>
             </button>
