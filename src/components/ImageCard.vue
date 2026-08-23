@@ -21,31 +21,26 @@ const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
 const displayCanvas = ref<HTMLCanvasElement | null>(null)
 
-// Pixel-based filters (temperature/vibrance/vignette) can't be expressed in CSS,
-// so when any are active we bake the full pipeline into the display canvas and
-// skip the CSS filter to avoid double application.
-const hasPixelFilters = computed(() => {
+// Alle Filter werden echt pixelbasiert in das Display-Canvas gebacken
+// (siehe ImageProcessor.applyFiltersToCanvas) – es werden keine CSS-Filter
+// mehr auf das DOM angewendet. `hasActiveFilters` prüft nur noch, ob überhaupt
+// Filter aktiv sind, um bei unveränderten Bildern das rohe Canvas zu zeigen.
+const hasActiveFilters = computed(() => {
   const f = props.image.filters || defaultFilters
-  return f.temperature !== 0 || f.vibrance !== 0 || f.vignette !== 0
-})
-
-// Computed CSS filter string based on image filters
-const filterStyle = computed(() => {
-  if (hasPixelFilters.value) return {}
-  const f = props.image.filters || defaultFilters
-  return {
-    filter: `
-      brightness(${f.brightness}%)
-      contrast(${f.contrast}%)
-      saturate(${f.saturation}%)
-      hue-rotate(${f.hue}deg)
-      blur(${f.blur}px)
-      grayscale(${f.grayscale}%)
-      sepia(${f.sepia}%)
-      invert(${f.invert}%)
-    `.trim(),
-    opacity: f.opacity / 100
-  }
+  return (
+    f.brightness !== 100 ||
+    f.contrast !== 100 ||
+    f.saturation !== 100 ||
+    f.hue !== 0 ||
+    f.grayscale !== 0 ||
+    f.sepia !== 0 ||
+    f.invert !== 0 ||
+    f.temperature !== 0 ||
+    f.vibrance !== 0 ||
+    f.blur > 0 ||
+    f.opacity !== 100 ||
+    f.vignette !== 0
+  )
 })
 
 // Computed CSS transform style (border, radius, shadow)
@@ -223,8 +218,9 @@ function syncDisplayCanvas() {
   const ctx = dst.getContext('2d')
   if (!ctx) return
 
-  if (hasPixelFilters.value) {
-    // Auf Thumbnail-Größe herunterskalieren, dann die volle Pipeline backen.
+  if (hasActiveFilters.value) {
+    // Auf Thumbnail-Größe herunterskalieren, dann die volle Pixel-Pipeline
+    // backen (Helligkeit, Kontrast, Blur, Temperatur, Vignette, …).
     const scale = Math.min(THUMB_BAKE_MAX / src.width, THUMB_BAKE_MAX / src.height, 1)
     let bakeSource: HTMLCanvasElement = src
     if (scale < 1) {
@@ -240,7 +236,7 @@ function syncDisplayCanvas() {
     ctx.clearRect(0, 0, dst.width, dst.height)
     ctx.drawImage(baked, 0, 0)
   } else {
-    // Schneller Pfad: rohes Canvas, CSS übernimmt die restlichen Filter.
+    // Keine Filter aktiv: rohes Canvas direkt anzeigen.
     dst.width = src.width
     dst.height = src.height
     ctx.clearRect(0, 0, dst.width, dst.height)
@@ -289,7 +285,7 @@ onUnmounted(() => {
       <div
         ref="previewContainer"
         class="image-preview"
-        :style="[filterStyle, transformStyle]"
+        :style="transformStyle"
       >
         <canvas ref="displayCanvas"></canvas>
       </div>
