@@ -18,24 +18,20 @@
       </div>
     </div>
 
-    <div
-      v-for="fd in filterDefs"
-      :key="fd.key"
-      class="filter-row"
-    >
-      <label class="filter-label">{{ t(`imageEditor.filters.${fd.key}`) }}</label>
-      <div class="filter-slider-wrap">
-        <input
-          type="range"
-          class="filter-slider"
-          :min="fd.min"
-          :max="fd.max"
-          :step="fd.step"
-          :value="(localFilters as Record<string, number>)[fd.key]"
-          @input="emit('filter-input', fd.key, $event)"
-        >
-        <span class="filter-value">{{ (localFilters as Record<string, number>)[fd.key] }}{{ fd.unit }}</span>
-      </div>
+    <div class="filter-rows">
+      <SliderRow
+        v-for="fd in filterDefs"
+        :key="fd.key"
+        :model-value="(localFilters as Record<string, number>)[fd.key]"
+        :label="t(`imageEditor.filters.${fd.key}`)"
+        :min="fd.min"
+        :max="fd.max"
+        :step="fd.step"
+        :unit="fd.unit"
+        :default="defaultValueFor(fd.key)"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="(v: number) => emit('filter-change', fd.key, v)"
+      />
     </div>
     <button type="button" class="btn btn-xs btn-ghost" @click="emit('reset')">
       <i class="fa-solid fa-arrow-rotate-left"></i>
@@ -47,6 +43,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { ImageFilters } from '@/lib/core/types'
+import { defaultFilters } from '@/lib/core/types'
+import SliderRow from '../SliderRow.vue'
 
 const { t } = useI18n()
 
@@ -70,14 +68,26 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'filter-input': [key: string, event: Event]
+  'filter-change': [key: string, value: number]
   preset: [key: string]
   reset: []
 }>()
+
+// Standardwert eines Filters (für den per-Slider-Reset-Button)
+function defaultValueFor(key: string): number {
+  return (defaultFilters as Record<string, number>)[key] ?? 0
+}
 </script>
 
 <style scoped>
 @import './editor-shared.css';
+
+.filter-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
 
 .preset-block {
   display: flex;
