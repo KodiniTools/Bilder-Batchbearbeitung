@@ -74,6 +74,10 @@ export interface ImageObject {
   filters?: ImageFilters
   transforms?: ImageTransforms
   watermark?: WatermarkSettings
+  /** Optionales Zielformat pro Bild (z. B. 'png', 'jpg'); Fallback: Dateiendung */
+  exportFormat?: string
+  /** Optionale Export-Qualität pro Bild (0.0–1.0) */
+  quality?: number
 }
 
 export interface PdfSettings {

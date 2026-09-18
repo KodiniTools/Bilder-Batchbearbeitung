@@ -282,7 +282,7 @@ async function handleExportConfirm(settings: ExportSettings) {
         : undefined
 
       for (const image of images) {
-        await downloadSingleImage(image, settings.format, settings.quality / 100, bgColor)
+        await downloadSingleImage(image, settings.format, (settings.quality ?? 92) / 100, bgColor)
         await new Promise(resolve => setTimeout(resolve, 200))
       }
 
@@ -518,12 +518,12 @@ onMounted(() => {
   }
 
   window.addEventListener('keydown', handleKeyboard)
-  window.addEventListener('paste', handlePaste as EventListener)
+  window.addEventListener('paste', handlePaste)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyboard)
-  window.removeEventListener('paste', handlePaste as EventListener)
+  window.removeEventListener('paste', handlePaste)
 })
 </script>
 

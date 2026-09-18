@@ -343,7 +343,7 @@ import { useI18n } from 'vue-i18n'
 import FrontPageDesigner from './FrontPageDesigner.vue'
 import CommentPageDesigner from './CommentPageDesigner.vue'
 import type { FrontPageElement } from './FrontPageDesigner.vue'
-import type { CanvasElement } from '@/lib/features/export-pdf-with-comments'
+import type { CanvasElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 

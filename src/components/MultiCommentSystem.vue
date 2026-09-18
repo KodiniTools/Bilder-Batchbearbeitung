@@ -299,7 +299,7 @@ function startDrag(event: MouseEvent) {
             </div>
 
             <div v-else class="image-uploaded">
-              <img :src="activeEntry.imagePreviewUrl" alt="Preview" />
+              <img :src="activeEntry.imagePreviewUrl ?? undefined" alt="Preview" />
               <div class="image-controls">
                 <div class="scale-control">
                   <label>

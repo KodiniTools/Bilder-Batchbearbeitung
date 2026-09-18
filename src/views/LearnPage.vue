@@ -286,7 +286,7 @@ function visualize(canvas: HTMLCanvasElement) {
                   {{ expandedCode === 'vue1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
-              <pre v-show="expandedCode === 'vue1'"><code>&lt;script setup lang="ts"&gt;
+              <pre v-show="expandedCode === 'vue1'"><code v-pre>&lt;script setup lang="ts"&gt;
 import { ref, reactive, computed, watch, watchEffect } from 'vue'
 
 // ref() für primitive Werte

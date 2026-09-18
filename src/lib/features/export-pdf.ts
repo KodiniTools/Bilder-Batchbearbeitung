@@ -298,6 +298,8 @@ export interface ExportSettings {
   zipName?: string
   format?: string
   quality?: number
+  pngTransparent?: boolean
+  pngBackgroundColor?: string
   // SVG-Export
   svgColormode?: 'color' | 'binary'
   svgFilterSpeckle?: number
@@ -458,7 +460,8 @@ async function renderFrontPageImageOnCanvas(
   ctx: CanvasRenderingContext2D,
   element: FrontPageElement
 ): Promise<void> {
-  if (!element.src) return
+  const src = element.src
+  if (!src) return
 
   return new Promise<void>((resolve) => {
     const img = new Image()
@@ -470,7 +473,7 @@ async function renderFrontPageImageOnCanvas(
       console.error('❌ Bild konnte nicht geladen werden:', element.id)
       resolve()
     }
-    img.src = element.src
+    img.src = src
   })
 }
 

@@ -50,7 +50,7 @@
     "typescript": "^5.3.0",
     "vite": "^5.0.0",
     "vue-eslint-parser": "^10.4.1",
-    "vue-tsc": "^1.8.27"
+    "vue-tsc": "^3.3.11"
   },
   "build": {
     "appId": "com.kodinitools.bilderserie-bearbeiten",
@@ -72,42 +72,57 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "electron/icon.ico",
       "requestedExecutionLevel": "asInvoker",
       "fileAssociations": [
         {
-          "ext": ["jpg", "jpeg"],
+          "ext": [
+            "jpg",
+            "jpeg"
+          ],
           "name": "JPEG Image",
           "description": "JPEG Bilddatei",
           "role": "Viewer"
         },
         {
-          "ext": ["png"],
+          "ext": [
+            "png"
+          ],
           "name": "PNG Image",
           "description": "PNG Bilddatei",
           "role": "Viewer"
         },
         {
-          "ext": ["webp"],
+          "ext": [
+            "webp"
+          ],
           "name": "WebP Image",
           "description": "WebP Bilddatei",
           "role": "Viewer"
         },
         {
-          "ext": ["gif"],
+          "ext": [
+            "gif"
+          ],
           "name": "GIF Image",
           "description": "GIF Bilddatei",
           "role": "Viewer"
         },
         {
-          "ext": ["bmp"],
+          "ext": [
+            "bmp"
+          ],
           "name": "BMP Image",
           "description": "BMP Bilddatei",
           "role": "Viewer"
@@ -124,7 +139,10 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Bilderserie Bearbeiten",
       "runAfterFinish": true,
-      "installerLanguages": ["de_DE", "en_US"],
+      "installerLanguages": [
+        "de_DE",
+        "en_US"
+      ],
       "language": "1031",
       "menuCategory": "KodiniTools",
       "deleteAppDataOnUninstall": false,
