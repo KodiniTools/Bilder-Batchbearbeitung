@@ -24,10 +24,6 @@ const goToBlog = () => {
   router.push('/blog')
 }
 
-const goToLearn = () => {
-  router.push('/learn')
-}
-
 const setLanguage = (lang: string) => {
   locale.value = lang
   localStorage.setItem('locale', lang)
@@ -65,7 +61,6 @@ onMounted(() => {
         <div class="nav-links">
           <button class="nav-link" @click="goToApp">{{ t('landing.nav.app') }}</button>
           <button class="nav-link" @click="goToBlog">{{ t('landing.nav.blog') }}</button>
-          <button class="nav-link" @click="goToLearn">{{ t('landing.nav.learn') }}</button>
           <button class="nav-link" @click="goToFaq">{{ t('landing.nav.faq') }}</button>
           <a class="nav-link" :href="BLOG_ARTICLE_URL" target="_blank" rel="noopener noreferrer">
             {{ t('landing.nav.blogExternal') }}
