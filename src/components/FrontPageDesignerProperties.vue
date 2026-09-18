@@ -17,7 +17,7 @@
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.textLabel') }}</label>
         <textarea
-          v-model="element.content"
+          v-model="content"
           rows="4"
           class="property-textarea"
           :placeholder="t('frontPageDesigner.canvas.emptyText')"
@@ -43,20 +43,14 @@
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.fontSize') }}</label>
         <div class="slider-group">
-          <input
-            v-model.number="element.fontSize"
-            type="range"
-            min="12"
-            max="72"
-            class="property-slider"
-          />
+          <input v-model.number="fontSize" type="range" min="12" max="72" class="property-slider" />
           <span class="slider-value">{{ element.fontSize }}px</span>
         </div>
       </div>
 
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.fontFamily') }}</label>
-        <select v-model="element.fontFamily" class="property-select font-select">
+        <select v-model="fontFamily" class="property-select font-select">
           <option
             v-for="font in CUSTOM_FONT_FAMILIES"
             :key="font"
@@ -70,7 +64,7 @@
 
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.fontWeight') }}</label>
-        <select v-model="element.fontWeight" class="property-select">
+        <select v-model="fontWeight" class="property-select">
           <option value="normal">{{ t('frontPageDesigner.properties.fontWeightNormal') }}</option>
           <option value="bold">{{ t('frontPageDesigner.properties.fontWeightBold') }}</option>
         </select>
@@ -82,7 +76,7 @@
           <button
             :class="{ active: element.textAlign === 'left' }"
             :title="t('frontPageDesigner.properties.textAlignLeft')"
-            @click="element.textAlign = 'left'"
+            @click="textAlign = 'left'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +96,7 @@
           <button
             :class="{ active: element.textAlign === 'center' }"
             :title="t('frontPageDesigner.properties.textAlignCenter')"
-            @click="element.textAlign = 'center'"
+            @click="textAlign = 'center'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +116,7 @@
           <button
             :class="{ active: element.textAlign === 'right' }"
             :title="t('frontPageDesigner.properties.textAlignRight')"
-            @click="element.textAlign = 'right'"
+            @click="textAlign = 'right'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -144,7 +138,7 @@
 
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.textColor') }}</label>
-        <input v-model="element.color" type="color" class="color-picker" />
+        <input v-model="color" type="color" class="color-picker" />
       </div>
     </template>
 
@@ -153,13 +147,13 @@
         <label>{{ t('frontPageDesigner.properties.imageSize') }}</label>
         <div class="size-inputs">
           <input
-            v-model.number="element.width"
+            v-model.number="width"
             type="number"
             min="50"
             @input="emit('maintainAspectRatio')"
           />
           <span>×</span>
-          <input v-model.number="element.height" type="number" min="50" />
+          <input v-model.number="height" type="number" min="50" />
         </div>
       </div>
     </template>
@@ -169,11 +163,11 @@
       <div class="size-inputs">
         <div>
           <small>X:</small>
-          <input v-model.number="element.x" type="number" min="0" />
+          <input v-model.number="x" type="number" min="0" />
         </div>
         <div>
           <small>Y:</small>
-          <input v-model.number="element.y" type="number" min="0" />
+          <input v-model.number="y" type="number" min="0" />
         </div>
       </div>
     </div>
@@ -187,19 +181,41 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 import type { FrontPageElement } from './FrontPageDesigner.vue'
 
 const { t } = useI18n()
 
-defineProps<{
+const props = defineProps<{
   element: FrontPageElement | undefined
 }>()
 
 const emit = defineEmits<{
+  /** Teil-Patch für das ausgewählte Element; der Parent wendet ihn an (kein Prop-Mutating) */
+  update: [patch: Partial<FrontPageElement>]
   maintainAspectRatio: []
 }>()
+
+/** Schreibbarer Proxy für ein Element-Feld: liest aus dem Prop, schreibt per update-Emit */
+function field<K extends keyof FrontPageElement>(key: K) {
+  return computed<FrontPageElement[K] | undefined>({
+    get: () => props.element?.[key],
+    set: (value) => emit('update', { [key]: value } as Partial<FrontPageElement>),
+  })
+}
+
+const content = field('content')
+const fontSize = field('fontSize')
+const fontFamily = field('fontFamily')
+const fontWeight = field('fontWeight')
+const textAlign = field('textAlign')
+const color = field('color')
+const width = field('width')
+const height = field('height')
+const x = field('x')
+const y = field('y')
 </script>
 
 <style scoped>

@@ -168,6 +168,7 @@
                 :element="selectedElement"
                 :page-width="pageWidth"
                 :page-height="pageHeight"
+                @update="updateSelectedElement"
                 @move-to-front="moveToFront"
                 @move-to-back="moveToBack"
                 @delete="deleteSelectedElement"
@@ -389,6 +390,7 @@
                       @edit-start="startInlineEdit"
                       @edit-stop="stopInlineEdit"
                       @resize-start="startTextResize"
+                      @update-content="updateElementContent"
                     />
                   </div>
                 </div>
@@ -572,6 +574,17 @@ const {
   pageHeight,
   canvasWrapperRef,
 })
+
+// Property-Panel: Teil-Patch auf das ausgewählte Element anwenden (Single Source of Truth hier)
+function updateSelectedElement(patch) {
+  if (selectedElement.value) Object.assign(selectedElement.value, patch)
+}
+
+// Inline-Editor: Textinhalt eines Elements der aktuellen Seite setzen
+function updateElementContent(id, content) {
+  const el = currentElements.value.find((e) => e.id === id)
+  if (el) el.content = content
+}
 
 // Footer preview text (matches PDF export footer)
 const footerPreviewText = computed(() => {
