@@ -42,12 +42,4 @@
     <priority>0.6</priority>
   </url>
 
-  <url>
-    <loc>https://kodinitools.com/bilderseriebearbeiten/downloads</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/downloads"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/downloads?lang=en"/>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
 </urlset>
