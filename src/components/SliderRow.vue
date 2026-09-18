@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onUnmounted } from 'vue'
+import { computed } from 'vue'
+import NumberSpinner from './NumberSpinner.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -33,11 +34,8 @@ const progress = computed(() => {
 
 const isModified = computed(() => props.modelValue !== props.default)
 
-function clamp(value: number, clampLow = true): number {
-  let v = value
-  if (v > props.max) v = props.max
-  if (clampLow && v < props.min) v = props.min
-  return v
+function clamp(value: number): number {
+  return Math.min(props.max, Math.max(props.min, value))
 }
 
 function emitValue(v: number) {
@@ -50,83 +48,9 @@ function onRangeInput(event: Event) {
   if (!Number.isNaN(v)) emitValue(clamp(v))
 }
 
-// Spinner-Eingabe: obere Grenze sofort, untere erst bei Blur, damit z.B.
-// negative Werte (Minus-Zeichen) noch eingetippt werden können.
-function onSpinnerInput(event: Event) {
-  const raw = (event.target as HTMLInputElement).value
-  if (raw === '' || raw === '-') return
-  const v = Number(raw)
-  if (!Number.isNaN(v)) emitValue(clamp(v, false))
-}
-
-function onSpinnerChange(event: Event) {
-  const v = Number((event.target as HTMLInputElement).value)
-  emitValue(Number.isNaN(v) ? props.default : clamp(v))
-}
-
-function stepBy(direction: 1 | -1) {
-  emitValue(clamp(props.modelValue + direction * props.step))
-}
-
-// Press-and-hold: erst eine Verzögerung, dann fortlaufende Schritte,
-// die mit der Haltezeit leicht beschleunigen.
-let holdTimeout: ReturnType<typeof setTimeout> | null = null
-let holdInterval: ReturnType<typeof setInterval> | null = null
-
-function stopHold() {
-  if (holdTimeout) {
-    clearTimeout(holdTimeout)
-    holdTimeout = null
-  }
-  if (holdInterval) {
-    clearInterval(holdInterval)
-    holdInterval = null
-  }
-  window.removeEventListener('mouseup', stopHold)
-  window.removeEventListener('touchend', stopHold)
-  window.removeEventListener('touchcancel', stopHold)
-}
-
-function startHold(direction: 1 | -1, event: Event) {
-  // Nur primäre Maustaste; bei Touch verhindern wir das nachgelagerte Klick-Event
-  if (event instanceof MouseEvent && event.button !== 0) return
-  if (event.type === 'touchstart') event.preventDefault()
-
-  stopHold()
-  stepBy(direction)
-
-  window.addEventListener('mouseup', stopHold)
-  window.addEventListener('touchend', stopHold)
-  window.addEventListener('touchcancel', stopHold)
-
-  holdTimeout = setTimeout(() => {
-    let delay = 90
-    const tick = () => {
-      // An der Grenze anhalten
-      if (
-        (direction === 1 && props.modelValue >= props.max) ||
-        (direction === -1 && props.modelValue <= props.min)
-      ) {
-        stopHold()
-        return
-      }
-      stepBy(direction)
-      // sanft beschleunigen bis min. 30ms
-      if (delay > 30) {
-        delay = Math.max(30, delay - 8)
-        if (holdInterval) clearInterval(holdInterval)
-        holdInterval = setInterval(tick, delay)
-      }
-    }
-    holdInterval = setInterval(tick, delay)
-  }, 350)
-}
-
 function resetValue() {
   emitValue(props.default)
 }
-
-onUnmounted(stopHold)
 </script>
 
 <template>
@@ -148,41 +72,15 @@ onUnmounted(stopHold)
     />
 
     <div class="slider-controls">
-      <div class="num-spinner">
-        <input
-          class="spin-input"
-          type="number"
-          :min="min"
-          :max="max"
-          :step="step"
-          :value="modelValue"
-          @input="onSpinnerInput"
-          @change="onSpinnerChange"
-        />
-        <span v-if="unit" class="spin-unit">{{ unit }}</span>
-        <div class="spin-buttons">
-          <button
-            type="button"
-            class="spin-btn"
-            tabindex="-1"
-            :disabled="modelValue >= max"
-            @mousedown="startHold(1, $event)"
-            @touchstart.prevent="startHold(1, $event)"
-          >
-            <i class="fa-solid fa-chevron-up"></i>
-          </button>
-          <button
-            type="button"
-            class="spin-btn"
-            tabindex="-1"
-            :disabled="modelValue <= min"
-            @mousedown="startHold(-1, $event)"
-            @touchstart.prevent="startHold(-1, $event)"
-          >
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-        </div>
-      </div>
+      <NumberSpinner
+        :model-value="modelValue"
+        :min="min"
+        :max="max"
+        :step="step"
+        :unit="unit"
+        :fallback="props.default"
+        @update:model-value="emitValue"
+      />
 
       <button
         class="btn-reset-slider"
@@ -237,85 +135,6 @@ onUnmounted(stopHold)
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
-}
-
-.num-spinner {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  height: 26px;
-  padding: 0 2px 0 5px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg);
-  transition: border-color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.num-spinner:focus-within {
-  border-color: var(--accent);
-}
-
-.spin-input {
-  width: 30px;
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  text-align: right;
-  outline: none;
-  padding: 0;
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
-.spin-input::-webkit-inner-spin-button,
-.spin-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.spin-unit {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--muted);
-  flex-shrink: 0;
-}
-
-.spin-buttons {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.spin-btn {
-  width: 16px;
-  height: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 0;
-  font-size: 0.5rem;
-  border-radius: 2px;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease;
-}
-
-.spin-btn:hover:not(:disabled) {
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 15%, transparent);
-}
-
-.spin-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
 }
 
 .btn-reset-slider {

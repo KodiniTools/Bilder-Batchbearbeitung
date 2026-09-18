@@ -7,38 +7,32 @@
     <div class="resize-inputs">
       <div class="resize-field">
         <label for="batch-resize-width">{{ t('batchEdit.transforms.resize.width') }}</label>
-        <div class="resize-input-wrapper">
-          <input
-            id="batch-resize-width"
-            type="number"
-            min="1"
-            max="10000"
-            class="resize-input"
-            :value="width"
-            :disabled="isApplying"
-            @input="onWidthInput"
-          />
-          <span class="resize-unit">px</span>
-        </div>
+        <NumberSpinner
+          id="batch-resize-width"
+          :model-value="width"
+          :min="1"
+          :max="10000"
+          unit="px"
+          fluid
+          :disabled="isApplying"
+          @update:model-value="onWidthUpdate"
+        />
       </div>
       <div class="resize-link-icon" :class="{ active: keepAspect }">
         <i class="fa-solid fa-link"></i>
       </div>
       <div class="resize-field">
         <label for="batch-resize-height">{{ t('batchEdit.transforms.resize.height') }}</label>
-        <div class="resize-input-wrapper">
-          <input
-            id="batch-resize-height"
-            type="number"
-            min="1"
-            max="10000"
-            class="resize-input"
-            :value="height"
-            :disabled="isApplying"
-            @input="onHeightInput"
-          />
-          <span class="resize-unit">px</span>
-        </div>
+        <NumberSpinner
+          id="batch-resize-height"
+          :model-value="height"
+          :min="1"
+          :max="10000"
+          unit="px"
+          fluid
+          :disabled="isApplying"
+          @update:model-value="onHeightUpdate"
+        />
       </div>
     </div>
     <div class="checkbox-group">
@@ -86,6 +80,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import NumberSpinner from '../NumberSpinner.vue'
 
 const { t } = useI18n()
 
@@ -115,13 +110,13 @@ const emit = defineEmits<{
 }>()
 
 // Reihenfolge ist wichtig: erst Wert übernehmen, dann Kopplungslogik auslösen
-function onWidthInput(event: Event) {
-  emit('update:width', Number((event.target as HTMLInputElement).value))
+function onWidthUpdate(value: number) {
+  emit('update:width', value)
   emit('width-change')
 }
 
-function onHeightInput(event: Event) {
-  emit('update:height', Number((event.target as HTMLInputElement).value))
+function onHeightUpdate(value: number) {
+  emit('update:height', value)
   emit('height-change')
 }
 
@@ -151,51 +146,6 @@ function onKeepAspectInput(event: Event) {
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--muted);
-}
-
-.resize-input-wrapper {
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  overflow: hidden;
-}
-
-.resize-input {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
-  padding: var(--space-2) var(--space-2);
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-size: 0.875rem;
-  font-family: var(--font-mono);
-  outline: none;
-  -moz-appearance: textfield;
-}
-
-.resize-input::-webkit-inner-spin-button,
-.resize-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.resize-input:focus {
-  outline: none;
-}
-
-.resize-input-wrapper:focus-within {
-  border-color: var(--accent);
-}
-
-.resize-unit {
-  padding: 0 var(--space-2);
-  font-size: 0.8rem;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  flex-shrink: 0;
 }
 
 .resize-link-icon {
