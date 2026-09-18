@@ -29,10 +29,10 @@ const webRoutes = [
     name: 'learn',
     component: () => import('@/views/LearnPage.vue'),
   },
+  // Ehemalige Downloads-Seite entfernt; alte Links und Suchindex-Einträge landen auf der Startseite
   {
     path: '/downloads',
-    name: 'downloads',
-    component: () => import('@/views/DownloadsPage.vue'),
+    redirect: '/',
   },
 ]
 
