@@ -488,7 +488,7 @@
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CommentPageDesignerElement from './CommentPageDesignerElement.vue'
@@ -496,36 +496,40 @@ import CommentPageDesignerProperties from './CommentPageDesignerProperties.vue'
 import CommentPageDesignerPreview from './CommentPageDesignerPreview.vue'
 import { useCommentPages } from '@/composables/useCommentPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
+import type { CanvasElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
 // Props — v-model based public API
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-  initialElements: {
-    type: Array,
-    default: () => [],
-  },
-  orientation: {
-    type: String,
-    default: 'portrait',
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    /** Sichtbarkeit des Designers (v-model) */
+    modelValue?: boolean
+    /** Bereits gespeicherte Elemente, werden beim Öffnen geladen */
+    initialElements?: CanvasElement[]
+    orientation?: 'portrait' | 'landscape'
+  }>(),
+  {
+    modelValue: false,
+    initialElements: () => [],
+    orientation: 'portrait',
+  }
+)
 
 // Emits — v-model and @save
-const emit = defineEmits(['update:modelValue', 'save'])
+const emit = defineEmits<{
+  'update:modelValue': [visible: boolean]
+  save: [elements: CanvasElement[]]
+}>()
 
 // Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
 const pageWidth = computed(() => (props.orientation === 'landscape' ? 1123 : 794))
 const pageHeight = computed(() => (props.orientation === 'landscape' ? 794 : 1123))
 
 // Template refs
-const canvasRef = ref(null)
-const canvasWrapperRef = ref(null)
-const imageInput = ref(null)
+const canvasRef = ref<HTMLElement | null>(null)
+const canvasWrapperRef = ref<HTMLElement | null>(null)
+const imageInput = ref<HTMLInputElement | null>(null)
 
 // Vorschau-State
 const showPreview = ref(false)
@@ -576,12 +580,12 @@ const {
 })
 
 // Property-Panel: Teil-Patch auf das ausgewählte Element anwenden (Single Source of Truth hier)
-function updateSelectedElement(patch) {
+function updateSelectedElement(patch: Partial<CanvasElement>) {
   if (selectedElement.value) Object.assign(selectedElement.value, patch)
 }
 
 // Inline-Editor: Textinhalt eines Elements der aktuellen Seite setzen
-function updateElementContent(id, content) {
+function updateElementContent(id: string, content: string) {
   const el = currentElements.value.find((e) => e.id === id)
   if (el) el.content = content
 }
@@ -628,7 +632,7 @@ function handleSave() {
 }
 
 // Keyboard shortcuts
-function handleKeyDown(event) {
+function handleKeyDown(event: KeyboardEvent) {
   // Don't handle shortcuts while editing text inline
   if (editingTextId.value) return
 
