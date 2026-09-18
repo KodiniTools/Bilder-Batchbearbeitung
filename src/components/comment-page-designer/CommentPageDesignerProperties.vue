@@ -283,7 +283,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
+import { CUSTOM_FONT_FAMILIES } from '../FrontPageDesigner.vue'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
