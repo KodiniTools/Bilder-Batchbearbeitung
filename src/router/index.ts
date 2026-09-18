@@ -24,14 +24,13 @@ const webRoutes = [
     name: 'blog',
     component: () => import('@/views/BlogPage.vue'),
   },
-  {
-    path: '/learn',
-    name: 'learn',
-    component: () => import('@/views/LearnPage.vue'),
-  },
-  // Ehemalige Downloads-Seite entfernt; alte Links und Suchindex-Einträge landen auf der Startseite
+  // Ehemalige Seiten entfernt; alte Links und Suchindex-Einträge landen auf der Startseite
   {
     path: '/downloads',
+    redirect: '/',
+  },
+  {
+    path: '/learn',
     redirect: '/',
   },
 ]
