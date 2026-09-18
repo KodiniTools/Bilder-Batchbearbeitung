@@ -1,0 +1,111 @@
+/* Gemeinsame Styles der Stapelbearbeitungs-Module.
+   Wird per `@import './batch-edit-shared.css'` in jedem <style scoped> eingebunden,
+   damit die Regeln pro Komponente gescoped bleiben. */
+
+.section-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: var(--space-2) 0;
+}
+
+.transform-subsection {
+  background: color-mix(in oklab, var(--bg) 50%, transparent);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.transform-subsection h4 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.transform-subsection h4 i {
+  color: var(--muted);
+  width: 16px;
+  text-align: center;
+}
+
+.color-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.color-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.color-input-wrapper input[type='color'] {
+  width: 36px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px;
+  background: var(--bg);
+}
+
+.color-input-wrapper .color-value {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-label input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
