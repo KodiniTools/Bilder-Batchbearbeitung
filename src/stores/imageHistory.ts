@@ -56,6 +56,12 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
   const canUndo = ref(false)
   const canRedo = ref(false)
 
+  /**
+   * Monoton steigender Zähler; ändert sich bei jedem commit/undo/redo/reset.
+   * Damit kann ein Aufrufer erkennen, ob "sein" Schritt noch der jüngste ist.
+   */
+  const version = ref(0)
+
   // Verhindert, dass restore()-Mutationen selbst wieder committet werden.
   const isRestoring = ref(false)
 
@@ -69,6 +75,7 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
   function refresh() {
     canUndo.value = past.length > 0
     canRedo.value = future.length > 0
+    version.value++
   }
 
   /**
@@ -199,5 +206,5 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
     refresh()
   }
 
-  return { commit, undo, redo, reset, canUndo, canRedo, isRestoring }
+  return { commit, undo, redo, reset, canUndo, canRedo, isRestoring, version }
 }

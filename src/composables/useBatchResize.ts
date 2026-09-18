@@ -18,7 +18,28 @@ export function useBatchResize() {
   const keepAspect = ref(true)
   const aspectRatio = ref(1920 / 1080)
 
-  const canApply = computed(() => imageStore.hasSelection && width.value > 0 && height.value > 0)
+  /** Läuft gerade eine Größenänderung (Quelle: Store-Fortschritt)? */
+  const isApplying = computed(() => imageStore.resizeProgress.active)
+  const progressCurrent = computed(() => imageStore.resizeProgress.current)
+  const progressTotal = computed(() => imageStore.resizeProgress.total)
+
+  const canApply = computed(
+    () => imageStore.hasSelection && width.value > 0 && height.value > 0 && !isApplying.value
+  )
+
+  /**
+   * Historien-Version direkt nach der letzten hier ausgelösten Größenänderung.
+   * "Rückgängig" ist nur möglich, solange dieser Schritt der jüngste in der
+   * globalen Historie ist; jede weitere Aktion (Filter, Undo, ...) hebt das auf.
+   */
+  const lastResizeVersion = ref<number | null>(null)
+  const canUndoResize = computed(
+    () =>
+      lastResizeVersion.value !== null &&
+      imageStore.canUndo &&
+      imageStore.historyVersion === lastResizeVersion.value &&
+      !isApplying.value
+  )
 
   /** Höhe aus Breite ableiten, wenn das Seitenverhältnis gekoppelt ist */
   function onWidthChange() {
@@ -53,7 +74,17 @@ export function useBatchResize() {
   async function applyResize() {
     if (!canApply.value) return
     await imageStore.resizeSelectedImages(width.value, height.value, keepAspect.value)
+    lastResizeVersion.value = imageStore.historyVersion
     toast.success(t('batchEdit.resize.toast', { count: imageStore.selectedCount }))
+  }
+
+  /** Letzte Größenänderung über die globale Historie zurücknehmen */
+  function undoResize() {
+    if (!canUndoResize.value) return
+    imageStore.undo()
+    lastResizeVersion.value = null
+    initFromSelection()
+    toast.success(t('batchEdit.resize.undoToast'))
   }
 
   return {
@@ -61,10 +92,15 @@ export function useBatchResize() {
     height,
     keepAspect,
     canApply,
+    isApplying,
+    progressCurrent,
+    progressTotal,
+    canUndoResize,
     onWidthChange,
     onHeightChange,
     onKeepAspectChange,
     initFromSelection,
     applyResize,
+    undoResize,
   }
 }

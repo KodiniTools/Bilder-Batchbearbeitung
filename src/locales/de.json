@@ -897,7 +897,10 @@
         "width": "Breite",
         "height": "Höhe",
         "keepAspect": "Seitenverhältnis beibehalten",
-        "apply": "Größe anwenden"
+        "apply": "Größe anwenden",
+        "applying": "Wird angewendet… {current}/{total}",
+        "undo": "Rückgängig",
+        "undoTitle": "Letzte Größenänderung rückgängig machen"
       },
       "border": {
         "title": "Bildrand",
@@ -940,7 +943,8 @@
       }
     },
     "resize": {
-      "toast": "Größe von {count} Bild(ern) geändert"
+      "toast": "Größe von {count} Bild(ern) geändert",
+      "undoToast": "Größenänderung rückgängig gemacht"
     },
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",

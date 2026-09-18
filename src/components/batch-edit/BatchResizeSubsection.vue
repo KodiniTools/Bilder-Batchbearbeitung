@@ -15,6 +15,7 @@
             max="10000"
             class="resize-input"
             :value="width"
+            :disabled="isApplying"
             @input="onWidthInput"
           />
           <span class="resize-unit">px</span>
@@ -33,6 +34,7 @@
             max="10000"
             class="resize-input"
             :value="height"
+            :disabled="isApplying"
             @input="onHeightInput"
           />
           <span class="resize-unit">px</span>
@@ -41,14 +43,44 @@
     </div>
     <div class="checkbox-group">
       <label class="checkbox-label">
-        <input type="checkbox" :checked="keepAspect" @change="onKeepAspectInput" />
+        <input
+          type="checkbox"
+          :checked="keepAspect"
+          :disabled="isApplying"
+          @change="onKeepAspectInput"
+        />
         <span>{{ t('batchEdit.transforms.resize.keepAspect') }}</span>
       </label>
     </div>
-    <button class="btn btn-apply-resize" type="button" :disabled="!canApply" @click="emit('apply')">
-      <i class="fa-solid fa-check"></i>
-      {{ t('batchEdit.transforms.resize.apply') }}
-    </button>
+    <div class="resize-actions">
+      <button
+        class="btn btn-apply-resize"
+        type="button"
+        :disabled="!canApply"
+        :aria-busy="isApplying"
+        @click="emit('apply')"
+      >
+        <i :class="isApplying ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-check'"></i>
+        {{
+          isApplying
+            ? t('batchEdit.transforms.resize.applying', {
+                current: progressCurrent,
+                total: progressTotal,
+              })
+            : t('batchEdit.transforms.resize.apply')
+        }}
+      </button>
+      <button
+        class="btn btn-undo-resize"
+        type="button"
+        :disabled="!canUndo"
+        :title="t('batchEdit.transforms.resize.undoTitle')"
+        @click="emit('undo')"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+        {{ t('batchEdit.transforms.resize.undo') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -62,6 +94,12 @@ defineProps<{
   height: number
   keepAspect: boolean
   canApply: boolean
+  /** Größenänderung läuft: Spinner zeigen, Eingaben sperren */
+  isApplying: boolean
+  progressCurrent: number
+  progressTotal: number
+  /** Letzte Größenänderung ist noch der jüngste Historienschritt */
+  canUndo: boolean
 }>()
 
 const emit = defineEmits<{
@@ -73,6 +111,7 @@ const emit = defineEmits<{
   'height-change': []
   'keep-aspect-change': []
   apply: []
+  undo: []
 }>()
 
 // Reihenfolge ist wichtig: erst Wert übernehmen, dann Kopplungslogik auslösen
@@ -177,6 +216,12 @@ function onKeepAspectInput(event: Event) {
   opacity: 1;
 }
 
+.resize-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .btn-apply-resize {
   width: 100%;
   padding: var(--space-2) var(--space-3);
@@ -200,6 +245,39 @@ function onKeepAspectInput(event: Event) {
 }
 
 .btn-apply-resize:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-apply-resize[aria-busy='true'] {
+  opacity: 0.85;
+  cursor: progress;
+}
+
+.btn-undo-resize {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--btn);
+  color: var(--text);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.btn-undo-resize:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-undo-resize:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
