@@ -10,10 +10,23 @@ export default [
   js.configs.recommended,
 
   // Browser globals (window, document, localStorage, fetch, etc.)
+  // + Compile-time constants injected via Vite `define`
   {
     languageOptions: {
       globals: {
         ...globals.browser,
+        __APP_VERSION__: 'readonly',
+      },
+    },
+  },
+
+  // Electron main/preload: CommonJS with Node globals (require, process, __dirname)
+  {
+    files: ['electron/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
       },
     },
   },

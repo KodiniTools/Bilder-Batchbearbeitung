@@ -98,8 +98,7 @@ function initPool(): void {
       // Alle laufenden Operationen dieses Workers rejekten
       rejectAllPending(entry, 'Worker-Fehler: ' + (err as ErrorEvent).message)
       // Queue sofort leeren – nicht an kaputte Worker weiterleiten
-      while (pendingQueue.length > 0) {
-        const queued = pendingQueue.shift()!
+      for (const queued of pendingQueue.splice(0)) {
         queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
       }
       // Späte dispatch()-Aufrufe (nach createImageBitmap) sofort rejecten,

@@ -191,6 +191,7 @@
 
               <FrontPageDesignerProperties
                 :element="selectedElement"
+                @update="updateSelectedElement"
                 @maintain-aspect-ratio="maintainAspectRatio"
               />
             </div>
@@ -583,6 +584,12 @@ function clearCanvas() {
 function updateElementContent(id: string, content: string) {
   const el = elements.value.find((e) => e.id === id)
   if (el) el.content = content
+}
+
+// Property-Panel: Teil-Patch auf das ausgewählte Element anwenden (Single Source of Truth hier)
+function updateSelectedElement(patch: Partial<FrontPageElement>) {
+  const el = selectedElement.value
+  if (el) Object.assign(el, patch)
 }
 
 // Selection

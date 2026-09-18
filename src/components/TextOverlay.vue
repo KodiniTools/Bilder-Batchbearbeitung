@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { onUnmounted } from 'vue'
 import type { TextItem } from '@/lib/core/types'
 
 const props = defineProps<{
@@ -38,8 +38,6 @@ const emit = defineEmits<{
   'update:items': [items: TextItem[]]
   deleteItem: [id: string]
 }>()
-
-const overlayRef = ref<HTMLDivElement | null>(null)
 
 let dragging = false
 let dragItemId = ''

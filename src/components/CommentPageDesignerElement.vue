@@ -36,7 +36,7 @@
       <textarea
         v-else
         ref="inlineTextareaRef"
-        v-model="element.content"
+        :value="element.content"
         class="inline-text-editor"
         :style="{
           fontSize: element.fontSize + 'px',
@@ -46,6 +46,7 @@
           fontWeight: element.bold ? 'bold' : 'normal',
           fontStyle: element.italic ? 'italic' : 'normal',
         }"
+        @input="emit('updateContent', element.id, ($event.target as HTMLTextAreaElement).value)"
         @click.stop
         @mousedown.stop
         @blur="emit('editStop')"
@@ -100,6 +101,7 @@ const emit = defineEmits<{
   editStart: [element: CanvasElement]
   editStop: []
   resizeStart: [event: MouseEvent, direction: string]
+  updateContent: [id: string, content: string]
 }>()
 
 const inlineTextareaRef = ref<HTMLTextAreaElement | null>(null)

@@ -19,7 +19,7 @@
         <label for="text-content">{{ t('commentPageDesigner.properties.textLabel') }}</label>
         <textarea
           id="text-content"
-          v-model="element.content"
+          v-model="content"
           rows="4"
           :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
         ></textarea>
@@ -43,7 +43,7 @@
 
       <div class="property-group">
         <label>{{ t('commentPageDesigner.properties.fontFamily') }}</label>
-        <select v-model="element.fontFamily" class="property-select font-select">
+        <select v-model="fontFamily" class="property-select font-select">
           <option
             v-for="font in CUSTOM_FONT_FAMILIES"
             :key="font"
@@ -59,19 +59,12 @@
         <label for="font-size">
           {{ t('commentPageDesigner.properties.fontSize', { size: element.fontSize }) }}
         </label>
-        <input
-          id="font-size"
-          v-model.number="element.fontSize"
-          type="range"
-          min="10"
-          max="72"
-          step="1"
-        />
+        <input id="font-size" v-model.number="fontSize" type="range" min="10" max="72" step="1" />
       </div>
 
       <div class="property-group">
         <label for="text-color">{{ t('commentPageDesigner.properties.textColor') }}</label>
-        <input id="text-color" v-model="element.color" type="color" />
+        <input id="text-color" v-model="color" type="color" />
       </div>
 
       <div class="property-group">
@@ -80,7 +73,7 @@
           <button
             :class="{ active: element.align === 'left' }"
             :title="t('commentPageDesigner.properties.alignLeft')"
-            @click="element.align = 'left'"
+            @click="align = 'left'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +93,7 @@
           <button
             :class="{ active: element.align === 'center' }"
             :title="t('commentPageDesigner.properties.alignCenter')"
-            @click="element.align = 'center'"
+            @click="align = 'center'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +113,7 @@
           <button
             :class="{ active: element.align === 'right' }"
             :title="t('commentPageDesigner.properties.alignRight')"
-            @click="element.align = 'right'"
+            @click="align = 'right'"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -142,11 +135,11 @@
 
       <div class="property-group">
         <label>
-          <input v-model="element.bold" type="checkbox" />
+          <input v-model="bold" type="checkbox" />
           {{ t('commentPageDesigner.properties.bold') }}
         </label>
         <label>
-          <input v-model="element.italic" type="checkbox" />
+          <input v-model="italic" type="checkbox" />
           {{ t('commentPageDesigner.properties.italic') }}
         </label>
       </div>
@@ -157,7 +150,7 @@
         </label>
         <input
           id="text-width"
-          v-model.number="element.width"
+          v-model.number="width"
           type="range"
           min="80"
           :max="pageWidth"
@@ -171,7 +164,7 @@
         </label>
         <input
           id="text-height"
-          v-model.number="element.height"
+          v-model.number="height"
           type="range"
           min="30"
           :max="pageHeight"
@@ -186,14 +179,7 @@
         <label for="img-width">
           {{ t('commentPageDesigner.properties.width', { width: element.width }) }}
         </label>
-        <input
-          id="img-width"
-          v-model.number="element.width"
-          type="range"
-          min="50"
-          max="500"
-          step="10"
-        />
+        <input id="img-width" v-model.number="width" type="range" min="50" max="500" step="10" />
       </div>
 
       <div class="property-group">
@@ -206,7 +192,7 @@
         </label>
         <input
           id="img-opacity"
-          v-model.number="element.opacity"
+          v-model.number="opacity"
           type="range"
           min="0.1"
           max="1"
@@ -221,12 +207,12 @@
       <div class="position-inputs">
         <div>
           <span>X:</span>
-          <input v-model.number="element.x" type="number" min="0" :max="pageWidth" step="1" />
+          <input v-model.number="x" type="number" min="0" :max="pageWidth" step="1" />
           px
         </div>
         <div>
           <span>Y:</span>
-          <input v-model.number="element.y" type="number" min="0" :max="pageHeight" step="1" />
+          <input v-model.number="y" type="number" min="0" :max="pageHeight" step="1" />
           px
         </div>
       </div>
@@ -295,23 +281,47 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
-defineProps<{
+const props = defineProps<{
   element: CanvasElement | null
   pageWidth: number
   pageHeight: number
 }>()
 
 const emit = defineEmits<{
+  /** Teil-Patch für das ausgewählte Element; der Parent wendet ihn an (kein Prop-Mutating) */
+  update: [patch: Partial<CanvasElement>]
   moveToFront: []
   moveToBack: []
   delete: []
 }>()
+
+/** Schreibbarer Proxy für ein Element-Feld: liest aus dem Prop, schreibt per update-Emit */
+function field<K extends keyof CanvasElement>(key: K) {
+  return computed<CanvasElement[K] | undefined>({
+    get: () => props.element?.[key],
+    set: (value) => emit('update', { [key]: value } as Partial<CanvasElement>),
+  })
+}
+
+const content = field('content')
+const fontFamily = field('fontFamily')
+const fontSize = field('fontSize')
+const color = field('color')
+const align = field('align')
+const bold = field('bold')
+const italic = field('italic')
+const width = field('width')
+const height = field('height')
+const opacity = field('opacity')
+const x = field('x')
+const y = field('y')
 </script>
 
 <style scoped>
