@@ -539,7 +539,7 @@ const transformStyle = computed(() => {
   const style: Record<string, string> = {}
   if (tr.borderWidth > 0) style.border = `${tr.borderWidth}px solid ${tr.borderColor}`
   if (tr.borderRadius > 0) style.borderRadius = `${(tr.borderRadius / 200) * 50}%`
-  if (tr.shadowBlur > 0) {
+  if (ImageProcessor.hasVisibleShadow(tr)) {
     const rgba = ImageProcessor.hexToRgba(tr.shadowColor, tr.shadowOpacity / 100)
     style.boxShadow = `${tr.shadowOffsetX}px ${tr.shadowOffsetY}px ${tr.shadowBlur}px ${rgba}`
   }

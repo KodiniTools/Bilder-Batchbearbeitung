@@ -44,8 +44,8 @@ export interface ImageTransforms {
   shadowBlur: number // 0-50, default 0
   shadowColor: string // hex, default '#000000'
   shadowOpacity: number // 0-100, default 40
-  shadowOffsetX: number // -25 to 25, default 5
-  shadowOffsetY: number // -25 to 25, default 5
+  shadowOffsetX: number // -25 to 25, default 0
+  shadowOffsetY: number // -25 to 25, default 0
 }
 
 export const defaultTransforms: ImageTransforms = {
@@ -55,8 +55,8 @@ export const defaultTransforms: ImageTransforms = {
   shadowBlur: 0,
   shadowColor: '#000000',
   shadowOpacity: 40,
-  shadowOffsetX: 5,
-  shadowOffsetY: 5,
+  shadowOffsetX: 0,
+  shadowOffsetY: 0,
 }
 
 export interface ImageObject {

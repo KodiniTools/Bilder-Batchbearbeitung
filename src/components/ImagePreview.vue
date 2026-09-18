@@ -64,7 +64,7 @@ const transformStyle = computed(() => {
     const pct = (t.borderRadius / 200) * 50
     style.borderRadius = `${pct}%`
   }
-  if (t.shadowBlur > 0) {
+  if (ImageProcessor.hasVisibleShadow(t)) {
     const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
     style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
   }
