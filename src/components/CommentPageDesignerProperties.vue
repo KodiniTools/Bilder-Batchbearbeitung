@@ -4,7 +4,13 @@
 
     <div class="property-group">
       <label>{{ t('commentPageDesigner.properties.elementType') }}</label>
-      <div class="property-value">{{ element.type === 'text' ? t('commentPageDesigner.properties.typeText') : t('commentPageDesigner.properties.typeImage') }}</div>
+      <div class="property-value">
+        {{
+          element.type === 'text'
+            ? t('commentPageDesigner.properties.typeText')
+            : t('commentPageDesigner.properties.typeImage')
+        }}
+      </div>
     </div>
 
     <!-- Text Properties -->
@@ -12,13 +18,21 @@
       <div class="property-group">
         <label for="text-content">{{ t('commentPageDesigner.properties.textLabel') }}</label>
         <textarea
-            id="text-content"
-            v-model="element.content"
-            rows="4"
-            :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
+          id="text-content"
+          v-model="element.content"
+          rows="4"
+          :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
         ></textarea>
         <div class="inline-edit-hint">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -35,40 +49,48 @@
             :key="font"
             :value="font"
             :style="{ fontFamily: font }"
-          >{{ font }}</option>
+          >
+            {{ font }}
+          </option>
         </select>
       </div>
 
       <div class="property-group">
-        <label for="font-size">{{ t('commentPageDesigner.properties.fontSize', { size: element.fontSize }) }}</label>
+        <label for="font-size">
+          {{ t('commentPageDesigner.properties.fontSize', { size: element.fontSize }) }}
+        </label>
         <input
-            id="font-size"
-            v-model.number="element.fontSize"
-            type="range"
-            min="10"
-            max="72"
-            step="1"
-        >
+          id="font-size"
+          v-model.number="element.fontSize"
+          type="range"
+          min="10"
+          max="72"
+          step="1"
+        />
       </div>
 
       <div class="property-group">
         <label for="text-color">{{ t('commentPageDesigner.properties.textColor') }}</label>
-        <input
-            id="text-color"
-            v-model="element.color"
-            type="color"
-        >
+        <input id="text-color" v-model="element.color" type="color" />
       </div>
 
       <div class="property-group">
         <label>{{ t('commentPageDesigner.properties.textAlignment') }}</label>
         <div class="align-buttons">
           <button
-              :class="{ active: element.align === 'left' }"
-              :title="t('commentPageDesigner.properties.alignLeft')"
-              @click="element.align = 'left'"
+            :class="{ active: element.align === 'left' }"
+            :title="t('commentPageDesigner.properties.alignLeft')"
+            @click="element.align = 'left'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="17" y1="10" x2="3" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -76,11 +98,19 @@
             </svg>
           </button>
           <button
-              :class="{ active: element.align === 'center' }"
-              :title="t('commentPageDesigner.properties.alignCenter')"
-              @click="element.align = 'center'"
+            :class="{ active: element.align === 'center' }"
+            :title="t('commentPageDesigner.properties.alignCenter')"
+            @click="element.align = 'center'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="18" y1="10" x2="6" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -88,11 +118,19 @@
             </svg>
           </button>
           <button
-              :class="{ active: element.align === 'right' }"
-              :title="t('commentPageDesigner.properties.alignRight')"
-              @click="element.align = 'right'"
+            :class="{ active: element.align === 'right' }"
+            :title="t('commentPageDesigner.properties.alignRight')"
+            @click="element.align = 'right'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="21" y1="10" x2="7" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -104,64 +142,76 @@
 
       <div class="property-group">
         <label>
-          <input v-model="element.bold" type="checkbox">
+          <input v-model="element.bold" type="checkbox" />
           {{ t('commentPageDesigner.properties.bold') }}
         </label>
         <label>
-          <input v-model="element.italic" type="checkbox">
+          <input v-model="element.italic" type="checkbox" />
           {{ t('commentPageDesigner.properties.italic') }}
         </label>
       </div>
 
       <div class="property-group">
-        <label for="text-width">{{ t('commentPageDesigner.properties.width', { width: element.width }) }}</label>
+        <label for="text-width">
+          {{ t('commentPageDesigner.properties.width', { width: element.width }) }}
+        </label>
         <input
-            id="text-width"
-            v-model.number="element.width"
-            type="range"
-            min="80"
-            :max="pageWidth"
-            step="10"
-        >
+          id="text-width"
+          v-model.number="element.width"
+          type="range"
+          min="80"
+          :max="pageWidth"
+          step="10"
+        />
       </div>
 
       <div class="property-group">
-        <label for="text-height">{{ t('commentPageDesigner.properties.height', { height: element.height }) }}</label>
+        <label for="text-height">
+          {{ t('commentPageDesigner.properties.height', { height: element.height }) }}
+        </label>
         <input
-            id="text-height"
-            v-model.number="element.height"
-            type="range"
-            min="30"
-            :max="pageHeight"
-            step="10"
-        >
+          id="text-height"
+          v-model.number="element.height"
+          type="range"
+          min="30"
+          :max="pageHeight"
+          step="10"
+        />
       </div>
     </template>
 
     <!-- Image Properties -->
     <template v-if="element.type === 'image'">
       <div class="property-group">
-        <label for="img-width">{{ t('commentPageDesigner.properties.width', { width: element.width }) }}</label>
+        <label for="img-width">
+          {{ t('commentPageDesigner.properties.width', { width: element.width }) }}
+        </label>
         <input
-            id="img-width"
-            v-model.number="element.width"
-            type="range"
-            min="50"
-            max="500"
-            step="10"
-        >
+          id="img-width"
+          v-model.number="element.width"
+          type="range"
+          min="50"
+          max="500"
+          step="10"
+        />
       </div>
 
       <div class="property-group">
-        <label for="img-opacity">{{ t('commentPageDesigner.properties.opacity', { opacity: Math.round((element.opacity ?? 1) * 100) }) }}</label>
+        <label for="img-opacity">
+          {{
+            t('commentPageDesigner.properties.opacity', {
+              opacity: Math.round((element.opacity ?? 1) * 100),
+            })
+          }}
+        </label>
         <input
-            id="img-opacity"
-            v-model.number="element.opacity"
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.1"
-        >
+          id="img-opacity"
+          v-model.number="element.opacity"
+          type="range"
+          min="0.1"
+          max="1"
+          step="0.1"
+        />
       </div>
     </template>
 
@@ -171,23 +221,13 @@
       <div class="position-inputs">
         <div>
           <span>X:</span>
-          <input
-              v-model.number="element.x"
-              type="number"
-              min="0"
-              :max="pageWidth"
-              step="1"
-          > px
+          <input v-model.number="element.x" type="number" min="0" :max="pageWidth" step="1" />
+          px
         </div>
         <div>
           <span>Y:</span>
-          <input
-              v-model.number="element.y"
-              type="number"
-              min="0"
-              :max="pageHeight"
-              step="1"
-          > px
+          <input v-model.number="element.y" type="number" min="0" :max="pageHeight" step="1" />
+          px
         </div>
       </div>
     </div>
@@ -196,14 +236,36 @@
     <div class="property-group">
       <label>{{ t('commentPageDesigner.properties.layer') }}</label>
       <div class="layer-buttons">
-        <button :title="t('commentPageDesigner.properties.toFrontTooltip')" @click="emit('moveToFront')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+          :title="t('commentPageDesigner.properties.toFrontTooltip')"
+          @click="emit('moveToFront')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <polyline points="18 15 12 9 6 15"></polyline>
           </svg>
           {{ t('commentPageDesigner.properties.toFrontButton') }}
         </button>
-        <button :title="t('commentPageDesigner.properties.toBackTooltip')" @click="emit('moveToBack')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+          :title="t('commentPageDesigner.properties.toBackTooltip')"
+          @click="emit('moveToBack')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           {{ t('commentPageDesigner.properties.toBackButton') }}
@@ -213,9 +275,19 @@
 
     <!-- Delete Button -->
     <button class="delete-element-btn" @click="emit('delete')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <path
+          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+        ></path>
       </svg>
       {{ t('commentPageDesigner.properties.deleteElement') }}
     </button>
@@ -307,7 +379,7 @@ const emit = defineEmits<{
 }
 
 .property-group textarea,
-.property-group input[type="number"] {
+.property-group input[type='number'] {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
@@ -320,12 +392,12 @@ const emit = defineEmits<{
 }
 
 .property-group textarea:focus,
-.property-group input[type="number"]:focus {
+.property-group input[type='number']:focus {
   outline: none;
   border-color: var(--accent);
 }
 
-.property-group input[type="range"] {
+.property-group input[type='range'] {
   width: 100%;
   height: 6px;
   border-radius: 3px;
@@ -334,7 +406,7 @@ const emit = defineEmits<{
   -webkit-appearance: none;
 }
 
-.property-group input[type="range"]::-webkit-slider-thumb {
+.property-group input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
@@ -345,7 +417,7 @@ const emit = defineEmits<{
   box-shadow: 0 2px 4px var(--shadow-color);
 }
 
-.property-group input[type="color"] {
+.property-group input[type='color'] {
   width: 100%;
   height: 40px;
   border: 1px solid var(--border-color);
@@ -388,7 +460,7 @@ const emit = defineEmits<{
   border-color: var(--accent);
 }
 
-.property-group label input[type="checkbox"] {
+.property-group label input[type='checkbox'] {
   margin-right: 6px;
 }
 

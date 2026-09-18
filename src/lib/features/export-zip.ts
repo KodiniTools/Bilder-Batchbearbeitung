@@ -49,18 +49,15 @@ export async function exportImagesAsZip(
       }
 
       const exportFormat = format || image.exportFormat || 'png'
-      const exportQuality = format === 'png' ? 1.0 : (quality / 100) || 0.92
+      const exportQuality = format === 'png' ? 1.0 : quality / 100 || 0.92
       // Canvas mit angewendeten Filtern und Transformationen holen
       // PNG ohne Transparenz: Hintergrundfarbe setzen
-      const backgroundColor = (exportFormat === 'png' && !pngTransparent)
-        ? pngBackgroundColor
-        : undefined
+      const backgroundColor =
+        exportFormat === 'png' && !pngTransparent ? pngBackgroundColor : undefined
       const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
       const blob = await canvasToBlob(exportCanvas, exportFormat, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
-      const fileNameWithExt = fileName.includes('.')
-        ? fileName
-        : `${fileName}.${exportFormat}`
+      const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}.${exportFormat}`
       folder.file(fileNameWithExt, blob)
     } catch (error) {
       console.warn(`Fehler beim Hinzufügen von ${image.file?.name}:`, error)
@@ -68,17 +65,17 @@ export async function exportImagesAsZip(
   }
 
   // ZIP generieren und downloaden
-  const blob = await zip.generateAsync({ 
+  const blob = await zip.generateAsync({
     type: 'blob',
     compression: 'DEFLATE',
-    compressionOptions: { level: 6 }
+    compressionOptions: { level: 6 },
   })
 
   let fileName = zipFileName || `bilder_${new Date().toISOString().slice(0, 10)}.zip`
   if (!fileName.endsWith('.zip')) {
     fileName += '.zip'
   }
-  
+
   downloadBlob(blob, fileName)
 }
 
@@ -91,7 +88,7 @@ function canvasToBlob(
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const mimeType = `image/${format === 'jpg' ? 'jpeg' : format}`
-    
+
     canvas.toBlob(
       (blob) => {
         if (blob) {
@@ -112,11 +109,11 @@ function downloadBlob(blob: Blob, fileName: string): void {
   link.href = url
   link.download = fileName
   link.style.display = 'none'
-  
+
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  
+
   // URL nach kurzer Verzögerung freigeben
   setTimeout(() => URL.revokeObjectURL(url), 100)
 }

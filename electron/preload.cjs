@@ -8,5 +8,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // App metadata
   getVersion: () => ipcRenderer.invoke('get-version'),
-  getPlatform: () => ipcRenderer.invoke('get-platform')
+  getPlatform: () => ipcRenderer.invoke('get-platform'),
 })

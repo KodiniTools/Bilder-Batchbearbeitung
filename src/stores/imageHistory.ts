@@ -17,7 +17,12 @@
 
 import type { Ref } from 'vue'
 import { ref } from 'vue'
-import type { ImageObject, ImageFilters, ImageTransforms, WatermarkSettings } from '@/lib/core/types'
+import type {
+  ImageObject,
+  ImageFilters,
+  ImageTransforms,
+  WatermarkSettings,
+} from '@/lib/core/types'
 
 /** Snapshot eines einzelnen Bildes zu einem Zeitpunkt. */
 interface ImageRecord {
@@ -88,7 +93,7 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
         transforms: img.transforms ? { ...img.transforms } : undefined,
         watermark: img.watermark ? { ...img.watermark } : undefined,
         outputName: img.outputName,
-        selected: img.selected
+        selected: img.selected,
       }
     })
 
@@ -146,7 +151,9 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
     const newSnap = snapshot(present)
     const t = now()
     const coalesce =
-      coalesceKey !== null && coalesceKey === lastCoalesceKey && t - lastCommitAt <= COALESCE_WINDOW_MS
+      coalesceKey !== null &&
+      coalesceKey === lastCoalesceKey &&
+      t - lastCommitAt <= COALESCE_WINDOW_MS
 
     if (coalesce) {
       // Gleiche fortlaufende Operation: Basis-Schritt beibehalten, nur den

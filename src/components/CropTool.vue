@@ -1,16 +1,12 @@
 <template>
-  <div
-    ref="overlayRef"
-    class="crop-overlay"
-    @mousedown.prevent="onOverlayMouseDown"
-  >
+  <div ref="overlayRef" class="crop-overlay" @mousedown.prevent="onOverlayMouseDown">
     <!-- Dark mask outside crop rect (4-piece approach) -->
     <div class="mask mask-top" :style="{ height: crop.y + 'px' }"></div>
     <div class="mask mask-mid" :style="{ top: crop.y + 'px', height: crop.h + 'px' }">
       <div class="mask mask-side mask-left" :style="{ width: crop.x + 'px' }"></div>
-      <div class="mask mask-side mask-right" :style="{ left: (crop.x + crop.w) + 'px' }"></div>
+      <div class="mask mask-side mask-right" :style="{ left: crop.x + crop.w + 'px' }"></div>
     </div>
-    <div class="mask mask-bottom" :style="{ top: (crop.y + crop.h) + 'px' }"></div>
+    <div class="mask mask-bottom" :style="{ top: crop.y + crop.h + 'px' }"></div>
 
     <!-- Crop rectangle -->
     <div
@@ -19,7 +15,7 @@
         left: crop.x + 'px',
         top: crop.y + 'px',
         width: crop.w + 'px',
-        height: crop.h + 'px'
+        height: crop.h + 'px',
       }"
       @mousedown.stop.prevent="onRectMouseDown"
     >
@@ -38,9 +34,7 @@
       ></div>
 
       <!-- Pixel dimensions badge -->
-      <div v-if="crop.w > 80 && crop.h > 40" class="crop-dims">
-        {{ displayW }} × {{ displayH }}
-      </div>
+      <div v-if="crop.w > 80 && crop.h > 40" class="crop-dims">{{ displayW }} × {{ displayH }}</div>
     </div>
   </div>
 </template>
@@ -59,17 +53,17 @@ const emit = defineEmits<{
 }>()
 
 const HANDLES = ['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'] as const
-type Handle = typeof HANDLES[number]
+type Handle = (typeof HANDLES)[number]
 
 const HANDLE_SIDES: Record<Handle, { n: boolean; s: boolean; w: boolean; e: boolean }> = {
-  nw: { n: true,  s: false, w: true,  e: false },
-  n:  { n: true,  s: false, w: false, e: false },
-  ne: { n: true,  s: false, w: false, e: true  },
-  w:  { n: false, s: false, w: true,  e: false },
-  e:  { n: false, s: false, w: false, e: true  },
-  sw: { n: false, s: true,  w: true,  e: false },
-  s:  { n: false, s: true,  w: false, e: false },
-  se: { n: false, s: true,  w: false, e: true  },
+  nw: { n: true, s: false, w: true, e: false },
+  n: { n: true, s: false, w: false, e: false },
+  ne: { n: true, s: false, w: false, e: true },
+  w: { n: false, s: false, w: true, e: false },
+  e: { n: false, s: false, w: false, e: true },
+  sw: { n: false, s: true, w: true, e: false },
+  s: { n: false, s: true, w: false, e: false },
+  se: { n: false, s: true, w: false, e: true },
 }
 
 const MIN_SIZE = 20
@@ -137,7 +131,13 @@ function clientToOverlay(clientX: number, clientY: number) {
   }
 }
 
-function applyLockedRatio(left: number, top: number, right: number, bottom: number, sides: typeof HANDLE_SIDES[Handle]) {
+function applyLockedRatio(
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  sides: (typeof HANDLE_SIDES)[Handle]
+) {
   const ratio = getDisplayRatio()
   if (ratio === null) return { left, top, right, bottom }
   const hasW = sides.w || sides.e
@@ -173,25 +173,28 @@ function initFullCrop() {
   emitCrop()
 }
 
-watch(() => props.lockedRatio, () => {
-  // Adjust existing crop rect to new ratio
-  const { w: ow, h: oh } = overlaySize()
-  const ratio = getDisplayRatio()
-  if (ratio === null) return
+watch(
+  () => props.lockedRatio,
+  () => {
+    // Adjust existing crop rect to new ratio
+    const { w: ow, h: oh } = overlaySize()
+    const ratio = getDisplayRatio()
+    if (ratio === null) return
 
-  const cw = crop.value.w
-  const ch = cw / ratio
+    const cw = crop.value.w
+    const ch = cw / ratio
 
-  let newH = ch
-  if (crop.value.y + newH > oh) {
-    newH = oh - crop.value.y
-    const newW = newH * ratio
-    crop.value = { ...crop.value, w: Math.min(newW, ow - crop.value.x), h: newH }
-  } else {
-    crop.value = { ...crop.value, h: newH }
+    let newH = ch
+    if (crop.value.y + newH > oh) {
+      newH = oh - crop.value.y
+      const newW = newH * ratio
+      crop.value = { ...crop.value, w: Math.min(newW, ow - crop.value.x), h: newH }
+    } else {
+      crop.value = { ...crop.value, h: newH }
+    }
+    emitCrop()
   }
-  emitCrop()
-})
+)
 
 onMounted(() => {
   document.addEventListener('mousemove', onDocMouseMove)
@@ -257,32 +260,36 @@ function onDocMouseMove(event: MouseEvent) {
       }
     }
 
-    if (w < 0) { x += w; w = -w }
-    if (h < 0) { y += h; h = -h }
+    if (w < 0) {
+      x += w
+      w = -w
+    }
+    if (h < 0) {
+      y += h
+      h = -h
+    }
     x = Math.max(0, Math.min(x, ow - MIN_SIZE))
     y = Math.max(0, Math.min(y, oh - MIN_SIZE))
     w = Math.max(MIN_SIZE, Math.min(w, ow - x))
     h = Math.max(MIN_SIZE, Math.min(h, oh - y))
     crop.value = { x, y, w, h }
-
   } else if (action === 'moving') {
     crop.value = {
       ...crop.value,
       x: Math.max(0, Math.min(initCrop.x + dx, ow - initCrop.w)),
       y: Math.max(0, Math.min(initCrop.y + dy, oh - initCrop.h)),
     }
-
   } else if (action === 'resizing') {
     const sides = HANDLE_SIDES[activeHandle]
-    let left   = sides.w ? cx : initCrop.x
-    let right  = sides.e ? cx : initCrop.x + initCrop.w
-    let top    = sides.n ? cy : initCrop.y
+    let left = sides.w ? cx : initCrop.x
+    let right = sides.e ? cx : initCrop.x + initCrop.w
+    let top = sides.n ? cy : initCrop.y
     let bottom = sides.s ? cy : initCrop.y + initCrop.h
 
     // Clamp to overlay
-    left   = Math.max(0, left)
-    right  = Math.min(ow, right)
-    top    = Math.max(0, top)
+    left = Math.max(0, left)
+    right = Math.min(ow, right)
+    top = Math.max(0, top)
     bottom = Math.min(oh, bottom)
 
     // Ensure min size before ratio
@@ -293,11 +300,16 @@ function onDocMouseMove(event: MouseEvent) {
 
     const locked = applyLockedRatio(left, top, right, bottom, sides)
     left = Math.max(0, locked.left)
-    top  = Math.max(0, locked.top)
-    right  = Math.min(ow, locked.right)
+    top = Math.max(0, locked.top)
+    right = Math.min(ow, locked.right)
     bottom = Math.min(oh, locked.bottom)
 
-    crop.value = { x: left, y: top, w: Math.max(MIN_SIZE, right - left), h: Math.max(MIN_SIZE, bottom - top) }
+    crop.value = {
+      x: left,
+      y: top,
+      w: Math.max(MIN_SIZE, right - left),
+      h: Math.max(MIN_SIZE, bottom - top),
+    }
   }
 
   emitCrop()
@@ -373,10 +385,30 @@ function onDocMouseUp() {
   pointer-events: none;
 }
 
-.thirds-line.v1 { left: 33.333%; top: 0; bottom: 0; width: 1px; }
-.thirds-line.v2 { left: 66.666%; top: 0; bottom: 0; width: 1px; }
-.thirds-line.h1 { top: 33.333%; left: 0; right: 0; height: 1px; }
-.thirds-line.h2 { top: 66.666%; left: 0; right: 0; height: 1px; }
+.thirds-line.v1 {
+  left: 33.333%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.thirds-line.v2 {
+  left: 66.666%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.thirds-line.h1 {
+  top: 33.333%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.thirds-line.h2 {
+  top: 66.666%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
 
 /* Resize handles */
 .handle {
@@ -388,14 +420,46 @@ function onDocMouseUp() {
   border-radius: 2px;
 }
 
-.handle.nw { top: -5px; left: -5px; cursor: nw-resize; }
-.handle.n  { top: -5px; left: calc(50% - 5px); cursor: n-resize; }
-.handle.ne { top: -5px; right: -5px; cursor: ne-resize; }
-.handle.w  { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
-.handle.e  { top: calc(50% - 5px); right: -5px; cursor: e-resize; }
-.handle.sw { bottom: -5px; left: -5px; cursor: sw-resize; }
-.handle.s  { bottom: -5px; left: calc(50% - 5px); cursor: s-resize; }
-.handle.se { bottom: -5px; right: -5px; cursor: se-resize; }
+.handle.nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+.handle.n {
+  top: -5px;
+  left: calc(50% - 5px);
+  cursor: n-resize;
+}
+.handle.ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+.handle.w {
+  top: calc(50% - 5px);
+  left: -5px;
+  cursor: w-resize;
+}
+.handle.e {
+  top: calc(50% - 5px);
+  right: -5px;
+  cursor: e-resize;
+}
+.handle.sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+.handle.s {
+  bottom: -5px;
+  left: calc(50% - 5px);
+  cursor: s-resize;
+}
+.handle.se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
 
 /* Dimensions badge */
 .crop-dims {

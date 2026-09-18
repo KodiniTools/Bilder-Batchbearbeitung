@@ -20,13 +20,15 @@ const galleryImages = computed(() => props.images ?? [])
 
 const currentIndex = computed(() => {
   if (!props.image) return -1
-  return galleryImages.value.findIndex(img => img.id === props.image!.id)
+  return galleryImages.value.findIndex((img) => img.id === props.image!.id)
 })
 
 const hasGallery = computed(() => galleryImages.value.length > 1 && currentIndex.value !== -1)
 
 const canGoPrev = computed(() => hasGallery.value && currentIndex.value > 0)
-const canGoNext = computed(() => hasGallery.value && currentIndex.value < galleryImages.value.length - 1)
+const canGoNext = computed(
+  () => hasGallery.value && currentIndex.value < galleryImages.value.length - 1
+)
 
 function goPrev() {
   if (!canGoPrev.value) return
@@ -44,9 +46,8 @@ const imageFormat = computed(() => {
   if (!props.image) return ''
 
   // Try exportFormat first, then extract from filename
-  const format = props.image.exportFormat ||
-                 props.image.file.name.split('.').pop()?.toUpperCase() ||
-                 'UNKNOWN'
+  const format =
+    props.image.exportFormat || props.image.file.name.split('.').pop()?.toUpperCase() || 'UNKNOWN'
 
   return format.toUpperCase()
 })
@@ -111,21 +112,21 @@ function renderWatermarkPreview() {
 
 function updatePreview() {
   if (!previewCanvas.value || !props.image) return
-  
+
   const canvas = previewCanvas.value
   const ctx = canvas.getContext('2d')
   if (!ctx) return
-  
+
   // Calculate scaling to fit window
   const maxWidth = window.innerWidth * 0.9
   const maxHeight = window.innerHeight * 0.9
-  
+
   const scale = Math.min(
     maxWidth / props.image.canvas.width,
     maxHeight / props.image.canvas.height,
     1 // Don't scale up
   )
-  
+
   canvas.width = props.image.canvas.width * scale
   canvas.height = props.image.canvas.height * scale
 
@@ -134,7 +135,10 @@ function updatePreview() {
   scaled.width = canvas.width
   scaled.height = canvas.height
   scaled.getContext('2d')?.drawImage(props.image.canvas, 0, 0, canvas.width, canvas.height)
-  const filtered = ImageProcessor.applyFiltersToCanvas(scaled, props.image.filters || defaultFilters)
+  const filtered = ImageProcessor.applyFiltersToCanvas(
+    scaled,
+    props.image.filters || defaultFilters
+  )
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.drawImage(filtered, 0, 0)
 
@@ -157,24 +161,34 @@ function handleKeyDown(event: KeyboardEvent) {
   }
 }
 
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    setTimeout(updatePreview, 50) // Small delay to ensure DOM is ready
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      setTimeout(updatePreview, 50) // Small delay to ensure DOM is ready
+    }
   }
-})
+)
 
-watch(() => props.image, () => {
-  if (props.isOpen) {
-    updatePreview()
+watch(
+  () => props.image,
+  () => {
+    if (props.isOpen) {
+      updatePreview()
+    }
   }
-})
+)
 
 // Wasserzeichen bei Änderung aktualisieren
-watch(() => props.image?.watermark, () => {
-  if (props.isOpen && watermarkActive.value) {
-    nextTick(() => renderWatermarkPreview())
-  }
-}, { deep: true })
+watch(
+  () => props.image?.watermark,
+  () => {
+    if (props.isOpen && watermarkActive.value) {
+      nextTick(() => renderWatermarkPreview())
+    }
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
@@ -197,11 +211,7 @@ onUnmounted(() => {
               ref="watermarkCanvasRef"
               class="watermark-canvas"
             ></canvas>
-            <button
-              class="preview-close-float"
-              aria-label="Schließen"
-              @click.stop="handleClose"
-            >
+            <button class="preview-close-float" aria-label="Schließen" @click.stop="handleClose">
               <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -229,7 +239,9 @@ onUnmounted(() => {
         <div v-if="image" class="preview-info">
           <span>{{ image.canvas.width }} × {{ image.canvas.height }} px</span>
           <span class="format-badge">{{ imageFormat }}</span>
-          <span v-if="hasGallery" class="preview-counter">{{ currentIndex + 1 }} / {{ galleryImages.length }}</span>
+          <span v-if="hasGallery" class="preview-counter">
+            {{ currentIndex + 1 }} / {{ galleryImages.length }}
+          </span>
           <span>{{ image.outputName || image.file.name }}</span>
         </div>
       </div>
@@ -315,7 +327,7 @@ onUnmounted(() => {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.60);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
@@ -343,7 +355,7 @@ onUnmounted(() => {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.60);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
@@ -414,9 +426,11 @@ onUnmounted(() => {
 
 .format-badge {
   padding: var(--space-2) var(--space-3);
-  background: linear-gradient(135deg, 
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 15%, transparent),
-    color-mix(in oklab, var(--green) 12%, transparent));
+    color-mix(in oklab, var(--green) 12%, transparent)
+  );
   border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
   border-radius: var(--radius-md);
   color: var(--text);

@@ -20,7 +20,7 @@ export function supportsFormat(mimeType: string): boolean {
   const canvas = document.createElement('canvas')
   canvas.width = 1
   canvas.height = 1
-  
+
   try {
     const dataUrl = canvas.toDataURL(mimeType)
     return dataUrl.indexOf(`data:${mimeType}`) === 0
@@ -158,28 +158,28 @@ export async function canvasToBlob(
 export async function loadImageToCanvas(file: File): Promise<HTMLCanvasElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
-    
+
     img.onload = () => {
       const canvas = document.createElement('canvas')
       canvas.width = img.naturalWidth
       canvas.height = img.naturalHeight
-      
+
       const ctx = canvas.getContext('2d')
       if (!ctx) {
         reject(new Error('Failed to get canvas context'))
         return
       }
-      
+
       ctx.drawImage(img, 0, 0)
       URL.revokeObjectURL(img.src)
       resolve(canvas)
     }
-    
+
     img.onerror = () => {
       URL.revokeObjectURL(img.src)
       reject(new Error('Failed to load image'))
     }
-    
+
     img.src = URL.createObjectURL(file)
   })
 }

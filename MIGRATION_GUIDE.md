@@ -5,6 +5,7 @@ Dieser Leitfaden beschreibt die Konvertierung der Bildbearbeitungs-App von Vanil
 ## 🎯 Migrations-Übersicht
 
 ### Vorher (Vanilla JS)
+
 - **index.html**: Monolithische HTML-Datei mit allem Code
 - **main.js**: Ein großes JavaScript-File mit globalem State
 - **Keine TypeScript-Unterstützung**
@@ -13,6 +14,7 @@ Dieser Leitfaden beschreibt die Konvertierung der Bildbearbeitungs-App von Vanil
 - **Inline Event Handlers**
 
 ### Nachher (Vue 3)
+
 - **Komponentenbasierte Architektur**
 - **TypeScript für Typsicherheit**
 - **Pinia für State Management**
@@ -24,32 +26,33 @@ Dieser Leitfaden beschreibt die Konvertierung der Bildbearbeitungs-App von Vanil
 
 ### HTML → Vue Komponenten
 
-| Vorher (HTML) | Nachher (Vue) |
-|--------------|---------------|
-| `<header class="app-header">` | `AppHeader.vue` |
-| `<div id="statusBar">` | `StatusBar.vue` |
-| `<section id="dropArea">` | `DropZone.vue` |
+| Vorher (HTML)                   | Nachher (Vue)                     |
+| ------------------------------- | --------------------------------- |
+| `<header class="app-header">`   | `AppHeader.vue`                   |
+| `<div id="statusBar">`          | `StatusBar.vue`                   |
+| `<section id="dropArea">`       | `DropZone.vue`                    |
 | `<section id="imageContainer">` | `ImageGrid.vue` + `ImageCard.vue` |
-| `<div id="loadingIndicator">` | `LoadingIndicator.vue` |
+| `<div id="loadingIndicator">`   | `LoadingIndicator.vue`            |
 
 ### JavaScript → TypeScript Module
 
-| Vorher (JS) | Nachher (TS) |
-|-------------|--------------|
-| `src/core/image-processor.js` | `src/lib/core/image-processor.ts` |
-| `src/features/export-pdf.js` | `src/lib/features/export-pdf.ts` |
-| `src/features/export-zip.js` | `src/lib/features/export-zip.ts` |
-| Globaler `state` Object | `src/stores/imageStore.ts` (Pinia) |
+| Vorher (JS)                   | Nachher (TS)                       |
+| ----------------------------- | ---------------------------------- |
+| `src/core/image-processor.js` | `src/lib/core/image-processor.ts`  |
+| `src/features/export-pdf.js`  | `src/lib/features/export-pdf.ts`   |
+| `src/features/export-zip.js`  | `src/lib/features/export-zip.ts`   |
+| Globaler `state` Object       | `src/stores/imageStore.ts` (Pinia) |
 
 ## 🔄 Code-Migrations-Beispiele
 
 ### 1. State Management
 
 **Vorher (Vanilla JS):**
+
 ```javascript
 const state = {
   images: [],
-  currentImageIndex: 0
+  currentImageIndex: 0,
 }
 
 function addImage(imageObj) {
@@ -58,6 +61,7 @@ function addImage(imageObj) {
 ```
 
 **Nachher (Vue 3 + Pinia):**
+
 ```typescript
 // stores/imageStore.ts
 import { defineStore } from 'pinia'
@@ -65,12 +69,12 @@ import { ref } from 'vue'
 
 export const useImageStore = defineStore('images', () => {
   const images = ref<ImageObject[]>([])
-  
+
   async function addImage(file: File) {
     const imageObj = await ImageProcessor.processFile(file)
     if (imageObj) images.value.push(imageObj)
   }
-  
+
   return { images, addImage }
 })
 ```
@@ -78,6 +82,7 @@ export const useImageStore = defineStore('images', () => {
 ### 2. DOM-Manipulation → Reaktive Templates
 
 **Vorher (Vanilla JS):**
+
 ```javascript
 function createImageCard(imageObj) {
   const card = document.createElement('div')
@@ -91,6 +96,7 @@ function createImageCard(imageObj) {
 ```
 
 **Nachher (Vue 3):**
+
 ```vue
 <!-- ImageCard.vue -->
 <template>
@@ -111,17 +117,18 @@ const displayName = computed(() => /* ... */)
 ### 3. Event Handling
 
 **Vorher (Vanilla JS):**
+
 ```javascript
-document.getElementById('selectAllButton')
-  .addEventListener('click', () => {
-    state.images.forEach(img => {
-      img.selected = !allSelected
-    })
-    updateUI()
+document.getElementById('selectAllButton').addEventListener('click', () => {
+  state.images.forEach((img) => {
+    img.selected = !allSelected
   })
+  updateUI()
+})
 ```
 
 **Nachher (Vue 3):**
+
 ```vue
 <template>
   <button @click="handleSelectAll">
@@ -143,24 +150,26 @@ const handleSelectAll = () => {
 ### 4. Internationalisierung (i18n)
 
 **Vorher (Vanilla JS):**
+
 ```javascript
 // i18n.js
 async function initializeI18n() {
   await i18next.init({
     lng: 'de',
-    resources: { de, en }
+    resources: { de, en },
   })
   updateContent()
 }
 
 function updateContent() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = i18next.t(el.getAttribute('data-i18n'))
   })
 }
 ```
 
 **Nachher (Vue 3 + vue-i18n):**
+
 ```typescript
 // main.ts
 import { createI18n } from 'vue-i18n'
@@ -169,7 +178,7 @@ import en from './locales/en.json'
 
 const i18n = createI18n({
   locale: 'de',
-  messages: { de, en }
+  messages: { de, en },
 })
 
 app.use(i18n)
@@ -190,11 +199,12 @@ const { t } = useI18n()
 ### 5. File Upload
 
 **Vorher (Vanilla JS):**
+
 ```javascript
 function handleFiles(files) {
   showLoading('Bilder werden geladen...')
   const arr = Array.from(files)
-  arr.forEach(file => {
+  arr.forEach((file) => {
     ImageProcessor.processFile(file, (result) => {
       if (result) {
         state.images.push(result)
@@ -208,6 +218,7 @@ function handleFiles(files) {
 ```
 
 **Nachher (Vue 3):**
+
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -218,7 +229,7 @@ const isLoading = ref(false)
 
 const handleFiles = async (files: FileList | null) => {
   if (!files) return
-  
+
   isLoading.value = true
   try {
     const fileArray = Array.from(files)
@@ -247,6 +258,7 @@ src/lib/
 ```
 
 **Vorteile:**
+
 - ✅ Wiederverwendbar in anderen Projekten
 - ✅ Unabhängig von Vue
 - ✅ Einfach zu testen
@@ -255,6 +267,7 @@ src/lib/
 ### 2. State Management mit Pinia
 
 **Vorteile:**
+
 - ✅ Zentraler, typsicherer State
 - ✅ DevTools-Integration
 - ✅ Time-Travel Debugging
@@ -263,6 +276,7 @@ src/lib/
 ### 3. Composition API
 
 **Vorteile:**
+
 - ✅ Bessere TypeScript-Integration
 - ✅ Logik-Wiederverwendung durch Composables
 - ✅ Klarere Code-Organisation
@@ -277,11 +291,11 @@ Alle CSS-Variablen und das Theme-System wurden beibehalten:
 ```css
 :root {
   --accent: #005cda;
-  --bg: #F0F0F0;
+  --bg: #f0f0f0;
   /* ... */
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   --accent: #6ea8fe;
   --bg: #0a0a0a;
   /* ... */
@@ -301,11 +315,13 @@ Alle CSS-Variablen und das Theme-System wurden beibehalten:
 ## 🚀 Build & Development
 
 ### Vorher
+
 - **Kein Build-Prozess**
 - Direkte Nutzung von HTML/JS/CSS
 - Manuelle Dateiverkettung
 
 ### Nachher
+
 - **Vite Build-Tool**
 - Hot Module Replacement
 - Optimierte Production Builds

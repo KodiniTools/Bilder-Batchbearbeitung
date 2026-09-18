@@ -5,12 +5,16 @@ import { useI18n } from 'vue-i18n'
 const BASE_URL = 'https://kodinitools.com/bilderseriebearbeiten'
 
 const routeSeoConfig: Record<string, { titleKey: string; descriptionKey: string; path: string }> = {
-  home:      { titleKey: 'seo.home.title',      descriptionKey: 'seo.home.description',      path: '/' },
-  app:       { titleKey: 'seo.app.title',       descriptionKey: 'seo.app.description',       path: '/app' },
-  faq:       { titleKey: 'seo.faq.title',       descriptionKey: 'seo.faq.description',       path: '/faq' },
-  blog:      { titleKey: 'seo.blog.title',      descriptionKey: 'seo.blog.description',      path: '/blog' },
-  learn:     { titleKey: 'seo.learn.title',     descriptionKey: 'seo.learn.description',     path: '/learn' },
-  downloads: { titleKey: 'seo.downloads.title', descriptionKey: 'seo.downloads.description', path: '/downloads' },
+  home: { titleKey: 'seo.home.title', descriptionKey: 'seo.home.description', path: '/' },
+  app: { titleKey: 'seo.app.title', descriptionKey: 'seo.app.description', path: '/app' },
+  faq: { titleKey: 'seo.faq.title', descriptionKey: 'seo.faq.description', path: '/faq' },
+  blog: { titleKey: 'seo.blog.title', descriptionKey: 'seo.blog.description', path: '/blog' },
+  learn: { titleKey: 'seo.learn.title', descriptionKey: 'seo.learn.description', path: '/learn' },
+  downloads: {
+    titleKey: 'seo.downloads.title',
+    descriptionKey: 'seo.downloads.description',
+    path: '/downloads',
+  },
 }
 
 function routeUrl(path: string): string {

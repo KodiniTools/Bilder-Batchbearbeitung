@@ -94,11 +94,7 @@ onMounted(() => {
           >
             EN
           </button>
-          <button
-            class="theme-toggle"
-            :title="t('header.themeToggle')"
-            @click="toggleTheme"
-          >
+          <button class="theme-toggle" :title="t('header.themeToggle')" @click="toggleTheme">
             {{ theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF13' }}
           </button>
         </div>
@@ -115,7 +111,9 @@ onMounted(() => {
           <p class="hero-download-hint">
             <i class="fa-solid fa-download"></i>
             {{ t('landing.hero.downloadHint') }} &mdash;
-            <button class="hero-download-link" @click="goToDownloads">{{ t('landing.hero.downloadLink') }}</button>
+            <button class="hero-download-link" @click="goToDownloads">
+              {{ t('landing.hero.downloadLink') }}
+            </button>
           </p>
         </div>
 
@@ -202,27 +200,25 @@ onMounted(() => {
           <a href="https://kodinitools.com/bildkonverter/" class="tool-card" rel="noopener">
             <h3>{{ t('landing.tools.converter.title') }}</h3>
             <p>{{ t('landing.tools.converter.description') }}</p>
-            <span class="tool-link">
-              {{ t('landing.tools.cta') }} &rarr;
-            </span>
+            <span class="tool-link">{{ t('landing.tools.cta') }} &rarr;</span>
           </a>
 
           <!-- Collage Maker -->
           <a href="https://kodinitools.com/collagemaker/" class="tool-card" rel="noopener">
             <h3>{{ t('landing.tools.collage.title') }}</h3>
             <p>{{ t('landing.tools.collage.description') }}</p>
-            <span class="tool-link">
-              {{ t('landing.tools.cta') }} &rarr;
-            </span>
+            <span class="tool-link">{{ t('landing.tools.cta') }} &rarr;</span>
           </a>
 
           <!-- Color Extractor -->
-          <a href="https://kodinitools.com/kodini-color-extractor/" class="tool-card" rel="noopener">
+          <a
+            href="https://kodinitools.com/kodini-color-extractor/"
+            class="tool-card"
+            rel="noopener"
+          >
             <h3>{{ t('landing.tools.colorExtractor.title') }}</h3>
             <p>{{ t('landing.tools.colorExtractor.description') }}</p>
-            <span class="tool-link">
-              {{ t('landing.tools.cta') }} &rarr;
-            </span>
+            <span class="tool-link">{{ t('landing.tools.cta') }} &rarr;</span>
           </a>
         </div>
       </div>
@@ -233,7 +229,12 @@ onMounted(() => {
       <div class="donate-container">
         <h2>{{ t('donate.title') }}</h2>
         <p class="donate-text">{{ t('donate.text') }}</p>
-        <form action="https://www.paypal.com/donate" method="post" target="_top" class="paypal-form">
+        <form
+          action="https://www.paypal.com/donate"
+          method="post"
+          target="_top"
+          class="paypal-form"
+        >
           <input type="hidden" name="hosted_button_id" value="8RGLGQ2BFMHU6" />
           <button type="submit" class="paypal-button">
             {{ t('donate.button') }}
@@ -241,7 +242,6 @@ onMounted(() => {
         </form>
       </div>
     </section>
-
   </div>
 </template>
 
@@ -388,7 +388,11 @@ a.nav-link {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
+  );
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -675,9 +679,11 @@ a.nav-link {
   max-width: 800px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-5);
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 8%, transparent) 0%,
-    color-mix(in oklab, var(--accent) 3%, transparent) 100%);
+    color-mix(in oklab, var(--accent) 3%, transparent) 100%
+  );
   border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
   border-radius: var(--radius-2xl);
   text-align: center;

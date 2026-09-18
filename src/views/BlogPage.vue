@@ -38,8 +38,20 @@ onMounted(() => {
 })
 
 const sections = [
-  'upload', 'transform', 'filters', 'batch', 'editor',
-  'pdf', 'zip', 'svg', 'save', 'ui', 'i18n', 'theme', 'shortcuts', 'privacy'
+  'upload',
+  'transform',
+  'filters',
+  'batch',
+  'editor',
+  'pdf',
+  'zip',
+  'svg',
+  'save',
+  'ui',
+  'i18n',
+  'theme',
+  'shortcuts',
+  'privacy',
 ]
 </script>
 
@@ -92,26 +104,53 @@ const sections = [
 
           <!-- Section 1: Upload -->
           <section id="upload" class="content-section">
-            <h2><span class="section-number">1</span> {{ t('blog.sections.upload.title') }}</h2>
+            <h2>
+              <span class="section-number">1</span>
+              {{ t('blog.sections.upload.title') }}
+            </h2>
             <h3>{{ t('blog.sections.upload.simple.title') }}</h3>
             <p>{{ t('blog.sections.upload.simple.text') }}</p>
             <ul>
-              <li><strong>Drag & Drop:</strong> {{ t('blog.sections.upload.simple.dragdrop') }}</li>
-              <li><strong>{{ t('blog.sections.upload.simple.clickLabel') }}:</strong> {{ t('blog.sections.upload.simple.click') }}</li>
+              <li>
+                <strong>Drag & Drop:</strong>
+                {{ t('blog.sections.upload.simple.dragdrop') }}
+              </li>
+              <li>
+                <strong>{{ t('blog.sections.upload.simple.clickLabel') }}:</strong>
+                {{ t('blog.sections.upload.simple.click') }}
+              </li>
             </ul>
             <h3>{{ t('blog.sections.upload.formats.title') }}</h3>
             <ul class="format-list">
-              <li><strong>JPEG/JPG</strong> – {{ t('blog.sections.upload.formats.jpeg') }}</li>
-              <li><strong>PNG</strong> – {{ t('blog.sections.upload.formats.png') }}</li>
-              <li><strong>WebP</strong> – {{ t('blog.sections.upload.formats.webp') }}</li>
-              <li><strong>BMP</strong> – {{ t('blog.sections.upload.formats.bmp') }}</li>
-              <li><strong>GIF</strong> – {{ t('blog.sections.upload.formats.gif') }}</li>
+              <li>
+                <strong>JPEG/JPG</strong>
+                – {{ t('blog.sections.upload.formats.jpeg') }}
+              </li>
+              <li>
+                <strong>PNG</strong>
+                – {{ t('blog.sections.upload.formats.png') }}
+              </li>
+              <li>
+                <strong>WebP</strong>
+                – {{ t('blog.sections.upload.formats.webp') }}
+              </li>
+              <li>
+                <strong>BMP</strong>
+                – {{ t('blog.sections.upload.formats.bmp') }}
+              </li>
+              <li>
+                <strong>GIF</strong>
+                – {{ t('blog.sections.upload.formats.gif') }}
+              </li>
             </ul>
           </section>
 
           <!-- Section 2: Transformations -->
           <section id="transform" class="content-section">
-            <h2><span class="section-number">2</span> {{ t('blog.sections.transform.title') }}</h2>
+            <h2>
+              <span class="section-number">2</span>
+              {{ t('blog.sections.transform.title') }}
+            </h2>
             <div class="feature-grid">
               <div class="feature-box">
                 <i class="fa-solid fa-rotate"></i>
@@ -138,23 +177,38 @@ const sections = [
 
           <!-- Section 3: Filters -->
           <section id="filters" class="content-section">
-            <h2><span class="section-number">3</span> {{ t('blog.sections.filters.title') }}</h2>
+            <h2>
+              <span class="section-number">3</span>
+              {{ t('blog.sections.filters.title') }}
+            </h2>
             <p>{{ t('blog.sections.filters.intro') }}</p>
             <div class="filter-list">
               <div class="filter-item">
-                <h4><i class="fa-solid fa-sun"></i> {{ t('blog.sections.filters.brightness.title') }}</h4>
+                <h4>
+                  <i class="fa-solid fa-sun"></i>
+                  {{ t('blog.sections.filters.brightness.title') }}
+                </h4>
                 <p>{{ t('blog.sections.filters.brightness.text') }}</p>
               </div>
               <div class="filter-item">
-                <h4><i class="fa-solid fa-circle-half-stroke"></i> {{ t('blog.sections.filters.contrast.title') }}</h4>
+                <h4>
+                  <i class="fa-solid fa-circle-half-stroke"></i>
+                  {{ t('blog.sections.filters.contrast.title') }}
+                </h4>
                 <p>{{ t('blog.sections.filters.contrast.text') }}</p>
               </div>
               <div class="filter-item">
-                <h4><i class="fa-solid fa-palette"></i> {{ t('blog.sections.filters.saturation.title') }}</h4>
+                <h4>
+                  <i class="fa-solid fa-palette"></i>
+                  {{ t('blog.sections.filters.saturation.title') }}
+                </h4>
                 <p>{{ t('blog.sections.filters.saturation.text') }}</p>
               </div>
               <div class="filter-item">
-                <h4><i class="fa-solid fa-droplet"></i> {{ t('blog.sections.filters.blur.title') }}</h4>
+                <h4>
+                  <i class="fa-solid fa-droplet"></i>
+                  {{ t('blog.sections.filters.blur.title') }}
+                </h4>
                 <p>{{ t('blog.sections.filters.blur.text') }}</p>
               </div>
             </div>
@@ -162,21 +216,33 @@ const sections = [
 
           <!-- Section 4: Batch -->
           <section id="batch" class="content-section">
-            <h2><span class="section-number">4</span> {{ t('blog.sections.batch.title') }}</h2>
+            <h2>
+              <span class="section-number">4</span>
+              {{ t('blog.sections.batch.title') }}
+            </h2>
             <p>{{ t('blog.sections.batch.intro') }}</p>
             <div class="highlight-box">
-              <h4><i class="fa-solid fa-pen"></i> {{ t('blog.sections.batch.rename.title') }}</h4>
+              <h4>
+                <i class="fa-solid fa-pen"></i>
+                {{ t('blog.sections.batch.rename.title') }}
+              </h4>
               <p>{{ t('blog.sections.batch.rename.text') }}</p>
             </div>
             <div class="highlight-box">
-              <h4><i class="fa-solid fa-sliders"></i> {{ t('blog.sections.batch.panel.title') }}</h4>
+              <h4>
+                <i class="fa-solid fa-sliders"></i>
+                {{ t('blog.sections.batch.panel.title') }}
+              </h4>
               <p>{{ t('blog.sections.batch.panel.text') }}</p>
             </div>
           </section>
 
           <!-- Section 5: Editor -->
           <section id="editor" class="content-section">
-            <h2><span class="section-number">5</span> {{ t('blog.sections.editor.title') }}</h2>
+            <h2>
+              <span class="section-number">5</span>
+              {{ t('blog.sections.editor.title') }}
+            </h2>
             <p>{{ t('blog.sections.editor.intro') }}</p>
             <ul>
               <li>{{ t('blog.sections.editor.features.preview') }}</li>
@@ -188,7 +254,10 @@ const sections = [
 
           <!-- Section 6: PDF -->
           <section id="pdf" class="content-section">
-            <h2><span class="section-number">6</span> {{ t('blog.sections.pdf.title') }}</h2>
+            <h2>
+              <span class="section-number">6</span>
+              {{ t('blog.sections.pdf.title') }}
+            </h2>
             <p>{{ t('blog.sections.pdf.intro') }}</p>
             <div class="feature-grid">
               <div class="feature-box accent">
@@ -211,28 +280,40 @@ const sections = [
 
           <!-- Section 7: ZIP -->
           <section id="zip" class="content-section">
-            <h2><span class="section-number">7</span> {{ t('blog.sections.zip.title') }}</h2>
+            <h2>
+              <span class="section-number">7</span>
+              {{ t('blog.sections.zip.title') }}
+            </h2>
             <p>{{ t('blog.sections.zip.intro') }}</p>
             <p>{{ t('blog.sections.zip.formats') }}</p>
           </section>
 
           <!-- Section 8: SVG -->
           <section id="svg" class="content-section">
-            <h2><span class="section-number">8</span> {{ t('blog.sections.svg.title') }}</h2>
+            <h2>
+              <span class="section-number">8</span>
+              {{ t('blog.sections.svg.title') }}
+            </h2>
             <p>{{ t('blog.sections.svg.intro') }}</p>
             <p>{{ t('blog.sections.svg.modes') }}</p>
           </section>
 
           <!-- Section 9: Save -->
           <section id="save" class="content-section">
-            <h2><span class="section-number">9</span> {{ t('blog.sections.save.title') }}</h2>
+            <h2>
+              <span class="section-number">9</span>
+              {{ t('blog.sections.save.title') }}
+            </h2>
             <p>{{ t('blog.sections.save.intro') }}</p>
             <p>{{ t('blog.sections.save.formats') }}</p>
           </section>
 
           <!-- Section 10: UI -->
           <section id="ui" class="content-section">
-            <h2><span class="section-number">10</span> {{ t('blog.sections.ui.title') }}</h2>
+            <h2>
+              <span class="section-number">10</span>
+              {{ t('blog.sections.ui.title') }}
+            </h2>
             <p>{{ t('blog.sections.ui.intro') }}</p>
             <ul>
               <li>{{ t('blog.sections.ui.features.grid') }}</li>
@@ -244,21 +325,30 @@ const sections = [
 
           <!-- Section 11: i18n -->
           <section id="i18n" class="content-section">
-            <h2><span class="section-number">11</span> {{ t('blog.sections.i18n.title') }}</h2>
+            <h2>
+              <span class="section-number">11</span>
+              {{ t('blog.sections.i18n.title') }}
+            </h2>
             <p>{{ t('blog.sections.i18n.intro') }}</p>
             <p>{{ t('blog.sections.i18n.languages') }}</p>
           </section>
 
           <!-- Section 12: Theme -->
           <section id="theme" class="content-section">
-            <h2><span class="section-number">12</span> {{ t('blog.sections.theme.title') }}</h2>
+            <h2>
+              <span class="section-number">12</span>
+              {{ t('blog.sections.theme.title') }}
+            </h2>
             <p>{{ t('blog.sections.theme.intro') }}</p>
             <p>{{ t('blog.sections.theme.features') }}</p>
           </section>
 
           <!-- Section 13: Shortcuts -->
           <section id="shortcuts" class="content-section">
-            <h2><span class="section-number">13</span> {{ t('blog.sections.shortcuts.title') }}</h2>
+            <h2>
+              <span class="section-number">13</span>
+              {{ t('blog.sections.shortcuts.title') }}
+            </h2>
             <p>{{ t('blog.sections.shortcuts.intro') }}</p>
             <table class="shortcuts-table">
               <thead>
@@ -269,7 +359,11 @@ const sections = [
               </thead>
               <tbody>
                 <tr>
-                  <td><kbd>Ctrl</kbd> + <kbd>A</kbd></td>
+                  <td>
+                    <kbd>Ctrl</kbd>
+                    +
+                    <kbd>A</kbd>
+                  </td>
                   <td>{{ t('blog.sections.shortcuts.selectAll') }}</td>
                 </tr>
                 <tr>
@@ -286,7 +380,10 @@ const sections = [
 
           <!-- Section 14: Privacy -->
           <section id="privacy" class="content-section">
-            <h2><span class="section-number">14</span> {{ t('blog.sections.privacy.title') }}</h2>
+            <h2>
+              <span class="section-number">14</span>
+              {{ t('blog.sections.privacy.title') }}
+            </h2>
             <div class="privacy-highlight">
               <i class="fa-solid fa-shield-halved"></i>
               <div>
@@ -307,12 +404,30 @@ const sections = [
             <h2>{{ t('blog.conclusion.title') }}</h2>
             <p>{{ t('blog.conclusion.text') }}</p>
             <div class="benefits-list">
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.local') }}</div>
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.batch') }}</div>
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.pdf') }}</div>
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.formats') }}</div>
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.ui') }}</div>
-              <div class="benefit-item"><i class="fa-solid fa-check"></i> {{ t('blog.conclusion.benefits.free') }}</div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.local') }}
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.batch') }}
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.pdf') }}
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.formats') }}
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.ui') }}
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-check"></i>
+                {{ t('blog.conclusion.benefits.free') }}
+              </div>
             </div>
             <button class="cta-button" @click="goToApp">
               <i class="fa-solid fa-rocket"></i>
@@ -498,8 +613,12 @@ const sections = [
   margin-bottom: var(--space-6);
 }
 
-.intro-section p { margin: 0 0 var(--space-4); }
-.intro-section p:last-child { margin-bottom: 0; }
+.intro-section p {
+  margin: 0 0 var(--space-4);
+}
+.intro-section p:last-child {
+  margin-bottom: 0;
+}
 
 .content-section {
   padding-bottom: var(--space-6);
@@ -616,8 +735,14 @@ const sections = [
   color: var(--text);
 }
 
-.filter-item h4 i { color: var(--accent); }
-.filter-item p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.filter-item h4 i {
+  color: var(--accent);
+}
+.filter-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 
 /* Highlight Box */
 .highlight-box {
@@ -636,8 +761,14 @@ const sections = [
   color: var(--text);
 }
 
-.highlight-box h4 i { color: var(--accent); }
-.highlight-box p { margin: 0; color: var(--text); line-height: 1.6; }
+.highlight-box h4 i {
+  color: var(--accent);
+}
+.highlight-box p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.6;
+}
 
 /* Privacy Highlight */
 .privacy-highlight {
@@ -645,9 +776,11 @@ const sections = [
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--green) 10%, transparent),
-    color-mix(in oklab, var(--accent) 5%, transparent));
+    color-mix(in oklab, var(--accent) 5%, transparent)
+  );
   border-radius: var(--radius-xl);
   margin-bottom: var(--space-4);
 }
@@ -688,7 +821,9 @@ const sections = [
   text-transform: uppercase;
 }
 
-.shortcuts-table td { color: var(--text); }
+.shortcuts-table td {
+  color: var(--text);
+}
 
 kbd {
   display: inline-block;
@@ -739,7 +874,9 @@ kbd {
   color: var(--text);
 }
 
-.benefit-item i { color: var(--green); }
+.benefit-item i {
+  color: var(--green);
+}
 
 .cta-button {
   display: inline-flex;
@@ -749,7 +886,11 @@ kbd {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--secondary)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in oklab, var(--accent) 80%, var(--secondary))
+  );
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -781,7 +922,9 @@ kbd {
 }
 
 @media (max-width: 768px) {
-  .nav-container { flex-wrap: wrap; }
+  .nav-container {
+    flex-wrap: wrap;
+  }
 
   .nav-links {
     order: 3;
@@ -792,11 +935,19 @@ kbd {
     border-top: 1px solid var(--glass-border);
   }
 
-  .article { padding: var(--space-4); }
+  .article {
+    padding: var(--space-4);
+  }
 
-  .feature-grid { grid-template-columns: 1fr; }
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
 
-  .privacy-highlight { flex-direction: column; text-align: center; align-items: center; }
+  .privacy-highlight {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
 }
 
 @media (max-width: 480px) {

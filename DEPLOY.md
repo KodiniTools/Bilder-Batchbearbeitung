@@ -5,12 +5,12 @@ Produktions-Deployment von **Bilderserie Bearbeiten** auf den VPS
 
 ## Überblick
 
-| Zweck            | Pfad                                                  |
-| ---------------- | ----------------------------------------------------- |
-| Quellcode / Build | `/opt/bilderseriebearbeiten`                          |
-| Web-Root (SPA)    | `/var/www/kodinitools.com/bilderseriebearbeiten`      |
-| Backend (API)     | `/var/www/kodinitools.com/bilderseriebearbeiten/backend` |
-| systemd-Service   | `bilderseriebearbeiten-api` (Port 9003)               |
+| Zweck             | Pfad                                                             |
+| ----------------- | ---------------------------------------------------------------- |
+| Quellcode / Build | `/opt/bilderseriebearbeiten`                                     |
+| Web-Root (SPA)    | `/var/www/kodinitools.com/bilderseriebearbeiten`                 |
+| Backend (API)     | `/var/www/kodinitools.com/bilderseriebearbeiten/backend`         |
+| systemd-Service   | `bilderseriebearbeiten-api` (Port 9003)                          |
 | Favicon           | `/var/www/kodinitools.com/public/favicon.ico` (→ `/favicon.ico`) |
 
 Der **Quellcode-Ordner** (Klon + Build, unter `/opt`) und das **Web-Root**
@@ -68,11 +68,11 @@ und startet den API-Service neu.
 
 Optionen:
 
-| Befehl                      | Wirkung                                  |
-| --------------------------- | ---------------------------------------- |
-| `./deploy.sh`               | Frontend + Backend                       |
-| `./deploy.sh --frontend-only` | nur das SPA                            |
-| `./deploy.sh --backend-only`  | nur Backend + Service-Neustart         |
+| Befehl                        | Wirkung                                 |
+| ----------------------------- | --------------------------------------- |
+| `./deploy.sh`                 | Frontend + Backend                      |
+| `./deploy.sh --frontend-only` | nur das SPA                             |
+| `./deploy.sh --backend-only`  | nur Backend + Service-Neustart          |
 | `./deploy.sh --no-git`        | aktuellen Checkout deployen (kein Pull) |
 
 Überschreibbare Variablen (Env): `DEPLOY_DIR`, `SRC_DIR`, `DEPLOY_BRANCH`,

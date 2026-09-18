@@ -14,7 +14,9 @@
           type="button"
           class="preset-chip"
           @click="emit('preset', preset.key)"
-        >{{ t(`imageEditor.presets.${preset.key}`) }}</button>
+        >
+          {{ t(`imageEditor.presets.${preset.key}`) }}
+        </button>
       </div>
     </div>
 
@@ -22,7 +24,7 @@
       <SliderRow
         v-for="fd in filterDefs"
         :key="fd.key"
-        :model-value="(localFilters as Record<string, number>)[fd.key]"
+        :model-value="localFilters[fd.key as keyof ImageFilters]"
         :label="t(`imageEditor.filters.${fd.key}`)"
         :min="fd.min"
         :max="fd.max"
@@ -75,7 +77,7 @@ const emit = defineEmits<{
 
 // Standardwert eines Filters (für den per-Slider-Reset-Button)
 function defaultValueFor(key: string): number {
-  return (defaultFilters as Record<string, number>)[key] ?? 0
+  return defaultFilters[key as keyof ImageFilters] ?? 0
 }
 </script>
 

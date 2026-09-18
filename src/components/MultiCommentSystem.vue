@@ -26,24 +26,22 @@ const entries = ref<CommentEntry[]>([
     text: '',
     image: null,
     imagePreviewUrl: null,
-    position: { x: 50, y: 50, scale: 0.3 }
-  }
+    position: { x: 50, y: 50, scale: 0.3 },
+  },
 ])
 
 const activeEntryId = ref<string>(entries.value[0].id)
 
-const activeEntry = computed(() => 
-  entries.value.find(e => e.id === activeEntryId.value) || entries.value[0]
+const activeEntry = computed(
+  () => entries.value.find((e) => e.id === activeEntryId.value) || entries.value[0]
 )
 
-const pageAspectRatio = computed(() => 
-  props.orientation === 'portrait' ? 1 / 1.414 : 1.414
-)
+const pageAspectRatio = computed(() => (props.orientation === 'portrait' ? 1 / 1.414 : 1.414))
 
 // Estimate pages needed based on content
 const estimatedPages = computed(() => {
   let pages = 0
-  
+
   for (const entry of entries.value) {
     // Estimate lines for text (rough calculation)
     const textLines = entry.text ? Math.ceil(entry.text.length / 80) : 0
@@ -51,7 +49,7 @@ const estimatedPages = computed(() => {
     const spaceNeeded = Math.max(textLines * 0.15, 0.3) + (entry.image ? 0.4 : 0)
     pages += Math.ceil(spaceNeeded)
   }
-  
+
   return Math.max(pages, 1)
 })
 
@@ -61,7 +59,7 @@ function addEntry() {
     text: '',
     image: null,
     imagePreviewUrl: null,
-    position: { x: 50, y: 50, scale: 0.3 }
+    position: { x: 50, y: 50, scale: 0.3 },
   }
   entries.value.push(newEntry)
   activeEntryId.value = newEntry.id
@@ -70,41 +68,45 @@ function addEntry() {
 
 function removeEntry(id: string) {
   if (entries.value.length === 1) return
-  
-  const index = entries.value.findIndex(e => e.id === id)
+
+  const index = entries.value.findIndex((e) => e.id === id)
   entries.value.splice(index, 1)
-  
+
   if (activeEntryId.value === id) {
     activeEntryId.value = entries.value[0].id
   }
-  
+
   emitUpdate()
 }
 
 function moveEntry(id: string, direction: 'up' | 'down') {
-  const index = entries.value.findIndex(e => e.id === id)
+  const index = entries.value.findIndex((e) => e.id === id)
   if (index === -1) return
-  
+
   if (direction === 'up' && index > 0) {
-    [entries.value[index], entries.value[index - 1]] = 
-    [entries.value[index - 1], entries.value[index]]
+    ;[entries.value[index], entries.value[index - 1]] = [
+      entries.value[index - 1],
+      entries.value[index],
+    ]
   } else if (direction === 'down' && index < entries.value.length - 1) {
-    [entries.value[index], entries.value[index + 1]] = 
-    [entries.value[index + 1], entries.value[index]]
+    ;[entries.value[index], entries.value[index + 1]] = [
+      entries.value[index + 1],
+      entries.value[index],
+    ]
   }
-  
+
   emitUpdate()
 }
 
 function handleImageUpload(event: Event, entryId: string) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  const entry = entries.value.find(e => e.id === entryId)
-  
+  const entry = entries.value.find((e) => e.id === entryId)
+
   if (!file || !entry) return
-  
+
   entry.image = file
-  
+
   const reader = new FileReader()
   reader.onload = (e) => {
     entry.imagePreviewUrl = e.target?.result as string
@@ -114,26 +116,26 @@ function handleImageUpload(event: Event, entryId: string) {
 }
 
 function removeImage(entryId: string) {
-  const entry = entries.value.find(e => e.id === entryId)
+  const entry = entries.value.find((e) => e.id === entryId)
   if (!entry) return
-  
+
   entry.image = null
   entry.imagePreviewUrl = null
   emitUpdate()
 }
 
 function updateEntryText(entryId: string, text: string) {
-  const entry = entries.value.find(e => e.id === entryId)
+  const entry = entries.value.find((e) => e.id === entryId)
   if (!entry) return
-  
+
   entry.text = text
   emitUpdate()
 }
 
 function updateImagePosition(entryId: string, position: { x: number; y: number; scale: number }) {
-  const entry = entries.value.find(e => e.id === entryId)
+  const entry = entries.value.find((e) => e.id === entryId)
   if (!entry) return
-  
+
   entry.position = position
   emitUpdate()
 }
@@ -148,34 +150,34 @@ const previewContainer = ref<HTMLDivElement | null>(null)
 
 function startDrag(event: MouseEvent) {
   if (!previewContainer.value || !activeEntry.value.imagePreviewUrl) return
-  
+
   isDragging.value = true
-  
+
   const rect = previewContainer.value.getBoundingClientRect()
   const startX = event.clientX
   const startY = event.clientY
   const startPosX = activeEntry.value.position.x
   const startPosY = activeEntry.value.position.y
-  
+
   function onMouseMove(e: MouseEvent) {
     if (!previewContainer.value) return
     const deltaX = ((e.clientX - startX) / rect.width) * 100
     const deltaY = ((e.clientY - startY) / rect.height) * 100
-    
+
     activeEntry.value.position = {
       ...activeEntry.value.position,
       x: Math.max(0, Math.min(100, startPosX + deltaX)),
-      y: Math.max(0, Math.min(100, startPosY + deltaY))
+      y: Math.max(0, Math.min(100, startPosY + deltaY)),
     }
     emitUpdate()
   }
-  
+
   function onMouseUp() {
     isDragging.value = false
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
   }
-  
+
   document.addEventListener('mousemove', onMouseMove)
   document.addEventListener('mouseup', onMouseUp)
 }
@@ -188,7 +190,7 @@ function startDrag(event: MouseEvent) {
         <i class="fa-solid fa-file-lines"></i>
         Arbeitsrapport / Kommentare
       </h4>
-      
+
       <div class="page-estimate">
         <i class="fa-solid fa-copy"></i>
         Ca. {{ estimatedPages }} {{ estimatedPages === 1 ? 'Seite' : 'Seiten' }}
@@ -215,7 +217,7 @@ function startDrag(event: MouseEvent) {
             @click="activeEntryId = entry.id"
           >
             <div class="entry-number">{{ index + 1 }}</div>
-            
+
             <div class="entry-content">
               <div class="entry-preview">
                 <i v-if="!entry.text && !entry.image" class="fa-regular fa-file"></i>
@@ -258,7 +260,9 @@ function startDrag(event: MouseEvent) {
       <!-- Active Entry Editor -->
       <div class="entry-editor">
         <div class="editor-header">
-          <span>Eintrag #{{ entries.findIndex(e => e.id === activeEntryId) + 1 }} bearbeiten</span>
+          <span>
+            Eintrag #{{ entries.findIndex((e) => e.id === activeEntryId) + 1 }} bearbeiten
+          </span>
         </div>
 
         <div class="editor-body">
@@ -283,7 +287,7 @@ function startDrag(event: MouseEvent) {
               <i class="fa-solid fa-image"></i>
               Bild
             </label>
-            
+
             <div v-if="!activeEntry.image" class="upload-area">
               <input
                 :id="`file-${activeEntryId}`"
@@ -299,7 +303,7 @@ function startDrag(event: MouseEvent) {
             </div>
 
             <div v-else class="image-uploaded">
-              <img :src="activeEntry.imagePreviewUrl" alt="Preview" />
+              <img :src="activeEntry.imagePreviewUrl ?? undefined" alt="Preview" />
               <div class="image-controls">
                 <div class="scale-control">
                   <label>
@@ -314,12 +318,16 @@ function startDrag(event: MouseEvent) {
                     max="1"
                     step="0.05"
                     class="scale-slider"
-                    @input="updateImagePosition(activeEntryId, { 
-                      ...activeEntry.position, 
-                      scale: parseFloat(($event.target as HTMLInputElement).value) 
-                    })"
+                    @input="
+                      updateImagePosition(activeEntryId, {
+                        ...activeEntry.position,
+                        scale: parseFloat(($event.target as HTMLInputElement).value),
+                      })
+                    "
                   />
-                  <span class="scale-value">{{ Math.round(activeEntry.position.scale * 100) }}%</span>
+                  <span class="scale-value">
+                    {{ Math.round(activeEntry.position.scale * 100) }}%
+                  </span>
                 </div>
                 <button class="remove-image-btn" @click="removeImage(activeEntryId)">
                   <i class="fa-solid fa-trash"></i>
@@ -335,7 +343,7 @@ function startDrag(event: MouseEvent) {
               <i class="fa-solid fa-eye"></i>
               Vorschau
             </label>
-            
+
             <div
               ref="previewContainer"
               class="mini-preview"
@@ -357,7 +365,7 @@ function startDrag(event: MouseEvent) {
                 :style="{
                   left: activeEntry.position.x + '%',
                   top: activeEntry.position.y + '%',
-                  transform: `translate(-50%, -50%) scale(${activeEntry.position.scale})`
+                  transform: `translate(-50%, -50%) scale(${activeEntry.position.scale})`,
                 }"
                 @mousedown="startDrag"
               >
@@ -367,10 +375,14 @@ function startDrag(event: MouseEvent) {
                 </div>
               </div>
             </div>
-            
+
             <p class="hint">
               <i class="fa-solid fa-info-circle"></i>
-              {{ activeEntry.imagePreviewUrl ? 'Ziehen Sie das Bild mit der Maus' : 'Laden Sie ein Bild hoch um es zu positionieren' }}
+              {{
+                activeEntry.imagePreviewUrl
+                  ? 'Ziehen Sie das Bild mit der Maus'
+                  : 'Laden Sie ein Bild hoch um es zu positionieren'
+              }}
             </p>
           </div>
         </div>
@@ -391,9 +403,11 @@ function startDrag(event: MouseEvent) {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-4);
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 10%, transparent),
-    color-mix(in oklab, var(--green) 8%, transparent));
+    color-mix(in oklab, var(--green) 8%, transparent)
+  );
   border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
   border-radius: var(--radius-xl);
 }
@@ -870,7 +884,7 @@ function startDrag(event: MouseEvent) {
   .entries-layout {
     grid-template-columns: 1fr;
   }
-  
+
   .entries-list {
     max-height: 300px;
   }
@@ -899,7 +913,7 @@ function startDrag(event: MouseEvent) {
 }
 
 /* Dark mode */
-[data-theme="dark"] .mini-preview {
+[data-theme='dark'] .mini-preview {
   background: #f5f5f5;
 }
 </style>

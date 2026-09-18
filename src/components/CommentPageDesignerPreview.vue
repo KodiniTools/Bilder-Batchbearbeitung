@@ -5,7 +5,15 @@
         <div class="preview-modal">
           <div class="preview-header">
             <div class="preview-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
@@ -17,21 +25,55 @@
 
             <!-- Seitennavigation in Vorschau -->
             <div class="preview-page-nav">
-              <button :disabled="previewPageIndex === 0" class="preview-nav-btn" @click="previewPageIndex--">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button
+                :disabled="previewPageIndex === 0"
+                class="preview-nav-btn"
+                @click="previewPageIndex--"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
               </button>
-              <span class="preview-page-info">Seite {{ previewPageIndex + 1 }} von {{ pages.length }}</span>
-              <button :disabled="previewPageIndex === pages.length - 1" class="preview-nav-btn" @click="previewPageIndex++">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <span class="preview-page-info">
+                Seite {{ previewPageIndex + 1 }} von {{ pages.length }}
+              </span>
+              <button
+                :disabled="previewPageIndex === pages.length - 1"
+                class="preview-nav-btn"
+                @click="previewPageIndex++"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>
             </div>
 
             <button class="preview-close-btn" @click="close">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -46,7 +88,7 @@
                   width: pageWidth + 'px',
                   height: pageHeight + 'px',
                   transform: `scale(${previewScale})`,
-                  transformOrigin: 'top center'
+                  transformOrigin: 'top center',
                 }"
               >
                 <!-- Elemente der aktuellen Vorschauseite -->
@@ -66,7 +108,7 @@
                       color: element.color,
                       textAlign: element.align,
                       fontWeight: element.bold ? 'bold' : 'normal',
-                      fontStyle: element.italic ? 'italic' : 'normal'
+                      fontStyle: element.italic ? 'italic' : 'normal',
                     }"
                   >
                     <div class="preview-text-content">{{ element.content }}</div>
@@ -80,19 +122,26 @@
                       left: element.x + 'px',
                       top: element.y + 'px',
                       width: element.width + 'px',
-                      opacity: element.opacity
+                      opacity: element.opacity,
                     }"
                   >
-                    <img :src="element.src" class="preview-image-content" draggable="false">
+                    <img :src="element.src" class="preview-image-content" draggable="false" />
                   </div>
                 </template>
 
                 <!-- Footer-Vorschau wie im Editor -->
                 <div class="canvas-footer-preview">
-                  {{ new Date().toLocaleDateString('de-DE') }} · Kommentarseite {{ previewPageIndex + 1 }}{{ pages.length > 1 ? ` von ${pages.length}` : '' }}
+                  {{ new Date().toLocaleDateString('de-DE') }} · Kommentarseite
+                  {{ previewPageIndex + 1 }}{{ pages.length > 1 ? ` von ${pages.length}` : '' }}
                 </div>
               </div>
-              <div class="preview-page-shadow" :style="{ width: pageWidth * previewScale + 'px', height: pageHeight * previewScale + 'px' }"></div>
+              <div
+                class="preview-page-shadow"
+                :style="{
+                  width: pageWidth * previewScale + 'px',
+                  height: pageHeight * previewScale + 'px',
+                }"
+              ></div>
             </div>
           </div>
 
@@ -110,7 +159,15 @@
           <div class="preview-footer">
             <button class="btn-secondary" @click="close">Schließen &amp; weiter bearbeiten</button>
             <button class="btn-primary" @click="save">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               Speichern
@@ -146,10 +203,10 @@ const previewPageIndex = ref(0)
 
 // Jump to the requested page each time the preview is opened
 watch(
-    () => props.modelValue,
-    (isOpen) => {
-      if (isOpen) previewPageIndex.value = props.initialPage
-    },
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen) previewPageIndex.value = props.initialPage
+  }
 )
 
 const previewScale = computed(() => {
@@ -159,7 +216,7 @@ const previewScale = computed(() => {
 })
 
 const previewElements = computed<CanvasElement[]>(
-    () => props.pages[previewPageIndex.value]?.elements || [],
+  () => props.pages[previewPageIndex.value]?.elements || []
 )
 
 function close() {
@@ -219,7 +276,7 @@ function save() {
   max-width: 95vw;
   max-height: 95vh;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
 
 .preview-header {
@@ -257,8 +314,13 @@ function save() {
   display: flex;
   transition: background 0.15s;
 }
-.preview-nav-btn:hover:not(:disabled) { background: var(--bg, #111); }
-.preview-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.preview-nav-btn:hover:not(:disabled) {
+  background: var(--bg, #111);
+}
+.preview-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 
 .preview-page-info {
   font-size: 0.875rem;
@@ -276,7 +338,9 @@ function save() {
   display: flex;
   transition: color 0.15s;
 }
-.preview-close-btn:hover { color: var(--text, #fff); }
+.preview-close-btn:hover {
+  color: var(--text, #fff);
+}
 
 .preview-body {
   flex: 1;
@@ -295,14 +359,14 @@ function save() {
   background: white;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .preview-page-shadow {
   position: absolute;
   top: 5px;
   left: 5px;
-  background: rgba(0,0,0,0.18);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 2px;
   z-index: -1;
   pointer-events: none;
@@ -345,7 +409,9 @@ function save() {
   background: var(--border-color, #444);
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .preview-dot.active {
   background: var(--accent);

@@ -180,9 +180,11 @@ onMounted(() => {
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 8%, transparent) 0%,
-    color-mix(in oklab, var(--green) 6%, transparent) 100%);
+    color-mix(in oklab, var(--green) 6%, transparent) 100%
+  );
   border-radius: var(--radius-2xl);
   border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
   margin-bottom: var(--space-6);
@@ -307,7 +309,11 @@ onMounted(() => {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
+  );
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

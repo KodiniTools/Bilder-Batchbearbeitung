@@ -6,7 +6,15 @@
           <!-- Header -->
           <div class="designer-header">
             <div class="header-content">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="3" y1="9" x2="21" y2="9"></line>
               </svg>
@@ -20,7 +28,9 @@
                 </p>
               </div>
             </div>
-            <button class="close-btn" :title="t('frontPageDesigner.close')" @click="closeDesigner">×</button>
+            <button class="close-btn" :title="t('frontPageDesigner.close')" @click="closeDesigner">
+              ×
+            </button>
           </div>
 
           <!-- Toolbar -->
@@ -31,7 +41,15 @@
                 :title="t('frontPageDesigner.toolbar.addTextTooltip')"
                 @click="addTextElement"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="4 7 4 4 20 4 20 7"></polyline>
                   <line x1="9" y1="20" x2="15" y2="20"></line>
                   <line x1="12" y1="4" x2="12" y2="20"></line>
@@ -44,7 +62,15 @@
                 :title="t('frontPageDesigner.toolbar.addImageTooltip')"
                 @click="triggerImageUpload"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <polyline points="21 15 16 10 5 21"></polyline>
@@ -55,9 +81,9 @@
                 ref="imageInput"
                 type="file"
                 accept="image/*"
-                style="display: none;"
+                style="display: none"
                 @change="handleImageUpload"
-              >
+              />
             </div>
 
             <div class="tool-group">
@@ -67,9 +93,19 @@
                 :title="t('frontPageDesigner.toolbar.clearAllTooltip')"
                 @click="clearCanvas"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
                 </svg>
                 {{ t('frontPageDesigner.toolbar.clearAll') }}
               </button>
@@ -80,11 +116,31 @@
           <div class="canvas-container">
             <!-- Zoom Controls -->
             <div class="zoom-controls">
-              <button :disabled="zoomLevel <= 0.25" :title="t('frontPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
+              <button
+                :disabled="zoomLevel <= 0.25"
+                :title="t('frontPageDesigner.zoom.zoomOut')"
+                @click="zoomOut"
+              >
+                −
+              </button>
               <span>{{ Math.round(zoomLevel * 100) }}%</span>
-              <button :disabled="zoomLevel >= 2" :title="t('frontPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
+              <button
+                :disabled="zoomLevel >= 2"
+                :title="t('frontPageDesigner.zoom.zoomIn')"
+                @click="zoomIn"
+              >
+                +
+              </button>
               <button :title="t('frontPageDesigner.zoom.reset')" @click="resetZoom">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                   <path d="M21 3v5h-5"></path>
                   <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
@@ -95,7 +151,13 @@
 
             <div class="canvas-scroll-area">
               <div ref="canvasWrapperRef" class="canvas-wrapper">
-                <div class="canvas-inner" :style="{ paddingTop: canvasVerticalPadding + 'px', paddingBottom: canvasVerticalPadding + 'px' }">
+                <div
+                  class="canvas-inner"
+                  :style="{
+                    paddingTop: canvasVerticalPadding + 'px',
+                    paddingBottom: canvasVerticalPadding + 'px',
+                  }"
+                >
                   <div
                     ref="canvasRef"
                     class="canvas"
@@ -105,7 +167,7 @@
                       transform: `scale(${zoomLevel})`,
                       transformOrigin: 'top left',
                       marginRight: `${canvasW * (zoomLevel - 1)}px`,
-                      marginBottom: `${canvasH * (zoomLevel - 1)}px`
+                      marginBottom: `${canvasH * (zoomLevel - 1)}px`,
                     }"
                     @click="deselectAll"
                   >
@@ -143,15 +205,35 @@
               <button class="btn-secondary" @click="closeDesigner">
                 {{ t('frontPageDesigner.footer.cancel') }}
               </button>
-              <button class="btn-preview" :disabled="elements.length === 0" @click="showPreview = true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button
+                class="btn-preview"
+                :disabled="elements.length === 0"
+                @click="showPreview = true"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
                 Vorschau
               </button>
               <button class="btn-primary" @click="saveAndClose">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 {{ t('frontPageDesigner.footer.save') }}
@@ -168,7 +250,15 @@
         <div class="preview-modal">
           <div class="preview-header">
             <div class="preview-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
@@ -178,7 +268,15 @@
               </span>
             </div>
             <button class="preview-close-btn" @click="showPreview = false">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -192,7 +290,7 @@
                   width: canvasW + 'px',
                   height: canvasH + 'px',
                   transform: `scale(${previewScale})`,
-                  transformOrigin: 'top center'
+                  transformOrigin: 'top center',
                 }"
               >
                 <div
@@ -209,24 +307,45 @@
                     fontFamily: element.fontFamily || 'Helvetica, Arial, sans-serif',
                     fontWeight: element.fontWeight,
                     textAlign: element.textAlign,
-                    color: element.color
+                    color: element.color,
                   }"
                 >
                   <template v-if="element.type === 'text'">
                     <div class="preview-text-content">{{ element.content }}</div>
                   </template>
                   <template v-else-if="element.type === 'image'">
-                    <img :src="element.src" :alt="element.alt" class="preview-image-content" draggable="false">
+                    <img
+                      :src="element.src"
+                      :alt="element.alt"
+                      class="preview-image-content"
+                      draggable="false"
+                    />
                   </template>
                 </div>
               </div>
-              <div class="preview-page-shadow" :style="{ width: canvasW * previewScale + 'px', height: canvasH * previewScale + 'px' }"></div>
+              <div
+                class="preview-page-shadow"
+                :style="{
+                  width: canvasW * previewScale + 'px',
+                  height: canvasH * previewScale + 'px',
+                }"
+              ></div>
             </div>
           </div>
           <div class="preview-footer">
-            <button class="btn-secondary" @click="showPreview = false">Schließen &amp; weiter bearbeiten</button>
-            <button class="btn-primary" @click="showPreview = false; saveAndClose()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="btn-secondary" @click="showPreview = false">
+              Schließen &amp; weiter bearbeiten
+            </button>
+            <button class="btn-primary" @click="saveFromPreview">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               Speichern
@@ -250,7 +369,7 @@ export const CUSTOM_FONT_FAMILIES = [
   'Ranade',
   'Satoshi',
   'Supreme',
-  'Switzer'
+  'Switzer',
 ] as const
 
 export interface FrontPageElement {
@@ -315,8 +434,8 @@ const dragStart = ref({ x: 0, y: 0 })
 const elementStartPos = ref({ x: 0, y: 0, width: 0, height: 0 })
 
 // Canvas-Dimensionen abhängig von Orientierung
-const canvasW = computed(() => props.orientation === 'landscape' ? 1123 : 794)
-const canvasH = computed(() => props.orientation === 'landscape' ? 794 : 1123)
+const canvasW = computed(() => (props.orientation === 'landscape' ? 1123 : 794))
+const canvasH = computed(() => (props.orientation === 'landscape' ? 794 : 1123))
 
 // Vertikales Padding damit Canvas beim Fit-Zoom vertikal zentriert erscheint
 const canvasVerticalPadding = computed(() => {
@@ -335,28 +454,37 @@ const previewScale = computed(() => {
 
 // Computed
 const selectedElement = computed(() =>
-  elements.value.find(el => el.id === selectedElementId.value)
+  elements.value.find((el) => el.id === selectedElementId.value)
 )
 
 // Elemente zurücksetzen wenn Orientierung wechselt (Layout würde sonst nicht passen)
-watch(() => props.orientation, () => {
-  if (elements.value.length > 0) {
-    if (confirm('Die Orientierung hat sich geändert. Elemente zurücksetzen?')) {
-      elements.value = []
-      selectedElementId.value = null
+watch(
+  () => props.orientation,
+  () => {
+    if (elements.value.length > 0) {
+      if (confirm('Die Orientierung hat sich geändert. Elemente zurücksetzen?')) {
+        elements.value = []
+        selectedElementId.value = null
+      }
     }
   }
-})
+)
 
 // Auto-fit wenn Orientierung wechselt
-watch(() => props.orientation, () => {
-  nextTick(() => fitZoom())
-})
+watch(
+  () => props.orientation,
+  () => {
+    nextTick(() => fitZoom())
+  }
+)
 
 // Auto-fit wenn Modal geöffnet wird
-watch(() => props.modelValue, (open) => {
-  if (open) nextTick(() => fitZoom())
-})
+watch(
+  () => props.modelValue,
+  (open) => {
+    if (open) nextTick(() => fitZoom())
+  }
+)
 
 // Initialize
 onMounted(() => {
@@ -388,7 +516,7 @@ function addTextElement() {
     fontFamily: 'Helvetica',
     fontWeight: 'normal',
     textAlign: 'left',
-    color: '#000000'
+    color: '#000000',
   }
   elements.value.push(newElement)
   selectElement(newElement.id)
@@ -428,7 +556,7 @@ function handleImageUpload(event: Event) {
         src: e.target?.result as string,
         alt: file.name,
         originalWidth: img.width,
-        originalHeight: img.height
+        originalHeight: img.height,
       }
       elements.value.push(newElement)
       selectElement(newElement.id)
@@ -441,7 +569,7 @@ function handleImageUpload(event: Event) {
 }
 
 function deleteElement(id: string) {
-  elements.value = elements.value.filter(el => el.id !== id)
+  elements.value = elements.value.filter((el) => el.id !== id)
   selectedElementId.value = null
 }
 
@@ -453,7 +581,7 @@ function clearCanvas() {
 }
 
 function updateElementContent(id: string, content: string) {
-  const el = elements.value.find(e => e.id === id)
+  const el = elements.value.find((e) => e.id === id)
   if (el) el.content = content
 }
 
@@ -483,7 +611,7 @@ function stopEditingText() {
 function startDrag(event: MouseEvent, id: string) {
   if (editingTextId.value) return
 
-  const element = elements.value.find(el => el.id === id)
+  const element = elements.value.find((el) => el.id === id)
   if (!element) return
 
   isDragging.value = true
@@ -493,13 +621,13 @@ function startDrag(event: MouseEvent, id: string) {
     x: element.x,
     y: element.y,
     width: element.width,
-    height: element.height
+    height: element.height,
   }
 }
 
 // Resize
 function startResize(event: MouseEvent, id: string, direction: string) {
-  const element = elements.value.find(el => el.id === id)
+  const element = elements.value.find((el) => el.id === id)
   if (!element) return
 
   isResizing.value = true
@@ -510,14 +638,14 @@ function startResize(event: MouseEvent, id: string, direction: string) {
     x: element.x,
     y: element.y,
     width: element.width,
-    height: element.height
+    height: element.height,
   }
 }
 
 // Mouse Handlers
 function handleMouseMove(event: MouseEvent) {
   if (isDragging.value) {
-    const element = elements.value.find(el => el.id === selectedElementId.value)
+    const element = elements.value.find((el) => el.id === selectedElementId.value)
     if (!element) return
 
     const dx = event.clientX / zoomLevel.value - dragStart.value.x
@@ -528,7 +656,7 @@ function handleMouseMove(event: MouseEvent) {
   }
 
   if (isResizing.value) {
-    const element = elements.value.find(el => el.id === selectedElementId.value)
+    const element = elements.value.find((el) => el.id === selectedElementId.value)
     if (!element) return
 
     const dx = event.clientX / zoomLevel.value - dragStart.value.x
@@ -598,7 +726,8 @@ function handleMouseUp() {
 // Aspect Ratio (for images)
 function maintainAspectRatio() {
   const element = selectedElement.value
-  if (!element || element.type !== 'image' || !element.originalWidth || !element.originalHeight) return
+  if (!element || element.type !== 'image' || !element.originalWidth || !element.originalHeight)
+    return
 
   const ratio = element.originalWidth / element.originalHeight
   element.height = Math.round(element.width / ratio)
@@ -618,7 +747,8 @@ function fitZoom() {
   const wrapper = canvasWrapperRef.value
   const availW = wrapper.clientWidth - 80
   const availH = wrapper.clientHeight - 80
-  zoomLevel.value = Math.round(Math.min(availW / canvasW.value, availH / canvasH.value, 1) * 100) / 100
+  zoomLevel.value =
+    Math.round(Math.min(availW / canvasW.value, availH / canvasH.value, 1) * 100) / 100
 }
 
 function resetZoom() {
@@ -629,6 +759,12 @@ function resetZoom() {
 function saveAndClose() {
   emit('save', JSON.parse(JSON.stringify(elements.value)))
   closeDesigner()
+}
+
+/** Vorschau schließen und speichern (Button in der Vorschau) */
+function saveFromPreview() {
+  showPreview.value = false
+  saveAndClose()
 }
 
 function closeDesigner() {
@@ -870,7 +1006,10 @@ function closeDesigner() {
   position: relative;
   flex-shrink: 0;
   transform-origin: top left;
-  transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    margin-right 0.2s ease,
+    margin-bottom 0.2s ease;
 }
 
 /* Footer */
@@ -968,7 +1107,7 @@ function closeDesigner() {
   max-width: 95vw;
   max-height: 95vh;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
 .preview-header {
@@ -999,7 +1138,9 @@ function closeDesigner() {
   display: flex;
   transition: color 0.15s;
 }
-.preview-close-btn:hover { color: var(--text); }
+.preview-close-btn:hover {
+  color: var(--text);
+}
 
 .preview-body {
   flex: 1;
@@ -1018,14 +1159,14 @@ function closeDesigner() {
   background: white;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .preview-page-shadow {
   position: absolute;
   top: 4px;
   left: 4px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 2px;
   z-index: -1;
   pointer-events: none;
@@ -1075,7 +1216,9 @@ function closeDesigner() {
 /* Transitions */
 .designer-modal-enter-active,
 .designer-modal-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .designer-modal-enter-from,

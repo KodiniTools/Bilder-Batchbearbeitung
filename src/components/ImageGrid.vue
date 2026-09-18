@@ -12,7 +12,7 @@ const props = withDefaults(
     onlySelected?: boolean
   }>(),
   {
-    onlySelected: false
+    onlySelected: false,
   }
 )
 
@@ -32,10 +32,10 @@ const displayedImages = computed(() =>
 const CARD_MIN_WIDTH: Record<string, string> = {
   small: '180px',
   medium: '260px',
-  large: '400px'
+  large: '400px',
 }
 const gridStyle = computed(() => ({
-  '--card-min': CARD_MIN_WIDTH[imageStore.gridSize] || CARD_MIN_WIDTH.medium
+  '--card-min': CARD_MIN_WIDTH[imageStore.gridSize] || CARD_MIN_WIDTH.medium,
 }))
 
 // Drag & Drop State
@@ -103,8 +103,6 @@ function handleDrop(event: DragEvent, toIndex: number) {
   draggedIndex.value = null
   dropTargetIndex.value = null
 }
-
-
 </script>
 
 <template>
@@ -117,7 +115,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
         :class="{
           'drop-target': dropTargetIndex === index,
           'drop-before': dropTargetIndex === index && draggedIndex !== null && draggedIndex > index,
-          'drop-after': dropTargetIndex === index && draggedIndex !== null && draggedIndex < index
+          'drop-after': dropTargetIndex === index && draggedIndex !== null && draggedIndex < index,
         }"
         draggable="true"
         @dragstart="handleDragStart($event, index)"

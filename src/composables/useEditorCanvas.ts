@@ -7,7 +7,7 @@ export function useEditorCanvas(
   previewAreaRef: Ref<HTMLElement | null>,
   canvasWrapperRef: Ref<HTMLElement | null>,
   changesApplied: Ref<boolean>,
-  onEditedPreview?: () => void,
+  onEditedPreview?: () => void
 ) {
   // Internal (non-reactive) canvases / state
   let _workingCanvas: HTMLCanvasElement | null = null
@@ -98,19 +98,25 @@ export function useEditorCanvas(
     const w = _workingCanvas.width
     const h = _workingCanvas.height
     if (Math.abs(degrees) === 90) {
-      tempCanvas.width = h; tempCanvas.height = w
+      tempCanvas.width = h
+      tempCanvas.height = w
       tempCtx.translate(h / 2, w / 2)
       tempCtx.rotate((degrees * Math.PI) / 180)
       tempCtx.drawImage(_workingCanvas, -w / 2, -h / 2)
-      _workingCanvas.width = h; _workingCanvas.height = w
+      _workingCanvas.width = h
+      _workingCanvas.height = w
     } else {
-      tempCanvas.width = w; tempCanvas.height = h
+      tempCanvas.width = w
+      tempCanvas.height = h
       tempCtx.translate(w / 2, h / 2)
       tempCtx.rotate((degrees * Math.PI) / 180)
       tempCtx.drawImage(_workingCanvas, -w / 2, -h / 2)
     }
     const ctx = _workingCanvas.getContext('2d')
-    if (ctx) { ctx.clearRect(0, 0, _workingCanvas.width, _workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
+    if (ctx) {
+      ctx.clearRect(0, 0, _workingCanvas.width, _workingCanvas.height)
+      ctx.drawImage(tempCanvas, 0, 0)
+    }
     _aspectRatio = _workingCanvas.width / _workingCanvas.height
     updatePreview()
   }
@@ -119,18 +125,24 @@ export function useEditorCanvas(
     if (!_workingCanvas) return
     changesApplied.value = false
     const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = _workingCanvas.width; tempCanvas.height = _workingCanvas.height
+    tempCanvas.width = _workingCanvas.width
+    tempCanvas.height = _workingCanvas.height
     const tempCtx = tempCanvas.getContext('2d')
     if (!tempCtx) return
     tempCtx.save()
     if (direction === 'horizontal') {
-      tempCtx.scale(-1, 1); tempCtx.drawImage(_workingCanvas, -_workingCanvas.width, 0)
+      tempCtx.scale(-1, 1)
+      tempCtx.drawImage(_workingCanvas, -_workingCanvas.width, 0)
     } else {
-      tempCtx.scale(1, -1); tempCtx.drawImage(_workingCanvas, 0, -_workingCanvas.height)
+      tempCtx.scale(1, -1)
+      tempCtx.drawImage(_workingCanvas, 0, -_workingCanvas.height)
     }
     tempCtx.restore()
     const ctx = _workingCanvas.getContext('2d')
-    if (ctx) { ctx.clearRect(0, 0, _workingCanvas.width, _workingCanvas.height); ctx.drawImage(tempCanvas, 0, 0) }
+    if (ctx) {
+      ctx.clearRect(0, 0, _workingCanvas.width, _workingCanvas.height)
+      ctx.drawImage(tempCanvas, 0, 0)
+    }
     updatePreview()
   }
 
@@ -140,9 +152,15 @@ export function useEditorCanvas(
     isCropMode.value = true
   }
 
-  function cancelCropMode() { isCropMode.value = false }
-  function setCropRatio(ratio: number | null) { cropLockedRatio.value = ratio }
-  function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) { cropNorm.value = rect }
+  function cancelCropMode() {
+    isCropMode.value = false
+  }
+  function setCropRatio(ratio: number | null) {
+    cropLockedRatio.value = ratio
+  }
+  function onCropUpdate(rect: { x: number; y: number; w: number; h: number }) {
+    cropNorm.value = rect
+  }
 
   function applyCrop() {
     if (!_workingCanvas) return
@@ -151,13 +169,18 @@ export function useEditorCanvas(
     const w = Math.max(1, Math.round(cropNorm.value.w * _workingCanvas.width))
     const h = Math.max(1, Math.round(cropNorm.value.h * _workingCanvas.height))
     const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = w; tempCanvas.height = h
+    tempCanvas.width = w
+    tempCanvas.height = h
     const tempCtx = tempCanvas.getContext('2d')
     if (!tempCtx) return
     tempCtx.drawImage(_workingCanvas, x, y, w, h, 0, 0, w, h)
-    _workingCanvas.width = w; _workingCanvas.height = h
+    _workingCanvas.width = w
+    _workingCanvas.height = h
     const ctx = _workingCanvas.getContext('2d')
-    if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(tempCanvas, 0, 0) }
+    if (ctx) {
+      ctx.clearRect(0, 0, w, h)
+      ctx.drawImage(tempCanvas, 0, 0)
+    }
     _aspectRatio = w / h
     isCropMode.value = false
     changesApplied.value = false
@@ -182,8 +205,13 @@ export function useEditorCanvas(
     let hr: number
     if (sideShort <= 2 * sinA * cosA * sideLong || Math.abs(sinA - cosA) < 1e-10) {
       const x = 0.5 * sideShort
-      if (widthIsLonger) { wr = x / sinA; hr = x / cosA }
-      else { wr = x / cosA; hr = x / sinA }
+      if (widthIsLonger) {
+        wr = x / sinA
+        hr = x / cosA
+      } else {
+        wr = x / cosA
+        hr = x / sinA
+      }
     } else {
       const cos2a = cosA * cosA - sinA * sinA
       wr = (w * cosA - h * sinA) / cos2a
@@ -317,11 +345,21 @@ export function useEditorCanvas(
   }
 
   // ── Accessors ───────────────────────────────────────────────────
-  function getWorkingCanvas() { return _workingCanvas }
-  function getOriginalCanvas() { return _originalCanvas }
-  function getOriginalImageObj() { return _originalImageObj }
-  function getAspectRatio() { return _aspectRatio }
-  function setAspectRatio(ratio: number) { _aspectRatio = ratio }
+  function getWorkingCanvas() {
+    return _workingCanvas
+  }
+  function getOriginalCanvas() {
+    return _originalCanvas
+  }
+  function getOriginalImageObj() {
+    return _originalImageObj
+  }
+  function getAspectRatio() {
+    return _aspectRatio
+  }
+  function setAspectRatio(ratio: number) {
+    _aspectRatio = ratio
+  }
 
   return {
     // reactive state

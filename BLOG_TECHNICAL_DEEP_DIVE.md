@@ -35,58 +35,56 @@ Die Web Audio API ist eine leistungsstarke Browser-API für die Audioverarbeitun
 
 Die Web Audio API basiert auf einem modularen Routing-System. Audio-Nodes werden miteinander verbunden und bilden einen Verarbeitungsgraphen.
 
-| Konzept | Beschreibung |
-|---------|-------------|
+| Konzept          | Beschreibung                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
 | **AudioContext** | Der zentrale Koordinator für alle Audio-Operationen. Verwaltet den Audio-Graph und die Zeitsteuerung. |
-| **AudioNode** | Bausteine der Audio-Verarbeitung: Sources, Effects, Analyser und Destination. |
-| **AudioBuffer** | Container für Audio-Daten im Speicher. Ermöglicht effiziente Wiedergabe und Manipulation. |
-| **AudioParam** | Automatisierbare Parameter für präzise Steuerung von Lautstärke, Frequenz und mehr. |
+| **AudioNode**    | Bausteine der Audio-Verarbeitung: Sources, Effects, Analyser und Destination.                         |
+| **AudioBuffer**  | Container für Audio-Daten im Speicher. Ermöglicht effiziente Wiedergabe und Manipulation.             |
+| **AudioParam**   | Automatisierbare Parameter für präzise Steuerung von Lautstärke, Frequenz und mehr.                   |
 
 ### 1.2 Grundlegende Audio-Wiedergabe
 
 ```javascript
 // AudioContext erstellen
-const audioContext = new AudioContext();
+const audioContext = new AudioContext()
 
 // Audio-Datei laden und abspielen
 async function playAudio(url) {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  const response = await fetch(url)
+  const arrayBuffer = await response.arrayBuffer()
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
 
   // Source-Node erstellen
-  const source = audioContext.createBufferSource();
-  source.buffer = audioBuffer;
+  const source = audioContext.createBufferSource()
+  source.buffer = audioBuffer
 
   // Gain-Node für Lautstärke
-  const gainNode = audioContext.createGain();
-  gainNode.gain.value = 0.5;
+  const gainNode = audioContext.createGain()
+  gainNode.gain.value = 0.5
 
   // Nodes verbinden: Source -> Gain -> Destination
-  source.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  source.connect(gainNode)
+  gainNode.connect(audioContext.destination)
 
   // Abspielen
-  source.start();
+  source.start()
 }
 
 // Oszillator für Töne erzeugen
 function playTone(frequency, duration) {
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = 'sine'; // sine, square, sawtooth, triangle
-  oscillator.frequency.value = frequency;
+  const oscillator = audioContext.createOscillator()
+  oscillator.type = 'sine' // sine, square, sawtooth, triangle
+  oscillator.frequency.value = frequency
 
-  const gainNode = audioContext.createGain();
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.001, audioContext.currentTime + duration
-  );
+  const gainNode = audioContext.createGain()
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+  gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration)
 
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  oscillator.connect(gainNode)
+  gainNode.connect(audioContext.destination)
 
-  oscillator.start();
-  oscillator.stop(audioContext.currentTime + duration);
+  oscillator.start()
+  oscillator.stop(audioContext.currentTime + duration)
 }
 ```
 
@@ -96,46 +94,46 @@ Mit dem AnalyserNode können Sie Frequenz- und Zeitbereichsdaten extrahieren und
 
 ```javascript
 // AnalyserNode für Frequenzanalyse
-const analyser = audioContext.createAnalyser();
-analyser.fftSize = 2048;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
+const analyser = audioContext.createAnalyser()
+analyser.fftSize = 2048
+const bufferLength = analyser.frequencyBinCount
+const dataArray = new Uint8Array(bufferLength)
 
 // Audio-Source mit Analyser verbinden
-source.connect(analyser);
-analyser.connect(audioContext.destination);
+source.connect(analyser)
+analyser.connect(audioContext.destination)
 
 // Visualisierung mit Canvas
 function visualize(canvas) {
-  const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
+  const ctx = canvas.getContext('2d')
+  const width = canvas.width
+  const height = canvas.height
 
   function draw() {
-    requestAnimationFrame(draw);
+    requestAnimationFrame(draw)
 
     // Frequenzdaten abrufen
-    analyser.getByteFrequencyData(dataArray);
+    analyser.getByteFrequencyData(dataArray)
 
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#1a1a2e'
+    ctx.fillRect(0, 0, width, height)
 
-    const barWidth = (width / bufferLength) * 2.5;
-    let x = 0;
+    const barWidth = (width / bufferLength) * 2.5
+    let x = 0
 
     for (let i = 0; i < bufferLength; i++) {
-      const barHeight = (dataArray[i] / 255) * height;
+      const barHeight = (dataArray[i] / 255) * height
 
       // Farbverlauf basierend auf Frequenz
-      const hue = (i / bufferLength) * 360;
-      ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+      const hue = (i / bufferLength) * 360
+      ctx.fillStyle = `hsl(${hue}, 70%, 50%)`
 
-      ctx.fillRect(x, height - barHeight, barWidth, barHeight);
-      x += barWidth + 1;
+      ctx.fillRect(x, height - barHeight, barWidth, barHeight)
+      x += barWidth + 1
     }
   }
 
-  draw();
+  draw()
 }
 ```
 
@@ -143,29 +141,27 @@ function visualize(canvas) {
 
 ```javascript
 // Biquad Filter für EQ
-const filter = audioContext.createBiquadFilter();
-filter.type = 'lowpass'; // lowpass, highpass, bandpass, etc.
-filter.frequency.value = 1000;
-filter.Q.value = 1;
+const filter = audioContext.createBiquadFilter()
+filter.type = 'lowpass' // lowpass, highpass, bandpass, etc.
+filter.frequency.value = 1000
+filter.Q.value = 1
 
 // Convolver für Hall-Effekte
-const convolver = audioContext.createConvolver();
+const convolver = audioContext.createConvolver()
 // Impulse Response laden
-const impulseResponse = await fetch('/impulse.wav');
-const impulseBuffer = await audioContext.decodeAudioData(
-  await impulseResponse.arrayBuffer()
-);
-convolver.buffer = impulseBuffer;
+const impulseResponse = await fetch('/impulse.wav')
+const impulseBuffer = await audioContext.decodeAudioData(await impulseResponse.arrayBuffer())
+convolver.buffer = impulseBuffer
 
 // Delay-Effekt
-const delay = audioContext.createDelay(5.0);
-delay.delayTime.value = 0.5;
+const delay = audioContext.createDelay(5.0)
+delay.delayTime.value = 0.5
 
 // Verkettung: Source -> Filter -> Delay -> Convolver -> Destination
-source.connect(filter);
-filter.connect(delay);
-delay.connect(convolver);
-convolver.connect(audioContext.destination);
+source.connect(filter)
+filter.connect(delay)
+delay.connect(convolver)
+convolver.connect(audioContext.destination)
 ```
 
 > **Tipp:** AudioContext muss durch eine Benutzerinteraktion gestartet werden (z.B. Klick), da Browser Autoplay blockieren.
@@ -178,11 +174,11 @@ Vue.js 3 bringt die Composition API, die eine flexiblere und besser wiederverwen
 
 ### 2.1 Options API vs. Composition API
 
-| Options API | Composition API |
-|-------------|-----------------|
+| Options API                                          | Composition API                                      |
+| ---------------------------------------------------- | ---------------------------------------------------- |
 | Klassischer Ansatz mit `data`, `methods`, `computed` | Moderner Ansatz mit `setup()`, `ref()`, `reactive()` |
-| Gut für einfache Komponenten | Ideal für komplexe Logik und Wiederverwendung |
-| Logik nach Optionstyp gruppiert | Logik nach Feature gruppiert |
+| Gut für einfache Komponenten                         | Ideal für komplexe Logik und Wiederverwendung        |
+| Logik nach Optionstyp gruppiert                      | Logik nach Feature gruppiert                         |
 
 ### 2.2 Reaktivitätssystem
 
@@ -202,8 +198,8 @@ const user = reactive({
   age: 25,
   settings: {
     theme: 'dark',
-    notifications: true
-  }
+    notifications: true,
+  },
 })
 
 // computed() für berechnete Werte
@@ -222,7 +218,7 @@ watchEffect(() => {
 
 // Methoden
 const increment = () => count.value++
-const updateUser = (newName: string) => user.name = newName
+const updateUser = (newName: string) => (user.name = newName)
 </script>
 
 <template>
@@ -288,7 +284,7 @@ export function useAudio() {
     isPlaying,
     volume,
     playSound,
-    setVolume
+    setVolume,
   }
 }
 ```
@@ -305,14 +301,14 @@ const { isPlaying, volume, playSound, setVolume } = useAudio()
 
 ### 2.4 Lifecycle Hooks
 
-| Hook | Beschreibung |
-|------|-------------|
-| `onMounted` | DOM ist bereit, externe APIs initialisieren |
-| `onUpdated` | Nach jedem reaktiven Update |
-| `onUnmounted` | Aufräumen, Event-Listener entfernen |
-| `onBeforeMount` | Bevor das DOM erstellt wird |
-| `onBeforeUpdate` | Vor dem Re-render |
-| `onBeforeUnmount` | Vor dem Entfernen der Komponente |
+| Hook              | Beschreibung                                |
+| ----------------- | ------------------------------------------- |
+| `onMounted`       | DOM ist bereit, externe APIs initialisieren |
+| `onUpdated`       | Nach jedem reaktiven Update                 |
+| `onUnmounted`     | Aufräumen, Event-Listener entfernen         |
+| `onBeforeMount`   | Bevor das DOM erstellt wird                 |
+| `onBeforeUpdate`  | Vor dem Re-render                           |
+| `onBeforeUnmount` | Vor dem Entfernen der Komponente            |
 
 ```typescript
 import { onMounted, onUnmounted } from 'vue'
@@ -336,12 +332,12 @@ Die Canvas API ermöglicht pixelgenaue Bildmanipulation direkt im Browser. Ideal
 
 ### 3.1 Grundlagen
 
-| Feature | Beschreibung |
-|---------|-------------|
-| **2D-Zeichnung** | Formen, Linien, Text und komplexe Pfade zeichnen |
+| Feature              | Beschreibung                                           |
+| -------------------- | ------------------------------------------------------ |
+| **2D-Zeichnung**     | Formen, Linien, Text und komplexe Pfade zeichnen       |
 | **Bildmanipulation** | Bilder laden, transformieren und pixelweise bearbeiten |
-| **Filter & Effekte** | Helligkeit, Kontrast, Graustufen und mehr |
-| **Export** | Als PNG, JPEG oder WebP exportieren |
+| **Filter & Effekte** | Helligkeit, Kontrast, Graustufen und mehr              |
+| **Export**           | Als PNG, JPEG oder WebP exportieren                    |
 
 ### 3.2 Bildverarbeitung
 
@@ -364,7 +360,7 @@ function processImage(image) {
   // Graustufenkonvertierung
   for (let i = 0; i < data.length; i += 4) {
     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-    data[i] = avg     // R
+    data[i] = avg // R
     data[i + 1] = avg // G
     data[i + 2] = avg // B
     // data[i + 3] ist Alpha, unverändert
@@ -471,7 +467,10 @@ function applyBlur(imageData, radius) {
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let r = 0, g = 0, b = 0, count = 0
+      let r = 0,
+        g = 0,
+        b = 0,
+        count = 0
 
       for (let dy = -radius; dy <= radius; dy++) {
         for (let dx = -radius; dx <= radius; dx++) {
@@ -510,11 +509,11 @@ Die File API ermöglicht den Zugriff auf vom Benutzer ausgewählte Dateien. Zusa
 
 ### 4.1 Kern-APIs
 
-| API | Beschreibung |
-|-----|-------------|
-| `File` | Repräsentiert eine Datei mit Metadaten wie Name, Größe und MIME-Type |
-| `FileReader` | Liest Dateiinhalte als Text, ArrayBuffer oder Data-URL |
-| `Blob` | Rohdaten-Container für binäre Daten beliebiger Art |
+| API                     | Beschreibung                                                           |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `File`                  | Repräsentiert eine Datei mit Metadaten wie Name, Größe und MIME-Type   |
+| `FileReader`            | Liest Dateiinhalte als Text, ArrayBuffer oder Data-URL                 |
+| `Blob`                  | Rohdaten-Container für binäre Daten beliebiger Art                     |
 | `URL.createObjectURL()` | Erstellt eine temporäre URL für Blob-Objekte zur Anzeige oder Download |
 
 ### 4.2 Datei-Handling
@@ -674,12 +673,12 @@ TypeScript bietet statische Typisierung für JavaScript und verbessert die Entwi
 
 ### 5.1 Vorteile
 
-| Vorteil | Beschreibung |
-|---------|-------------|
-| **Typsicherheit** | Fehler werden zur Compile-Zeit erkannt |
-| **IDE-Unterstützung** | Bessere Autovervollständigung und Refactoring |
-| **Selbstdokumentierend** | Typen dienen als Dokumentation |
-| **Sicheres Refactoring** | Änderungen werden überall propagiert |
+| Vorteil                  | Beschreibung                                  |
+| ------------------------ | --------------------------------------------- |
+| **Typsicherheit**        | Fehler werden zur Compile-Zeit erkannt        |
+| **IDE-Unterstützung**    | Bessere Autovervollständigung und Refactoring |
+| **Selbstdokumentierend** | Typen dienen als Dokumentation                |
+| **Sicheres Refactoring** | Änderungen werden überall propagiert          |
 
 ### 5.2 Typdefinitionen
 
@@ -707,17 +706,17 @@ export interface ImageTransformations {
 }
 
 export interface ImageFilters {
-  brightness: number  // -100 to 100
-  contrast: number    // -100 to 100
-  saturation: number  // -100 to 100
-  blur: number        // 0 to 20
+  brightness: number // -100 to 100
+  contrast: number // -100 to 100
+  saturation: number // -100 to 100
+  blur: number // 0 to 20
 }
 
 export type ExportFormat = 'png' | 'jpeg' | 'webp' | 'bmp'
 
 export interface ExportOptions {
   format: ExportFormat
-  quality: number     // 0.1 to 1.0
+  quality: number // 0.1 to 1.0
   maxWidth?: number
   maxHeight?: number
 }
@@ -737,7 +736,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  options: () => ({ format: 'png', quality: 0.92 })
+  options: () => ({ format: 'png', quality: 0.92 }),
 })
 
 // Emits typisieren
@@ -758,10 +757,7 @@ const handleUpdate = () => {
 
 ```typescript
 // Generics für flexible Funktionen
-function processImages<T extends ImageFile>(
-  images: T[],
-  processor: (img: T) => T
-): T[] {
+function processImages<T extends ImageFile>(images: T[], processor: (img: T) => T): T[] {
   return images.map(processor)
 }
 
@@ -812,12 +808,12 @@ Pinia ist die offizielle State-Management-Lösung für Vue 3. Es bietet eine int
 
 ### 6.1 Vorteile
 
-| Feature | Beschreibung |
-|---------|-------------|
-| **Leichtgewichtig** | Minimaler Overhead |
-| **TypeScript-first** | Volle Typisierung ohne Workarounds |
-| **DevTools-Integration** | Time-travel debugging |
-| **Modulare Stores** | Einfache Aufteilung nach Domäne |
+| Feature                  | Beschreibung                       |
+| ------------------------ | ---------------------------------- |
+| **Leichtgewichtig**      | Minimaler Overhead                 |
+| **TypeScript-first**     | Volle Typisierung ohne Workarounds |
+| **DevTools-Integration** | Time-travel debugging              |
+| **Modulare Stores**      | Einfache Aufteilung nach Domäne    |
 
 ### 6.2 Store Definition
 
@@ -833,15 +829,11 @@ export const useImageStore = defineStore('images', () => {
   const isLoading = ref(false)
 
   // Getters
-  const selectedImages = computed(() =>
-    images.value.filter(img => img.selected)
-  )
+  const selectedImages = computed(() => images.value.filter((img) => img.selected))
 
   const selectedCount = computed(() => selectedImages.value.length)
 
-  const totalSize = computed(() =>
-    images.value.reduce((sum, img) => sum + img.size, 0)
-  )
+  const totalSize = computed(() => images.value.reduce((sum, img) => sum + img.size, 0))
 
   // Actions
   function addImage(image: ImageFile) {
@@ -853,39 +845,36 @@ export const useImageStore = defineStore('images', () => {
   }
 
   function removeImage(id: string) {
-    const index = images.value.findIndex(img => img.id === id)
+    const index = images.value.findIndex((img) => img.id === id)
     if (index !== -1) {
       images.value.splice(index, 1)
     }
   }
 
   function toggleSelection(id: string) {
-    const image = images.value.find(img => img.id === id)
+    const image = images.value.find((img) => img.id === id)
     if (image) {
       image.selected = !image.selected
     }
   }
 
   function selectAll() {
-    images.value.forEach(img => img.selected = true)
+    images.value.forEach((img) => (img.selected = true))
   }
 
   function deselectAll() {
-    images.value.forEach(img => img.selected = false)
+    images.value.forEach((img) => (img.selected = false))
   }
 
-  function applyTransformation(
-    id: string,
-    transform: Partial<ImageTransformations>
-  ) {
-    const image = images.value.find(img => img.id === id)
+  function applyTransformation(id: string, transform: Partial<ImageTransformations>) {
+    const image = images.value.find((img) => img.id === id)
     if (image) {
       Object.assign(image.transformations, transform)
     }
   }
 
   function applyToSelected(transform: Partial<ImageTransformations>) {
-    selectedImages.value.forEach(img => {
+    selectedImages.value.forEach((img) => {
       Object.assign(img.transformations, transform)
     })
   }
@@ -917,7 +906,7 @@ export const useImageStore = defineStore('images', () => {
     applyTransformation,
     applyToSelected,
     reorderImages,
-    clearAll
+    clearAll,
   }
 })
 ```
@@ -964,11 +953,11 @@ Web Workers ermöglichen die Ausführung von JavaScript in Hintergrund-Threads, 
 
 ### 7.1 Worker-Typen
 
-| Typ | Beschreibung |
-|-----|-------------|
-| **Web Worker** | Eigener Thread für rechenintensive Aufgaben wie Bildverarbeitung |
-| **Shared Worker** | Kann von mehreren Browsing-Contexts geteilt werden |
-| **Service Worker** | Für Offline-Funktionalität, Caching und Push-Benachrichtigungen |
+| Typ                | Beschreibung                                                     |
+| ------------------ | ---------------------------------------------------------------- |
+| **Web Worker**     | Eigener Thread für rechenintensive Aufgaben wie Bildverarbeitung |
+| **Shared Worker**  | Kann von mehreren Browsing-Contexts geteilt werden               |
+| **Service Worker** | Für Offline-Funktionalität, Caching und Push-Benachrichtigungen  |
 
 ### 7.2 Web Worker für Bildverarbeitung
 
@@ -1020,13 +1009,15 @@ async function processBatch(images: ImageData[]) {
     // Fortschritt melden
     self.postMessage({
       type: 'PROGRESS',
-      payload: { current: i + 1, total: images.length }
+      payload: { current: i + 1, total: images.length },
     })
 
-    results.push(await processImageData({
-      imageData: images[i],
-      filters: { brightness: 10, contrast: 10 }
-    }))
+    results.push(
+      await processImageData({
+        imageData: images[i],
+        filters: { brightness: 10, contrast: 10 },
+      })
+    )
   }
   return results
 }
@@ -1045,10 +1036,9 @@ export function useImageWorker() {
 
   const initWorker = () => {
     if (!worker.value) {
-      worker.value = new Worker(
-        new URL('@/workers/imageProcessor.worker.ts', import.meta.url),
-        { type: 'module' }
-      )
+      worker.value = new Worker(new URL('@/workers/imageProcessor.worker.ts', import.meta.url), {
+        type: 'module',
+      })
 
       worker.value.onmessage = (event) => {
         const { type, payload } = event.data
@@ -1081,7 +1071,7 @@ export function useImageWorker() {
     progress.value = 0
     w.postMessage({
       type: 'PROCESS_IMAGE',
-      payload: { imageData, filters }
+      payload: { imageData, filters },
     })
   }
 
@@ -1091,7 +1081,7 @@ export function useImageWorker() {
     progress.value = 0
     w.postMessage({
       type: 'BATCH_PROCESS',
-      payload: images
+      payload: images,
     })
   }
 
@@ -1119,27 +1109,25 @@ Eine schnelle Anwendung verbessert die Benutzererfahrung erheblich. Diese Techni
 
 ### 8.1 Optimierungstechniken
 
-| Technik | Beschreibung |
-|---------|-------------|
-| **Lazy Loading** | Komponenten und Routen erst bei Bedarf laden |
-| **Virtual Scrolling** | Nur sichtbare Elemente in langen Listen rendern |
-| **Memoization** | Teure Berechnungen cachen mit `computed()` und `v-memo` |
-| **Debouncing** | Häufige Events zusammenfassen für weniger Updates |
+| Technik               | Beschreibung                                            |
+| --------------------- | ------------------------------------------------------- |
+| **Lazy Loading**      | Komponenten und Routen erst bei Bedarf laden            |
+| **Virtual Scrolling** | Nur sichtbare Elemente in langen Listen rendern         |
+| **Memoization**       | Teure Berechnungen cachen mit `computed()` und `v-memo` |
+| **Debouncing**        | Häufige Events zusammenfassen für weniger Updates       |
 
 ### 8.2 Code-Beispiele
 
 ```typescript
 // Lazy Loading von Komponenten
-const ImageEditor = defineAsyncComponent(() =>
-  import('@/components/ImageEditor.vue')
-)
+const ImageEditor = defineAsyncComponent(() => import('@/components/ImageEditor.vue'))
 
 // Route-basiertes Code-Splitting
 const routes = [
   {
     path: '/editor',
-    component: () => import('@/views/EditorView.vue')
-  }
+    component: () => import('@/views/EditorView.vue'),
+  },
 ]
 ```
 
@@ -1168,7 +1156,7 @@ function throttle<T extends (...args: any[]) => any>(
     if (!inThrottle) {
       fn(...args)
       inThrottle = true
-      setTimeout(() => inThrottle = false, limit)
+      setTimeout(() => (inThrottle = false), limit)
     }
   }
 }
@@ -1199,11 +1187,7 @@ function updateImageData(newData: ImageData) {
 
 <!-- v-memo für bedingte Re-renders -->
 <template>
-  <div
-    v-for="image in images"
-    :key="image.id"
-    v-memo="[image.selected, image.dataUrl]"
-  >
+  <div v-for="image in images" :key="image.id" v-memo="[image.selected, image.dataUrl]">
     <ImageCard :image="image" />
   </div>
 </template>
@@ -1222,12 +1206,15 @@ export function useLazyLoad(callback: () => void, options = {}) {
   onMounted(() => {
     if (!targetRef.value) return
 
-    observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        callback()
-        observer?.disconnect()
-      }
-    }, { threshold: 0.1, ...options })
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          callback()
+          observer?.disconnect()
+        }
+      },
+      { threshold: 0.1, ...options }
+    )
 
     observer.observe(targetRef.value)
   })
@@ -1263,8 +1250,8 @@ const visibleItems = computed(() => {
     style: {
       position: 'absolute',
       top: `${(startIndex + index) * itemHeight}px`,
-      height: `${itemHeight}px`
-    }
+      height: `${itemHeight}px`,
+    },
   }))
 })
 
@@ -1278,11 +1265,7 @@ const totalHeight = computed(() => items.value.length * itemHeight)
     @scroll="scrollTop = $event.target.scrollTop"
   >
     <div :style="{ height: `${totalHeight}px`, position: 'relative' }">
-      <div
-        v-for="item in visibleItems"
-        :key="item.id"
-        :style="item.style"
-      >
+      <div v-for="item in visibleItems" :key="item.id" :style="item.style">
         {{ item.name }}
       </div>
     </div>
@@ -1298,12 +1281,12 @@ Sicherheit ist ein kritischer Aspekt jeder Webanwendung. Diese Best Practices he
 
 ### 9.1 Sicherheitspraktiken
 
-| Praxis | Beschreibung |
-|--------|-------------|
-| **Content Security Policy** | HTTP-Header zur Kontrolle erlaubter Ressourcen |
-| **XSS-Prävention** | Vue escaped automatisch, aber `v-html` erfordert Vorsicht |
-| **CORS verstehen** | Cross-Origin Requests richtig konfigurieren |
-| **Datenschutz** | Daten lokal verarbeiten, wenn möglich |
+| Praxis                      | Beschreibung                                              |
+| --------------------------- | --------------------------------------------------------- |
+| **Content Security Policy** | HTTP-Header zur Kontrolle erlaubter Ressourcen            |
+| **XSS-Prävention**          | Vue escaped automatisch, aber `v-html` erfordert Vorsicht |
+| **CORS verstehen**          | Cross-Origin Requests richtig konfigurieren               |
+| **Datenschutz**             | Daten lokal verarbeiten, wenn möglich                     |
 
 ### 9.2 Input-Validierung
 
@@ -1330,8 +1313,8 @@ function validateImageFile(file: File): boolean {
 function sanitizeFilename(name: string): string {
   return name
     .replace(/[^\w\s.-]/g, '') // Nur sichere Zeichen
-    .replace(/\s+/g, '_')       // Leerzeichen ersetzen
-    .substring(0, 255)          // Maximale Länge
+    .replace(/\s+/g, '_') // Leerzeichen ersetzen
+    .substring(0, 255) // Maximale Länge
 }
 ```
 
@@ -1366,9 +1349,7 @@ function isValidUrl(string: string): boolean {
 // Vue's v-html nur mit sanitierten Daten verwenden
 import DOMPurify from 'dompurify'
 
-const sanitizedHtml = computed(() =>
-  DOMPurify.sanitize(userInput.value)
-)
+const sanitizedHtml = computed(() => DOMPurify.sanitize(userInput.value))
 
 // Alternativ: Text escapen
 function escapeHtml(text: string): string {
@@ -1409,11 +1390,13 @@ Setzen Sie das Gelernte in die Praxis um. Diese Übungen helfen Ihnen, die Konze
 Erstellen Sie einen einfachen Audio-Player mit Frequenz-Visualisierung.
 
 **Aufgaben:**
+
 1. AudioContext und AnalyserNode einrichten
 2. Canvas-Visualisierung implementieren
 3. Play/Pause und Lautstärke-Kontrolle hinzufügen
 
 **Hinweise:**
+
 - Verwenden Sie `createBufferSource()` für die Wiedergabe
 - `getByteFrequencyData()` liefert die Frequenzdaten
 - Canvas `fillRect()` für die Balkenanzeige
@@ -1423,11 +1406,13 @@ Erstellen Sie einen einfachen Audio-Player mit Frequenz-Visualisierung.
 Eine Vue 3 Komponente für Bildanzeige mit Canvas-Filtern.
 
 **Aufgaben:**
+
 1. Drag & Drop Upload implementieren
 2. Canvas-Filter (Helligkeit, Kontrast) hinzufügen
 3. Pinia Store für Bildverwaltung erstellen
 
 **Hinweise:**
+
 - Verwenden Sie `reactive()` für die Filterwerte
 - `computed()` für die gefilterte Vorschau
 - Web Worker für intensive Filteroperationen
@@ -1437,11 +1422,13 @@ Eine Vue 3 Komponente für Bildanzeige mit Canvas-Filtern.
 Kombinieren Sie Web Audio API mit Canvas für beeindruckende Visualisierungen.
 
 **Aufgaben:**
+
 1. Mikrofon-Input per `getUserMedia()` erfassen
 2. FFT-Daten für Spektrumanalyse nutzen
 3. Verschiedene Visualisierungsmodi implementieren (Bars, Waveform, Circular)
 
 **Hinweise:**
+
 - `navigator.mediaDevices.getUserMedia({ audio: true })`
 - `MediaStreamAudioSourceNode` für Mikrofon-Input
 - Experimentieren Sie mit verschiedenen `fftSize`-Werten
@@ -1475,4 +1462,4 @@ Diese Konzepte bilden die Grundlage für leistungsfähige Browser-Anwendungen wi
 
 ---
 
-*Diese Lernressource wird kontinuierlich erweitert und aktualisiert.*
+_Diese Lernressource wird kontinuierlich erweitert und aktualisiert._

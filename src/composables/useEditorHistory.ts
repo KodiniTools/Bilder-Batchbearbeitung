@@ -9,7 +9,7 @@ interface HistorySnapshot {
 export function useEditorHistory(
   localFilters: Ref<ImageFilters>,
   textItems: Ref<TextItem[]>,
-  changesApplied: Ref<boolean>,
+  changesApplied: Ref<boolean>
 ) {
   const history = ref<HistorySnapshot[]>([])
   const historyIndex = ref(-1)
@@ -19,10 +19,13 @@ export function useEditorHistory(
   const canRedo = computed(() => historyIndex.value < history.value.length - 1)
 
   function snapshotNow() {
-    if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+    if (historyTimer) {
+      clearTimeout(historyTimer)
+      historyTimer = null
+    }
     const snap: HistorySnapshot = {
       filters: { ...localFilters.value },
-      texts: textItems.value.map(t => ({ ...t })),
+      texts: textItems.value.map((t) => ({ ...t })),
     }
     history.value = history.value.slice(0, historyIndex.value + 1)
     history.value.push(snap)
@@ -36,32 +39,44 @@ export function useEditorHistory(
 
   function restoreSnapshot(snap: HistorySnapshot) {
     localFilters.value = { ...snap.filters }
-    textItems.value = snap.texts.map(t => ({ ...t }))
+    textItems.value = snap.texts.map((t) => ({ ...t }))
     changesApplied.value = false
   }
 
   function undo() {
-    if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+    if (historyTimer) {
+      clearTimeout(historyTimer)
+      historyTimer = null
+    }
     if (!canUndo.value) return
     historyIndex.value--
     restoreSnapshot(history.value[historyIndex.value])
   }
 
   function redo() {
-    if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+    if (historyTimer) {
+      clearTimeout(historyTimer)
+      historyTimer = null
+    }
     if (!canRedo.value) return
     historyIndex.value++
     restoreSnapshot(history.value[historyIndex.value])
   }
 
   function init(filters: ImageFilters) {
-    if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+    if (historyTimer) {
+      clearTimeout(historyTimer)
+      historyTimer = null
+    }
     history.value = [{ filters: { ...filters }, texts: [] }]
     historyIndex.value = 0
   }
 
   function dispose() {
-    if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+    if (historyTimer) {
+      clearTimeout(historyTimer)
+      historyTimer = null
+    }
   }
 
   return {

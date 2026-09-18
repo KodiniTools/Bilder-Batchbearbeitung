@@ -18,9 +18,9 @@
   --color-blue-dark: #003971;
   --color-gold-light: #f8e1a9;
   --color-cream: #f9f2d5;
-  --color-gray: #5E5F69;
-  --color-silver: #AEAFB7;
-  --color-dark: #0C0C10;
+  --color-gray: #5e5f69;
+  --color-silver: #aeafb7;
+  --color-dark: #0c0c10;
 
   /* Basis-Farben */
   --green: #22c55e;
@@ -30,13 +30,13 @@
   --cyan: #06b6d4;
 
   /* Light Theme (Standard) */
-  --bg: #F8F7F4;
-  --panel: #FFFFFF;
+  --bg: #f8f7f4;
+  --panel: #ffffff;
   --text: var(--color-dark);
   --muted: var(--color-gray);
   --accent: var(--color-blue);
   --accent-hover: var(--color-blue-dark);
-  --accent-text: #F5F4D6;
+  --accent-text: #f5f4d6;
   --secondary: var(--color-gold);
   --btn: var(--color-cream);
   --btn-hover: var(--color-gold-light);
@@ -54,9 +54,21 @@
 
   /* Dynamische Hintergründe */
   --body-gradient:
-    radial-gradient(circle at 25% 25%, color-mix(in oklab, var(--color-gold-light) 8%, transparent) 0%, transparent 60%),
-    radial-gradient(circle at 75% 75%, color-mix(in oklab, var(--color-blue) 5%, transparent) 0%, transparent 60%),
-    linear-gradient(135deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 96%, var(--color-gold-light)) 100%);
+    radial-gradient(
+      circle at 25% 25%,
+      color-mix(in oklab, var(--color-gold-light) 8%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 75% 75%,
+      color-mix(in oklab, var(--color-blue) 5%, transparent) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
+      var(--bg) 0%,
+      color-mix(in oklab, var(--bg) 96%, var(--color-gold-light)) 100%
+    );
 
   /* Layout-Variablen */
   --radius-sm: 8px;
@@ -73,8 +85,12 @@
   --space-6: 32px;
   --space-7: 48px;
 
-  --font-sans: 'Supreme', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans:
+    'Supreme', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, 'Helvetica Neue',
+    Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
 
   /* Animation Curves */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -83,16 +99,16 @@
 }
 
 /* Dark Theme Overrides – Navy/Gold Palette */
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   --bg: #091428;
   --panel: #142640;
   --text: #f9f2d5;
-  --muted: #7A8DA0;
+  --muted: #7a8da0;
   --accent: #c9984d;
   --accent-hover: #f8e1a9;
   --accent-text: #091428;
   --secondary: #014f99;
-  --btn: #0E1C32;
+  --btn: #0e1c32;
   --btn-hover: #1a3050;
   --ring: #c9984d;
   --border-color: rgb(201 152 77 / 18%);
@@ -102,10 +118,22 @@
   --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
 
   --body-gradient:
-    radial-gradient(circle at 20% 80%, color-mix(in oklab, #c9984d 6%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in oklab, #014f99 8%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, color-mix(in oklab, #0E1C32 10%, transparent) 0%, transparent 70%),
-    linear-gradient(135deg, #091428 0%, #0E1C32 100%);
+    radial-gradient(
+      circle at 20% 80%,
+      color-mix(in oklab, #c9984d 6%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      color-mix(in oklab, #014f99 8%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      color-mix(in oklab, #0e1c32 10%, transparent) 0%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, #091428 0%, #0e1c32 100%);
 }
 
 /* =============================
@@ -115,7 +143,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: auto;
   min-height: 100%;
 }
@@ -133,28 +162,33 @@ body {
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.5s var(--ease-smooth), color 0.3s var(--ease-smooth);
+  transition:
+    background-color 0.5s var(--ease-smooth),
+    color 0.3s var(--ease-smooth);
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
 
-img, canvas, svg, video { 
-  display: block; 
-  max-width: 100%; 
+img,
+canvas,
+svg,
+video {
+  display: block;
+  max-width: 100%;
 }
 
-button { 
-  font: inherit; 
-  cursor: pointer; 
+button {
+  font: inherit;
+  cursor: pointer;
   border: none;
   background: none;
 }
 
 :focus-visible {
   outline: none;
-  box-shadow: 
-    0 0 0 3px var(--bg), 
+  box-shadow:
+    0 0 0 3px var(--bg),
     0 0 0 6px var(--accent),
     0 8px 20px color-mix(in oklab, var(--accent) 20%, transparent);
   border-radius: var(--radius-sm);
@@ -162,7 +196,9 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { 
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -173,7 +209,7 @@ button {
    Dark Mode Specific Enhancements
    ============================= */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme='light']) {
     --surface-elevation: 0 8px 32px color-mix(in oklab, black 40%, transparent);
     --surface-hover: 0 16px 48px color-mix(in oklab, black 60%, transparent);
   }
@@ -204,8 +240,8 @@ body > header {
 /* Ensure navigation dropdowns are above everything */
 body > nav .dropdown,
 body > nav .dropdown-menu,
-body > nav [class*="dropdown"],
-body > nav [class*="menu"] {
+body > nav [class*='dropdown'],
+body > nav [class*='menu'] {
   z-index: 1001 !important;
 }
 
@@ -227,16 +263,19 @@ body > footer {
    Print Styles
    ============================= */
 @media print {
-  .app-header, .app-footer, .status-bar, .image-actions {
+  .app-header,
+  .app-footer,
+  .status-bar,
+  .image-actions {
     display: none !important;
   }
-  
+
   .image-card {
     break-inside: avoid;
     box-shadow: none;
     border: 1px solid #ccc;
   }
-  
+
   body {
     background: white !important;
   }

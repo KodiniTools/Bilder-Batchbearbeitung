@@ -3,7 +3,6 @@
     <Transition name="modal">
       <div v-if="isOpen" class="modal-overlay" @click.self="closeEditor">
         <div class="modal-container">
-
           <!-- Header -->
           <div class="modal-header">
             <div class="header-left">
@@ -18,10 +17,8 @@
 
           <!-- Body: Preview (left) + Controls (right) -->
           <div class="editor-body">
-
             <!-- Preview Panel -->
             <div ref="previewAreaRef" class="preview-panel">
-
               <!-- Compare toolbar -->
               <div v-if="!isCropMode" class="compare-toolbar">
                 <button
@@ -57,7 +54,6 @@
 
               <div class="preview-area">
                 <div ref="canvasWrapperRef" class="canvas-crop-wrapper">
-
                   <!-- Edited canvas (base, determines wrapper size) -->
                   <canvas
                     ref="previewCanvas"
@@ -83,8 +79,12 @@
                     >
                       <i class="fa-solid fa-left-right"></i>
                     </div>
-                    <span class="split-label split-label-l">{{ t('imageEditor.compare.before') }}</span>
-                    <span class="split-label split-label-r">{{ t('imageEditor.compare.after') }}</span>
+                    <span class="split-label split-label-l">
+                      {{ t('imageEditor.compare.before') }}
+                    </span>
+                    <span class="split-label split-label-r">
+                      {{ t('imageEditor.compare.after') }}
+                    </span>
                   </template>
 
                   <!-- Text overlay (only in 'after' mode, not during crop) -->
@@ -108,14 +108,19 @@
               </div>
 
               <div class="image-meta">
-                <span><i class="fa-solid fa-expand"></i> {{ dimensions }}</span>
-                <span><i class="fa-solid fa-weight-hanging"></i> {{ fileSize }}</span>
+                <span>
+                  <i class="fa-solid fa-expand"></i>
+                  {{ dimensions }}
+                </span>
+                <span>
+                  <i class="fa-solid fa-weight-hanging"></i>
+                  {{ fileSize }}
+                </span>
               </div>
             </div>
 
             <!-- Controls Panel -->
             <div class="controls-panel">
-
               <!-- Undo / Redo bar -->
               <div class="undo-redo-bar">
                 <button
@@ -153,7 +158,7 @@
                   type="text"
                   class="ctrl-input"
                   :placeholder="t('imageEditor.fileName.placeholder')"
-                >
+                />
               </div>
 
               <EditorTextSection
@@ -248,7 +253,6 @@
                 @update:selected-format="selectedFormat = $event"
                 @download="downloadImage"
               />
-
             </div>
           </div>
 
@@ -272,19 +276,12 @@
                 <i class="fa-solid fa-eye"></i>
                 {{ t('imageEditor.footer.apply') }}
               </button>
-              <button
-                v-else
-                key="save"
-                type="button"
-                class="btn btn-save"
-                @click="saveChanges"
-              >
+              <button v-else key="save" type="button" class="btn btn-save" @click="saveChanges">
                 <i class="fa-solid fa-floppy-disk"></i>
                 {{ t('imageEditor.footer.save') }}
               </button>
             </Transition>
           </div>
-
         </div>
       </div>
     </Transition>
@@ -320,12 +317,12 @@ const toast = useToast()
 const imageStore = useImageStore()
 
 const FONT_FAMILIES: { label: string; value: string }[] = [
-  { label: 'Arial',           value: 'Arial, sans-serif' },
-  { label: 'Georgia',         value: 'Georgia, serif' },
-  { label: 'Verdana',         value: 'Verdana, sans-serif' },
+  { label: 'Arial', value: 'Arial, sans-serif' },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Verdana', value: 'Verdana, sans-serif' },
   { label: 'Times New Roman', value: '"Times New Roman", serif' },
-  { label: 'Courier New',     value: '"Courier New", monospace' },
-  { label: 'Impact',          value: 'Impact, sans-serif' },
+  { label: 'Courier New', value: '"Courier New", monospace' },
+  { label: 'Impact', value: 'Impact, sans-serif' },
 ]
 
 const CROP_RATIO_PRESETS = [
@@ -337,20 +334,20 @@ const CROP_RATIO_PRESETS = [
 
 type FilterKey = keyof Omit<ImageFilters, 'invert'>
 
-const FILTER_DEFS: Array<{ key: FilterKey; min: number; max: number; step: number; unit: string }> = [
-  { key: 'brightness',  min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'contrast',    min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'saturation',  min: 0, max: 200, step: 1, unit: '%' },
-  { key: 'vibrance',    min: -100, max: 100, step: 1, unit: '' },
-  { key: 'temperature', min: -100, max: 100, step: 1, unit: '' },
-  { key: 'hue',         min: -180, max: 180, step: 1, unit: '°' },
-  { key: 'grayscale',   min: 0, max: 100, step: 1, unit: '%' },
-  { key: 'sepia',       min: 0, max: 100, step: 1, unit: '%' },
-  { key: 'vignette',    min: 0, max: 100, step: 1, unit: '%' },
-  { key: 'blur',        min: 0, max: 20,  step: 0.5, unit: 'px' },
-  { key: 'opacity',     min: 0, max: 100, step: 1, unit: '%' },
-]
-
+const FILTER_DEFS: Array<{ key: FilterKey; min: number; max: number; step: number; unit: string }> =
+  [
+    { key: 'brightness', min: 0, max: 200, step: 1, unit: '%' },
+    { key: 'contrast', min: 0, max: 200, step: 1, unit: '%' },
+    { key: 'saturation', min: 0, max: 200, step: 1, unit: '%' },
+    { key: 'vibrance', min: -100, max: 100, step: 1, unit: '' },
+    { key: 'temperature', min: -100, max: 100, step: 1, unit: '' },
+    { key: 'hue', min: -180, max: 180, step: 1, unit: '°' },
+    { key: 'grayscale', min: 0, max: 100, step: 1, unit: '%' },
+    { key: 'sepia', min: 0, max: 100, step: 1, unit: '%' },
+    { key: 'vignette', min: 0, max: 100, step: 1, unit: '%' },
+    { key: 'blur', min: 0, max: 20, step: 0.5, unit: 'px' },
+    { key: 'opacity', min: 0, max: 100, step: 1, unit: '%' },
+  ]
 
 interface Props {
   image: ImageObject | null
@@ -390,8 +387,8 @@ const compareMode = ref<'before' | 'split' | 'after'>('after')
 const textItems = ref<TextItem[]>([])
 const selectedTextId = ref<string | null>(null)
 
-const selectedText = computed(() =>
-  textItems.value.find(i => i.id === selectedTextId.value) ?? null
+const selectedText = computed(
+  () => textItems.value.find((i) => i.id === selectedTextId.value) ?? null
 )
 
 // ── Canvas composable ─────────────────────────────────────────────
@@ -429,7 +426,7 @@ const {
   previewAreaRef,
   canvasWrapperRef,
   changesApplied,
-  renderEditedPreview,
+  renderEditedPreview
 )
 
 // Bakes the full filter pipeline (incl. temperature/vibrance/vignette) into the
@@ -466,7 +463,7 @@ const {
 
 function updateSelectedText(patch: Partial<TextItem>) {
   if (!selectedTextId.value) return
-  textItems.value = textItems.value.map(i =>
+  textItems.value = textItems.value.map((i) =>
     i.id === selectedTextId.value ? { ...i, ...patch } : i
   )
   schedulePushHistory()
@@ -488,16 +485,21 @@ function onFlip(direction: string) {
 function handleUndoRedo(e: KeyboardEvent) {
   if (!props.isOpen) return
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-    e.preventDefault(); undo()
+    e.preventDefault()
+    undo()
   } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-    e.preventDefault(); redo()
+    e.preventDefault()
+    redo()
   }
 }
 
-watch(() => props.isOpen, (open) => {
-  if (open) document.addEventListener('keydown', handleUndoRedo)
-  else document.removeEventListener('keydown', handleUndoRedo)
-})
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) document.addEventListener('keydown', handleUndoRedo)
+    else document.removeEventListener('keydown', handleUndoRedo)
+  }
+)
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleUndoRedo)
@@ -525,7 +527,7 @@ const fileSize = computed(() => {
 })
 
 const availableFormats = computed(() => {
-  const imageFormats = ImageProcessor.availableFormats.filter(format =>
+  const imageFormats = ImageProcessor.availableFormats.filter((format) =>
     ImageProcessor.supportsFormat(format.mimeType)
   )
   return [...imageFormats, { name: 'PDF', mimeType: 'application/pdf', ext: 'pdf' }]
@@ -560,17 +562,24 @@ const editedCanvasStyle = computed(() => {
 
 // ── Watchers ──────────────────────────────────────────────────────
 
-watch(() => props.image, (newImage) => {
-  if (newImage && props.isOpen) initializeEditor(newImage)
-}, { immediate: true })
+watch(
+  () => props.image,
+  (newImage) => {
+    if (newImage && props.isOpen) initializeEditor(newImage)
+  },
+  { immediate: true }
+)
 
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
-  if (!isOpen) {
-    changesApplied.value = false
-    compareMode.value = 'after'
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
+    if (!isOpen) {
+      changesApplied.value = false
+      compareMode.value = 'after'
+    }
   }
-})
+)
 
 watch([resizeWidth, resizeHeight], () => {
   if (resizeWidth.value !== currentWidth.value || resizeHeight.value !== currentHeight.value) {
@@ -605,7 +614,7 @@ function initializeEditor(image: ImageObject) {
   initHistory(localFilters.value)
 
   const ext = ImageProcessor.getFileExtension(image.file.name).toLowerCase()
-  const format = availableFormats.value.find(f => f.ext === ext)
+  const format = availableFormats.value.find((f) => f.ext === ext)
   if (format) selectedFormat.value = format.mimeType
 
   nextTick(() => updatePreview())
@@ -642,7 +651,7 @@ function onFilterChange(key: string, value: number) {
 }
 
 function applyPreset(presetKey: string) {
-  const preset = FILTER_PRESETS.find(p => p.key === presetKey)
+  const preset = FILTER_PRESETS.find((p) => p.key === presetKey)
   if (!preset) return
   localFilters.value = { ...defaultFilters, ...preset.filters }
   changesApplied.value = false
@@ -679,7 +688,7 @@ async function applyEditToBatch(mode: 'all' | 'selected') {
   if (showLoader) {
     batchLoader.value?.showWithProgress(
       t('imageEditor.batch.progress', { current: 0, total }),
-      total,
+      total
     )
   }
 
@@ -690,9 +699,12 @@ async function applyEditToBatch(mode: 'all' | 'selected') {
       imageStore.updateImage(img)
       done++
       if (showLoader) {
-        batchLoader.value?.updateProgress(done, t('imageEditor.batch.progress', { current: done, total }))
+        batchLoader.value?.updateProgress(
+          done,
+          t('imageEditor.batch.progress', { current: done, total })
+        )
         // Yield so the grid can re-bake thumbnails and the bar can repaint
-        await new Promise(resolve => setTimeout(resolve, 0))
+        await new Promise((resolve) => setTimeout(resolve, 0))
       }
     }
     toast.success(t('imageEditor.batch.done', { count: total }))
@@ -729,7 +741,9 @@ async function downloadImage() {
   if (!workingCanvas || !originalImageObj) return
   isDownloading.value = true
   try {
-    const fileBase = fileName.value.trim() || ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
+    const fileBase =
+      fileName.value.trim() ||
+      ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
     const safeBase = ImageProcessor.safeBaseName(fileBase)
 
     // Build export canvas with current filters applied
@@ -757,7 +771,7 @@ async function downloadImage() {
       return
     }
 
-    const format = availableFormats.value.find(f => f.mimeType === selectedFormat.value)
+    const format = availableFormats.value.find((f) => f.mimeType === selectedFormat.value)
     if (!format) throw new Error('Ungültiges Format')
     const blob = await ImageProcessor.convertToFormat(
       { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
@@ -765,8 +779,11 @@ async function downloadImage() {
     )
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = `${safeBase}.${format.ext}`
-    document.body.appendChild(a); a.click(); a.remove()
+    a.href = url
+    a.download = `${safeBase}.${format.ext}`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
@@ -780,11 +797,16 @@ function resetToOriginal() {
   const originalCanvas = getOriginalCanvas()
   const workingCanvas = getWorkingCanvas()
   if (!originalCanvas || !workingCanvas) return
-  workingCanvas.width = originalCanvas.width; workingCanvas.height = originalCanvas.height
+  workingCanvas.width = originalCanvas.width
+  workingCanvas.height = originalCanvas.height
   const ctx = workingCanvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(originalCanvas, 0, 0) }
+  if (ctx) {
+    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
+    ctx.drawImage(originalCanvas, 0, 0)
+  }
   const originalImageObj = getOriginalImageObj()
-  if (originalImageObj) fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
+  if (originalImageObj)
+    fileName.value = ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
   setAspectRatio(workingCanvas.width / workingCanvas.height)
   localFilters.value = { ...defaultFilters }
   textItems.value = []
@@ -803,15 +825,34 @@ function applyChanges() {
   const newWidth = resizeWidth.value || workingCanvas.width
   const newHeight = resizeHeight.value || workingCanvas.height
 
-  if (newWidth > 0 && newHeight > 0 && (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)) {
+  if (
+    newWidth > 0 &&
+    newHeight > 0 &&
+    (newWidth !== workingCanvas.width || newHeight !== workingCanvas.height)
+  ) {
     const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = newWidth; tempCanvas.height = newHeight
+    tempCanvas.width = newWidth
+    tempCanvas.height = newHeight
     const tempCtx = tempCanvas.getContext('2d')
     if (tempCtx) {
-      tempCtx.drawImage(workingCanvas, 0, 0, workingCanvas.width, workingCanvas.height, 0, 0, newWidth, newHeight)
-      workingCanvas.width = newWidth; workingCanvas.height = newHeight
+      tempCtx.drawImage(
+        workingCanvas,
+        0,
+        0,
+        workingCanvas.width,
+        workingCanvas.height,
+        0,
+        0,
+        newWidth,
+        newHeight
+      )
+      workingCanvas.width = newWidth
+      workingCanvas.height = newHeight
       const ctx = workingCanvas.getContext('2d')
-      if (ctx) { ctx.clearRect(0, 0, newWidth, newHeight); ctx.drawImage(tempCanvas, 0, 0) }
+      if (ctx) {
+        ctx.clearRect(0, 0, newWidth, newHeight)
+        ctx.drawImage(tempCanvas, 0, 0)
+      }
     }
     setAspectRatio(newWidth / newHeight)
   }
@@ -843,7 +884,9 @@ function bakeTextToCanvas() {
       item.bold ? 'bold' : '',
       `${bakeFontSize}px`,
       item.fontFamily,
-    ].filter(Boolean).join(' ')
+    ]
+      .filter(Boolean)
+      .join(' ')
     ctx.textAlign = item.align
     ctx.textBaseline = 'top'
 
@@ -860,7 +903,7 @@ function bakeTextToCanvas() {
     // Stroke first (rendered behind fill)
     if ((item.strokeWidth ?? 0) > 0) {
       ctx.strokeStyle = item.strokeColor ?? '#000000'
-      ctx.lineWidth = (item.strokeWidth!) * 2 * scale
+      ctx.lineWidth = item.strokeWidth! * 2 * scale
       ctx.lineJoin = 'round'
       item.text.split('\n').forEach((line, i) => {
         ctx.strokeText(line, x, y + i * lineHeight)
@@ -893,7 +936,10 @@ function saveChanges() {
   props.image.canvas.width = workingCanvas.width
   props.image.canvas.height = workingCanvas.height
   const ctx = props.image.canvas.getContext('2d')
-  if (ctx) { ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height); ctx.drawImage(workingCanvas, 0, 0) }
+  if (ctx) {
+    ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height)
+    ctx.drawImage(workingCanvas, 0, 0)
+  }
   const newName = fileName.value.trim()
   if (newName) props.image.outputName = ImageProcessor.safeBaseName(newName)
   props.image.filters = { ...localFilters.value }
@@ -932,7 +978,7 @@ function addTextItem() {
 }
 
 function deleteTextItem(id: string) {
-  textItems.value = textItems.value.filter(i => i.id !== id)
+  textItems.value = textItems.value.filter((i) => i.id !== id)
   if (selectedTextId.value === id) selectedTextId.value = null
   snapshotNow()
 }
@@ -994,7 +1040,10 @@ function closeEditor() {
   min-width: 0;
 }
 
-.header-icon { color: var(--accent); font-size: 1rem; }
+.header-icon {
+  color: var(--accent);
+  font-size: 1rem;
+}
 
 .modal-title {
   font-size: 0.95rem;
@@ -1030,7 +1079,10 @@ function closeEditor() {
   transition: all 0.15s;
   flex-shrink: 0;
 }
-.icon-btn:hover { background: var(--bg); color: var(--text); }
+.icon-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
 
 /* ── Body ────────────────────────────────────────────────── */
 .editor-body {
@@ -1074,8 +1126,15 @@ function closeEditor() {
   cursor: pointer;
   transition: all 0.15s;
 }
-.cmp-btn:hover { color: var(--text); border-color: var(--accent); }
-.cmp-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+.cmp-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.cmp-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
 
 .cmp-sep {
   color: var(--border-color);
@@ -1167,8 +1226,12 @@ function closeEditor() {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.split-label-l { left: 8px; }
-.split-label-r { right: 8px; }
+.split-label-l {
+  left: 8px;
+}
+.split-label-r {
+  right: 8px;
+}
 
 /* Image meta */
 .image-meta {
@@ -1179,7 +1242,10 @@ function closeEditor() {
   padding: 0 var(--space-1);
   gap: var(--space-3);
 }
-.image-meta i { margin-right: 4px; opacity: 0.6; }
+.image-meta i {
+  margin-right: 4px;
+  opacity: 0.6;
+}
 
 /* ── Controls panel (right) ──────────────────────────────── */
 .controls-panel {
@@ -1219,8 +1285,14 @@ function closeEditor() {
   transition: all 0.15s;
   white-space: nowrap;
 }
-.undo-redo-btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
-.undo-redo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.undo-redo-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.undo-redo-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 
 .undo-redo-hint {
   font-size: 0.67rem;
@@ -1258,8 +1330,13 @@ function closeEditor() {
   gap: 6px;
   white-space: nowrap;
 }
-.btn:hover:not(:disabled) { border-color: var(--accent); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
 .btn-primary {
   background: var(--accent);
@@ -1283,23 +1360,43 @@ function closeEditor() {
 }
 
 .btn-swap-enter-active,
-.btn-swap-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
-.btn-swap-enter-from { opacity: 0; transform: translateY(4px); }
-.btn-swap-leave-to { opacity: 0; transform: translateY(-4px); }
+.btn-swap-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.btn-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.btn-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
 
 /* ── Animations ──────────────────────────────────────────── */
 .modal-enter-active,
-.modal-leave-active { transition: opacity 0.25s ease; }
+.modal-leave-active {
+  transition: opacity 0.25s ease;
+}
 .modal-enter-from,
-.modal-leave-to { opacity: 0; }
+.modal-leave-to {
+  opacity: 0;
+}
 .modal-enter-active .modal-container,
-.modal-leave-active .modal-container { transition: transform 0.25s ease; }
+.modal-leave-active .modal-container {
+  transition: transform 0.25s ease;
+}
 .modal-enter-from .modal-container,
-.modal-leave-to .modal-container { transform: scale(0.97) translateY(10px); }
+.modal-leave-to .modal-container {
+  transform: scale(0.97) translateY(10px);
+}
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .editor-body { flex-direction: column; }
+  .editor-body {
+    flex-direction: column;
+  }
 
   .preview-panel {
     flex: 0 0 auto;
@@ -1308,18 +1405,27 @@ function closeEditor() {
     border-bottom: 1px solid var(--border-color);
   }
 
-  .controls-panel { flex: 1; }
+  .controls-panel {
+    flex: 1;
+  }
 
   .modal-container {
     height: 95vh;
     border-radius: var(--radius-xl);
   }
 
-  .header-filename { display: none; }
+  .header-filename {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
-  .modal-overlay { padding: 0; }
-  .modal-container { height: 100dvh; border-radius: 0; }
+  .modal-overlay {
+    padding: 0;
+  }
+  .modal-container {
+    height: 100dvh;
+    border-radius: 0;
+  }
 }
 </style>

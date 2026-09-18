@@ -23,55 +23,63 @@ const imageScale = ref(0.3) // Scale factor (0.1 to 1)
 const previewContainer = ref<HTMLDivElement | null>(null)
 
 // Load image when file changes
-watch(() => props.commentImage, (newImage) => {
-  if (newImage) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreviewUrl.value = e.target?.result as string
+watch(
+  () => props.commentImage,
+  (newImage) => {
+    if (newImage) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        imagePreviewUrl.value = e.target?.result as string
+      }
+      reader.readAsDataURL(newImage)
+    } else {
+      imagePreviewUrl.value = null
     }
-    reader.readAsDataURL(newImage)
-  } else {
-    imagePreviewUrl.value = null
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 // Emit position changes
-watch([imagePosition, imageScale], () => {
-  emit('update:position', {
-    x: imagePosition.value.x,
-    y: imagePosition.value.y,
-    scale: imageScale.value
-  })
-}, { deep: true })
+watch(
+  [imagePosition, imageScale],
+  () => {
+    emit('update:position', {
+      x: imagePosition.value.x,
+      y: imagePosition.value.y,
+      scale: imageScale.value,
+    })
+  },
+  { deep: true }
+)
 
 // Drag handlers
 function startDrag(event: MouseEvent) {
   if (!previewContainer.value) return
   isDragging.value = true
-  
+
   const rect = previewContainer.value.getBoundingClientRect()
   const startX = event.clientX
   const startY = event.clientY
   const startPosX = imagePosition.value.x
   const startPosY = imagePosition.value.y
-  
+
   function onMouseMove(e: MouseEvent) {
     if (!previewContainer.value) return
     const deltaX = ((e.clientX - startX) / rect.width) * 100
     const deltaY = ((e.clientY - startY) / rect.height) * 100
-    
+
     imagePosition.value = {
       x: Math.max(0, Math.min(100, startPosX + deltaX)),
-      y: Math.max(0, Math.min(100, startPosY + deltaY))
+      y: Math.max(0, Math.min(100, startPosY + deltaY)),
     }
   }
-  
+
   function onMouseUp() {
     isDragging.value = false
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
   }
-  
+
   document.addEventListener('mousemove', onMouseMove)
   document.addEventListener('mouseup', onMouseUp)
 }
@@ -93,7 +101,7 @@ const pageAspectRatio = computed(() => {
         <i class="fa-solid fa-eye"></i>
         Kommentarseite Vorschau
       </h4>
-      
+
       <div v-if="commentImage" class="preview-controls">
         <div class="scale-control">
           <label>
@@ -101,29 +109,25 @@ const pageAspectRatio = computed(() => {
             Größe
             <i class="fa-solid fa-search-plus"></i>
           </label>
-          <input 
-            v-model.number="imageScale" 
-            type="range" 
-            min="0.1" 
-            max="1" 
+          <input
+            v-model.number="imageScale"
+            type="range"
+            min="0.1"
+            max="1"
             step="0.05"
             class="scale-slider"
           />
           <span class="scale-value">{{ Math.round(imageScale * 100) }}%</span>
         </div>
-        
-        <button 
-          class="reset-btn" 
-          title="Position zurücksetzen"
-          @click="resetPosition"
-        >
+
+        <button class="reset-btn" title="Position zurücksetzen" @click="resetPosition">
           <i class="fa-solid fa-arrows-rotate"></i>
           Zentrieren
         </button>
       </div>
     </div>
 
-    <div 
+    <div
       ref="previewContainer"
       class="page-preview"
       :class="{ 'orientation-landscape': orientation === 'landscape' }"
@@ -141,14 +145,14 @@ const pageAspectRatio = computed(() => {
       </div>
 
       <!-- Draggable Image -->
-      <div 
+      <div
         v-if="imagePreviewUrl"
         class="draggable-image"
         :class="{ dragging: isDragging }"
         :style="{
           left: imagePosition.x + '%',
           top: imagePosition.y + '%',
-          transform: `translate(-50%, -50%) scale(${imageScale})`
+          transform: `translate(-50%, -50%) scale(${imageScale})`,
         }"
         @mousedown="startDrag"
       >
@@ -168,12 +172,8 @@ const pageAspectRatio = computed(() => {
 
     <div class="preview-info">
       <i class="fa-solid fa-info-circle"></i>
-      <span v-if="commentImage">
-        Ziehen Sie das Bild mit der Maus, um es zu positionieren
-      </span>
-      <span v-else>
-        Laden Sie ein Bild hoch, um die Vorschau zu sehen
-      </span>
+      <span v-if="commentImage">Ziehen Sie das Bild mit der Maus, um es zu positionieren</span>
+      <span v-else>Laden Sie ein Bild hoch, um die Vorschau zu sehen</span>
     </div>
   </div>
 </template>
@@ -305,7 +305,7 @@ const pageAspectRatio = computed(() => {
   margin: 0 auto;
   background: white;
   border-radius: var(--radius-lg);
-  box-shadow: 
+  box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -467,7 +467,7 @@ const pageAspectRatio = computed(() => {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] .page-preview {
+[data-theme='dark'] .page-preview {
   background: #f5f5f5;
 }
 </style>

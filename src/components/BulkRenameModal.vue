@@ -5,7 +5,9 @@
         <div class="modal-content">
           <div class="modal-header">
             <h2>{{ t('bulkRename.title') }}</h2>
-            <button class="close-btn" :title="t('bulkRename.close')" @click="$emit('close')">×</button>
+            <button class="close-btn" :title="t('bulkRename.close')" @click="$emit('close')">
+              ×
+            </button>
           </div>
 
           <div class="modal-body">
@@ -19,7 +21,7 @@
                 :placeholder="t('bulkRename.baseName.placeholder')"
                 autofocus
                 @keydown.enter="handleConfirm"
-              >
+              />
               <p class="setting-hint">{{ t('bulkRename.baseName.hint') }}</p>
             </div>
 
@@ -33,7 +35,7 @@
                 min="0"
                 :placeholder="t('bulkRename.startNumber.placeholder')"
                 @keydown.enter="handleConfirm"
-              >
+              />
               <p class="setting-hint">{{ t('bulkRename.startNumber.hint') }}</p>
             </div>
 
@@ -42,14 +44,18 @@
               <label>{{ t('bulkRename.seo.label') }}</label>
               <div class="seo-options">
                 <div class="option-row">
-                  <label for="separator" class="option-label">{{ t('bulkRename.seo.separator') }}</label>
+                  <label for="separator" class="option-label">
+                    {{ t('bulkRename.seo.separator') }}
+                  </label>
                   <select id="separator" v-model="separator" class="option-select">
                     <option value="-">{{ t('bulkRename.seo.hyphen') }} (-)</option>
                     <option value="_">{{ t('bulkRename.seo.underscore') }} (_)</option>
                   </select>
                 </div>
                 <div class="option-row">
-                  <label for="lowercase" class="option-label">{{ t('bulkRename.seo.lowercase') }}</label>
+                  <label for="lowercase" class="option-label">
+                    {{ t('bulkRename.seo.lowercase') }}
+                  </label>
                   <button
                     id="lowercase"
                     type="button"
@@ -97,11 +103,7 @@
             <button class="btn-secondary" @click="$emit('close')">
               {{ t('bulkRename.buttons.cancel') }}
             </button>
-            <button
-              class="btn-primary"
-              :disabled="!isValid"
-              @click="handleConfirm"
-            >
+            <button class="btn-primary" :disabled="!isValid" @click="handleConfirm">
               <i class="fa-solid fa-pen"></i>
               {{ t('bulkRename.buttons.rename') }}
             </button>
@@ -147,9 +149,7 @@ const isValid = computed(() => {
 })
 
 function buildSeoName(base: string, number: number, sep: string, lowercase: boolean): string {
-  let name = base
-    .replace(/\s+/g, sep)
-    .replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
+  let name = base.replace(/\s+/g, sep).replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
   if (lowercase) {
     name = name.toLowerCase()
   }
@@ -157,7 +157,7 @@ function buildSeoName(base: string, number: number, sep: string, lowercase: bool
 }
 
 const previewNames = computed(() => {
-  const selected = imageStore.images.filter(img => img.selected)
+  const selected = imageStore.images.filter((img) => img.selected)
   const safeBase = ImageProcessor.safeBaseName(baseName.value) || 'Bild'
 
   return selected.slice(0, maxPreviewItems).map((img, index) => {
@@ -166,20 +166,23 @@ const previewNames = computed(() => {
     const newName = buildSeoName(safeBase, number, separator.value, lowercaseEnabled.value)
     return {
       old: img.outputName || img.file.name.replace(/\.[^.]+$/, ''),
-      new: `${newName}.${extension}`
+      new: `${newName}.${extension}`,
     }
   })
 })
 
 // Reset form when modal opens
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    baseName.value = 'Bild'
-    startNumber.value = 1
-    separator.value = '-'
-    lowercaseEnabled.value = true
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      baseName.value = 'Bild'
+      startNumber.value = 1
+      separator.value = '-'
+      lowercaseEnabled.value = true
+    }
   }
-})
+)
 
 function handleConfirm() {
   if (!isValid.value) return
@@ -212,7 +215,9 @@ function handleConfirm() {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-header {
@@ -279,8 +284,8 @@ function handleConfirm() {
   line-height: 1.4;
 }
 
-.setting-group input[type="text"],
-.setting-group input[type="number"] {
+.setting-group input[type='text'],
+.setting-group input[type='number'] {
   width: 100%;
   padding: var(--space-3);
   border: 1px solid var(--border-color);
@@ -288,11 +293,13 @@ function handleConfirm() {
   background: var(--panel);
   color: var(--text);
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
-.setting-group input[type="text"]:focus,
-.setting-group input[type="number"]:focus {
+.setting-group input[type='text']:focus,
+.setting-group input[type='number']:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
@@ -539,7 +546,9 @@ function handleConfirm() {
 /* Transition */
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .modal-enter-from,
@@ -562,7 +571,8 @@ function handleConfirm() {
     flex-wrap: wrap;
   }
 
-  .old-name, .new-name {
+  .old-name,
+  .new-name {
     flex: 0 0 100%;
   }
 

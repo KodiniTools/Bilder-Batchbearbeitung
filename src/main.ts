@@ -23,8 +23,8 @@ const i18n = createI18n({
   fallbackLocale: 'de',
   messages: {
     de,
-    en
-  }
+    en,
+  },
 })
 
 // Create app

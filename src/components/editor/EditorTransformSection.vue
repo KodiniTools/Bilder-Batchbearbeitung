@@ -13,21 +13,25 @@
           :title="t('imageEditor.transformations.rotate.left90')"
           @click="emit('rotate', -90)"
         >
-          <i class="fa-solid fa-rotate-left"></i> −90°
+          <i class="fa-solid fa-rotate-left"></i>
+          −90°
         </button>
         <button
           type="button"
           class="btn btn-icon-sm"
           :title="t('imageEditor.transformations.rotate.rotate180')"
           @click="emit('rotate', 180)"
-        >180°</button>
+        >
+          180°
+        </button>
         <button
           type="button"
           class="btn btn-icon-sm"
           :title="t('imageEditor.transformations.rotate.right90')"
           @click="emit('rotate', 90)"
         >
-          +90° <i class="fa-solid fa-rotate-right"></i>
+          +90°
+          <i class="fa-solid fa-rotate-right"></i>
         </button>
       </div>
     </div>
@@ -67,7 +71,7 @@
           step="1"
           :value="straightenAngle"
           @input="onStraighten($event)"
-        >
+        />
         <span class="filter-value">{{ straightenAngle }}°</span>
       </div>
     </div>

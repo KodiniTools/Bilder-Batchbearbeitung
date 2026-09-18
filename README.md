@@ -84,10 +84,12 @@ npm run preview
 Die `src/lib/` Ordnerstruktur enthält die wiederverwendbaren Core-Module, die unabhängig von Vue funktionieren:
 
 ### `src/lib/core/`
+
 - **image-processor.ts**: Zentrale Bildverarbeitungsklasse mit allen Canvas-Operationen
 - **types.ts**: TypeScript-Typdefinitionen für die gesamte App
 
 ### `src/lib/features/`
+
 - **export-pdf.ts**: PDF-Export-Funktionalität mit jsPDF
 - **export-zip.ts**: ZIP-Download-Funktionalität mit JSZip
 
@@ -189,7 +191,7 @@ const settings = {
   includeCommentPage: true,
   includeFileName: true,
   optimizeSize: true,
-  orientation: 'auto' // 'auto' | 'portrait' | 'landscape'
+  orientation: 'auto', // 'auto' | 'portrait' | 'landscape'
 }
 
 await exportMultipleImagesAsPdf(images, settings)
@@ -283,4 +285,5 @@ Wenn dir dieses Projekt gefällt und du die Entwicklung unterstützen möchtest,
 [![PayPal Spenden](https://www.paypalobjects.com/de_DE/CH/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=8RGLGQ2BFMHU6)
 
 ---
+
 Autor: Dinko Ramić - Kodini Tools - kodinitools.com

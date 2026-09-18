@@ -6,9 +6,17 @@
           <!-- Header -->
           <div class="modal-header">
             <h2>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
               {{ t('commentPageDesigner.title') }}
             </h2>
@@ -20,15 +28,36 @@
 
             <!-- Page Counter Badge -->
             <div class="page-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
               </svg>
-              {{ pages.length }} {{ pages.length === 1 ? t('commentPageDesigner.page.singular') : t('commentPageDesigner.page.plural') }}
+              {{ pages.length }}
+              {{
+                pages.length === 1
+                  ? t('commentPageDesigner.page.singular')
+                  : t('commentPageDesigner.page.plural')
+              }}
             </div>
 
             <button class="close-btn" :title="t('commentPageDesigner.close')" @click="handleClose">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -42,7 +71,15 @@
               <!-- Element Tools Section -->
               <div class="tool-section">
                 <h3>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
                     <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
                     <path d="M2 2l7.586 7.586"></path>
@@ -51,8 +88,20 @@
                 </h3>
 
                 <!-- Add Text Button -->
-                <button class="tool-btn" :disabled="currentElements.length >= 20" @click="addTextElement">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button
+                  class="tool-btn"
+                  :disabled="currentElements.length >= 20"
+                  @click="addTextElement"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <polyline points="4 7 4 4 20 4 20 7"></polyline>
                     <line x1="9" y1="20" x2="15" y2="20"></line>
                     <line x1="12" y1="4" x2="12" y2="20"></line>
@@ -61,8 +110,20 @@
                 </button>
 
                 <!-- Add Image Button -->
-                <button class="tool-btn" :disabled="currentElements.length >= 20" @click="triggerImageUpload">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button
+                  class="tool-btn"
+                  :disabled="currentElements.length >= 20"
+                  @click="triggerImageUpload"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                     <polyline points="21 15 16 10 5 21"></polyline>
@@ -70,18 +131,32 @@
                   {{ t('commentPageDesigner.tools.addImage') }}
                 </button>
                 <input
-                    ref="imageInput"
-                    type="file"
-                    accept="image/*"
-                    style="display: none"
-                    @change="handleImageUpload"
-                >
+                  ref="imageInput"
+                  type="file"
+                  accept="image/*"
+                  style="display: none"
+                  @change="handleImageUpload"
+                />
 
                 <!-- Clear Current Page Button -->
-                <button v-if="currentElements.length > 0" class="tool-btn danger" @click="clearCurrentPage">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button
+                  v-if="currentElements.length > 0"
+                  class="tool-btn danger"
+                  @click="clearCurrentPage"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path>
                   </svg>
                   {{ t('commentPageDesigner.tools.clearPage') }}
                 </button>
@@ -89,18 +164,26 @@
 
               <!-- Element Properties -->
               <CommentPageDesignerProperties
-                  v-if="selectedElement"
-                  :element="selectedElement"
-                  :page-width="pageWidth"
-                  :page-height="pageHeight"
-                  @move-to-front="moveToFront"
-                  @move-to-back="moveToBack"
-                  @delete="deleteSelectedElement"
+                v-if="selectedElement"
+                :element="selectedElement"
+                :page-width="pageWidth"
+                :page-height="pageHeight"
+                @move-to-front="moveToFront"
+                @move-to-back="moveToBack"
+                @delete="deleteSelectedElement"
               />
 
               <!-- Info when no element selected -->
               <div v-else-if="currentElements.length > 0" class="no-selection">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -115,48 +198,94 @@
               <div class="page-toolbar">
                 <div class="page-toolbar-left">
                   <button
-                      :disabled="currentPageIndex === 0"
-                      class="ptb-btn"
-                      :title="t('commentPageDesigner.pageManagement.previousPage')"
-                      @click="previousPage"
+                    :disabled="currentPageIndex === 0"
+                    class="ptb-btn"
+                    :title="t('commentPageDesigner.pageManagement.previousPage')"
+                    @click="previousPage"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                   </button>
 
                   <div class="ptb-thumbs">
                     <button
-                        v-for="(page, index) in pages"
-                        :key="page.id"
-                        :class="['ptb-thumb', { active: index === currentPageIndex }]"
-                        :title="t('commentPageDesigner.pageManagement.pageTitle', { number: index + 1 })"
-                        @click="goToPage(index)"
-                    >{{ index + 1 }}</button>
+                      v-for="(page, index) in pages"
+                      :key="page.id"
+                      :class="['ptb-thumb', { active: index === currentPageIndex }]"
+                      :title="
+                        t('commentPageDesigner.pageManagement.pageTitle', { number: index + 1 })
+                      "
+                      @click="goToPage(index)"
+                    >
+                      {{ index + 1 }}
+                    </button>
                   </div>
 
                   <button
-                      :disabled="currentPageIndex === pages.length - 1"
-                      class="ptb-btn"
-                      :title="t('commentPageDesigner.pageManagement.nextPage')"
-                      @click="nextPage"
+                    :disabled="currentPageIndex === pages.length - 1"
+                    class="ptb-btn"
+                    :title="t('commentPageDesigner.pageManagement.nextPage')"
+                    @click="nextPage"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                   </button>
 
                   <span class="ptb-info">
-                    {{ t('commentPageDesigner.pageManagement.pageOf', { current: currentPageIndex + 1, total: pages.length }) }}
-                    <span class="ptb-elem-count">· {{ t('commentPageDesigner.pageManagement.elementCount', { count: currentElements.length }, currentElements.length) }}</span>
+                    {{
+                      t('commentPageDesigner.pageManagement.pageOf', {
+                        current: currentPageIndex + 1,
+                        total: pages.length,
+                      })
+                    }}
+                    <span class="ptb-elem-count">
+                      ·
+                      {{
+                        t(
+                          'commentPageDesigner.pageManagement.elementCount',
+                          { count: currentElements.length },
+                          currentElements.length
+                        )
+                      }}
+                    </span>
                   </span>
                 </div>
 
                 <div class="page-toolbar-right">
-                  <button class="ptb-action primary" :title="t('commentPageDesigner.pageManagement.addPageTooltip')" @click="addNewPage">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14 2 14 8 20 8"/>
+                  <button
+                    class="ptb-action primary"
+                    :title="t('commentPageDesigner.pageManagement.addPageTooltip')"
+                    @click="addNewPage"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
                       <line x1="12" y1="18" x2="12" y2="12"></line>
                       <line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
@@ -164,14 +293,24 @@
                   </button>
 
                   <button
-                      class="ptb-action danger"
-                      :disabled="pages.length === 1"
-                      :title="t('commentPageDesigner.pageManagement.deletePageTooltip')"
-                      @click="deletePage"
+                    class="ptb-action danger"
+                    :disabled="pages.length === 1"
+                    :title="t('commentPageDesigner.pageManagement.deletePageTooltip')"
+                    @click="deletePage"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      ></path>
                     </svg>
                     {{ t('commentPageDesigner.pageManagement.deletePageButton') }}
                   </button>
@@ -180,11 +319,31 @@
 
               <!-- Zoom Controls -->
               <div class="zoom-controls">
-                <button :disabled="zoomLevel <= 0.25" :title="t('commentPageDesigner.zoom.zoomOut')" @click="zoomOut">−</button>
+                <button
+                  :disabled="zoomLevel <= 0.25"
+                  :title="t('commentPageDesigner.zoom.zoomOut')"
+                  @click="zoomOut"
+                >
+                  −
+                </button>
                 <span>{{ Math.round(zoomLevel * 100) }}%</span>
-                <button :disabled="zoomLevel >= 2" :title="t('commentPageDesigner.zoom.zoomIn')" @click="zoomIn">+</button>
+                <button
+                  :disabled="zoomLevel >= 2"
+                  :title="t('commentPageDesigner.zoom.zoomIn')"
+                  @click="zoomIn"
+                >
+                  +
+                </button>
                 <button :title="t('commentPageDesigner.zoom.reset')" @click="resetZoom">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                     <path d="M21 3v5h-5"></path>
                     <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
@@ -194,27 +353,33 @@
               </div>
 
               <div ref="canvasWrapperRef" class="canvas-wrapper">
-                <div class="canvas-inner" :style="{ paddingTop: canvasVerticalPadding + 'px', paddingBottom: canvasVerticalPadding + 'px' }">
                 <div
+                  class="canvas-inner"
+                  :style="{
+                    paddingTop: canvasVerticalPadding + 'px',
+                    paddingBottom: canvasVerticalPadding + 'px',
+                  }"
+                >
+                  <div
                     ref="canvasRef"
                     class="canvas"
                     :style="{
-                    width: pageWidth + 'px',
-                    height: pageHeight + 'px',
-                    transform: `scale(${zoomLevel})`,
-                    transformOrigin: 'top left',
-                    marginRight: `${pageWidth * (zoomLevel - 1)}px`,
-                    marginBottom: `${pageHeight * (zoomLevel - 1)}px`
-                  }"
+                      width: pageWidth + 'px',
+                      height: pageHeight + 'px',
+                      transform: `scale(${zoomLevel})`,
+                      transformOrigin: 'top left',
+                      marginRight: `${pageWidth * (zoomLevel - 1)}px`,
+                      marginBottom: `${pageHeight * (zoomLevel - 1)}px`,
+                    }"
                     @mousedown="handleCanvasClick"
-                >
-                  <!-- PDF Footer Preview (shows what will appear in exported PDF) -->
-                  <div class="canvas-footer-preview">
-                    {{ footerPreviewText }}
-                  </div>
+                  >
+                    <!-- PDF Footer Preview (shows what will appear in exported PDF) -->
+                    <div class="canvas-footer-preview">
+                      {{ footerPreviewText }}
+                    </div>
 
-                  <!-- Render elements for current page -->
-                  <CommentPageDesignerElement
+                    <!-- Render elements for current page -->
+                    <CommentPageDesignerElement
                       v-for="element in currentElements"
                       :key="element.id"
                       :element="element"
@@ -224,8 +389,8 @@
                       @edit-start="startInlineEdit"
                       @edit-stop="stopInlineEdit"
                       @resize-start="startTextResize"
-                  />
-                </div>
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -234,30 +399,73 @@
           <!-- Footer -->
           <div class="modal-footer">
             <div class="footer-info">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              <span>{{ t('commentPageDesigner.footer.info', { current: currentPageIndex + 1, total: pages.length, count: getTotalElementCount() }) }}</span>
+              <span>
+                {{
+                  t('commentPageDesigner.footer.info', {
+                    current: currentPageIndex + 1,
+                    total: pages.length,
+                    count: getTotalElementCount(),
+                  })
+                }}
+              </span>
             </div>
             <div class="footer-actions">
-              <button class="btn-secondary" @click="handleClose">{{ t('commentPageDesigner.footer.cancel') }}</button>
-              <button class="btn-preview" :disabled="getTotalElementCount() === 0" @click="openPreview">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="btn-secondary" @click="handleClose">
+                {{ t('commentPageDesigner.footer.cancel') }}
+              </button>
+              <button
+                class="btn-preview"
+                :disabled="getTotalElementCount() === 0"
+                @click="openPreview"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
                 Vorschau
               </button>
-              <button
-                  class="btn-primary"
-                  @click="handleSave"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="btn-primary" @click="handleSave">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                {{ t('commentPageDesigner.footer.save', { count: getTotalElementCount(), elements: getTotalElementCount() === 1 ? t('commentPageDesigner.element.singular') : t('commentPageDesigner.element.plural') }) }}
+                {{
+                  t('commentPageDesigner.footer.save', {
+                    count: getTotalElementCount(),
+                    elements:
+                      getTotalElementCount() === 1
+                        ? t('commentPageDesigner.element.singular')
+                        : t('commentPageDesigner.element.plural'),
+                  })
+                }}
               </button>
             </div>
           </div>
@@ -268,13 +476,13 @@
 
   <!-- Vorschau-Modal -->
   <CommentPageDesignerPreview
-      v-model="showPreview"
-      :pages="pages"
-      :page-width="pageWidth"
-      :page-height="pageHeight"
-      :orientation="orientation"
-      :initial-page="currentPageIndex"
-      @save="handleSave"
+    v-model="showPreview"
+    :pages="pages"
+    :page-width="pageWidth"
+    :page-height="pageHeight"
+    :orientation="orientation"
+    :initial-page="currentPageIndex"
+    @save="handleSave"
   />
 </template>
 
@@ -293,24 +501,24 @@ const { t } = useI18n()
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   initialElements: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   orientation: {
     type: String,
-    default: 'portrait'
-  }
+    default: 'portrait',
+  },
 })
 
 // Emits — v-model and @save
 const emit = defineEmits(['update:modelValue', 'save'])
 
 // Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
-const pageWidth = computed(() => props.orientation === 'landscape' ? 1123 : 794)
-const pageHeight = computed(() => props.orientation === 'landscape' ? 794 : 1123)
+const pageWidth = computed(() => (props.orientation === 'landscape' ? 1123 : 794))
+const pageHeight = computed(() => (props.orientation === 'landscape' ? 794 : 1123))
 
 // Template refs
 const canvasRef = ref(null)
@@ -344,7 +552,7 @@ const {
   moveToBack,
   startInlineEdit,
   stopInlineEdit,
-  handleCanvasClick
+  handleCanvasClick,
 } = useCommentPages({ pageWidth, pageHeight, imageInput, canvasRef })
 
 // Direct manipulation: drag / resize / zoom
@@ -356,8 +564,14 @@ const {
   zoomIn,
   zoomOut,
   fitToScreen,
-  resetZoom
-} = useCanvasInteraction({ selectedElement, editingTextId, pageWidth, pageHeight, canvasWrapperRef })
+  resetZoom,
+} = useCanvasInteraction({
+  selectedElement,
+  editingTextId,
+  pageWidth,
+  pageHeight,
+  canvasWrapperRef,
+})
 
 // Footer preview text (matches PDF export footer)
 const footerPreviewText = computed(() => {
@@ -372,17 +586,23 @@ function openPreview() {
 }
 
 // Load initial elements when the modal opens — distribute by page number
-watch(() => props.modelValue, (newVal) => {
-  if (newVal) {
-    initFromElements(props.initialElements)
-    nextTick(() => fitToScreen())
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      initFromElements(props.initialElements)
+      nextTick(() => fitToScreen())
+    }
   }
-})
+)
 
 // Auto-fit on orientation change
-watch(() => props.orientation, () => {
-  nextTick(() => fitToScreen())
-})
+watch(
+  () => props.orientation,
+  () => {
+    nextTick(() => fitToScreen())
+  }
+)
 
 // Close handler — v-model
 function handleClose() {
@@ -858,7 +1078,10 @@ onUnmounted(() => {
   position: relative;
   flex-shrink: 0;
   transform-origin: top left;
-  transition: transform 0.2s ease, margin-right 0.2s ease, margin-bottom 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    margin-right 0.2s ease,
+    margin-bottom 0.2s ease;
 }
 
 .canvas-grid {

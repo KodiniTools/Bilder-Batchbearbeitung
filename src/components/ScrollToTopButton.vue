@@ -10,7 +10,7 @@ const props = withDefaults(
     threshold?: number
   }>(),
   {
-    threshold: 400
+    threshold: 400,
   }
 )
 
@@ -52,7 +52,7 @@ function scrollToTop() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   window.scrollTo({
     top: 0,
-    behavior: prefersReducedMotion ? 'auto' : 'smooth'
+    behavior: prefersReducedMotion ? 'auto' : 'smooth',
   })
 }
 

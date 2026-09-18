@@ -1,23 +1,28 @@
 // src/lib/core/image-processor.ts
 // Bildverarbeitungs-Modul für Canvas-Operationen und Format-Konvertierungen
 
-import type { ImageFormat, ImageFilters, ImageObject, ImageTransforms, WatermarkSettings } from './types'
+import type {
+  ImageFormat,
+  ImageFilters,
+  ImageObject,
+  ImageTransforms,
+  WatermarkSettings,
+} from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
 
 /**
  * Zentrale Klasse für alle Bildverarbeitungsoperationen
  */
 export class ImageProcessor {
-  
   /**
    * Verfügbare Export-Formate
    */
   static availableFormats: ImageFormat[] = [
-    { name: 'PNG',  mimeType: 'image/png',  ext: 'png'  },
-    { name: 'JPEG', mimeType: 'image/jpeg', ext: 'jpg'  },
+    { name: 'PNG', mimeType: 'image/png', ext: 'png' },
+    { name: 'JPEG', mimeType: 'image/jpeg', ext: 'jpg' },
     { name: 'WebP', mimeType: 'image/webp', ext: 'webp' },
-    { name: 'BMP',  mimeType: 'image/bmp',  ext: 'bmp'  },
-    { name: 'GIF',  mimeType: 'image/gif',  ext: 'gif'  }
+    { name: 'BMP', mimeType: 'image/bmp', ext: 'bmp' },
+    { name: 'GIF', mimeType: 'image/gif', ext: 'gif' },
   ]
 
   /**
@@ -46,10 +51,10 @@ export class ImageProcessor {
 
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
-      
+
       reader.onload = (ev) => {
         const image = new Image()
-        
+
         image.onload = () => {
           const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
@@ -83,23 +88,23 @@ export class ImageProcessor {
             originalHeight: image.height,
             selected: false,
             outputName: this.getFileNameWithoutExtension(file.name),
-            version: 0
+            version: 0,
           }
 
           resolve(imageObj)
         }
-        
+
         image.onerror = () => {
           reject(new Error(`Die Datei ${file.name} konnte nicht geladen werden`))
         }
-        
+
         image.src = String(ev.target?.result || '')
       }
-      
+
       reader.onerror = () => {
         reject(new Error(`Die Datei ${file.name} konnte nicht gelesen werden`))
       }
-      
+
       reader.readAsDataURL(file)
     })
   }
@@ -108,9 +113,9 @@ export class ImageProcessor {
    * Ändert die Größe eines Bildes
    */
   static resizeImage(
-    imageObj: ImageObject, 
-    newWidth: number, 
-    newHeight: number, 
+    imageObj: ImageObject,
+    newWidth: number,
+    newHeight: number,
     keepAspect = false
   ): void {
     const { canvas, ctx, originalWidth, originalHeight } = imageObj
@@ -118,7 +123,7 @@ export class ImageProcessor {
 
     let targetW = newWidth
     let targetH = newHeight
-    
+
     if (keepAspect) {
       const aspect = originalWidth / originalHeight
       if (newWidth / newHeight > aspect) {
@@ -146,21 +151,25 @@ export class ImageProcessor {
    * Konvertiert ein Bild in ein bestimmtes Format
    */
   static async convertToFormat(
-    imageObj: ImageObject, 
-    format: ImageFormat, 
+    imageObj: ImageObject,
+    format: ImageFormat,
     quality = 0.95
   ): Promise<Blob> {
     const { canvas } = imageObj
-    
+
     return new Promise((resolve, reject) => {
       if (canvas.toBlob) {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error('Blob konnte nicht erzeugt werden'))
-          }
-        }, format.mimeType, quality)
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob)
+            } else {
+              reject(new Error('Blob konnte nicht erzeugt werden'))
+            }
+          },
+          format.mimeType,
+          quality
+        )
       } else {
         try {
           const dataURL = canvas.toDataURL(format.mimeType, quality)
@@ -193,20 +202,12 @@ export class ImageProcessor {
   /**
    * Erstellt eine Vorschau-Canvas mit begrenzter Größe
    */
-  static createPreview(
-    imageObj: ImageObject, 
-    maxWidth = 300, 
-    maxHeight = 300
-  ): HTMLCanvasElement {
+  static createPreview(imageObj: ImageObject, maxWidth = 300, maxHeight = 300): HTMLCanvasElement {
     const previewCanvas = document.createElement('canvas')
     const ctx = previewCanvas.getContext('2d')
     if (!ctx) return previewCanvas
 
-    const scale = Math.min(
-      maxWidth / imageObj.canvas.width, 
-      maxHeight / imageObj.canvas.height, 
-      1
-    )
+    const scale = Math.min(maxWidth / imageObj.canvas.width, maxHeight / imageObj.canvas.height, 1)
     previewCanvas.width = Math.floor(imageObj.canvas.width * scale)
     previewCanvas.height = Math.floor(imageObj.canvas.height * scale)
 
@@ -232,15 +233,16 @@ export class ImageProcessor {
       tempCanvas.width = h
       tempCanvas.height = w
       tempCtx.translate(h / 2, w / 2)
-      tempCtx.rotate(degrees * Math.PI / 180)
+      tempCtx.rotate((degrees * Math.PI) / 180)
       tempCtx.drawImage(canvas, -w / 2, -h / 2)
       canvas.width = h
       canvas.height = w
-    } else { // 180 Grad
+    } else {
+      // 180 Grad
       tempCanvas.width = w
       tempCanvas.height = h
       tempCtx.translate(w / 2, h / 2)
-      tempCtx.rotate(degrees * Math.PI / 180)
+      tempCtx.rotate((degrees * Math.PI) / 180)
       tempCtx.drawImage(canvas, -w / 2, -h / 2)
     }
 
@@ -265,7 +267,8 @@ export class ImageProcessor {
     if (direction === 'horizontal') {
       tempCtx.scale(-1, 1)
       tempCtx.drawImage(canvas, -canvas.width, 0)
-    } else { // vertical
+    } else {
+      // vertical
       tempCtx.scale(1, -1)
       tempCtx.drawImage(canvas, 0, -canvas.height)
     }
@@ -317,8 +320,14 @@ export class ImageProcessor {
     // Ausschnitt auf temporäres Canvas zeichnen
     tempCtx.drawImage(
       canvas,
-      offsetX, offsetY, cropWidth, cropHeight,  // Quellbereich
-      0, 0, cropWidth, cropHeight               // Zielbereich
+      offsetX,
+      offsetY,
+      cropWidth,
+      cropHeight, // Quellbereich
+      0,
+      0,
+      cropWidth,
+      cropHeight // Zielbereich
     )
 
     // Original-Canvas auf neue Größe setzen
@@ -490,23 +499,20 @@ export class ImageProcessor {
    * Reihenfolge: Helligkeit → Kontrast → Sättigung → Farbton → Temperatur →
    * Vibrance → Graustufen → Sepia → Invert.
    */
-  private static applyColorPipeline(
-    data: Uint8ClampedArray,
-    f: ImageFilters
-  ): void {
+  private static applyColorPipeline(data: Uint8ClampedArray, f: ImageFilters): void {
     // Rec. 709 Luminanz-Koeffizienten (auch von CSS für grayscale genutzt)
     const LR = 0.2126
     const LG = 0.7152
     const LB = 0.0722
 
-    const brightness = f.brightness / 100   // 1 = neutral
-    const contrast = f.contrast / 100       // 1 = neutral
-    const saturation = f.saturation / 100   // 1 = neutral
-    const grayscale = f.grayscale / 100     // 0 = aus
-    const sepia = f.sepia / 100             // 0 = aus
-    const invert = f.invert / 100           // 0 = aus
-    const tempShift = (f.temperature / 100) * 45  // max ±45 auf 0-255-Skala
-    const vib = f.vibrance / 100            // -1 .. 1
+    const brightness = f.brightness / 100 // 1 = neutral
+    const contrast = f.contrast / 100 // 1 = neutral
+    const saturation = f.saturation / 100 // 1 = neutral
+    const grayscale = f.grayscale / 100 // 0 = aus
+    const sepia = f.sepia / 100 // 0 = aus
+    const invert = f.invert / 100 // 0 = aus
+    const tempShift = (f.temperature / 100) * 45 // max ±45 auf 0-255-Skala
+    const vib = f.vibrance / 100 // -1 .. 1
 
     const doBright = brightness !== 1
     const doContrast = contrast !== 1
@@ -519,9 +525,15 @@ export class ImageProcessor {
 
     // Farbton-Rotation als 3×3-Matrix (W3C Filter-Effects hue-rotate)
     const doHue = f.hue !== 0
-    let m00 = 1, m01 = 0, m02 = 0
-    let m10 = 0, m11 = 1, m12 = 0
-    let m20 = 0, m21 = 0, m22 = 1
+    let m00 = 1,
+      m01 = 0,
+      m02 = 0
+    let m10 = 0,
+      m11 = 1,
+      m12 = 0
+    let m20 = 0,
+      m21 = 0,
+      m22 = 1
     if (doHue) {
       const a = (f.hue * Math.PI) / 180
       const cos = Math.cos(a)
@@ -530,7 +542,7 @@ export class ImageProcessor {
       m01 = 0.715 - cos * 0.715 - sin * 0.715
       m02 = 0.072 - cos * 0.072 + sin * 0.928
       m10 = 0.213 - cos * 0.213 + sin * 0.143
-      m11 = 0.715 + cos * 0.285 + sin * 0.140
+      m11 = 0.715 + cos * 0.285 + sin * 0.14
       m12 = 0.072 - cos * 0.072 - sin * 0.283
       m20 = 0.213 - cos * 0.213 - sin * 0.787
       m21 = 0.715 - cos * 0.715 + sin * 0.715
@@ -689,8 +701,7 @@ export class ImageProcessor {
     if (wl % 2 === 0) wl--
     const wu = wl + 2
     const mIdeal =
-      (12 * sigma * sigma - passes * wl * wl - 4 * passes * wl - 3 * passes) /
-      (-4 * wl - 4)
+      (12 * sigma * sigma - passes * wl * wl - 4 * passes * wl - 3 * passes) / (-4 * wl - 4)
     const m = Math.round(mIdeal)
     const sizes: number[] = []
     for (let i = 0; i < passes; i++) sizes.push(i < m ? wl : wu)
@@ -975,9 +986,12 @@ export class ImageProcessor {
    */
   private static drawRoundRect(
     ctx: CanvasRenderingContext2D,
-    x: number, y: number,
-    w: number, h: number,
-    rx: number, ry?: number
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    rx: number,
+    ry?: number
   ): void {
     if (ry === undefined) ry = rx
     rx = Math.min(rx, w / 2)
@@ -1032,14 +1046,17 @@ export class ImageProcessor {
 
     // borderRadius als Prozent der Bilddimensionen skalieren
     // Slider 0-200 → 0%-50% → bei 200 = voller Kreis/Ellipse
-    const radiusFraction = t.borderRadius / 200 * 0.5 // 0 bis 0.5
+    const radiusFraction = (t.borderRadius / 200) * 0.5 // 0 bis 0.5
     const innerRx = radiusFraction * imgW
     const innerRy = radiusFraction * imgH
 
     // Padding für Schatten berechnen
-    const shadowPadding = t.shadowBlur > 0
-      ? Math.ceil(t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY)))
-      : 0
+    const shadowPadding =
+      t.shadowBlur > 0
+        ? Math.ceil(
+            t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY))
+          )
+        : 0
 
     // Gesamtpadding pro Seite
     const padding = t.borderWidth + shadowPadding

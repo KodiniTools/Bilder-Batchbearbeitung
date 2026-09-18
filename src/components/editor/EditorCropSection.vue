@@ -21,7 +21,9 @@
             class="btn btn-xs"
             :class="{ 'btn-active': cropLockedRatio === preset.ratio }"
             @click="emit('set-ratio', preset.ratio)"
-          >{{ preset.label }}</button>
+          >
+            {{ preset.label }}
+          </button>
         </div>
       </div>
       <div class="btn-row">

@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { computed, onUnmounted } from 'vue'
 
-const props = withDefaults(defineProps<{
-  modelValue: number
-  label: string
-  min: number
-  max: number
-  default: number
-  icon?: string
-  step?: number
-  unit?: string
-  resetTitle?: string
-}>(), {
-  icon: '',
-  step: 1,
-  unit: '',
-  resetTitle: '',
-})
+const props = withDefaults(
+  defineProps<{
+    modelValue: number
+    label: string
+    min: number
+    max: number
+    default: number
+    icon?: string
+    step?: number
+    unit?: string
+    resetTitle?: string
+  }>(),
+  {
+    icon: '',
+    step: 1,
+    unit: '',
+    resetTitle: '',
+  }
+)
 
 const emit = defineEmits<{
   'update:modelValue': [value: number]
@@ -71,8 +74,14 @@ let holdTimeout: ReturnType<typeof setTimeout> | null = null
 let holdInterval: ReturnType<typeof setInterval> | null = null
 
 function stopHold() {
-  if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null }
-  if (holdInterval) { clearInterval(holdInterval); holdInterval = null }
+  if (holdTimeout) {
+    clearTimeout(holdTimeout)
+    holdTimeout = null
+  }
+  if (holdInterval) {
+    clearInterval(holdInterval)
+    holdInterval = null
+  }
   window.removeEventListener('mouseup', stopHold)
   window.removeEventListener('touchend', stopHold)
   window.removeEventListener('touchcancel', stopHold)
@@ -94,8 +103,10 @@ function startHold(direction: 1 | -1, event: Event) {
     let delay = 90
     const tick = () => {
       // An der Grenze anhalten
-      if ((direction === 1 && props.modelValue >= props.max) ||
-          (direction === -1 && props.modelValue <= props.min)) {
+      if (
+        (direction === 1 && props.modelValue >= props.max) ||
+        (direction === -1 && props.modelValue <= props.min)
+      ) {
         stopHold()
         return
       }
@@ -292,7 +303,9 @@ onUnmounted(stopHold)
   padding: 0;
   font-size: 0.5rem;
   border-radius: 2px;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 }
 
 .spin-btn:hover:not(:disabled) {
@@ -319,7 +332,10 @@ onUnmounted(stopHold)
   cursor: default;
   font-size: 0.7rem;
   pointer-events: none;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
   opacity: 0;
 }
 

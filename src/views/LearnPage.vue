@@ -43,8 +43,16 @@ onMounted(() => {
 })
 
 const sections = [
-  'webaudio', 'vue3', 'canvas', 'fileapi', 'typescript',
-  'pinia', 'workers', 'performance', 'security', 'practice'
+  'webaudio',
+  'vue3',
+  'canvas',
+  'fileapi',
+  'typescript',
+  'pinia',
+  'workers',
+  'performance',
+  'security',
+  'practice',
 ]
 </script>
 
@@ -71,10 +79,22 @@ const sections = [
         <h1>{{ t('learn.title') }}</h1>
         <p class="hero-subtitle">{{ t('learn.subtitle') }}</p>
         <div class="hero-tags">
-          <span class="tag"><i class="fa-brands fa-vuejs"></i> Vue.js 3</span>
-          <span class="tag"><i class="fa-solid fa-wave-square"></i> Web Audio API</span>
-          <span class="tag"><i class="fa-solid fa-code"></i> TypeScript</span>
-          <span class="tag"><i class="fa-solid fa-paint-brush"></i> Canvas API</span>
+          <span class="tag">
+            <i class="fa-brands fa-vuejs"></i>
+            Vue.js 3
+          </span>
+          <span class="tag">
+            <i class="fa-solid fa-wave-square"></i>
+            Web Audio API
+          </span>
+          <span class="tag">
+            <i class="fa-solid fa-code"></i>
+            TypeScript
+          </span>
+          <span class="tag">
+            <i class="fa-solid fa-paint-brush"></i>
+            Canvas API
+          </span>
         </div>
       </div>
     </header>
@@ -104,7 +124,10 @@ const sections = [
             <p>{{ t('learn.intro.p1') }}</p>
             <p>{{ t('learn.intro.p2') }}</p>
             <div class="prereq-box">
-              <h4><i class="fa-solid fa-list-check"></i> {{ t('learn.intro.prereqTitle') }}</h4>
+              <h4>
+                <i class="fa-solid fa-list-check"></i>
+                {{ t('learn.intro.prereqTitle') }}
+              </h4>
               <ul>
                 <li>{{ t('learn.intro.prereq1') }}</li>
                 <li>{{ t('learn.intro.prereq2') }}</li>
@@ -115,7 +138,10 @@ const sections = [
 
           <!-- Section 1: Web Audio API -->
           <section id="webaudio" class="content-section">
-            <h2><span class="section-number">1</span> {{ t('learn.sections.webaudio.title') }}</h2>
+            <h2>
+              <span class="section-number">1</span>
+              {{ t('learn.sections.webaudio.title') }}
+            </h2>
             <p>{{ t('learn.sections.webaudio.intro') }}</p>
 
             <h3>{{ t('learn.sections.webaudio.basics.title') }}</h3>
@@ -146,7 +172,10 @@ const sections = [
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Web Audio API Grundlagen</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Web Audio API Grundlagen
+                </span>
                 <button class="code-toggle" @click="toggleCode('webaudio1')">
                   {{ expandedCode === 'webaudio1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -201,7 +230,10 @@ function playTone(frequency: number, duration: number) {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Audio-Visualisierung</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Audio-Visualisierung
+                </span>
                 <button class="code-toggle" @click="toggleCode('webaudio2')">
                   {{ expandedCode === 'webaudio2' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -261,17 +293,26 @@ function visualize(canvas: HTMLCanvasElement) {
 
           <!-- Section 2: Vue.js 3 Composition API -->
           <section id="vue3" class="content-section">
-            <h2><span class="section-number">2</span> {{ t('learn.sections.vue3.title') }}</h2>
+            <h2>
+              <span class="section-number">2</span>
+              {{ t('learn.sections.vue3.title') }}
+            </h2>
             <p>{{ t('learn.sections.vue3.intro') }}</p>
 
             <div class="comparison-box">
               <div class="comparison-item">
-                <h4><i class="fa-solid fa-code"></i> Options API</h4>
+                <h4>
+                  <i class="fa-solid fa-code"></i>
+                  Options API
+                </h4>
                 <p>{{ t('learn.sections.vue3.optionsApi') }}</p>
               </div>
               <div class="vs-divider">VS</div>
               <div class="comparison-item highlight">
-                <h4><i class="fa-solid fa-puzzle-piece"></i> Composition API</h4>
+                <h4>
+                  <i class="fa-solid fa-puzzle-piece"></i>
+                  Composition API
+                </h4>
                 <p>{{ t('learn.sections.vue3.compositionApi') }}</p>
               </div>
             </div>
@@ -281,12 +322,15 @@ function visualize(canvas: HTMLCanvasElement) {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-vuejs"></i> Reaktivität in Vue 3</span>
+                <span>
+                  <i class="fa-brands fa-vuejs"></i>
+                  Reaktivität in Vue 3
+                </span>
                 <button class="code-toggle" @click="toggleCode('vue1')">
                   {{ expandedCode === 'vue1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
-              <pre v-show="expandedCode === 'vue1'"><code>&lt;script setup lang="ts"&gt;
+              <pre v-show="expandedCode === 'vue1'"><code v-pre>&lt;script setup lang="ts"&gt;
 import { ref, reactive, computed, watch, watchEffect } from 'vue'
 
 // ref() für primitive Werte
@@ -336,7 +380,10 @@ const updateUser = (newName: string) => user.name = newName
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-vuejs"></i> Eigene Composables</span>
+                <span>
+                  <i class="fa-brands fa-vuejs"></i>
+                  Eigene Composables
+                </span>
                 <button class="code-toggle" @click="toggleCode('vue2')">
                   {{ expandedCode === 'vue2' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -425,7 +472,10 @@ const { isPlaying, volume, playSound, setVolume } = useAudio()
 
           <!-- Section 3: Canvas API -->
           <section id="canvas" class="content-section">
-            <h2><span class="section-number">3</span> {{ t('learn.sections.canvas.title') }}</h2>
+            <h2>
+              <span class="section-number">3</span>
+              {{ t('learn.sections.canvas.title') }}
+            </h2>
             <p>{{ t('learn.sections.canvas.intro') }}</p>
 
             <div class="feature-grid">
@@ -453,7 +503,10 @@ const { isPlaying, volume, playSound, setVolume } = useAudio()
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Bildverarbeitung mit Canvas</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Bildverarbeitung mit Canvas
+                </span>
                 <button class="code-toggle" @click="toggleCode('canvas1')">
                   {{ expandedCode === 'canvas1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -546,7 +599,10 @@ function adjustBrightnessContrast(
 
           <!-- Section 4: File API -->
           <section id="fileapi" class="content-section">
-            <h2><span class="section-number">4</span> {{ t('learn.sections.fileapi.title') }}</h2>
+            <h2>
+              <span class="section-number">4</span>
+              {{ t('learn.sections.fileapi.title') }}
+            </h2>
             <p>{{ t('learn.sections.fileapi.intro') }}</p>
 
             <div class="api-list">
@@ -570,12 +626,17 @@ function adjustBrightnessContrast(
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Datei-Handling</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Datei-Handling
+                </span>
                 <button class="code-toggle" @click="toggleCode('file1')">
                   {{ expandedCode === 'file1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
               </div>
-              <pre v-show="expandedCode === 'file1'"><code>// Dateien per Drag & Drop oder Input laden
+              <pre
+                v-show="expandedCode === 'file1'"
+              ><code>// Dateien per Drag & Drop oder Input laden
 function handleFileInput(event: Event) {
   const input = event.target as HTMLInputElement
   const files = input.files
@@ -651,7 +712,10 @@ function downloadBlob(data: BlobPart[], filename: string, type: string) {
 
           <!-- Section 5: TypeScript -->
           <section id="typescript" class="content-section">
-            <h2><span class="section-number">5</span> {{ t('learn.sections.typescript.title') }}</h2>
+            <h2>
+              <span class="section-number">5</span>
+              {{ t('learn.sections.typescript.title') }}
+            </h2>
             <p>{{ t('learn.sections.typescript.intro') }}</p>
 
             <div class="benefits-grid">
@@ -675,7 +739,10 @@ function downloadBlob(data: BlobPart[], filename: string, type: string) {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> TypeScript mit Vue 3</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  TypeScript mit Vue 3
+                </span>
                 <button class="code-toggle" @click="toggleCode('ts1')">
                   {{ expandedCode === 'ts1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -763,7 +830,10 @@ function isImageFile(obj: unknown): obj is ImageFile {
 
           <!-- Section 6: Pinia State Management -->
           <section id="pinia" class="content-section">
-            <h2><span class="section-number">6</span> {{ t('learn.sections.pinia.title') }}</h2>
+            <h2>
+              <span class="section-number">6</span>
+              {{ t('learn.sections.pinia.title') }}
+            </h2>
             <p>{{ t('learn.sections.pinia.intro') }}</p>
 
             <div class="pinia-features">
@@ -787,7 +857,10 @@ function isImageFile(obj: unknown): obj is ImageFile {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-vuejs"></i> Pinia Store</span>
+                <span>
+                  <i class="fa-brands fa-vuejs"></i>
+                  Pinia Store
+                </span>
                 <button class="code-toggle" @click="toggleCode('pinia1')">
                   {{ expandedCode === 'pinia1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -912,27 +985,42 @@ const handleDelete = (id: string) => store.removeImage(id)
 
           <!-- Section 7: Web Workers -->
           <section id="workers" class="content-section">
-            <h2><span class="section-number">7</span> {{ t('learn.sections.workers.title') }}</h2>
+            <h2>
+              <span class="section-number">7</span>
+              {{ t('learn.sections.workers.title') }}
+            </h2>
             <p>{{ t('learn.sections.workers.intro') }}</p>
 
             <div class="worker-types">
               <div class="worker-type">
-                <h4><i class="fa-solid fa-cog"></i> Web Worker</h4>
+                <h4>
+                  <i class="fa-solid fa-cog"></i>
+                  Web Worker
+                </h4>
                 <p>{{ t('learn.sections.workers.types.dedicated') }}</p>
               </div>
               <div class="worker-type">
-                <h4><i class="fa-solid fa-share-nodes"></i> Shared Worker</h4>
+                <h4>
+                  <i class="fa-solid fa-share-nodes"></i>
+                  Shared Worker
+                </h4>
                 <p>{{ t('learn.sections.workers.types.shared') }}</p>
               </div>
               <div class="worker-type">
-                <h4><i class="fa-solid fa-cloud"></i> Service Worker</h4>
+                <h4>
+                  <i class="fa-solid fa-cloud"></i>
+                  Service Worker
+                </h4>
                 <p>{{ t('learn.sections.workers.types.service') }}</p>
               </div>
             </div>
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Web Worker für Bildverarbeitung</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Web Worker für Bildverarbeitung
+                </span>
                 <button class="code-toggle" @click="toggleCode('worker1')">
                   {{ expandedCode === 'worker1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -1038,7 +1126,10 @@ export function useImageWorker() {
 
           <!-- Section 8: Performance -->
           <section id="performance" class="content-section">
-            <h2><span class="section-number">8</span> {{ t('learn.sections.performance.title') }}</h2>
+            <h2>
+              <span class="section-number">8</span>
+              {{ t('learn.sections.performance.title') }}
+            </h2>
             <p>{{ t('learn.sections.performance.intro') }}</p>
 
             <div class="perf-techniques">
@@ -1074,7 +1165,10 @@ export function useImageWorker() {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-vuejs"></i> Performance-Optimierungen</span>
+                <span>
+                  <i class="fa-brands fa-vuejs"></i>
+                  Performance-Optimierungen
+                </span>
                 <button class="code-toggle" @click="toggleCode('perf1')">
                   {{ expandedCode === 'perf1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -1146,7 +1240,10 @@ function useLazyLoad(callback: () => void) {
 
           <!-- Section 9: Security -->
           <section id="security" class="content-section">
-            <h2><span class="section-number">9</span> {{ t('learn.sections.security.title') }}</h2>
+            <h2>
+              <span class="section-number">9</span>
+              {{ t('learn.sections.security.title') }}
+            </h2>
             <p>{{ t('learn.sections.security.intro') }}</p>
 
             <div class="security-grid">
@@ -1174,7 +1271,10 @@ function useLazyLoad(callback: () => void) {
 
             <div class="code-block">
               <div class="code-header">
-                <span><i class="fa-brands fa-js"></i> Sicherheits-Best-Practices</span>
+                <span>
+                  <i class="fa-brands fa-js"></i>
+                  Sicherheits-Best-Practices
+                </span>
                 <button class="code-toggle" @click="toggleCode('sec1')">
                   {{ expandedCode === 'sec1' ? t('learn.hideCode') : t('learn.showCode') }}
                 </button>
@@ -1252,12 +1352,17 @@ function processLocally(image: File): Promise&lt;string&gt; {
 
           <!-- Section 10: Practice -->
           <section id="practice" class="content-section">
-            <h2><span class="section-number">10</span> {{ t('learn.sections.practice.title') }}</h2>
+            <h2>
+              <span class="section-number">10</span>
+              {{ t('learn.sections.practice.title') }}
+            </h2>
             <p>{{ t('learn.sections.practice.intro') }}</p>
 
             <div class="exercise-list">
               <div class="exercise-card">
-                <div class="exercise-level beginner">{{ t('learn.sections.practice.levels.beginner') }}</div>
+                <div class="exercise-level beginner">
+                  {{ t('learn.sections.practice.levels.beginner') }}
+                </div>
                 <h4>{{ t('learn.sections.practice.exercises.audio.title') }}</h4>
                 <p>{{ t('learn.sections.practice.exercises.audio.desc') }}</p>
                 <ul>
@@ -1268,7 +1373,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
               </div>
 
               <div class="exercise-card">
-                <div class="exercise-level intermediate">{{ t('learn.sections.practice.levels.intermediate') }}</div>
+                <div class="exercise-level intermediate">
+                  {{ t('learn.sections.practice.levels.intermediate') }}
+                </div>
                 <h4>{{ t('learn.sections.practice.exercises.gallery.title') }}</h4>
                 <p>{{ t('learn.sections.practice.exercises.gallery.desc') }}</p>
                 <ul>
@@ -1279,7 +1386,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
               </div>
 
               <div class="exercise-card">
-                <div class="exercise-level advanced">{{ t('learn.sections.practice.levels.advanced') }}</div>
+                <div class="exercise-level advanced">
+                  {{ t('learn.sections.practice.levels.advanced') }}
+                </div>
                 <h4>{{ t('learn.sections.practice.exercises.visualizer.title') }}</h4>
                 <p>{{ t('learn.sections.practice.exercises.visualizer.desc') }}</p>
                 <ul>
@@ -1291,13 +1400,38 @@ function processLocally(image: File): Promise&lt;string&gt; {
             </div>
 
             <div class="resources-box">
-              <h4><i class="fa-solid fa-book-open"></i> {{ t('learn.sections.practice.resources.title') }}</h4>
+              <h4>
+                <i class="fa-solid fa-book-open"></i>
+                {{ t('learn.sections.practice.resources.title') }}
+              </h4>
               <ul>
-                <li><a href="https://vuejs.org/guide/" target="_blank">Vue.js 3 Official Guide</a></li>
-                <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API" target="_blank">MDN Web Audio API</a></li>
-                <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API" target="_blank">MDN Canvas API</a></li>
-                <li><a href="https://www.typescriptlang.org/docs/" target="_blank">TypeScript Documentation</a></li>
-                <li><a href="https://pinia.vuejs.org/" target="_blank">Pinia State Management</a></li>
+                <li>
+                  <a href="https://vuejs.org/guide/" target="_blank">Vue.js 3 Official Guide</a>
+                </li>
+                <li>
+                  <a
+                    href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API"
+                    target="_blank"
+                  >
+                    MDN Web Audio API
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API"
+                    target="_blank"
+                  >
+                    MDN Canvas API
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.typescriptlang.org/docs/" target="_blank">
+                    TypeScript Documentation
+                  </a>
+                </li>
+                <li>
+                  <a href="https://pinia.vuejs.org/" target="_blank">Pinia State Management</a>
+                </li>
               </ul>
             </div>
           </section>
@@ -1481,7 +1615,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.tag i { color: var(--accent); }
+.tag i {
+  color: var(--accent);
+}
 
 /* Content Layout */
 .learn-content {
@@ -1560,7 +1696,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   margin-bottom: var(--space-6);
 }
 
-.intro-section p { margin: 0 0 var(--space-4); }
+.intro-section p {
+  margin: 0 0 var(--space-4);
+}
 
 .prereq-box {
   background: color-mix(in oklab, var(--accent) 8%, transparent);
@@ -1578,7 +1716,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.prereq-box h4 i { color: var(--accent); }
+.prereq-box h4 i {
+  color: var(--accent);
+}
 
 .prereq-box ul {
   margin: 0;
@@ -1706,7 +1846,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--muted);
 }
 
-.code-header span i { color: var(--accent); }
+.code-header span i {
+  color: var(--accent);
+}
 
 .code-toggle {
   padding: var(--space-2) var(--space-3);
@@ -1739,7 +1881,8 @@ function processLocally(image: File): Promise&lt;string&gt; {
 }
 
 /* Tip & Warning Boxes */
-.tip-box, .warning-box {
+.tip-box,
+.warning-box {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -1753,16 +1896,23 @@ function processLocally(image: File): Promise&lt;string&gt; {
   border: 1px solid color-mix(in oklab, var(--green) 25%, transparent);
 }
 
-.tip-box > i { color: var(--green); font-size: 1.2rem; }
+.tip-box > i {
+  color: var(--green);
+  font-size: 1.2rem;
+}
 
 .warning-box {
   background: color-mix(in oklab, var(--orange) 10%, transparent);
   border: 1px solid color-mix(in oklab, var(--orange) 25%, transparent);
 }
 
-.warning-box > i { color: var(--orange); font-size: 1.2rem; }
+.warning-box > i {
+  color: var(--orange);
+  font-size: 1.2rem;
+}
 
-.tip-box div, .warning-box div {
+.tip-box div,
+.warning-box div {
   flex: 1;
   color: var(--text);
   font-size: 0.95rem;
@@ -1798,7 +1948,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.comparison-item h4 i { color: var(--accent); }
+.comparison-item h4 i {
+  color: var(--accent);
+}
 
 .comparison-item p {
   margin: 0;
@@ -1962,7 +2114,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   font-size: 0.9rem;
 }
 
-.pinia-feature i { color: var(--accent); }
+.pinia-feature i {
+  color: var(--accent);
+}
 
 /* Worker Types */
 .worker-types {
@@ -1987,7 +2141,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.worker-type h4 i { color: var(--accent); }
+.worker-type h4 i {
+  color: var(--accent);
+}
 
 .worker-type p {
   margin: 0;
@@ -2090,9 +2246,11 @@ function processLocally(image: File): Promise&lt;string&gt; {
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--green) 10%, transparent),
-    color-mix(in oklab, var(--accent) 5%, transparent));
+    color-mix(in oklab, var(--accent) 5%, transparent)
+  );
   border-radius: var(--radius-xl);
   margin: var(--space-4) 0;
 }
@@ -2193,7 +2351,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.resources-box h4 i { color: var(--accent); }
+.resources-box h4 i {
+  color: var(--accent);
+}
 
 .resources-box ul {
   margin: 0;
@@ -2253,7 +2413,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
   color: var(--text);
 }
 
-.conclusion-item i { color: var(--green); }
+.conclusion-item i {
+  color: var(--green);
+}
 
 .cta-button {
   display: inline-flex;
@@ -2263,7 +2425,11 @@ function processLocally(image: File): Promise&lt;string&gt; {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--secondary)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in oklab, var(--accent) 80%, var(--secondary))
+  );
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -2323,7 +2489,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
 }
 
 @media (max-width: 768px) {
-  .nav-container { flex-wrap: wrap; }
+  .nav-container {
+    flex-wrap: wrap;
+  }
 
   .nav-links {
     order: 3;
@@ -2334,7 +2502,9 @@ function processLocally(image: File): Promise&lt;string&gt; {
     border-top: 1px solid var(--glass-border);
   }
 
-  .article { padding: var(--space-4); }
+  .article {
+    padding: var(--space-4);
+  }
 
   .concept-grid,
   .feature-grid,

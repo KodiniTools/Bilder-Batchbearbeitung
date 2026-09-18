@@ -11,14 +11,14 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   define: {
-    __APP_VERSION__: JSON.stringify(version)
+    __APP_VERSION__: JSON.stringify(version),
   },
   worker: {
-    format: 'es'
+    format: 'es',
   },
   build: {
     // Electron Chromium supports modern JS – no need for legacy transpilation
@@ -27,8 +27,8 @@ export default defineConfig({
       output: {
         // Deterministic chunk names for electron-builder file inclusion
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]'
-      }
-    }
-  }
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
+  },
 })

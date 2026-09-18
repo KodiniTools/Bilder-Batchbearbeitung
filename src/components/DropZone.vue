@@ -16,7 +16,7 @@ const handleFiles = async (files: FileList | File[] | null) => {
 
   isLoading.value = true
   try {
-    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
+    const fileArray = Array.from(files).filter((f) => f.type.startsWith('image/'))
     if (fileArray.length > 0) await imageStore.addImages(fileArray)
   } catch (error) {
     console.error('Fehler beim Laden der Dateien:', error)
@@ -51,15 +51,18 @@ const handleDrop = async (event: DragEvent) => {
 
   const readEntry = (entry: FileSystemEntry): Promise<void> => {
     if (entry.isFile) {
-      return new Promise(resolve => {
-        (entry as FileSystemFileEntry).file(f => { files.push(f); resolve() })
+      return new Promise((resolve) => {
+        ;(entry as FileSystemFileEntry).file((f) => {
+          files.push(f)
+          resolve()
+        })
       })
     }
     if (entry.isDirectory) {
       const reader = (entry as FileSystemDirectoryEntry).createReader()
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const readAll = () => {
-          reader.readEntries(async entries => {
+          reader.readEntries(async (entries) => {
             if (entries.length === 0) return resolve()
             await Promise.all(entries.map(readEntry))
             readAll()
@@ -73,7 +76,7 @@ const handleDrop = async (event: DragEvent) => {
 
   await Promise.all(
     Array.from(items)
-      .map(item => item.webkitGetAsEntry())
+      .map((item) => item.webkitGetAsEntry())
       .filter((e): e is FileSystemEntry => e !== null)
       .map(readEntry)
   )
@@ -95,27 +98,34 @@ const handleDrop = async (event: DragEvent) => {
       {{ t('upload.text') }}
     </div>
     <div class="upload-buttons">
-      <button type="button" class="btn upload-btn pill-btn" :title="t('upload.button')" :aria-label="t('upload.button')" @click.stop="fileInput?.click()">
+      <button
+        type="button"
+        class="btn upload-btn pill-btn"
+        :title="t('upload.button')"
+        :aria-label="t('upload.button')"
+        @click.stop="fileInput?.click()"
+      >
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
         <span>{{ t('upload.button') }}</span>
       </button>
-      <button type="button" class="btn upload-btn pill-btn folder-btn" :title="t('upload.folderButton')" :aria-label="t('upload.folderButton')" @click.stop="folderInput?.click()">
+      <button
+        type="button"
+        class="btn upload-btn pill-btn folder-btn"
+        :title="t('upload.folderButton')"
+        :aria-label="t('upload.folderButton')"
+        @click.stop="folderInput?.click()"
+      >
         <i class="fa-solid fa-folder-open"></i>
         <span>{{ t('upload.folderButton') }}</span>
       </button>
     </div>
     <div class="paste-hint" :title="t('upload.pasteHintTooltip')">
-      <kbd>Ctrl</kbd><span class="kbd-plus">+</span><kbd>V</kbd>
+      <kbd>Ctrl</kbd>
+      <span class="kbd-plus">+</span>
+      <kbd>V</kbd>
       <span class="paste-hint-label">{{ t('upload.pasteHint') }}</span>
     </div>
-    <input
-      ref="fileInput"
-      type="file"
-      accept="image/*"
-      multiple
-      hidden
-      @change="handleFileInput"
-    />
+    <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFileInput" />
     <input
       ref="folderInput"
       type="file"
@@ -137,12 +147,16 @@ const handleDrop = async (event: DragEvent) => {
   border: 2px dashed color-mix(in oklab, var(--border-color) 50%, transparent);
   border-radius: var(--radius-2xl);
   background:
-    linear-gradient(135deg,
+    linear-gradient(
+      135deg,
       color-mix(in oklab, var(--panel) 60%, transparent) 0%,
-      color-mix(in oklab, var(--panel) 30%, transparent) 100%),
-    radial-gradient(circle at center,
+      color-mix(in oklab, var(--panel) 30%, transparent) 100%
+    ),
+    radial-gradient(
+      circle at center,
       color-mix(in oklab, var(--accent) 4%, transparent) 0%,
-      transparent 70%);
+      transparent 70%
+    );
   color: var(--muted);
   transition: all 0.4s var(--ease-spring);
   cursor: default;
@@ -156,8 +170,7 @@ const handleDrop = async (event: DragEvent) => {
   content: '';
   position: absolute;
   inset: -3px;
-  background: linear-gradient(45deg, 
-    var(--accent), var(--green), var(--purple), var(--accent));
+  background: linear-gradient(45deg, var(--accent), var(--green), var(--purple), var(--accent));
   border-radius: inherit;
   opacity: 0;
   transition: opacity 0.4s var(--ease-smooth);
@@ -166,10 +179,11 @@ const handleDrop = async (event: DragEvent) => {
 
 .drop-area.highlight {
   border-color: transparent;
-  background: 
-    linear-gradient(135deg, 
-      color-mix(in oklab, var(--accent) 15%, transparent) 0%,
-      color-mix(in oklab, var(--green) 10%, transparent) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--accent) 15%, transparent) 0%,
+    color-mix(in oklab, var(--green) 10%, transparent) 100%
+  );
   transform: translateY(-6px) scale(1.02);
   box-shadow: var(--surface-hover);
 }

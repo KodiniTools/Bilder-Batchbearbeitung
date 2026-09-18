@@ -7,41 +7,41 @@ const webRoutes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/LandingPage.vue')
+    component: () => import('@/views/LandingPage.vue'),
   },
   {
     path: '/app',
     name: 'app',
-    component: () => import('@/views/AppPage.vue')
+    component: () => import('@/views/AppPage.vue'),
   },
   {
     path: '/faq',
     name: 'faq',
-    component: () => import('@/views/FaqPage.vue')
+    component: () => import('@/views/FaqPage.vue'),
   },
   {
     path: '/blog',
     name: 'blog',
-    component: () => import('@/views/BlogPage.vue')
+    component: () => import('@/views/BlogPage.vue'),
   },
   {
     path: '/learn',
     name: 'learn',
-    component: () => import('@/views/LearnPage.vue')
+    component: () => import('@/views/LearnPage.vue'),
   },
   {
     path: '/downloads',
     name: 'downloads',
-    component: () => import('@/views/DownloadsPage.vue')
-  }
+    component: () => import('@/views/DownloadsPage.vue'),
+  },
 ]
 
 const electronRoutes = [
   {
     path: '/',
     name: 'app',
-    component: () => import('@/views/AppPage.vue')
-  }
+    component: () => import('@/views/AppPage.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -52,7 +52,7 @@ const router = createRouter({
       return savedPosition
     }
     return { top: 0 }
-  }
+  },
 })
 
 export default router
