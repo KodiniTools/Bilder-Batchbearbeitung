@@ -39,11 +39,16 @@ const {
   height: resizeHeight,
   keepAspect: resizeKeepAspect,
   canApply: canApplyResize,
+  isApplying: isResizing,
+  progressCurrent: resizeProgressCurrent,
+  progressTotal: resizeProgressTotal,
+  canUndoResize,
   onWidthChange: onResizeWidthChange,
   onHeightChange: onResizeHeightChange,
   onKeepAspectChange: onResizeKeepAspectChange,
   initFromSelection: initResizeFromSelection,
   applyResize,
+  undoResize,
 } = useBatchResize()
 
 const hasSelection = computed(() => imageStore.hasSelection)
@@ -147,10 +152,15 @@ function close() {
             v-model:height="resizeHeight"
             v-model:keep-aspect="resizeKeepAspect"
             :can-apply="canApplyResize"
+            :is-applying="isResizing"
+            :progress-current="resizeProgressCurrent"
+            :progress-total="resizeProgressTotal"
+            :can-undo="canUndoResize"
             @width-change="onResizeWidthChange"
             @height-change="onResizeHeightChange"
             @keep-aspect-change="onResizeKeepAspectChange"
             @apply="applyResize"
+            @undo="undoResize"
           />
           <BatchTransformControls v-model:transforms="transforms" />
         </BatchCollapsibleSection>

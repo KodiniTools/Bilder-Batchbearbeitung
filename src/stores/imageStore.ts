@@ -437,6 +437,7 @@ export const useImageStore = defineStore('images', () => {
     hasSelection,
     canUndo: history.canUndo,
     canRedo: history.canRedo,
+    historyVersion: history.version,
 
     // Actions
     addImage,

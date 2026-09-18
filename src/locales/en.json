@@ -722,7 +722,10 @@
         "width": "Width",
         "height": "Height",
         "keepAspect": "Keep aspect ratio",
-        "apply": "Apply resize"
+        "apply": "Apply resize",
+        "applying": "Applying… {current}/{total}",
+        "undo": "Undo",
+        "undoTitle": "Undo last resize"
       },
       "border": {
         "title": "Border",
@@ -765,7 +768,8 @@
       }
     },
     "resize": {
-      "toast": "{count} image(s) resized"
+      "toast": "{count} image(s) resized",
+      "undoToast": "Resize undone"
     },
     "toast": {
       "applied": "Filters applied to {count} image(s)",
