@@ -10,26 +10,26 @@ Eine moderne, datenschutzfreundliche Webanwendung zur Batch-Bearbeitung von Bild
 
 ### Frontend
 
-| Technologie | Version | Zweck |
-|-------------|---------|-------|
-| Vue 3 | ^3.4.0 | UI-Framework (Composition API) |
-| Vite | ^5.0.0 | Build-Tool & Dev-Server |
-| TypeScript | ^5.3.0 | Typsicherheit |
-| Pinia | ^2.1.7 | State Management |
-| Vue Router | ^4.2.5 | Client-Side Routing |
-| vue-i18n | ^9.8.0 | Internationalisierung (DE/EN) |
-| jsPDF | ^2.5.2 | PDF-Generierung im Browser |
-| JSZip | ^3.10.1 | ZIP-Komprimierung |
+| Technologie | Version | Zweck                          |
+| ----------- | ------- | ------------------------------ |
+| Vue 3       | ^3.4.0  | UI-Framework (Composition API) |
+| Vite        | ^5.0.0  | Build-Tool & Dev-Server        |
+| TypeScript  | ^5.3.0  | Typsicherheit                  |
+| Pinia       | ^2.1.7  | State Management               |
+| Vue Router  | ^4.2.5  | Client-Side Routing            |
+| vue-i18n    | ^9.8.0  | Internationalisierung (DE/EN)  |
+| jsPDF       | ^2.5.2  | PDF-Generierung im Browser     |
+| JSZip       | ^3.10.1 | ZIP-Komprimierung              |
 
 ### Backend (Optional - nur für SVG-Konvertierung)
 
-| Technologie | Version | Zweck |
-|-------------|---------|-------|
-| FastAPI | 0.109.2 | REST API Framework |
-| Uvicorn | 0.27.1 | ASGI Server |
-| vtracer | 0.6.10 | Raster-zu-SVG Konvertierung |
-| Pillow | 10.2.0 | Bildverarbeitung |
-| Python | 3.10+ | Runtime |
+| Technologie | Version | Zweck                       |
+| ----------- | ------- | --------------------------- |
+| FastAPI     | 0.109.2 | REST API Framework          |
+| Uvicorn     | 0.27.1  | ASGI Server                 |
+| vtracer     | 0.6.10  | Raster-zu-SVG Konvertierung |
+| Pillow      | 10.2.0  | Bildverarbeitung            |
+| Python      | 3.10+   | Runtime                     |
 
 ### Deployment
 
@@ -122,11 +122,11 @@ Eine moderne, datenschutzfreundliche Webanwendung zur Batch-Bearbeitung von Bild
 
 Diese Anwendung verwendet **keine traditionelle Datenbank**. Das Design ist bewusst client-seitig:
 
-| Aspekt | Beschreibung |
-|--------|--------------|
-| **Datenverarbeitung** | Vollständig im Browser (Canvas API) |
-| **Datenspeicherung** | Keine - Bilder bleiben lokal beim Nutzer |
-| **Persistenz** | Keine server-seitige Speicherung |
+| Aspekt                   | Beschreibung                                  |
+| ------------------------ | --------------------------------------------- |
+| **Datenverarbeitung**    | Vollständig im Browser (Canvas API)           |
+| **Datenspeicherung**     | Keine - Bilder bleiben lokal beim Nutzer      |
+| **Persistenz**           | Keine server-seitige Speicherung              |
 | **Backend-Verarbeitung** | Stateless (temporäre Verarbeitung in `/tmp/`) |
 
 ### Datenfluss
@@ -143,43 +143,43 @@ Diese Anwendung verwendet **keine traditionelle Datenbank**. Das Design ist bewu
 ```typescript
 // src/stores/imageStore.ts
 interface ImageObject {
-  id: string;
-  name: string;
-  originalName: string;
-  file: File;
-  url: string;
-  width: number;
-  height: number;
-  rotation: number;
-  flipX: boolean;
-  flipY: boolean;
-  filters: ImageFilters;
-  crop?: CropArea;
-  selected: boolean;
+  id: string
+  name: string
+  originalName: string
+  file: File
+  url: string
+  width: number
+  height: number
+  rotation: number
+  flipX: boolean
+  flipY: boolean
+  filters: ImageFilters
+  crop?: CropArea
+  selected: boolean
 }
 
 interface ImageFilters {
-  brightness: number;    // 0-200 (100 = normal)
-  contrast: number;      // 0-200 (100 = normal)
-  saturation: number;    // 0-200 (100 = normal)
-  grayscale: number;     // 0-100
-  sepia: number;         // 0-100
-  blur: number;          // 0-10 px
-  hueRotate: number;     // 0-360 degrees
+  brightness: number // 0-200 (100 = normal)
+  contrast: number // 0-200 (100 = normal)
+  saturation: number // 0-200 (100 = normal)
+  grayscale: number // 0-100
+  sepia: number // 0-100
+  blur: number // 0-10 px
+  hueRotate: number // 0-360 degrees
 }
 
 // Unterstützte Bildformate
-type ImageFormat = 'png' | 'jpeg' | 'webp' | 'bmp' | 'gif';
+type ImageFormat = 'png' | 'jpeg' | 'webp' | 'bmp' | 'gif'
 
 // PDF-Export Einstellungen
 interface PdfSettings {
-  pageSize: 'a4' | 'a3' | 'letter' | 'legal';
-  orientation: 'portrait' | 'landscape';
-  imagesPerPage: 1 | 2 | 4 | 6 | 9;
-  quality: number;       // 0.1 - 1.0
-  includeFilenames: boolean;
-  title?: string;
-  author?: string;
+  pageSize: 'a4' | 'a3' | 'letter' | 'legal'
+  orientation: 'portrait' | 'landscape'
+  imagesPerPage: 1 | 2 | 4 | 6 | 9
+  quality: number // 0.1 - 1.0
+  includeFilenames: boolean
+  title?: string
+  author?: string
 }
 ```
 
@@ -187,11 +187,11 @@ interface PdfSettings {
 
 ## API Endpunkte (Backend)
 
-| Methode | Endpunkt | Beschreibung |
-|---------|----------|--------------|
-| GET | `/health` | Health Check |
-| POST | `/api/convert-svg` | Einzelbild zu SVG konvertieren |
-| POST | `/api/convert-svg-batch` | Batch SVG-Konvertierung (ZIP) |
+| Methode | Endpunkt                 | Beschreibung                   |
+| ------- | ------------------------ | ------------------------------ |
+| GET     | `/health`                | Health Check                   |
+| POST    | `/api/convert-svg`       | Einzelbild zu SVG konvertieren |
+| POST    | `/api/convert-svg-batch` | Batch SVG-Konvertierung (ZIP)  |
 
 ### Limits
 

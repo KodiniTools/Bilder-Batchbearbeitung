@@ -103,22 +103,33 @@ function createTransparentCanvas(width: number, height: number): HTMLCanvasEleme
 }
 
 // Wenn das Bild bearbeitet wurde (version erhöht), Display-Canvas neu synchronisieren
-watch(() => props.image.version, () => {
-  nextTick(() => syncDisplayCanvas())
-})
+watch(
+  () => props.image.version,
+  () => {
+    nextTick(() => syncDisplayCanvas())
+  }
+)
 
 // Bei Filteränderungen (z.B. Batch-Bearbeitung) das Display-Canvas neu backen,
 // damit Pixel-basierte Filter (Temperatur/Vibrance/Vignette) sichtbar werden
-watch(() => props.image.filters, () => {
-  nextTick(() => syncDisplayCanvas())
-}, { deep: true })
+watch(
+  () => props.image.filters,
+  () => {
+    nextTick(() => syncDisplayCanvas())
+  },
+  { deep: true }
+)
 
 // Wasserzeichen-Canvas aktualisieren wenn sich Einstellungen ändern
-watch(() => props.image.watermark, () => {
-  if (watermarkActive.value) {
-    renderWatermarkPreview()
-  }
-}, { deep: true })
+watch(
+  () => props.image.watermark,
+  () => {
+    if (watermarkActive.value) {
+      renderWatermarkPreview()
+    }
+  },
+  { deep: true }
+)
 
 watch(watermarkActive, (active) => {
   if (active) {
@@ -142,7 +153,7 @@ function updateDimensions() {
   if (props.image.canvas) {
     imageDimensions.value = {
       width: props.image.canvas.width,
-      height: props.image.canvas.height
+      height: props.image.canvas.height,
     }
   }
 }
@@ -230,7 +241,10 @@ function syncDisplayCanvas() {
       scaled.getContext('2d')?.drawImage(src, 0, 0, scaled.width, scaled.height)
       bakeSource = scaled
     }
-    const baked = ImageProcessor.applyFiltersToCanvas(bakeSource, props.image.filters || defaultFilters)
+    const baked = ImageProcessor.applyFiltersToCanvas(
+      bakeSource,
+      props.image.filters || defaultFilters
+    )
     dst.width = baked.width
     dst.height = baked.height
     ctx.clearRect(0, 0, dst.width, dst.height)
@@ -255,7 +269,7 @@ onMounted(() => {
     })
     mutationObserver.observe(props.image.canvas, {
       attributes: true,
-      attributeFilter: ['width', 'height']
+      attributeFilter: ['width', 'height'],
     })
     if (watermarkActive.value) {
       nextTick(() => renderWatermarkPreview())
@@ -271,31 +285,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="image-card"
-    :class="{ selected: image.selected }"
-    @click="handleCardClick"
-  >
+  <div class="image-card" :class="{ selected: image.selected }" @click="handleCardClick">
     <!-- Checkbox-Overlay für bessere Sichtbarkeit des Auswahlstatus -->
     <div class="checkbox-overlay" :class="{ checked: image.selected }">
       <i v-if="image.selected" class="fas fa-check"></i>
     </div>
 
     <div class="image-preview-wrapper" @click.stop="handlePreview">
-      <div
-        ref="previewContainer"
-        class="image-preview"
-        :style="transformStyle"
-      >
+      <div ref="previewContainer" class="image-preview" :style="transformStyle">
         <canvas ref="displayCanvas"></canvas>
       </div>
-      <canvas
-        v-if="watermarkActive"
-        ref="watermarkCanvasRef"
-        class="watermark-canvas"
-      ></canvas>
+      <canvas v-if="watermarkActive" ref="watermarkCanvasRef" class="watermark-canvas"></canvas>
     </div>
-    
+
     <div class="image-meta">
       <div class="image-info" :title="displayName" @dblclick="startEditing">
         <template v-if="!isEditing">
@@ -319,7 +321,7 @@ onUnmounted(() => {
         {{ imageDimensions.width }} × {{ imageDimensions.height }} px
       </div>
     </div>
-    
+
     <div class="image-actions">
       <button
         type="button"
@@ -371,7 +373,11 @@ onUnmounted(() => {
 }
 
 .checkbox-overlay.checked {
-  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--green)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in oklab, var(--accent) 80%, var(--green))
+  );
   border-color: var(--accent);
   opacity: 1;
   box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 40%, transparent);
@@ -396,7 +402,7 @@ onUnmounted(() => {
   background: var(--panel);
   border: 2px solid var(--border-color);
   border-radius: 0;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.08),
     0 2px 6px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -405,12 +411,15 @@ onUnmounted(() => {
   opacity: 0;
   transform: translateY(40px);
   animation: cardFadeIn 0.6s var(--ease-smooth) forwards;
-  
-  background: 
+
+  background:
     var(--panel) padding-box,
-    linear-gradient(135deg, 
-      color-mix(in oklab, var(--border-color) 60%, transparent), 
-      color-mix(in oklab, var(--accent) 25%, transparent)) border-box;
+    linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--border-color) 60%, transparent),
+        color-mix(in oklab, var(--accent) 25%, transparent)
+      )
+      border-box;
 }
 
 @keyframes cardFadeIn {
@@ -425,10 +434,12 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, 
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 8%, transparent) 0%,
     transparent 40%,
-    color-mix(in oklab, var(--green) 6%, transparent) 100%);
+    color-mix(in oklab, var(--green) 6%, transparent) 100%
+  );
   opacity: 0;
   transition: opacity 0.4s var(--ease-smooth);
   pointer-events: none;
@@ -436,7 +447,7 @@ onUnmounted(() => {
 
 .image-card:hover {
   transform: translateY(-12px) scale(1.02);
-  box-shadow: 
+  box-shadow:
     0 12px 28px rgba(0, 0, 0, 0.15),
     0 6px 12px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -448,13 +459,12 @@ onUnmounted(() => {
 }
 
 .image-card.selected {
-  background: 
+  background:
     var(--panel) padding-box,
-    linear-gradient(135deg, 
-      var(--accent), 
-      color-mix(in oklab, var(--accent) 70%, var(--green))) border-box;
+    linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 70%, var(--green)))
+      border-box;
   border-color: var(--accent);
-  box-shadow: 
+  box-shadow:
     0 12px 28px rgba(0, 0, 0, 0.15),
     0 6px 12px rgba(0, 0, 0, 0.08),
     0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent),

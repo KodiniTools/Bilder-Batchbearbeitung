@@ -88,15 +88,17 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.installer.size') }}</span>
-              <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.installer.requirements') }}</span>
+              <span>
+                <i class="fa-solid fa-hard-drive"></i>
+                {{ t('downloads.installer.size') }}
+              </span>
+              <span>
+                <i class="fa-solid fa-microchip"></i>
+                {{ t('downloads.installer.requirements') }}
+              </span>
             </div>
 
-            <a
-              :href="installerUrl"
-              class="download-button installer-button"
-              download
-            >
+            <a :href="installerUrl" class="download-button installer-button" download>
               <i class="fa-solid fa-download"></i>
               {{ t('downloads.installer.button') }}
             </a>
@@ -130,15 +132,17 @@ onMounted(() => {
             </ul>
 
             <div class="card-meta">
-              <span><i class="fa-solid fa-hard-drive"></i> {{ t('downloads.portable.size') }}</span>
-              <span><i class="fa-solid fa-microchip"></i> {{ t('downloads.portable.requirements') }}</span>
+              <span>
+                <i class="fa-solid fa-hard-drive"></i>
+                {{ t('downloads.portable.size') }}
+              </span>
+              <span>
+                <i class="fa-solid fa-microchip"></i>
+                {{ t('downloads.portable.requirements') }}
+              </span>
             </div>
 
-            <a
-              :href="portableUrl"
-              class="download-button portable-button"
-              download
-            >
+            <a :href="portableUrl" class="download-button portable-button" download>
               <i class="fa-solid fa-file-zipper"></i>
               {{ t('downloads.portable.button') }}
             </a>
@@ -147,7 +151,10 @@ onMounted(() => {
 
         <!-- Info Section -->
         <div class="downloads-info">
-          <h3><i class="fa-solid fa-circle-info"></i> {{ t('downloads.info.title') }}</h3>
+          <h3>
+            <i class="fa-solid fa-circle-info"></i>
+            {{ t('downloads.info.title') }}
+          </h3>
           <ul>
             <li>
               <i class="fa-solid fa-shield-halved"></i>
@@ -349,16 +356,20 @@ onMounted(() => {
 }
 
 .installer-card .card-icon {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 15%, transparent),
-    color-mix(in oklab, var(--accent) 8%, transparent));
+    color-mix(in oklab, var(--accent) 8%, transparent)
+  );
   color: var(--accent);
 }
 
 .portable-card .card-icon {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--secondary) 15%, transparent),
-    color-mix(in oklab, var(--secondary) 8%, transparent));
+    color-mix(in oklab, var(--secondary) 8%, transparent)
+  );
   color: var(--secondary);
 }
 
@@ -443,7 +454,11 @@ onMounted(() => {
 
 .installer-button {
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
+  );
   box-shadow:
     0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 20%, transparent);
@@ -470,9 +485,11 @@ onMounted(() => {
 
 /* Info Section */
 .downloads-info {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 8%, transparent) 0%,
-    color-mix(in oklab, var(--green, var(--accent)) 6%, transparent) 100%);
+    color-mix(in oklab, var(--green, var(--accent)) 6%, transparent) 100%
+  );
   border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
   border-radius: var(--radius-2xl);
   padding: var(--space-5);
@@ -541,7 +558,11 @@ onMounted(() => {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
+  );
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

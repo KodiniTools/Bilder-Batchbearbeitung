@@ -69,11 +69,7 @@ onMounted(() => {
           >
             EN
           </button>
-          <button
-            class="theme-toggle"
-            :title="t('header.themeToggle')"
-            @click="toggleTheme"
-          >
+          <button class="theme-toggle" :title="t('header.themeToggle')" @click="toggleTheme">
             {{ theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF13' }}
           </button>
         </div>
@@ -144,7 +140,11 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: linear-gradient(135deg, var(--text), color-mix(in oklab, var(--text) 70%, var(--accent)));
+  background: linear-gradient(
+    135deg,
+    var(--text),
+    color-mix(in oklab, var(--text) 70%, var(--accent))
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

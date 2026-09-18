@@ -6,17 +6,35 @@
           <!-- Success Header -->
           <div class="wizard-header">
             <div class="success-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             </div>
             <h2 class="wizard-title">{{ t('wizard.title') }}</h2>
             <p class="wizard-summary">{{ getSummaryText() }}</p>
             <button class="close-btn" :title="t('buttons.close')" @click="handleClose">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
@@ -29,9 +47,17 @@
               <!-- Continue Editing -->
               <button class="action-card action-continue" @click="handleClose">
                 <div class="action-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </div>
                 <span class="action-label">{{ t('wizard.actions.continue') }}</span>
@@ -41,9 +67,17 @@
               <!-- New Project -->
               <button class="action-card action-new" @click="handleNewProject">
                 <div class="action-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
                   </svg>
                 </div>
                 <span class="action-label">{{ t('wizard.actions.newProject') }}</span>
@@ -57,17 +91,22 @@
             </div>
 
             <div class="tools-grid">
-              <button
-                class="tool-card"
-                @click="handleToolNavigation('bildkonverter')"
-              >
+              <button class="tool-card" @click="handleToolNavigation('bildkonverter')">
                 <div class="tool-icon tool-icon-converter">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="16 3 21 3 21 8"/>
-                    <line x1="4" y1="20" x2="21" y2="3"/>
-                    <polyline points="21 16 21 21 16 21"/>
-                    <line x1="15" y1="15" x2="21" y2="21"/>
-                    <line x1="4" y1="4" x2="9" y2="9"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="16 3 21 3 21 8" />
+                    <line x1="4" y1="20" x2="21" y2="3" />
+                    <polyline points="21 16 21 21 16 21" />
+                    <line x1="15" y1="15" x2="21" y2="21" />
+                    <line x1="4" y1="4" x2="9" y2="9" />
                   </svg>
                 </div>
                 <div class="tool-info">
@@ -80,16 +119,21 @@
                 <span class="tool-arrow">&rarr;</span>
               </button>
 
-              <button
-                class="tool-card"
-                @click="handleToolNavigation('collagemaker')"
-              >
+              <button class="tool-card" @click="handleToolNavigation('collagemaker')">
                 <div class="tool-icon tool-icon-collage">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
                   </svg>
                 </div>
                 <div class="tool-info">
@@ -102,17 +146,24 @@
                 <span class="tool-arrow">&rarr;</span>
               </button>
 
-              <button
-                class="tool-card"
-                @click="handleToolNavigation('color-extractor')"
-              >
+              <button class="tool-card" @click="handleToolNavigation('color-extractor')">
                 <div class="tool-icon tool-icon-color">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="13.5" cy="6.5" r="2.5"/>
-                    <circle cx="17.5" cy="10.5" r="2.5"/>
-                    <circle cx="8.5" cy="7.5" r="2.5"/>
-                    <circle cx="6.5" cy="12.5" r="2.5"/>
-                    <path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 5-3 5c-1 0-2-.5-2-2 0-.5.1-1 .3-1.5"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="13.5" cy="6.5" r="2.5" />
+                    <circle cx="17.5" cy="10.5" r="2.5" />
+                    <circle cx="8.5" cy="7.5" r="2.5" />
+                    <circle cx="6.5" cy="12.5" r="2.5" />
+                    <path
+                      d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 5-3 5c-1 0-2-.5-2-2 0-.5.1-1 .3-1.5"
+                    />
                   </svg>
                 </div>
                 <div class="tool-info">
@@ -130,9 +181,17 @@
           <!-- Footer -->
           <div class="wizard-footer">
             <button class="btn-home" @click="handleGoHome">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
               {{ t('wizard.backHome') }}
             </button>
@@ -184,9 +243,9 @@ function handleGoHome() {
 }
 
 function handleToolNavigation(target: HandoffTarget) {
-  const canvases = imageStore.images.map(img => ({
+  const canvases = imageStore.images.map((img) => ({
     name: img.outputName || img.file.name,
-    canvas: img.canvas
+    canvas: img.canvas,
   }))
 
   const url = prepareHandoff(canvases, target)
@@ -196,9 +255,9 @@ function handleToolNavigation(target: HandoffTarget) {
   } else {
     // Fallback: open without handoff data
     const fallbackUrls: Record<HandoffTarget, string> = {
-      'bildkonverter': 'https://kodinitools.com/bildkonverter/',
-      'collagemaker': 'https://kodinitools.com/collagemaker/',
-      'color-extractor': 'https://kodinitools.com/kodini-color-extractor/'
+      bildkonverter: 'https://kodinitools.com/bildkonverter/',
+      collagemaker: 'https://kodinitools.com/collagemaker/',
+      'color-extractor': 'https://kodinitools.com/kodini-color-extractor/',
     }
     window.open(fallbackUrls[target], '_blank', 'noopener')
   }
@@ -258,7 +317,11 @@ function handleToolNavigation(target: HandoffTarget) {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--green), color-mix(in oklab, var(--green) 70%, var(--cyan)));
+  background: linear-gradient(
+    135deg,
+    var(--green),
+    color-mix(in oklab, var(--green) 70%, var(--cyan))
+  );
   color: white;
   margin-bottom: var(--space-3);
   animation: successPop 0.5s var(--ease-spring) both;
@@ -544,7 +607,9 @@ function handleToolNavigation(target: HandoffTarget) {
 }
 
 .wizard-enter-active .wizard-content {
-  transition: transform 0.4s var(--ease-spring), opacity 0.3s var(--ease-smooth);
+  transition:
+    transform 0.4s var(--ease-spring),
+    opacity 0.3s var(--ease-smooth);
 }
 
 .wizard-leave-active {
@@ -552,7 +617,9 @@ function handleToolNavigation(target: HandoffTarget) {
 }
 
 .wizard-leave-active .wizard-content {
-  transition: transform 0.25s var(--ease-smooth), opacity 0.25s var(--ease-smooth);
+  transition:
+    transform 0.25s var(--ease-smooth),
+    opacity 0.25s var(--ease-smooth);
 }
 
 .wizard-enter-from {

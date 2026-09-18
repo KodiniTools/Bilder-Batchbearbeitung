@@ -45,7 +45,7 @@ const watermarkPositions = [
   { value: 'top-right', labelKey: 'batchEdit.watermark.positions.topRight' },
   { value: 'bottom-left', labelKey: 'batchEdit.watermark.positions.bottomLeft' },
   { value: 'bottom-right', labelKey: 'batchEdit.watermark.positions.bottomRight' },
-  { value: 'tile', labelKey: 'batchEdit.watermark.positions.tile' }
+  { value: 'tile', labelKey: 'batchEdit.watermark.positions.tile' },
 ] as const
 
 // Debounce timers
@@ -54,21 +54,27 @@ let transformDebounceTimer: ReturnType<typeof setTimeout> | null = null
 let watermarkDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 // Reset filters, transforms, and watermark when panel opens
-watch(() => props.isOpen, (open) => {
-  if (open) {
-    filters.value = { ...defaultFilters }
-    transforms.value = { ...defaultTransforms }
-    watermark.value = { ...defaultWatermark }
-    initResizeFromSelection()
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      filters.value = { ...defaultFilters }
+      transforms.value = { ...defaultTransforms }
+      watermark.value = { ...defaultWatermark }
+      initResizeFromSelection()
+    }
   }
-})
+)
 
 // Close panel when no images are selected
-watch(() => imageStore.hasSelection, (hasSelection) => {
-  if (!hasSelection && props.isOpen) {
-    emit('close')
+watch(
+  () => imageStore.hasSelection,
+  (hasSelection) => {
+    if (!hasSelection && props.isOpen) {
+      emit('close')
+    }
   }
-})
+)
 
 // Apply filters with debounce for smooth slider movement
 function applyFiltersDebounced() {
@@ -83,9 +89,13 @@ function applyFiltersDebounced() {
 }
 
 // Watch for filter changes and apply with debounce
-watch(filters, () => {
-  applyFiltersDebounced()
-}, { deep: true })
+watch(
+  filters,
+  () => {
+    applyFiltersDebounced()
+  },
+  { deep: true }
+)
 
 // Apply transforms with debounce for smooth slider movement
 function applyTransformsDebounced() {
@@ -100,9 +110,13 @@ function applyTransformsDebounced() {
 }
 
 // Watch for transform changes and apply with debounce
-watch(transforms, () => {
-  applyTransformsDebounced()
-}, { deep: true })
+watch(
+  transforms,
+  () => {
+    applyTransformsDebounced()
+  },
+  { deep: true }
+)
 
 // Apply watermark with debounce
 function applyWatermarkDebounced() {
@@ -117,9 +131,13 @@ function applyWatermarkDebounced() {
 }
 
 // Watch for watermark changes and apply with debounce
-watch(watermark, () => {
-  applyWatermarkDebounced()
-}, { deep: true })
+watch(
+  watermark,
+  () => {
+    applyWatermarkDebounced()
+  },
+  { deep: true }
+)
 
 // Cleanup on unmount
 onUnmounted(() => {
@@ -154,7 +172,11 @@ function onKeepAspectChange() {
 // Resize anwenden
 async function applyResize() {
   if (!hasSelection.value || resizeWidth.value <= 0 || resizeHeight.value <= 0) return
-  await imageStore.resizeSelectedImages(resizeWidth.value, resizeHeight.value, resizeKeepAspect.value)
+  await imageStore.resizeSelectedImages(
+    resizeWidth.value,
+    resizeHeight.value,
+    resizeKeepAspect.value
+  )
   toast.success(t('batchEdit.resize.toast', { count: selectedCount.value }))
 }
 
@@ -172,7 +194,7 @@ function initResizeFromSelection() {
 // Preset (One-Click-Look) auf die Auswahl anwenden
 const presets = FILTER_PRESETS
 function applyPreset(presetKey: string) {
-  const preset = FILTER_PRESETS.find(p => p.key === presetKey)
+  const preset = FILTER_PRESETS.find((p) => p.key === presetKey)
   if (!preset) return
   // Vollständig setzen (nicht mergen), damit der Look exakt übernommen wird.
   // Der filters-Watcher überträgt die Änderung debounced auf die Auswahl.
@@ -208,7 +230,7 @@ const sliderConfig = [
   { key: 'grayscale', icon: 'fa-swatchbook', min: 0, max: 100, default: 0, unit: '%' },
   { key: 'sepia', icon: 'fa-image', min: 0, max: 100, default: 0, unit: '%' },
   { key: 'vignette', icon: 'fa-circle-dot', min: 0, max: 100, default: 0, unit: '%' },
-  { key: 'invert', icon: 'fa-right-left', min: 0, max: 100, default: 0, unit: '%' }
+  { key: 'invert', icon: 'fa-right-left', min: 0, max: 100, default: 0, unit: '%' },
 ] as const
 </script>
 
@@ -240,7 +262,9 @@ const sliderConfig = [
               type="button"
               class="preset-chip"
               @click="applyPreset(preset.key)"
-            >{{ t(`batchEdit.presets.${preset.key}`) }}</button>
+            >
+              {{ t(`batchEdit.presets.${preset.key}`) }}
+            </button>
           </div>
         </div>
 
@@ -266,7 +290,10 @@ const sliderConfig = [
         <button class="section-toggle" @click="transformsOpen = !transformsOpen">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
           <span>{{ t('batchEdit.transforms.title') }}</span>
-          <i :class="['fa-solid', transformsOpen ? 'fa-chevron-up' : 'fa-chevron-down']" class="toggle-icon"></i>
+          <i
+            :class="['fa-solid', transformsOpen ? 'fa-chevron-up' : 'fa-chevron-down']"
+            class="toggle-icon"
+          ></i>
         </button>
 
         <div v-show="transformsOpen" class="transforms-container">
@@ -311,11 +338,7 @@ const sliderConfig = [
             </div>
             <div class="checkbox-group">
               <label class="checkbox-label">
-                <input
-                  v-model="resizeKeepAspect"
-                  type="checkbox"
-                  @change="onKeepAspectChange"
-                />
+                <input v-model="resizeKeepAspect" type="checkbox" @change="onKeepAspectChange" />
                 <span>{{ t('batchEdit.transforms.resize.keepAspect') }}</span>
               </label>
             </div>
@@ -428,7 +451,10 @@ const sliderConfig = [
         <button class="section-toggle" @click="watermarkOpen = !watermarkOpen">
           <i class="fa-solid fa-stamp"></i>
           <span>{{ t('batchEdit.watermark.title') }}</span>
-          <i :class="['fa-solid', watermarkOpen ? 'fa-chevron-up' : 'fa-chevron-down']" class="toggle-icon"></i>
+          <i
+            :class="['fa-solid', watermarkOpen ? 'fa-chevron-up' : 'fa-chevron-down']"
+            class="toggle-icon"
+          ></i>
         </button>
 
         <div v-show="watermarkOpen" class="transforms-container">
@@ -462,7 +488,9 @@ const sliderConfig = [
                     :key="font"
                     :value="font"
                     :style="{ fontFamily: font }"
-                  >{{ font }}</option>
+                  >
+                    {{ font }}
+                  </option>
                 </select>
               </div>
 
@@ -532,11 +560,9 @@ const sliderConfig = [
               <div class="property-group">
                 <label>{{ t('batchEdit.watermark.position') }}</label>
                 <select v-model="watermark.position" class="property-select">
-                  <option
-                    v-for="pos in watermarkPositions"
-                    :key="pos.value"
-                    :value="pos.value"
-                  >{{ t(pos.labelKey) }}</option>
+                  <option v-for="pos in watermarkPositions" :key="pos.value" :value="pos.value">
+                    {{ t(pos.labelKey) }}
+                  </option>
                 </select>
               </div>
             </template>
@@ -545,11 +571,7 @@ const sliderConfig = [
       </div>
 
       <div class="panel-footer">
-        <button
-          class="btn btn-reset-all"
-          :disabled="!hasSelection"
-          @click="resetFilters"
-        >
+        <button class="btn btn-reset-all" :disabled="!hasSelection" @click="resetFilters">
           <i class="fa-solid fa-arrow-rotate-left"></i>
           {{ t('batchEdit.buttons.reset') }}
         </button>
@@ -771,7 +793,7 @@ const sliderConfig = [
   gap: var(--space-2);
 }
 
-.color-input-wrapper input[type="color"] {
+.color-input-wrapper input[type='color'] {
   width: 36px;
   height: 28px;
   border: 1px solid var(--border-color);
@@ -911,7 +933,7 @@ const sliderConfig = [
   cursor: pointer;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   width: 18px;
   height: 18px;
   accent-color: var(--accent);

@@ -26,12 +26,12 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       // Disable web security only in dev; keep sandbox in production
-      sandbox: false
+      sandbox: false,
     },
     title: `Bilderserie Bearbeiten v${app.getVersion()} – KodiniTools`,
     autoHideMenuBar: true,
     show: false,
-    backgroundColor: '#1a1a2e'
+    backgroundColor: '#1a1a2e',
   })
 
   // Show window once ready (avoids white flash on startup)
@@ -83,8 +83,8 @@ function buildMenu() {
     {
       label: 'Datei',
       submenu: [
-        isMac ? { role: 'close', label: 'Fenster schließen' } : { role: 'quit', label: 'Beenden' }
-      ]
+        isMac ? { role: 'close', label: 'Fenster schließen' } : { role: 'quit', label: 'Beenden' },
+      ],
     },
     {
       label: 'Bearbeiten',
@@ -95,43 +95,41 @@ function buildMenu() {
         { role: 'cut', label: 'Ausschneiden' },
         { role: 'copy', label: 'Kopieren' },
         { role: 'paste', label: 'Einfügen' },
-        { role: 'selectAll', label: 'Alles auswählen' }
-      ]
+        { role: 'selectAll', label: 'Alles auswählen' },
+      ],
     },
     {
       label: 'Ansicht',
       submenu: [
         { role: 'reload', label: 'Neu laden' },
         // DevTools only in development
-        ...(!app.isPackaged
-          ? [{ role: 'toggleDevTools', label: 'Entwicklertools' }]
-          : []),
+        ...(!app.isPackaged ? [{ role: 'toggleDevTools', label: 'Entwicklertools' }] : []),
         { type: 'separator' },
         { role: 'resetZoom', label: 'Zoom zurücksetzen' },
         { role: 'zoomIn', label: 'Vergrößern' },
         { role: 'zoomOut', label: 'Verkleinern' },
         { type: 'separator' },
-        { role: 'togglefullscreen', label: 'Vollbild' }
-      ]
+        { role: 'togglefullscreen', label: 'Vollbild' },
+      ],
     },
     {
       label: 'Hilfe',
       submenu: [
         {
           label: 'Website öffnen',
-          click: () => shell.openExternal('https://kodinitools.com/bilderseriebearbeiten/')
+          click: () => shell.openExternal('https://kodinitools.com/bilderseriebearbeiten/'),
         },
         {
           label: 'FAQ',
-          click: () => shell.openExternal('https://kodinitools.com/bilderseriebearbeiten/faq')
+          click: () => shell.openExternal('https://kodinitools.com/bilderseriebearbeiten/faq'),
         },
         { type: 'separator' },
         {
           label: `Version ${app.getVersion()}`,
-          enabled: false
-        }
-      ]
-    }
+          enabled: false,
+        },
+      ],
+    },
   ]
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }

@@ -23,10 +23,20 @@
     <div v-if="handoff" class="handoff-banner">
       <div class="handoff-inner">
         <div class="handoff-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
           </svg>
         </div>
 
@@ -36,11 +46,7 @@
         </div>
 
         <div class="handoff-thumbs">
-          <div
-            v-for="(img, i) in previewImages"
-            :key="i"
-            class="handoff-thumb"
-          >
+          <div v-for="(img, i) in previewImages" :key="i" class="handoff-thumb">
             <img :src="img.dataUrl" :alt="img.name" />
           </div>
           <span v-if="handoff.images.length > 4" class="handoff-more">
@@ -69,7 +75,7 @@ import {
   consumeHandoff,
   dismissHandoff,
   type HandoffPayload,
-  type HandoffImage
+  type HandoffImage,
 } from '@/lib/core/handoff'
 
 const { t } = useI18n()
@@ -82,18 +88,16 @@ const emit = defineEmits<{
 
 const SOURCE_LABELS: Record<string, string> = {
   'bilder-batchbearbeitung': 'Bilder-Batchbearbeitung',
-  'bildkonverter': 'Bildkonverter',
-  'collagemaker': 'Collage Maker',
-  'color-extractor': 'Color Extractor'
+  bildkonverter: 'Bildkonverter',
+  collagemaker: 'Collage Maker',
+  'color-extractor': 'Color Extractor',
 }
 
 const sourceLabel = computed(() =>
-  handoff.value ? (SOURCE_LABELS[handoff.value.source] || handoff.value.source) : ''
+  handoff.value ? SOURCE_LABELS[handoff.value.source] || handoff.value.source : ''
 )
 
-const previewImages = computed(() =>
-  handoff.value ? handoff.value.images.slice(0, 4) : []
-)
+const previewImages = computed(() => (handoff.value ? handoff.value.images.slice(0, 4) : []))
 
 function handleAccept() {
   const images = consumeHandoff()
@@ -126,7 +130,7 @@ onMounted(() => {
     color-mix(in oklab, var(--accent, #014f99) 15%, var(--panel, #fff)),
     color-mix(in oklab, var(--secondary, #c9984d) 8%, var(--panel, #fff))
   );
-  border-bottom: 1px solid var(--glass-border, rgba(0,0,0,0.1));
+  border-bottom: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
 }
 
@@ -161,12 +165,12 @@ onMounted(() => {
 
 .handoff-text strong {
   font-size: 0.9rem;
-  color: var(--text, #0C0C10);
+  color: var(--text, #0c0c10);
 }
 
 .handoff-source {
   font-size: 0.8rem;
-  color: var(--muted, #5E5F69);
+  color: var(--muted, #5e5f69);
 }
 
 .handoff-thumbs {
@@ -180,7 +184,7 @@ onMounted(() => {
   height: 36px;
   border-radius: var(--radius-sm, 8px);
   overflow: hidden;
-  border: 1px solid var(--glass-border, rgba(0,0,0,0.1));
+  border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
 }
 
 .handoff-thumb img {
@@ -191,7 +195,7 @@ onMounted(() => {
 
 .handoff-more {
   font-size: 0.8rem;
-  color: var(--muted, #5E5F69);
+  color: var(--muted, #5e5f69);
   font-weight: 600;
   padding-left: 4px;
 }
@@ -206,7 +210,7 @@ onMounted(() => {
   padding: 6px 16px;
   border-radius: var(--radius-md, 12px);
   background: var(--accent, #014f99);
-  color: var(--accent-text, #F5F4D6);
+  color: var(--accent-text, #f5f4d6);
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.2s;
@@ -221,23 +225,27 @@ onMounted(() => {
   padding: 6px 12px;
   border-radius: var(--radius-md, 12px);
   background: transparent;
-  color: var(--muted, #5E5F69);
+  color: var(--muted, #5e5f69);
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 
 .btn-dismiss:hover {
-  background: color-mix(in oklab, var(--text, #0C0C10) 8%, transparent);
-  color: var(--text, #0C0C10);
+  background: color-mix(in oklab, var(--text, #0c0c10) 8%, transparent);
+  color: var(--text, #0c0c10);
 }
 
 /* Transition */
 .handoff-banner-enter-active {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s;
 }
 
 .handoff-banner-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
 }
 
 .handoff-banner-enter-from {

@@ -41,15 +41,19 @@ export interface HandoffPayload {
 export type HandoffTarget = 'bildkonverter' | 'collagemaker' | 'color-extractor'
 
 const TARGET_URLS: Record<HandoffTarget, string> = {
-  'bildkonverter': 'https://kodinitools.com/bildkonverter/editor',
-  'collagemaker': 'https://kodinitools.com/collagemaker/editor',
-  'color-extractor': 'https://kodinitools.com/kodini-color-extractor/app'
+  bildkonverter: 'https://kodinitools.com/bildkonverter/editor',
+  collagemaker: 'https://kodinitools.com/collagemaker/editor',
+  'color-extractor': 'https://kodinitools.com/kodini-color-extractor/app',
 }
 
 /**
  * Downscale a canvas to fit within MAX_DIMENSION and return a compressed dataUrl.
  */
-function compressCanvas(canvas: HTMLCanvasElement): { dataUrl: string; width: number; height: number } {
+function compressCanvas(canvas: HTMLCanvasElement): {
+  dataUrl: string
+  width: number
+  height: number
+} {
   let { width, height } = canvas
 
   if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
@@ -68,7 +72,7 @@ function compressCanvas(canvas: HTMLCanvasElement): { dataUrl: string; width: nu
   return {
     dataUrl: tmp.toDataURL('image/jpeg', JPEG_QUALITY),
     width,
-    height
+    height,
   }
 }
 
@@ -95,7 +99,7 @@ export function prepareHandoff(
     source: 'bilder-batchbearbeitung',
     target,
     timestamp: Date.now(),
-    images
+    images,
   }
 
   try {

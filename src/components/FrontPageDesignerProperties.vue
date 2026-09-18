@@ -5,7 +5,11 @@
     <div class="property-group">
       <label>{{ t('frontPageDesigner.properties.elementType') }}</label>
       <div class="property-value">
-        {{ element.type === 'text' ? t('frontPageDesigner.properties.typeText') : t('frontPageDesigner.properties.typeImage') }}
+        {{
+          element.type === 'text'
+            ? t('frontPageDesigner.properties.typeText')
+            : t('frontPageDesigner.properties.typeImage')
+        }}
       </div>
     </div>
 
@@ -19,7 +23,15 @@
           :placeholder="t('frontPageDesigner.canvas.emptyText')"
         ></textarea>
         <div class="inline-edit-hint">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -37,7 +49,7 @@
             min="12"
             max="72"
             class="property-slider"
-          >
+          />
           <span class="slider-value">{{ element.fontSize }}px</span>
         </div>
       </div>
@@ -50,7 +62,9 @@
             :key="font"
             :value="font"
             :style="{ fontFamily: font }"
-          >{{ font }}</option>
+          >
+            {{ font }}
+          </option>
         </select>
       </div>
 
@@ -70,7 +84,15 @@
             :title="t('frontPageDesigner.properties.textAlignLeft')"
             @click="element.textAlign = 'left'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="17" y1="10" x2="3" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -82,7 +104,15 @@
             :title="t('frontPageDesigner.properties.textAlignCenter')"
             @click="element.textAlign = 'center'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="18" y1="10" x2="6" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -94,7 +124,15 @@
             :title="t('frontPageDesigner.properties.textAlignRight')"
             @click="element.textAlign = 'right'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="21" y1="10" x2="7" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -106,11 +144,7 @@
 
       <div class="property-group">
         <label>{{ t('frontPageDesigner.properties.textColor') }}</label>
-        <input
-          v-model="element.color"
-          type="color"
-          class="color-picker"
-        >
+        <input v-model="element.color" type="color" class="color-picker" />
       </div>
     </template>
 
@@ -123,13 +157,9 @@
             type="number"
             min="50"
             @input="emit('maintainAspectRatio')"
-          >
+          />
           <span>×</span>
-          <input
-            v-model.number="element.height"
-            type="number"
-            min="50"
-          >
+          <input v-model.number="element.height" type="number" min="50" />
         </div>
       </div>
     </template>
@@ -139,11 +169,11 @@
       <div class="size-inputs">
         <div>
           <small>X:</small>
-          <input v-model.number="element.x" type="number" min="0">
+          <input v-model.number="element.x" type="number" min="0" />
         </div>
         <div>
           <small>Y:</small>
-          <input v-model.number="element.y" type="number" min="0">
+          <input v-model.number="element.y" type="number" min="0" />
         </div>
       </div>
     </div>

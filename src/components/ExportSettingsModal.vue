@@ -16,40 +16,46 @@
                 <label>{{ t('exportModal.pdf.orientation.label') }}:</label>
                 <select v-model="settings.orientation">
                   <option value="portrait">{{ t('exportModal.pdf.orientation.portrait') }}</option>
-                  <option value="landscape">{{ t('exportModal.pdf.orientation.landscape') }}</option>
+                  <option value="landscape">
+                    {{ t('exportModal.pdf.orientation.landscape') }}
+                  </option>
                 </select>
               </div>
 
               <!-- Author -->
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.author') }}:</label>
-                <input 
-                  v-model="settings.author" 
-                  type="text" 
+                <input
+                  v-model="settings.author"
+                  type="text"
                   :placeholder="t('exportModal.pdf.authorPlaceholder')"
-                >
+                />
               </div>
 
               <!-- ✨ NEU: Eigene Startseite gestalten -->
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input 
-                    v-model="settings.includeCustomFrontPage" 
-                    type="checkbox"
-                  >
+                  <input v-model="settings.includeCustomFrontPage" type="checkbox" />
                   {{ t('exportModal.pdf.frontPage.label') }}
                 </label>
                 <p class="setting-hint">{{ t('exportModal.pdf.frontPage.description') }}</p>
               </div>
 
               <!-- ✨ NEU: Startseite Designer Button -->
-              <div v-if="settings.includeCustomFrontPage" class="designer-section front-page-section">
-                <button 
-                  type="button"
-                  class="designer-btn"
-                  @click="showFrontPageDesigner = true"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <div
+                v-if="settings.includeCustomFrontPage"
+                class="designer-section front-page-section"
+              >
+                <button type="button" class="designer-btn" @click="showFrontPageDesigner = true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="3" y1="9" x2="21" y2="9"></line>
                   </svg>
@@ -62,24 +68,51 @@
                 <!-- Element-Vorschau für Startseite -->
                 <div v-if="settings.frontPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
-                    <span>{{ settings.frontPageElements.length }} {{ t('exportModal.pdf.frontPage.elementsAdded') }}</span>
+                    <span>
+                      {{ settings.frontPageElements.length }}
+                      {{ t('exportModal.pdf.frontPage.elementsAdded') }}
+                    </span>
                     <button type="button" class="clear-btn" @click="clearFrontPageElements">
                       {{ t('exportModal.pdf.frontPage.clearButton') }}
                     </button>
                   </div>
                   <ul class="element-list">
                     <li v-for="element in settings.frontPageElements.slice(0, 3)" :key="element.id">
-                      <svg v-if="element.type === 'text'" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg
+                        v-if="element.type === 'text'"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
                         <polyline points="4 7 4 4 20 4 20 7"></polyline>
                         <line x1="9" y1="20" x2="15" y2="20"></line>
                         <line x1="12" y1="4" x2="12" y2="20"></line>
                       </svg>
-                      <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg
+                        v-else
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
-                      <span>{{ element.type === 'text' ? element.content?.substring(0, 25) : t('frontPageDesigner.properties.typeImage') }}</span>
+                      <span>
+                        {{
+                          element.type === 'text'
+                            ? element.content?.substring(0, 25)
+                            : t('frontPageDesigner.properties.typeImage')
+                        }}
+                      </span>
                     </li>
                     <li v-if="settings.frontPageElements.length > 3" class="more-indicator">
                       +{{ settings.frontPageElements.length - 3 }} weitere
@@ -91,24 +124,28 @@
               <!-- ✨ Kommentarseite hinzufügen -->
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input 
-                    v-model="settings.includeCommentPages" 
-                    type="checkbox"
-                  >
+                  <input v-model="settings.includeCommentPages" type="checkbox" />
                   {{ t('exportModal.pdf.commentPage.label') }}
                 </label>
               </div>
 
               <!-- ✨ Kommentarseite Designer Button -->
-              <div v-if="settings.includeCommentPages" class="designer-section comment-page-section">
-                <button 
-                  type="button"
-                  class="designer-btn"
-                  @click="showCommentPageDesigner = true"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              <div
+                v-if="settings.includeCommentPages"
+                class="designer-section comment-page-section"
+              >
+                <button type="button" class="designer-btn" @click="showCommentPageDesigner = true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                   {{ t('exportModal.pdf.commentPage.designButton') }}
                   <span v-if="settings.commentPageElements.length > 0" class="badge">
@@ -119,24 +156,54 @@
                 <!-- Element-Vorschau für Kommentarseite -->
                 <div v-if="settings.commentPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
-                    <span>{{ settings.commentPageElements.length }} {{ t('exportModal.pdf.commentPage.elementsAdded') }}</span>
+                    <span>
+                      {{ settings.commentPageElements.length }}
+                      {{ t('exportModal.pdf.commentPage.elementsAdded') }}
+                    </span>
                     <button type="button" class="clear-btn" @click="clearCommentPageElements">
                       {{ t('exportModal.pdf.commentPage.clearButton') }}
                     </button>
                   </div>
                   <ul class="element-list">
-                    <li v-for="element in settings.commentPageElements.slice(0, 3)" :key="element.id">
-                      <svg v-if="element.type === 'text'" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <li
+                      v-for="element in settings.commentPageElements.slice(0, 3)"
+                      :key="element.id"
+                    >
+                      <svg
+                        v-if="element.type === 'text'"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
                         <polyline points="4 7 4 4 20 4 20 7"></polyline>
                         <line x1="9" y1="20" x2="15" y2="20"></line>
                         <line x1="12" y1="4" x2="12" y2="20"></line>
                       </svg>
-                      <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg
+                        v-else
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
-                      <span>{{ element.type === 'text' ? element.content?.substring(0, 25) : t('commentPageDesigner.properties.typeImage') }}</span>
+                      <span>
+                        {{
+                          element.type === 'text'
+                            ? element.content?.substring(0, 25)
+                            : t('commentPageDesigner.properties.typeImage')
+                        }}
+                      </span>
                     </li>
                     <li v-if="settings.commentPageElements.length > 3" class="more-indicator">
                       +{{ settings.commentPageElements.length - 3 }} weitere
@@ -154,7 +221,7 @@
                   v-model="settings.zipName"
                   type="text"
                   :placeholder="t('exportModal.zip.fileNamePlaceholder')"
-                >
+                />
               </div>
 
               <div class="setting-group">
@@ -174,15 +241,12 @@
                   min="1"
                   max="100"
                   class="quality-slider"
-                >
+                />
               </div>
 
               <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
                 <label class="checkbox-label">
-                  <input
-                    v-model="settings.pngTransparent"
-                    type="checkbox"
-                  >
+                  <input v-model="settings.pngTransparent" type="checkbox" />
                   {{ t('exportModal.format.pngTransparent') }}
                 </label>
                 <p class="setting-hint">{{ t('exportModal.format.pngTransparentHint') }}</p>
@@ -204,44 +268,79 @@
                   v-model="settings.zipName"
                   type="text"
                   :placeholder="t('exportModal.zip.fileNamePlaceholder')"
-                >
+                />
               </div>
 
               <div class="setting-group">
                 <label>{{ t('exportModal.svg.colormode') || 'Farbmodus' }}:</label>
                 <select v-model="settings.svgColormode">
-                  <option value="color">{{ t('exportModal.svg.colormodeColor') || 'Farbe' }}</option>
-                  <option value="binary">{{ t('exportModal.svg.colormodeBinary') || 'Schwarz-Weiß' }}</option>
+                  <option value="color">
+                    {{ t('exportModal.svg.colormodeColor') || 'Farbe' }}
+                  </option>
+                  <option value="binary">
+                    {{ t('exportModal.svg.colormodeBinary') || 'Schwarz-Weiß' }}
+                  </option>
                 </select>
               </div>
 
               <div class="setting-group">
                 <label>{{ t('exportModal.svg.quality') || 'Qualität' }}:</label>
                 <select v-model="settings.svgQuality">
-                  <option value="standard">{{ t('exportModal.svg.qualityStandard') || 'Standard (Originalauflösung)' }}</option>
-                  <option value="high">{{ t('exportModal.svg.qualityHigh') || 'Hoch (schärfer)' }}</option>
-                  <option value="ultra">{{ t('exportModal.svg.qualityUltra') || 'Ultra (maximale Schärfe)' }}</option>
+                  <option value="standard">
+                    {{ t('exportModal.svg.qualityStandard') || 'Standard (Originalauflösung)' }}
+                  </option>
+                  <option value="high">
+                    {{ t('exportModal.svg.qualityHigh') || 'Hoch (schärfer)' }}
+                  </option>
+                  <option value="ultra">
+                    {{ t('exportModal.svg.qualityUltra') || 'Ultra (maximale Schärfe)' }}
+                  </option>
                 </select>
-                <p class="setting-hint">{{ t('exportModal.svg.qualityHint') || 'Höhere Qualität skaliert kleine Bilder vor der Vektorisierung hoch – schärfere Konturen, etwas größere Dateien.' }}</p>
+                <p class="setting-hint">
+                  {{
+                    t('exportModal.svg.qualityHint') ||
+                    'Höhere Qualität skaliert kleine Bilder vor der Vektorisierung hoch – schärfere Konturen, etwas größere Dateien.'
+                  }}
+                </p>
               </div>
 
               <div class="setting-group">
-                <label>{{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}</label>
+                <label>
+                  {{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}
+                </label>
                 <input
                   v-model.number="settings.svgFilterSpeckle"
                   type="range"
                   min="1"
                   max="32"
                   class="quality-slider"
-                >
-                <p class="setting-hint">{{ t('exportModal.svg.detailHint') || 'Niedriger = mehr Details, Höher = glattere Kurven' }}</p>
+                />
+                <p class="setting-hint">
+                  {{
+                    t('exportModal.svg.detailHint') ||
+                    'Niedriger = mehr Details, Höher = glattere Kurven'
+                  }}
+                </p>
               </div>
 
               <div class="svg-info-box">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
-                <span>{{ t('exportModal.svg.info') || 'SVG-Vektorisierung funktioniert am besten bei Logos, Icons und einfachen Grafiken.' }}</span>
+                <span>
+                  {{
+                    t('exportModal.svg.info') ||
+                    'SVG-Vektorisierung funktioniert am besten bei Logos, Icons und einfachen Grafiken.'
+                  }}
+                </span>
               </div>
             </template>
 
@@ -264,15 +363,12 @@
                   min="1"
                   max="100"
                   class="quality-slider"
-                >
+                />
               </div>
 
               <div v-if="settings.format === 'png'" class="setting-group png-bg-setting">
                 <label class="checkbox-label">
-                  <input
-                    v-model="settings.pngTransparent"
-                    type="checkbox"
-                  >
+                  <input v-model="settings.pngTransparent" type="checkbox" />
                   {{ t('exportModal.format.pngTransparent') }}
                 </label>
                 <p class="setting-hint">{{ t('exportModal.format.pngTransparentHint') }}</p>
@@ -287,17 +383,34 @@
             </template>
 
             <!-- Info Text -->
-            <div class="info-box" :class="{ 'info-box-selected': hasSelection && (mode === 'zip' || mode === 'svg') }">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div
+              class="info-box"
+              :class="{ 'info-box-selected': hasSelection && (mode === 'zip' || mode === 'svg') }"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
               <span v-if="hasSelection && (mode === 'zip' || mode === 'svg')">
-                {{ imageCount }} {{ imageCount === 1 ? t('exportModal.info.selectedImage') : t('exportModal.info.selectedImages') }}
+                {{ imageCount }}
+                {{
+                  imageCount === 1
+                    ? t('exportModal.info.selectedImage')
+                    : t('exportModal.info.selectedImages')
+                }}
               </span>
               <span v-else>
-                {{ imageCount }} {{ imageCount === 1 ? t('exportModal.info.image') : t('exportModal.info.images') }}
+                {{ imageCount }}
+                {{ imageCount === 1 ? t('exportModal.info.image') : t('exportModal.info.images') }}
               </span>
             </div>
           </div>
@@ -307,7 +420,15 @@
               {{ t('exportModal.buttons.cancel') }}
             </button>
             <button class="btn-primary" @click="handleConfirm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -387,7 +508,7 @@ const settings = reactive({
   // SVG Settings
   svgColormode: 'color' as 'color' | 'binary',
   svgFilterSpeckle: 4,
-  svgQuality: 'high' as 'standard' | 'high' | 'ultra'
+  svgQuality: 'high' as 'standard' | 'high' | 'ultra',
 })
 
 // ✨ NEU: Front Page Designer Save Handler
@@ -468,7 +589,9 @@ function handleConfirm() {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-header {
@@ -539,13 +662,13 @@ function handleConfirm() {
   cursor: pointer;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
 }
 
-.setting-group input[type="text"],
+.setting-group input[type='text'],
 .setting-group select {
   width: 100%;
   padding: var(--space-3);
@@ -557,7 +680,7 @@ function handleConfirm() {
   transition: border-color 0.2s;
 }
 
-.setting-group input[type="text"]:focus,
+.setting-group input[type='text']:focus,
 .setting-group select:focus {
   outline: none;
   border-color: var(--accent);
@@ -597,7 +720,9 @@ function handleConfirm() {
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   position: relative;
 }
 
@@ -703,7 +828,7 @@ function handleConfirm() {
   gap: var(--space-2);
 }
 
-.color-input-row input[type="color"] {
+.color-input-row input[type='color'] {
   width: 36px;
   height: 30px;
   border: 1px solid var(--border-color);
@@ -815,7 +940,9 @@ function handleConfirm() {
 /* Transition */
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .modal-enter-from,

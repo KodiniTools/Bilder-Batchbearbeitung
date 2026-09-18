@@ -8,18 +8,18 @@ export interface ImageFormat {
 }
 
 export interface ImageFilters {
-  brightness: number   // 0-200, default 100
-  contrast: number     // 0-200, default 100
-  saturation: number   // 0-200, default 100
-  hue: number          // 0-360, default 0
-  opacity: number      // 0-100, default 100
-  blur: number         // 0-20, default 0
-  grayscale: number    // 0-100, default 0
-  sepia: number        // 0-100, default 0
-  invert: number       // 0-100, default 0
-  temperature: number  // -100 (kühl) .. 100 (warm), default 0
-  vibrance: number     // -100 .. 100, default 0
-  vignette: number     // 0-100, default 0
+  brightness: number // 0-200, default 100
+  contrast: number // 0-200, default 100
+  saturation: number // 0-200, default 100
+  hue: number // 0-360, default 0
+  opacity: number // 0-100, default 100
+  blur: number // 0-20, default 0
+  grayscale: number // 0-100, default 0
+  sepia: number // 0-100, default 0
+  invert: number // 0-100, default 0
+  temperature: number // -100 (kühl) .. 100 (warm), default 0
+  vibrance: number // -100 .. 100, default 0
+  vignette: number // 0-100, default 0
 }
 
 export const defaultFilters: ImageFilters = {
@@ -34,18 +34,18 @@ export const defaultFilters: ImageFilters = {
   invert: 0,
   temperature: 0,
   vibrance: 0,
-  vignette: 0
+  vignette: 0,
 }
 
 export interface ImageTransforms {
-  borderWidth: number     // 0-50, default 0
-  borderColor: string     // hex, default '#000000'
-  borderRadius: number    // 0-200, default 0
-  shadowBlur: number      // 0-50, default 0
-  shadowColor: string     // hex, default '#000000'
-  shadowOpacity: number   // 0-100, default 40
-  shadowOffsetX: number   // -25 to 25, default 5
-  shadowOffsetY: number   // -25 to 25, default 5
+  borderWidth: number // 0-50, default 0
+  borderColor: string // hex, default '#000000'
+  borderRadius: number // 0-200, default 0
+  shadowBlur: number // 0-50, default 0
+  shadowColor: string // hex, default '#000000'
+  shadowOpacity: number // 0-100, default 40
+  shadowOffsetX: number // -25 to 25, default 5
+  shadowOffsetY: number // -25 to 25, default 5
 }
 
 export const defaultTransforms: ImageTransforms = {
@@ -56,7 +56,7 @@ export const defaultTransforms: ImageTransforms = {
   shadowColor: '#000000',
   shadowOpacity: 40,
   shadowOffsetX: 5,
-  shadowOffsetY: 5
+  shadowOffsetY: 5,
 }
 
 export interface ImageObject {
@@ -100,21 +100,21 @@ export interface EditorState {
 
 export interface TextItem {
   id: string
-  text: string        // multi-line (newlines preserved)
-  x: number          // % from left edge (0–100)
-  y: number          // % from top edge (0–100)
-  fontSize: number   // px at preview-canvas scale
+  text: string // multi-line (newlines preserved)
+  x: number // % from left edge (0–100)
+  y: number // % from top edge (0–100)
+  fontSize: number // px at preview-canvas scale
   fontFamily: string // CSS font stack
-  color: string      // hex color
+  color: string // hex color
   bold: boolean
   italic: boolean
   align: 'left' | 'center' | 'right'
-  opacity: number    // 0–100
-  strokeWidth: number  // 0–20, default 0
-  strokeColor: string  // hex, default '#000000'
-  shadowColor: string  // hex, default '#000000'
+  opacity: number // 0–100
+  strokeWidth: number // 0–20, default 0
+  strokeColor: string // hex, default '#000000'
+  shadowColor: string // hex, default '#000000'
   shadowOpacity: number // 0–100, default 60
-  shadowBlur: number   // 0–30, default 0
+  shadowBlur: number // 0–30, default 0
   shadowOffsetX: number // -20–20, default 2
   shadowOffsetY: number // -20–20, default 2
 }
@@ -123,10 +123,10 @@ export interface WatermarkSettings {
   enabled: boolean
   text: string
   fontFamily: string
-  fontSize: number       // 10-200, default 48
-  color: string          // hex, default '#ffffff'
-  opacity: number        // 0-100, default 50
-  rotation: number       // -180 to 180, default -30
+  fontSize: number // 10-200, default 48
+  color: string // hex, default '#ffffff'
+  opacity: number // 0-100, default 50
+  rotation: number // -180 to 180, default -30
   position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'tile'
   bold: boolean
   italic: boolean
@@ -142,7 +142,12 @@ export const defaultWatermark: WatermarkSettings = {
   rotation: -30,
   position: 'center',
   bold: false,
-  italic: false
+  italic: false,
 }
 
-export type TransformOperation = 'rotateLeft' | 'rotateRight' | 'rotate180' | 'flipHorizontal' | 'flipVertical'
+export type TransformOperation =
+  | 'rotateLeft'
+  | 'rotateRight'
+  | 'rotate180'
+  | 'flipHorizontal'
+  | 'flipVertical'

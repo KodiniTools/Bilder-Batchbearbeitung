@@ -50,7 +50,7 @@ export const defaultSvgSettings: SvgConversionSettings = {
   path_precision: 6,
   mode: 'spline',
   hierarchical: 'stacked',
-  quality: 'high'
+  quality: 'high',
 }
 
 // vtracer-relevante Parameter (werden ans Backend gesendet).
@@ -65,7 +65,7 @@ const VTRACER_KEYS: (keyof SvgConversionSettings)[] = [
   'splice_threshold',
   'path_precision',
   'mode',
-  'hierarchical'
+  'hierarchical',
 ]
 
 // Auflösungs-Untergrenze (längste Kante in px) je Qualitätsstufe. Es wird nur
@@ -76,7 +76,7 @@ const VTRACER_KEYS: (keyof SvgConversionSettings)[] = [
 const QUALITY_TARGET: Record<SvgQuality, number> = {
   standard: 0, // native Auflösung beibehalten
   high: 1024, // kleine Bilder auf mind. 1024 px anheben
-  ultra: 2048 // maximale Schärfe – auch mittlere Bilder werden hochskaliert
+  ultra: 2048, // maximale Schärfe – auch mittlere Bilder werden hochskaliert
 }
 
 // Obergrenze für die längste Kante, damit das PNG unter dem Backend-Limit (20 MB)
@@ -93,7 +93,7 @@ export async function checkSvgServiceAvailable(): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE}/../health`, {
       method: 'GET',
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(5000),
     })
     return response.ok
   } catch {
@@ -105,7 +105,10 @@ export async function checkSvgServiceAvailable(): Promise<boolean> {
  * Bereitet das Canvas für das Tracing vor: Supersampling auf die Ziel-Auflösung
  * der gewählten Qualitätsstufe (nur Hochskalieren) mit hochwertiger Glättung.
  */
-function prepareCanvasForTracing(source: HTMLCanvasElement, quality: SvgQuality): HTMLCanvasElement {
+function prepareCanvasForTracing(
+  source: HTMLCanvasElement,
+  quality: SvgQuality
+): HTMLCanvasElement {
   const longest = Math.max(source.width, source.height)
   const target = QUALITY_TARGET[quality]
 
@@ -134,10 +137,7 @@ function prepareCanvasForTracing(source: HTMLCanvasElement, quality: SvgQuality)
 /**
  * Erzeugt das aufbereitete, verlustfreie PNG-Blob eines Bildes für das Tracing.
  */
-async function buildTracingBlob(
-  imageObj: ImageObject,
-  quality: SvgQuality
-): Promise<Blob> {
+async function buildTracingBlob(imageObj: ImageObject, quality: SvgQuality): Promise<Blob> {
   // Composed-Canvas (Filter + Wasserzeichen + Transforms) in voller Auflösung.
   const exportCanvas = ImageProcessor.getExportCanvas(imageObj)
   const tracingCanvas = prepareCanvasForTracing(exportCanvas, quality)
@@ -170,7 +170,7 @@ export async function convertImageToSvg(
 
   const response = await fetch(`${API_BASE}/convert-svg`, {
     method: 'POST',
-    body: formData
+    body: formData,
   })
 
   if (!response.ok) {
@@ -217,7 +217,7 @@ export async function convertImagesToSvgBatch(
 
   const response = await fetch(`${API_BASE}/convert-svg-batch`, {
     method: 'POST',
-    body: formData
+    body: formData,
   })
 
   if (!response.ok) {
@@ -300,10 +300,7 @@ function enhanceSvg(svg: string): string {
   return svg.replace(openTagMatch[0], openTag)
 }
 
-function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  format: string = 'png'
-): Promise<Blob> {
+function canvasToBlob(canvas: HTMLCanvasElement, format: string = 'png'): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const mimeType = `image/${format === 'jpg' ? 'jpeg' : format}`
 

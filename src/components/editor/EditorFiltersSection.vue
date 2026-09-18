@@ -14,7 +14,9 @@
           type="button"
           class="preset-chip"
           @click="emit('preset', preset.key)"
-        >{{ t(`imageEditor.presets.${preset.key}`) }}</button>
+        >
+          {{ t(`imageEditor.presets.${preset.key}`) }}
+        </button>
       </div>
     </div>
 

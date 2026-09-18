@@ -14,7 +14,7 @@
         max="5000"
         :value="resizeWidth"
         @input="onWidthInput"
-      >
+      />
       <span class="size-unit">px</span>
       <button
         type="button"
@@ -34,7 +34,7 @@
         max="5000"
         :value="resizeHeight"
         @input="onHeightInput"
-      >
+      />
       <span class="size-unit">px</span>
     </div>
     <button type="button" class="btn btn-xs btn-ghost" @click="emit('reset-size')">

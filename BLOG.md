@@ -1,6 +1,6 @@
 # Bilder-Batchbearbeitung: Das ultimative Werkzeug für professionelle Bildverarbeitung im Browser
 
-*Entdecken Sie die leistungsstarke Webanwendung, die Ihre Bildbearbeitung revolutioniert – komplett lokal, sicher und ohne Server-Upload.*
+_Entdecken Sie die leistungsstarke Webanwendung, die Ihre Bildbearbeitung revolutioniert – komplett lokal, sicher und ohne Server-Upload._
 
 ---
 
@@ -44,6 +44,7 @@ Das Hinzufügen von Bildern zur Anwendung könnte nicht einfacher sein. Sie habe
 ### Unterstützte Bildformate
 
 Die Anwendung arbeitet mit allen gängigen Bildformaten:
+
 - **JPEG/JPG** – Ideal für Fotografien
 - **PNG** – Perfekt für Grafiken mit Transparenz
 - **WebP** – Modernes Format mit hervorragender Kompression
@@ -125,6 +126,7 @@ Verleihen Sie Ihren Bildern den perfekten Look mit einer Vielzahl von Filtern un
 Regeln Sie die Gesamthelligkeit des Bildes von 0% (komplett dunkel) bis 200% (überbelichtet). Der Standardwert liegt bei 100%.
 
 **Anwendungsbeispiele:**
+
 - Unterbelichtete Fotos aufhellen
 - Überbelichtete Bereiche abdunkeln
 - Stimmungsvolle Low-Key-Effekte erzeugen
@@ -136,6 +138,7 @@ Steuern Sie den Unterschied zwischen hellen und dunklen Bereichen. Ein höherer 
 **Wertebereich:** 0% bis 200%
 
 **Tipps:**
+
 - Erhöhen Sie den Kontrast für knackigere Landschaftsfotos
 - Reduzieren Sie ihn für sanftere Porträts
 
@@ -148,6 +151,7 @@ Bestimmen Sie die Farbintensität Ihrer Bilder:
 - **200%**: Sehr intensive, knallige Farben
 
 **Kreative Anwendungen:**
+
 - Schwarz-Weiß-Konvertierung durch Sättigung auf 0%
 - Vintage-Look durch leicht reduzierte Sättigung
 - Pop-Art-Effekt durch erhöhte Sättigung
@@ -157,6 +161,7 @@ Bestimmen Sie die Farbintensität Ihrer Bilder:
 Drehen Sie das gesamte Farbspektrum um bis zu 360°. Diese Funktion verschiebt alle Farben im Bild gleichmäßig auf dem Farbkreis.
 
 **Kreative Möglichkeiten:**
+
 - Surreale Farbwelten erschaffen
 - Farbkorrekturen durchführen
 - Künstlerische Effekte erzeugen
@@ -166,6 +171,7 @@ Drehen Sie das gesamte Farbspektrum um bis zu 360°. Diese Funktion verschiebt a
 Stellen Sie die Transparenz des Bildes ein. Bei 100% ist das Bild vollständig sichtbar, bei 0% komplett transparent.
 
 **Nützlich für:**
+
 - Wasserzeichen-Effekte
 - Überlagerungen
 - Ausblendeffekte
@@ -175,6 +181,7 @@ Stellen Sie die Transparenz des Bildes ein. Bei 100% ist das Bild vollständig s
 Fügen Sie einen Weichzeichnungseffekt hinzu. Der Wert reicht von 0px (scharf) bis 20px (stark weichgezeichnet).
 
 **Anwendungsbereiche:**
+
 - Hintergrund-Weichzeichnung für Fokuseffekte
 - Künstlerische Unschärfe
 - Glättung von Hautunebenheiten
@@ -197,6 +204,7 @@ Benennen Sie mehrere Bilder mit einem einheitlichen Schema um:
 6. Bestätigen Sie die Umbenennung
 
 **Intelligente Funktionen:**
+
 - Automatische fortlaufende Nummerierung
 - Live-Vorschau aller neuen Namen
 - Automatische Bereinigung ungültiger Zeichen
@@ -211,6 +219,7 @@ Das Batch-Bearbeitungspanel ist Ihr Werkzeug für die gleichzeitige Filteranpass
 4. Alle ausgewählten Bilder werden in Echtzeit aktualisiert
 
 **Verfügbare Batch-Filter:**
+
 - Helligkeit
 - Kontrast
 - Sättigung
@@ -219,6 +228,7 @@ Das Batch-Bearbeitungspanel ist Ihr Werkzeug für die gleichzeitige Filteranpass
 - Weichzeichner
 
 **Komfortfunktionen:**
+
 - Einzelne Filter zurücksetzen
 - Alle Filter auf einmal zurücksetzen
 - Anzeige der Anzahl ausgewählter Bilder
@@ -249,11 +259,13 @@ Klicken Sie auf das Zauberstab-Symbol einer Bildkarte, um den Editor zu öffnen.
 Sehen Sie alle Ihre Änderungen sofort auf einer großen Vorschau-Leinwand.
 
 **Bildinformationen:**
+
 - Aktuelle Bildabmessungen (Breite x Höhe)
 - Dateigröße
 - Aktueller Dateiname
 
 **Bearbeitungswerkzeuge:**
+
 - Komplette Rotations- und Spiegelungssteuerung
 - Präzise Größenanpassung mit Seitenverhältnis-Sperre
 - Alle Filter mit Schiebereglern
@@ -271,14 +283,17 @@ Einer der leistungsstärksten Bereiche der Anwendung ist der PDF-Export mit umfa
 ### Grundlegende PDF-Export-Optionen
 
 **Exportmodus:**
+
 - **Alle Bilder exportieren**: Exportiert sämtliche geladenen Bilder
 - **Nur ausgewählte Bilder**: Exportiert nur die markierten Bilder
 
 **Seitenausrichtung:**
+
 - **Hochformat (Portrait)**: Ideal für Dokumente und Präsentationen
 - **Querformat (Landscape)**: Perfekt für Panoramabilder
 
 **Metadaten:**
+
 - Autor-Feld für PDF-Eigenschaften
 - Dateinamen unter jedem Bild anzeigen (optional)
 
@@ -287,6 +302,7 @@ Einer der leistungsstärksten Bereiche der Anwendung ist der PDF-Export mit umfa
 Gestalten Sie eine professionelle Titelseite für Ihr PDF:
 
 **Textelemente hinzufügen:**
+
 - Beliebigen Text eingeben
 - Schriftgröße anpassen
 - Schriftstärke wählen (Normal/Fett)
@@ -296,12 +312,14 @@ Gestalten Sie eine professionelle Titelseite für Ihr PDF:
 - Breite und Höhe des Textbereichs definieren
 
 **Bildelemente hinzufügen:**
+
 - Eigene Bilder (z.B. Logos) hochladen
 - Frei auf der Seite positionieren
 - Größe anpassen
 - Deckkraft einstellen
 
 **Designer-Funktionen:**
+
 - Drag-and-Drop-Positionierung auf einer A4-Vorschau
 - Echtzeit-Vorschau aller Elemente
 - Einzelne Elemente löschen
@@ -312,12 +330,14 @@ Gestalten Sie eine professionelle Titelseite für Ihr PDF:
 Erstellen Sie zusätzliche Seiten mit Anmerkungen, Beschreibungen oder Zusatzinformationen:
 
 **Seitenverwaltung:**
+
 - Neue Seiten hinzufügen
 - Zwischen Seiten navigieren
 - Seiten löschen
 - Seitenvorschauen in Miniaturansicht
 
 **Elemente pro Seite:**
+
 - Text mit vollständigen Formatierungsoptionen
 - Bilder mit Positionierung und Größenanpassung
 - Ebenenreihenfolge (Z-Index) für überlappende Elemente
@@ -338,6 +358,7 @@ Stellen Sie die JPEG-Qualität ein (0-1 Skala) für das perfekte Gleichgewicht z
 Überdimensionierte Bilder werden automatisch auf eine maximale Dimension von 1920 Pixeln reduziert.
 
 **Typische Dateigrößen:**
+
 - ~2-5 MB für 8 Seiten mit Bildern
 - Deutlich kleiner als unkomprimierte PDFs
 
@@ -350,10 +371,12 @@ Exportieren Sie Ihre bearbeiteten Bilder als praktisches ZIP-Archiv.
 ### Export-Optionen
 
 **Auswahl:**
+
 - Alle Bilder exportieren
 - Nur ausgewählte Bilder exportieren
 
 **Formatauswahl:**
+
 - **PNG**: Verlustfreie Qualität, größere Dateien
 - **JPEG**: Gute Komprimierung, ideal für Fotos
 - **WebP**: Moderne Komprimierung, beste Balance
@@ -369,6 +392,7 @@ Ein Schieberegler von 1% bis 100% lässt Sie die Komprimierungsstufe präzise ei
 4. Das ZIP-Archiv wird automatisch heruntergeladen
 
 **Archiv-Struktur:**
+
 - Bilder werden in einem "bilder"-Ordner organisiert
 - Originale oder benutzerdefinierte Dateinamen werden verwendet
 - DEFLATE-Komprimierung für optimale Dateigröße
@@ -463,20 +487,24 @@ Jede Bildkarte bietet direkten Zugriff auf:
 Am unteren Rand der Bildübersicht finden Sie die Statusleiste mit:
 
 **Statistiken:**
+
 - Gesamtanzahl der Bilder
 - Anzahl ausgewählter Bilder
 
 **Schnellaktionen:**
+
 - Alle auswählen / Auswahl aufheben
 - Ausgewählte löschen
 
 **Transformations-Buttons** (bei Auswahl):
+
 - Rotieren links/rechts
 - Horizontal/vertikal spiegeln
 - Seitenverhältnis-Dropdown
 - Alle Bearbeitungen zurücksetzen
 
 **Export-Buttons:**
+
 - PDF exportieren (alle)
 - PDF exportieren (ausgewählte)
 - Als ZIP exportieren
@@ -540,6 +568,7 @@ Ihre Spracheinstellung wird automatisch gespeichert und beim nächsten Besuch wi
 ### Umfang der Übersetzung
 
 Alle Elemente der Benutzeroberfläche sind übersetzt:
+
 - Buttons und Menüs
 - Tooltips und Hilfetexte
 - Fehlermeldungen und Benachrichtigungen
@@ -566,6 +595,7 @@ Ihre Theme-Präferenz wird gespeichert und beim nächsten Besuch angewendet.
 ### Vollständiges Theming
 
 Alle UI-Elemente sind konsistent gestaltet:
+
 - Hintergründe und Vordergründe
 - Buttons und Eingabefelder
 - Karten und Dialoge
@@ -577,12 +607,12 @@ Alle UI-Elemente sind konsistent gestaltet:
 
 Für eine schnellere Bedienung stehen Ihnen praktische Tastenkürzel zur Verfügung:
 
-| Tastenkombination | Funktion |
-|-------------------|----------|
-| `Strg + A` / `Cmd + A` | Alle Bilder auswählen |
-| `Entf` / `Backspace` | Ausgewählte Bilder löschen |
-| `Escape` | Auswahl aufheben |
-| `Enter` | Dialoge bestätigen |
+| Tastenkombination      | Funktion                   |
+| ---------------------- | -------------------------- |
+| `Strg + A` / `Cmd + A` | Alle Bilder auswählen      |
+| `Entf` / `Backspace`   | Ausgewählte Bilder löschen |
+| `Escape`               | Auswahl aufheben           |
+| `Enter`                | Dialoge bestätigen         |
 
 ### Barrierefreiheit
 
@@ -643,4 +673,4 @@ Die Kombination aus leistungsstarken Funktionen und vollständiger Privatsphäre
 
 ---
 
-*Probieren Sie die Bilder-Batchbearbeitung noch heute aus und erleben Sie, wie einfach professionelle Bildbearbeitung sein kann!*
+_Probieren Sie die Bilder-Batchbearbeitung noch heute aus und erleben Sie, wie einfach professionelle Bildbearbeitung sein kann!_

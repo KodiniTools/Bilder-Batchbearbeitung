@@ -52,6 +52,12 @@ const handleExportPdf = (mode: 'all' | 'selected') => {
   emit('export-pdf', mode)
 }
 
+/** Dropdown-Eintrag: Export auslösen und Menü schließen */
+const selectPdfExport = (mode: 'all' | 'selected') => {
+  handleExportPdf(mode)
+  closePdfDropdown()
+}
+
 const handleExportZip = () => {
   emit('export-zip')
 }
@@ -249,18 +255,10 @@ const handleRedo = () => {
         </div>
 
         <div class="btn-group">
-          <button
-            class="btn btn-icon"
-            :title="t('statusBar.tooltips.flipH')"
-            @click="handleFlipH"
-          >
+          <button class="btn btn-icon" :title="t('statusBar.tooltips.flipH')" @click="handleFlipH">
             <i class="fa-solid fa-arrows-left-right"></i>
           </button>
-          <button
-            class="btn btn-icon"
-            :title="t('statusBar.tooltips.flipV')"
-            @click="handleFlipV"
-          >
+          <button class="btn btn-icon" :title="t('statusBar.tooltips.flipV')" @click="handleFlipV">
             <i class="fa-solid fa-arrows-up-down"></i>
           </button>
         </div>
@@ -274,27 +272,27 @@ const handleRedo = () => {
           >
             <i class="fa-solid fa-crop"></i>
           </button>
-          <div v-if="isAspectRatioDropdownOpen" class="dropdown-menu" @mouseleave="closeAspectRatioDropdown">
+          <div
+            v-if="isAspectRatioDropdownOpen"
+            class="dropdown-menu"
+            @mouseleave="closeAspectRatioDropdown"
+          >
             <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
               <i class="fa-solid fa-square"></i>
               <span>1:1</span>
             </button>
-            <button class="dropdown-item" @click="handleCropToAspectRatio(16/9)">
+            <button class="dropdown-item" @click="handleCropToAspectRatio(16 / 9)">
               <i class="fa-solid fa-rectangle-wide"></i>
               <span>16:9</span>
             </button>
-            <button class="dropdown-item" @click="handleCropToAspectRatio(2/3)">
+            <button class="dropdown-item" @click="handleCropToAspectRatio(2 / 3)">
               <i class="fa-solid fa-rectangle-portrait"></i>
               <span>2:3</span>
             </button>
           </div>
         </div>
 
-        <button
-          class="btn btn-icon"
-          :title="t('statusBar.tooltips.reset')"
-          @click="handleReset"
-        >
+        <button class="btn btn-icon" :title="t('statusBar.tooltips.reset')" @click="handleReset">
           <i class="fa-solid fa-arrow-rotate-left"></i>
         </button>
 
@@ -332,7 +330,7 @@ const handleRedo = () => {
           </button>
         </div>
         <div v-if="isPdfDropdownOpen" class="dropdown-menu" @mouseleave="closePdfDropdown">
-          <button class="dropdown-item" @click="handleExportPdf('all'); closePdfDropdown()">
+          <button class="dropdown-item" @click="selectPdfExport('all')">
             <i class="fa-solid fa-images"></i>
             <span>{{ t('statusBar.tooltips.exportAllPdf') }}</span>
           </button>
@@ -340,7 +338,7 @@ const handleRedo = () => {
             class="dropdown-item"
             :class="{ 'dropdown-item--disabled': !imageStore.hasSelection }"
             :disabled="!imageStore.hasSelection"
-            @click="handleExportPdf('selected'); closePdfDropdown()"
+            @click="selectPdfExport('selected')"
           >
             <i class="fa-solid fa-check-double"></i>
             <span>{{ t('statusBar.tooltips.exportSelectedPdf') }}</span>
@@ -548,16 +546,22 @@ const handleRedo = () => {
 
 /* Primary Button */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 85%, var(--purple)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    color-mix(in oklab, var(--accent) 85%, var(--purple)) 100%
+  );
   color: var(--accent-text);
   border-color: transparent;
   box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 25%, transparent);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     color-mix(in oklab, var(--accent) 90%, black) 0%,
-    color-mix(in oklab, var(--accent) 75%, var(--purple)) 100%);
+    color-mix(in oklab, var(--accent) 75%, var(--purple)) 100%
+  );
   box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 35%, transparent);
   transform: translateY(-2px);
 }

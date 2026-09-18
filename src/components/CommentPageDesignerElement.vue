@@ -1,67 +1,69 @@
 <template>
   <div
-      :class="['canvas-element', { selected, editing }]"
-      :style="{
-        position: 'absolute',
-        left: element.x + 'px',
-        top: element.y + 'px',
-        width: element.width ? element.width + 'px' : undefined,
-        height: element.height ? element.height + 'px' : undefined,
-        zIndex: element.zIndex,
-        cursor: 'move'
-      }"
-      @mousedown.stop="emit('select', element, $event)"
+    :class="['canvas-element', { selected, editing }]"
+    :style="{
+      position: 'absolute',
+      left: element.x + 'px',
+      top: element.y + 'px',
+      width: element.width ? element.width + 'px' : undefined,
+      height: element.height ? element.height + 'px' : undefined,
+      zIndex: element.zIndex,
+      cursor: 'move',
+    }"
+    @mousedown.stop="emit('select', element, $event)"
   >
     <!-- Text Element -->
     <div
-        v-if="element.type === 'text'"
-        class="element-text"
+      v-if="element.type === 'text'"
+      class="element-text"
+      :style="{
+        fontSize: element.fontSize + 'px',
+        fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
+        color: element.color,
+        textAlign: element.align,
+        fontWeight: element.bold ? 'bold' : 'normal',
+        fontStyle: element.italic ? 'italic' : 'normal',
+      }"
+    >
+      <div
+        v-if="!editing"
+        class="text-content"
+        @click.stop
+        @dblclick.stop="emit('editStart', element)"
+      >
+        {{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}
+      </div>
+      <textarea
+        v-else
+        ref="inlineTextareaRef"
+        v-model="element.content"
+        class="inline-text-editor"
         :style="{
           fontSize: element.fontSize + 'px',
           fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
           color: element.color,
           textAlign: element.align,
           fontWeight: element.bold ? 'bold' : 'normal',
-          fontStyle: element.italic ? 'italic' : 'normal'
+          fontStyle: element.italic ? 'italic' : 'normal',
         }"
-    >
-      <div
-          v-if="!editing"
-          class="text-content"
-          @click.stop
-          @dblclick.stop="emit('editStart', element)"
-      >{{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}</div>
-      <textarea
-          v-else
-          ref="inlineTextareaRef"
-          v-model="element.content"
-          class="inline-text-editor"
-          :style="{
-            fontSize: element.fontSize + 'px',
-            fontFamily: (element.fontFamily || 'Helvetica') + ', Arial, Helvetica Neue, sans-serif',
-            color: element.color,
-            textAlign: element.align,
-            fontWeight: element.bold ? 'bold' : 'normal',
-            fontStyle: element.italic ? 'italic' : 'normal'
-          }"
-          @click.stop
-          @mousedown.stop
-          @blur="emit('editStop')"
-          @keydown.esc="emit('editStop')"
+        @click.stop
+        @mousedown.stop
+        @blur="emit('editStop')"
+        @keydown.esc="emit('editStop')"
       ></textarea>
     </div>
 
     <!-- Image Element -->
     <div
-        v-if="element.type === 'image'"
-        class="element-image"
-        :style="{
-          width: element.width + 'px',
-          height: element.height ? element.height + 'px' : 'auto',
-          opacity: element.opacity
-        }"
+      v-if="element.type === 'image'"
+      class="element-image"
+      :style="{
+        width: element.width + 'px',
+        height: element.height ? element.height + 'px' : 'auto',
+        opacity: element.opacity,
+      }"
     >
-      <img :src="element.src" alt="Uploaded image" draggable="false">
+      <img :src="element.src" alt="Uploaded image" draggable="false" />
     </div>
 
     <!-- 8 Resize-Handles (Ecken + Kanten) für alle Elemente -->
@@ -72,10 +74,10 @@
       <div class="resize-handle sw" @mousedown.stop="emit('resizeStart', $event, 'sw')"></div>
       <div class="resize-handle se" @mousedown.stop="emit('resizeStart', $event, 'se')"></div>
       <!-- Kanten -->
-      <div class="resize-handle n"  @mousedown.stop="emit('resizeStart', $event, 'n')"></div>
-      <div class="resize-handle s"  @mousedown.stop="emit('resizeStart', $event, 's')"></div>
-      <div class="resize-handle e"  @mousedown.stop="emit('resizeStart', $event, 'e')"></div>
-      <div class="resize-handle w"  @mousedown.stop="emit('resizeStart', $event, 'w')"></div>
+      <div class="resize-handle n" @mousedown.stop="emit('resizeStart', $event, 'n')"></div>
+      <div class="resize-handle s" @mousedown.stop="emit('resizeStart', $event, 's')"></div>
+      <div class="resize-handle e" @mousedown.stop="emit('resizeStart', $event, 'e')"></div>
+      <div class="resize-handle w" @mousedown.stop="emit('resizeStart', $event, 'w')"></div>
     </div>
   </div>
 </template>
@@ -104,15 +106,15 @@ const inlineTextareaRef = ref<HTMLTextAreaElement | null>(null)
 
 // Focus + select the inline editor whenever this element enters edit mode
 watch(
-    () => props.editing,
-    (isEditing) => {
-      if (isEditing) {
-        nextTick(() => {
-          inlineTextareaRef.value?.focus()
-          inlineTextareaRef.value?.select()
-        })
-      }
-    },
+  () => props.editing,
+  (isEditing) => {
+    if (isEditing) {
+      nextTick(() => {
+        inlineTextareaRef.value?.focus()
+        inlineTextareaRef.value?.select()
+      })
+    }
+  }
 )
 </script>
 
@@ -188,7 +190,9 @@ watch(
 }
 
 .canvas-element.editing {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 12px color-mix(in oklab, var(--accent) 25%, transparent);
+  box-shadow:
+    0 0 0 2px var(--accent),
+    0 0 12px color-mix(in oklab, var(--accent) 25%, transparent);
   border-radius: 4px;
 }
 
@@ -212,9 +216,13 @@ watch(
   border: 2.5px solid white;
   border-radius: 50%;
   pointer-events: all;
-  box-shadow: 0 0 0 1.5px var(--accent), 0 2px 6px rgba(0,0,0,0.5);
+  box-shadow:
+    0 0 0 1.5px var(--accent),
+    0 2px 6px rgba(0, 0, 0, 0.5);
   transform: translate(-50%, -50%);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 
 .resize-handle::after {
@@ -225,21 +233,56 @@ watch(
 }
 
 .resize-handle:hover {
-  box-shadow: 0 0 0 1.5px var(--accent), 0 0 0 5px rgba(102, 126, 234, 0.35), 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow:
+    0 0 0 1.5px var(--accent),
+    0 0 0 5px rgba(102, 126, 234, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.5);
   transform: translate(-50%, -50%) scale(1.3);
 }
 
 /* Ecken */
-.resize-handle.nw { top: 0;    left: 0;    cursor: nw-resize; }
-.resize-handle.ne { top: 0;    left: 100%; cursor: ne-resize; }
-.resize-handle.sw { top: 100%; left: 0;    cursor: sw-resize; }
-.resize-handle.se { top: 100%; left: 100%; cursor: se-resize; }
+.resize-handle.nw {
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+}
+.resize-handle.ne {
+  top: 0;
+  left: 100%;
+  cursor: ne-resize;
+}
+.resize-handle.sw {
+  top: 100%;
+  left: 0;
+  cursor: sw-resize;
+}
+.resize-handle.se {
+  top: 100%;
+  left: 100%;
+  cursor: se-resize;
+}
 
 /* Kanten */
-.resize-handle.n  { top: 0;    left: 50%;  cursor: n-resize; }
-.resize-handle.s  { top: 100%; left: 50%;  cursor: s-resize; }
-.resize-handle.e  { top: 50%;  left: 100%; cursor: e-resize; }
-.resize-handle.w  { top: 50%;  left: 0;    cursor: w-resize; }
+.resize-handle.n {
+  top: 0;
+  left: 50%;
+  cursor: n-resize;
+}
+.resize-handle.s {
+  top: 100%;
+  left: 50%;
+  cursor: s-resize;
+}
+.resize-handle.e {
+  top: 50%;
+  left: 100%;
+  cursor: e-resize;
+}
+.resize-handle.w {
+  top: 50%;
+  left: 0;
+  cursor: w-resize;
+}
 
 .resize-handle svg {
   display: none;

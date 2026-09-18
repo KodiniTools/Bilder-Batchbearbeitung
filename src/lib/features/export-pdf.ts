@@ -3,12 +3,12 @@ import jsPDF from 'jspdf'
 /**
  * 🎨 VOLLSTÄNDIGE PDF-EXPORT-LÖSUNG
  * Unterstützt: Benutzerdefinierte Startseite, Mehrere Kommentarseiten, Bilder, Texte, Formatierungen
- * 
+ *
  * ✨ OPTIMIERUNGEN FÜR KLEINE DATEIGRÖSSEN:
  * 1. JPEG-Komprimierung statt PNG (bis zu 90% kleiner)
  * 2. Automatisches Herunterskalieren zu großer Bilder (Standard: max 1920px)
  * 3. Konfigurierbare Qualität (0.0 - 1.0)
- * 
+ *
  * 📊 ERWARTETE DATEIGRÖSSEN:
  * - 8 Seiten mit Bildern: ca. 2-5 MB (statt 18+ MB ohne Optimierung)
  * - Pro Seite: ca. 300-600 KB
@@ -93,7 +93,7 @@ export interface PdfExportSettings {
 
 /**
  * Exportiert Bilder mit optionalen Kommentarseiten als PDF
- * 
+ *
  * @param images - Array von Bildern (mit canvas oder dataUrl)
  * @param settings - Export-Einstellungen
  * @param filename - Dateiname für das PDF (optional)
@@ -116,26 +116,30 @@ export async function exportMultipleImagesAsPdf(
     imageQuality,
     maxImageDimension = 1920, // Standard: 1920px (Full HD)
     optimizeSize = false,
-    orientation = 'portrait'
+    orientation = 'portrait',
   } = settings
 
   // Bestimme JPEG-Qualität:
   // - Wenn imageQuality gesetzt ist, verwende diesen Wert
   // - Wenn optimizeSize=true, verwende niedrigere Qualität (0.65) für kleinere Dateien
   // - Ansonsten verwende gute Standard-Qualität (0.75)
-  const jpegQuality = imageQuality !== undefined ? imageQuality : (optimizeSize ? 0.65 : 0.75)
+  const jpegQuality = imageQuality !== undefined ? imageQuality : optimizeSize ? 0.65 : 0.75
 
   const pdf = new jsPDF({
     orientation: orientation,
     unit: 'mm',
-    format: 'a4'
+    format: 'a4',
   })
 
   let pageAdded = false
 
   console.log('📄 Starte PDF-Export...')
-  console.log(`📊 ${images.length} Bilder, ${commentPageElements.length} Kommentar-Elemente, ${frontPageElements.length} Startseiten-Elemente`)
-  console.log(`🎨 JPEG-Qualität: ${(jpegQuality * 100).toFixed(0)}% ${optimizeSize ? '(optimiert)' : ''}`)
+  console.log(
+    `📊 ${images.length} Bilder, ${commentPageElements.length} Kommentar-Elemente, ${frontPageElements.length} Startseiten-Elemente`
+  )
+  console.log(
+    `🎨 JPEG-Qualität: ${(jpegQuality * 100).toFixed(0)}% ${optimizeSize ? '(optimiert)' : ''}`
+  )
   console.log(`📏 Max. Bildauflösung: ${maxImageDimension}px`)
 
   // ========================================
@@ -144,7 +148,14 @@ export async function exportMultipleImagesAsPdf(
   // Prüfe ob benutzerdefinierte Startseite aktiviert ist UND Elemente vorhanden sind
   if (includeCustomFrontPage && frontPageElements.length > 0) {
     console.log('✨ Erstelle benutzerdefinierte Startseite...')
-    await createCustomFrontPage(pdf, frontPageElements, jpegQuality, maxImageDimension, orientation, author)
+    await createCustomFrontPage(
+      pdf,
+      frontPageElements,
+      jpegQuality,
+      maxImageDimension,
+      orientation,
+      author
+    )
     pageAdded = true
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
@@ -158,15 +169,21 @@ export async function exportMultipleImagesAsPdf(
   // ========================================
   if (includeCommentPages && commentPageElements.length > 0) {
     console.log('🎨 Erstelle Kommentar-Seiten...')
-    
+
     if (pageAdded) {
       pdf.addPage()
     }
-    
+
     // Automatisch page-Nummern hinzufügen wenn nicht vorhanden
     const elementsWithPages = assignPageNumbersIfMissing(commentPageElements)
-    
-    await createCommentPagesFromElements(pdf, elementsWithPages, jpegQuality, maxImageDimension, orientation)
+
+    await createCommentPagesFromElements(
+      pdf,
+      elementsWithPages,
+      jpegQuality,
+      maxImageDimension,
+      orientation
+    )
     pageAdded = true
   }
 
@@ -175,7 +192,7 @@ export async function exportMultipleImagesAsPdf(
   // ========================================
   if (includeImages && images.length > 0) {
     console.log('🖼️ Füge Bilder hinzu...')
-    
+
     for (let i = 0; i < images.length; i++) {
       const image = images[i]
 
@@ -234,7 +251,7 @@ export async function exportMultipleImagesAsPdf(
           const filenameWidth = pdf.getTextWidth(filename)
           pdf.text(filename, (pageWidth - filenameWidth) / 2, y + imgHeight + 5)
         }
-        
+
         console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
       } catch (error) {
         console.error(`❌ Fehler bei Bild ${i}:`, error)
@@ -249,7 +266,7 @@ export async function exportMultipleImagesAsPdf(
   // ========================================
   const finalFilename = filename || `bilder-export-${new Date().toISOString().slice(0, 10)}.pdf`
   pdf.save(finalFilename)
-  
+
   console.log('✅ PDF erfolgreich gespeichert:', finalFilename)
 }
 
@@ -272,18 +289,22 @@ export async function exportImagesWithComments(
   },
   filename: string
 ): Promise<void> {
-  await exportMultipleImagesAsPdf(images, {
-    title: 'Bildersammlung',
-    author: settings.author,
-    includeTitlePage: !settings.includeCustomFrontPage, // Automatische Titelseite nur wenn keine benutzerdefinierte
-    includeCustomFrontPage: settings.includeCustomFrontPage,
-    frontPageElements: settings.frontPageElements,
-    includeCommentPages: settings.includeCommentPages,
-    commentPageElements: settings.commentPageElements,
-    includeFileName: true,
-    includeImages: true,
-    orientation: settings.orientation || 'portrait'
-  }, filename)
+  await exportMultipleImagesAsPdf(
+    images,
+    {
+      title: 'Bildersammlung',
+      author: settings.author,
+      includeTitlePage: !settings.includeCustomFrontPage, // Automatische Titelseite nur wenn keine benutzerdefinierte
+      includeCustomFrontPage: settings.includeCustomFrontPage,
+      frontPageElements: settings.frontPageElements,
+      includeCommentPages: settings.includeCommentPages,
+      commentPageElements: settings.commentPageElements,
+      includeFileName: true,
+      includeImages: true,
+      orientation: settings.orientation || 'portrait',
+    },
+    filename
+  )
 }
 
 export interface ExportSettings {
@@ -489,35 +510,35 @@ async function renderFrontPageImageOnCanvas(
  */
 function assignPageNumbersIfMissing(elements: CanvasElement[]): CanvasElement[] {
   // Wenn alle Elemente bereits page-Nummern haben, nichts tun
-  if (elements.every(el => el.page !== undefined)) {
+  if (elements.every((el) => el.page !== undefined)) {
     return elements
   }
-  
+
   console.log('⚠️ Einige Elemente haben keine page-Nummer, weise automatisch zu...')
-  
+
   // Sortiere nach Y-Position
   const sorted = [...elements].sort((a, b) => a.y - b.y)
-  
+
   // Gruppiere Elemente die nah beieinander sind auf die gleiche Seite
   const pageHeight = 1123 // A4 bei 96 DPI
   let currentPage = 1
   let lastY = 0
-  
-  return sorted.map(element => {
+
+  return sorted.map((element) => {
     if (element.page !== undefined) {
       return element
     }
-    
+
     // Wenn Element viel weiter unten ist, neue Seite
     if (element.y - lastY > pageHeight * 0.9) {
       currentPage++
     }
-    
+
     lastY = element.y
-    
+
     return {
       ...element,
-      page: currentPage
+      page: currentPage,
     }
   })
 }
@@ -525,12 +546,7 @@ function assignPageNumbersIfMissing(elements: CanvasElement[]): CanvasElement[] 
 /**
  * Erstellt eine automatische Titel-Seite
  */
-function createTitlePage(
-  pdf: jsPDF,
-  title: string,
-  imageCount: number,
-  author?: string
-): void {
+function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?: string): void {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
 
@@ -564,7 +580,7 @@ function createTitlePage(
   const dateText = new Date().toLocaleDateString('de-DE', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
   const dateWidth = pdf.getTextWidth(dateText)
   pdf.text(dateText, (pageWidth - dateWidth) / 2, pageHeight / 3 + 50)
@@ -594,8 +610,8 @@ async function createCommentPagesFromElements(
 
   // Gruppiere Elemente nach Seiten
   const elementsByPage = new Map<number, CanvasElement[]>()
-  
-  elements.forEach(element => {
+
+  elements.forEach((element) => {
     const pageNum = element.page || 1
     if (!elementsByPage.has(pageNum)) {
       elementsByPage.set(pageNum, [])
@@ -620,8 +636,16 @@ async function createCommentPagesFromElements(
     }
 
     console.log(`  📝 Rendere Seite ${pageNum} mit ${pageElements.length} Elementen`)
-    
-    await renderSingleCommentPage(pdf, pageElements, pageNum, pageNumbers.length, jpegQuality, maxImageDimension, orientation)
+
+    await renderSingleCommentPage(
+      pdf,
+      pageElements,
+      pageNum,
+      pageNumbers.length,
+      jpegQuality,
+      maxImageDimension,
+      orientation
+    )
   }
 }
 
@@ -698,7 +722,7 @@ function renderTextElement(
   // Schriftgröße: Canvas-px → PDF-Punkte
   // fontSizePt = fontSizePx × (mm pro Canvas-px) / (mm pro Punkt)
   const fontSizePx = element.fontSize || 24
-  const fontSizePt = fontSizePx * scaleY / 0.3528
+  const fontSizePt = (fontSizePx * scaleY) / 0.3528
   pdf.setFontSize(fontSizePt)
 
   // Schrift-Style setzen
@@ -734,7 +758,7 @@ function renderTextElement(
   const explicitLines = element.content.split('\n')
   const allLines: string[] = []
 
-  explicitLines.forEach(line => {
+  explicitLines.forEach((line) => {
     if (line.trim() === '') {
       allLines.push('')
     } else {
@@ -785,15 +809,15 @@ async function renderImageElement(
       console.log('  🔄 Konvertiere Kommentar-Bild von PNG zu JPEG...')
       imageSrc = await resizeAndConvertDataUrl(element.src, maxImageDimension, jpegQuality)
     }
-    
+
     // Konvertiere Koordinaten und Dimensionen
     const x = element.x * scaleX
     const y = element.y * scaleY
-    
+
     // Hole Bild-Eigenschaften
     const imgProps = pdf.getImageProperties(imageSrc)
     const imgAspectRatio = imgProps.width / imgProps.height
-    
+
     // Berechne skalierte Größe
     const width = (element.width || 200) * scaleX
     const height = width / imgAspectRatio
@@ -815,7 +839,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
+        b: parseInt(result[3], 16),
       }
     : null
 }
@@ -827,16 +851,16 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 function resizeCanvas(sourceCanvas: HTMLCanvasElement, maxDimension: number): HTMLCanvasElement {
   const width = sourceCanvas.width
   const height = sourceCanvas.height
-  
+
   // Wenn Bild bereits klein genug ist, Original zurückgeben
   if (width <= maxDimension && height <= maxDimension) {
     return sourceCanvas
   }
-  
+
   // Berechne neue Dimensionen unter Beibehaltung des Seitenverhältnisses
   let newWidth: number
   let newHeight: number
-  
+
   if (width > height) {
     newWidth = maxDimension
     newHeight = Math.round((height / width) * maxDimension)
@@ -844,25 +868,27 @@ function resizeCanvas(sourceCanvas: HTMLCanvasElement, maxDimension: number): HT
     newHeight = maxDimension
     newWidth = Math.round((width / height) * maxDimension)
   }
-  
+
   // Erstelle neues Canvas mit reduzierten Dimensionen
   const resizedCanvas = document.createElement('canvas')
   resizedCanvas.width = newWidth
   resizedCanvas.height = newHeight
-  
+
   const ctx = resizedCanvas.getContext('2d')
   if (!ctx) {
     console.warn('⚠️ Konnte Canvas-Context nicht erstellen, verwende Original')
     return sourceCanvas
   }
-  
+
   // Zeichne Bild in reduzierter Größe (mit Antialiasing für bessere Qualität)
   ctx.imageSmoothingEnabled = true
   ctx.imageSmoothingQuality = 'high'
   ctx.drawImage(sourceCanvas, 0, 0, newWidth, newHeight)
-  
-  console.log(`  📏 Bild skaliert: ${width}x${height} → ${newWidth}x${newHeight} (${((newWidth * newHeight) / (width * height) * 100).toFixed(1)}% der Originalgröße)`)
-  
+
+  console.log(
+    `  📏 Bild skaliert: ${width}x${height} → ${newWidth}x${newHeight} (${(((newWidth * newHeight) / (width * height)) * 100).toFixed(1)}% der Originalgröße)`
+  )
+
   return resizedCanvas
 }
 
@@ -870,15 +896,19 @@ function resizeCanvas(sourceCanvas: HTMLCanvasElement, maxDimension: number): HT
  * Konvertiert und skaliert eine dataUrl zu JPEG
  * WICHTIG: Konvertiert PNG zu JPEG für drastisch kleinere Dateien!
  */
-async function resizeAndConvertDataUrl(dataUrl: string, maxDimension: number, quality: number): Promise<string> {
+async function resizeAndConvertDataUrl(
+  dataUrl: string,
+  maxDimension: number,
+  quality: number
+): Promise<string> {
   return new Promise((resolve, _reject) => {
     const img = new Image()
-    
+
     img.onload = () => {
       // Berechne Dimensionen (immer neu erstellen für JPEG-Konvertierung)
       let newWidth: number
       let newHeight: number
-      
+
       // Wenn Bild klein genug ist, behalte Original-Größe
       if (img.width <= maxDimension && img.height <= maxDimension) {
         newWidth = img.width
@@ -893,28 +923,28 @@ async function resizeAndConvertDataUrl(dataUrl: string, maxDimension: number, qu
           newWidth = Math.round((img.width / img.height) * maxDimension)
         }
       }
-      
+
       // Erstelle Canvas und zeichne Bild
       const canvas = document.createElement('canvas')
       canvas.width = newWidth
       canvas.height = newHeight
-      
+
       const ctx = canvas.getContext('2d')
       if (!ctx) {
         console.warn('⚠️ Konnte Canvas-Context nicht erstellen')
         resolve(dataUrl)
         return
       }
-      
+
       // Zeichne mit High-Quality Antialiasing
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(img, 0, 0, newWidth, newHeight)
-      
+
       // IMMER zu JPEG konvertieren (auch wenn Original PNG war!)
       const originalFormat = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG'
       const jpegDataUrl = canvas.toDataURL('image/jpeg', quality)
-      
+
       if (img.width !== newWidth || img.height !== newHeight) {
         console.log(`  📏 Bild skaliert: ${img.width}x${img.height} → ${newWidth}x${newHeight}`)
       }
@@ -922,17 +952,19 @@ async function resizeAndConvertDataUrl(dataUrl: string, maxDimension: number, qu
         const originalSize = Math.round(dataUrl.length / 1024)
         const newSize = Math.round(jpegDataUrl.length / 1024)
         const savings = Math.round((1 - newSize / originalSize) * 100)
-        console.log(`  🔄 PNG→JPEG konvertiert: ${originalSize}KB → ${newSize}KB (${savings}% kleiner)`)
+        console.log(
+          `  🔄 PNG→JPEG konvertiert: ${originalSize}KB → ${newSize}KB (${savings}% kleiner)`
+        )
       }
-      
+
       resolve(jpegDataUrl)
     }
-    
+
     img.onerror = () => {
       console.warn('⚠️ Fehler beim Laden des Bildes, verwende Original')
       resolve(dataUrl)
     }
-    
+
     img.src = dataUrl
   })
 }

@@ -28,7 +28,7 @@
           max="300"
           :value="selectedText.fontSize"
           @input="emit('update-text', { fontSize: +($event.target as HTMLInputElement).value })"
-        >
+        />
         <span class="size-unit">px</span>
       </div>
 
@@ -50,7 +50,7 @@
           class="color-input"
           :value="selectedText.color"
           @input="emit('update-text', { color: ($event.target as HTMLInputElement).value })"
-        >
+        />
       </div>
 
       <div class="ctrl-row">
@@ -62,35 +62,45 @@
             :class="{ 'btn-active': selectedText.bold }"
             :title="t('imageEditor.text.bold')"
             @click="emit('update-text', { bold: !selectedText.bold })"
-          ><b>B</b></button>
+          >
+            <b>B</b>
+          </button>
           <button
             type="button"
             class="btn btn-xs"
             :class="{ 'btn-active': selectedText.italic }"
             :title="t('imageEditor.text.italic')"
             @click="emit('update-text', { italic: !selectedText.italic })"
-          ><i>I</i></button>
+          >
+            <i>I</i>
+          </button>
           <button
             type="button"
             class="btn btn-xs"
             :class="{ 'btn-active': selectedText.align === 'left' }"
             :title="t('imageEditor.text.alignLeft')"
             @click="emit('update-text', { align: 'left' })"
-          ><i class="fa-solid fa-align-left"></i></button>
+          >
+            <i class="fa-solid fa-align-left"></i>
+          </button>
           <button
             type="button"
             class="btn btn-xs"
             :class="{ 'btn-active': selectedText.align === 'center' }"
             :title="t('imageEditor.text.alignCenter')"
             @click="emit('update-text', { align: 'center' })"
-          ><i class="fa-solid fa-align-center"></i></button>
+          >
+            <i class="fa-solid fa-align-center"></i>
+          </button>
           <button
             type="button"
             class="btn btn-xs"
             :class="{ 'btn-active': selectedText.align === 'right' }"
             :title="t('imageEditor.text.alignRight')"
             @click="emit('update-text', { align: 'right' })"
-          ><i class="fa-solid fa-align-right"></i></button>
+          >
+            <i class="fa-solid fa-align-right"></i>
+          </button>
         </div>
       </div>
 
@@ -105,7 +115,7 @@
             step="1"
             :value="selectedText.opacity"
             @input="emit('update-text', { opacity: +($event.target as HTMLInputElement).value })"
-          >
+          />
           <span class="filter-value">{{ selectedText.opacity }}%</span>
         </div>
       </div>
@@ -119,7 +129,7 @@
           class="color-input"
           :value="selectedText.strokeColor"
           @input="emit('update-text', { strokeColor: ($event.target as HTMLInputElement).value })"
-        >
+        />
       </div>
       <div class="filter-row">
         <label class="filter-label">{{ t('imageEditor.text.strokeWidth') }}</label>
@@ -131,8 +141,10 @@
             max="20"
             step="0.5"
             :value="selectedText.strokeWidth"
-            @input="emit('update-text', { strokeWidth: +($event.target as HTMLInputElement).value })"
-          >
+            @input="
+              emit('update-text', { strokeWidth: +($event.target as HTMLInputElement).value })
+            "
+          />
           <span class="filter-value">{{ selectedText.strokeWidth }}px</span>
         </div>
       </div>
@@ -146,7 +158,7 @@
           class="color-input"
           :value="selectedText.shadowColor"
           @input="emit('update-text', { shadowColor: ($event.target as HTMLInputElement).value })"
-        >
+        />
       </div>
       <div class="filter-row">
         <label class="filter-label">{{ t('imageEditor.text.shadowOpacity') }}</label>
@@ -158,8 +170,10 @@
             max="100"
             step="1"
             :value="selectedText.shadowOpacity"
-            @input="emit('update-text', { shadowOpacity: +($event.target as HTMLInputElement).value })"
-          >
+            @input="
+              emit('update-text', { shadowOpacity: +($event.target as HTMLInputElement).value })
+            "
+          />
           <span class="filter-value">{{ selectedText.shadowOpacity }}%</span>
         </div>
       </div>
@@ -174,7 +188,7 @@
             step="1"
             :value="selectedText.shadowBlur"
             @input="emit('update-text', { shadowBlur: +($event.target as HTMLInputElement).value })"
-          >
+          />
           <span class="filter-value">{{ selectedText.shadowBlur }}px</span>
         </div>
       </div>
@@ -188,8 +202,10 @@
             max="20"
             step="1"
             :value="selectedText.shadowOffsetX"
-            @input="emit('update-text', { shadowOffsetX: +($event.target as HTMLInputElement).value })"
-          >
+            @input="
+              emit('update-text', { shadowOffsetX: +($event.target as HTMLInputElement).value })
+            "
+          />
           <span class="filter-value">{{ selectedText.shadowOffsetX }}px</span>
         </div>
       </div>
@@ -203,8 +219,10 @@
             max="20"
             step="1"
             :value="selectedText.shadowOffsetY"
-            @input="emit('update-text', { shadowOffsetY: +($event.target as HTMLInputElement).value })"
-          >
+            @input="
+              emit('update-text', { shadowOffsetY: +($event.target as HTMLInputElement).value })
+            "
+          />
           <span class="filter-value">{{ selectedText.shadowOffsetY }}px</span>
         </div>
       </div>
@@ -212,7 +230,7 @@
       <button
         type="button"
         class="btn btn-xs btn-ghost"
-        style="color: #ef4444; align-self: flex-start;"
+        style="color: #ef4444; align-self: flex-start"
         @click="emit('delete', selectedText.id)"
       >
         <i class="fa-solid fa-trash"></i>

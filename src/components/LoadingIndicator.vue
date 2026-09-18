@@ -54,17 +54,12 @@ defineExpose({
   show,
   showWithProgress,
   updateProgress,
-  hide
+  hide,
 })
 </script>
 
 <template>
-  <div
-    v-if="isVisible"
-    class="loading-indicator active"
-    role="status"
-    aria-live="assertive"
-  >
+  <div v-if="isVisible" class="loading-indicator active" role="status" aria-live="assertive">
     <div class="box">
       <div class="spinner" aria-hidden="true"></div>
       <div class="loading-content">
@@ -73,10 +68,7 @@ defineExpose({
         <!-- Fortschrittsanzeige -->
         <div v-if="showProgress" class="progress-container">
           <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style="{ width: `${progressPercent}%` }"
-            ></div>
+            <div class="progress-fill" :style="{ width: `${progressPercent}%` }"></div>
           </div>
           <div class="progress-info">
             <span class="progress-count">{{ progressText }}</span>
@@ -180,18 +172,17 @@ defineExpose({
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   animation: shimmer 1.5s infinite;
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .progress-info {

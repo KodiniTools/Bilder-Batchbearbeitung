@@ -85,7 +85,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
       page.elements.map((element) => ({
         ...element,
         page: pageIndex + 1,
-      })),
+      }))
     )
   }
 
@@ -193,7 +193,6 @@ export function useCommentPages(options: UseCommentPagesOptions) {
       img.src = result
     }
     reader.readAsDataURL(file)
-
     ;(event.target as HTMLInputElement).value = ''
   }
 

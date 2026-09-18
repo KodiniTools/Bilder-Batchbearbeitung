@@ -17,7 +17,9 @@
         @mousedown.stop
         @touchstart.stop
         @click.stop="$emit('deleteItem', item.id)"
-      >×</button>
+      >
+        ×
+      </button>
     </div>
   </div>
 </template>
@@ -34,7 +36,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:selectedId': [id: string | null]
   'update:items': [items: TextItem[]]
-  'deleteItem': [id: string]
+  deleteItem: [id: string]
 }>()
 
 const overlayRef = ref<HTMLDivElement | null>(null)
@@ -54,7 +56,7 @@ function getOverlaySize() {
 
 function startDrag(event: MouseEvent | TouchEvent, id: string) {
   emit('update:selectedId', id)
-  const item = props.items.find(i => i.id === id)
+  const item = props.items.find((i) => i.id === id)
   if (!item) return
 
   const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
@@ -84,9 +86,13 @@ function onMove(event: MouseEvent | TouchEvent) {
   const dx = ((clientX - dragStartClientX) / w) * 100
   const dy = ((clientY - dragStartClientY) / h) * 100
 
-  const updated = props.items.map(i =>
+  const updated = props.items.map((i) =>
     i.id === dragItemId
-      ? { ...i, x: Math.max(0, Math.min(100, itemStartX + dx)), y: Math.max(0, Math.min(95, itemStartY + dy)) }
+      ? {
+          ...i,
+          x: Math.max(0, Math.min(100, itemStartX + dx)),
+          y: Math.max(0, Math.min(95, itemStartY + dy)),
+        }
       : i
   )
   emit('update:items', updated)
@@ -104,11 +110,14 @@ onUnmounted(stopDrag)
 
 function itemPositionStyle(item: TextItem) {
   const transformX =
-    item.align === 'center' ? 'translateX(-50%)' :
-    item.align === 'right'  ? 'translateX(-100%)' : 'none'
+    item.align === 'center'
+      ? 'translateX(-50%)'
+      : item.align === 'right'
+        ? 'translateX(-100%)'
+        : 'none'
   return {
     left: item.x + '%',
-    top:  item.y + '%',
+    top: item.y + '%',
     transform: transformX,
   }
 }
@@ -130,13 +139,13 @@ function textBodyStyle(item: TextItem) {
   const textShadow = hasTextShadow ? `${sx}px ${sy}px ${sb}px ${hexToRgba(sc, so)}` : 'none'
   const sw = item.strokeWidth ?? 0
   return {
-    fontSize:   item.fontSize + 'px',
+    fontSize: item.fontSize + 'px',
     fontFamily: item.fontFamily,
-    color:      item.color,
+    color: item.color,
     fontWeight: item.bold ? 'bold' : 'normal',
-    fontStyle:  item.italic ? 'italic' : 'normal',
-    textAlign:  item.align,
-    opacity:    item.opacity / 100,
+    fontStyle: item.italic ? 'italic' : 'normal',
+    textAlign: item.align,
+    opacity: item.opacity / 100,
     textShadow,
     lineHeight: 1.35,
     WebkitTextStroke: sw > 0 ? `${sw}px ${item.strokeColor ?? '#000000'}` : '0',

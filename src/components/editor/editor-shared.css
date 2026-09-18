@@ -33,9 +33,16 @@
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
-.ctrl-input:focus { outline: none; border-color: var(--accent); }
+.ctrl-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
 
-.ctrl-row { display: flex; align-items: center; gap: var(--space-2); }
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
 .ctrl-sublabel {
   font-size: 0.78rem;
@@ -44,8 +51,15 @@
   flex-shrink: 0;
 }
 
-.btn-cluster { display: flex; gap: 4px; flex-wrap: wrap; }
-.btn-row { display: flex; gap: var(--space-2); }
+.btn-cluster {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.btn-row {
+  display: flex;
+  gap: var(--space-2);
+}
 
 /* ── Text section ────────────────────────────────────────── */
 .text-add-btn {
@@ -75,7 +89,10 @@
   transition: border-color 0.15s;
   min-height: 60px;
 }
-.ctrl-textarea:focus { outline: none; border-color: var(--accent); }
+.ctrl-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
 
 .ctrl-select-sm {
   flex: 1;
@@ -113,8 +130,13 @@
   text-align: left;
   transition: all 0.15s;
 }
-.text-list-item:hover { border-color: var(--accent); }
-.text-list-item i { color: var(--muted); flex-shrink: 0; }
+.text-list-item:hover {
+  border-color: var(--accent);
+}
+.text-list-item i {
+  color: var(--muted);
+  flex-shrink: 0;
+}
 
 .text-list-preview {
   overflow: hidden;
@@ -130,7 +152,11 @@
   gap: 6px;
   margin: 0;
 }
-.text-hint i { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+.text-hint i {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 /* ── Filter sliders ──────────────────────────────────────── */
 .filter-row {
@@ -173,7 +199,7 @@
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .filter-slider::-moz-range-thumb {
@@ -195,7 +221,11 @@
 }
 
 /* ── Size row ────────────────────────────────────────────── */
-.size-row { display: flex; align-items: center; gap: 6px; }
+.size-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
 .size-label {
   font-size: 0.78rem;
@@ -215,8 +245,14 @@
   text-align: center;
   transition: border-color 0.15s;
 }
-.size-input:focus { outline: none; border-color: var(--accent); }
-.size-unit { font-size: 0.75rem; color: var(--muted); }
+.size-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.size-unit {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
 
 .link-btn {
   width: 28px;
@@ -232,11 +268,22 @@
   transition: all 0.15s;
   flex-shrink: 0;
 }
-.link-btn:hover { border-color: var(--accent); color: var(--accent); }
-.link-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
+.link-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.link-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
 
 /* ── Export row ──────────────────────────────────────────── */
-.export-row { display: flex; gap: var(--space-2); align-items: center; }
+.export-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
 
 .ctrl-select {
   flex: 1;
@@ -265,12 +312,26 @@
   gap: 6px;
   white-space: nowrap;
 }
-.btn:hover:not(:disabled) { border-color: var(--accent); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
-.btn-sm { padding: 6px 12px; font-size: 0.82rem; }
-.btn-xs { padding: 3px 8px; font-size: 0.78rem; }
-.btn-icon-sm { padding: 5px 10px; font-size: 0.8rem; }
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+.btn-xs {
+  padding: 3px 8px;
+  font-size: 0.78rem;
+}
+.btn-icon-sm {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
 
 .btn-ghost {
   background: transparent;
@@ -311,6 +372,16 @@
 }
 
 .btn-swap-enter-active,
-.btn-swap-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
-.btn-swap-enter-from { opacity: 0; transform: translateY(4px); }
-.btn-swap-leave-to { opacity: 0; transform: translateY(-4px); }
+.btn-swap-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.btn-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.btn-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}

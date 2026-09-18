@@ -22,11 +22,16 @@ import { ImageProcessor } from '@/lib/core/image-processor'
 import {
   exportMultipleImagesAsPdf,
   type ExportSettings,
-  type ImageData
+  type ImageData,
 } from '@/lib/features/export-pdf'
 
 import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
-import { downloadSvgBatch, downloadSingleSvg, checkSvgServiceAvailable, type SvgProgressCallback } from '@/lib/features/export-svg'
+import {
+  downloadSvgBatch,
+  downloadSingleSvg,
+  checkSvgServiceAvailable,
+  type SvgProgressCallback,
+} from '@/lib/features/export-svg'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
@@ -63,7 +68,7 @@ function closeWizard() {
 }
 
 function handleWizardNewProject() {
-  imageStore.images.forEach(img => img.selected = true)
+  imageStore.images.forEach((img) => (img.selected = true))
   imageStore.removeSelectedImages()
   closeWizard()
 }
@@ -108,9 +113,8 @@ function saveEditorChanges(image: ImageObject) {
 }
 
 function handleExportPdf(mode: 'all' | 'selected') {
-  const images = mode === 'all'
-    ? imageStore.images
-    : imageStore.images.filter(img => img.selected)
+  const images =
+    mode === 'all' ? imageStore.images : imageStore.images.filter((img) => img.selected)
 
   if (images.length === 0) {
     alert(t('alerts.noImagesToExport'))
@@ -158,16 +162,19 @@ async function handleExportConfirm(settings: ExportSettings) {
 
   try {
     if (currentMode === 'pdf-all' || currentMode === 'pdf-selected') {
-      const images = currentMode === 'pdf-all'
-        ? imageStore.images
-        : imageStore.images.filter(img => img.selected)
+      const images =
+        currentMode === 'pdf-all'
+          ? imageStore.images
+          : imageStore.images.filter((img) => img.selected)
 
       const imageDataArray: ImageData[] = await Promise.all(
         images.map(async (img) => {
-          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92, { backgroundColor: '#ffffff' })
+          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92, {
+            backgroundColor: '#ffffff',
+          })
           return {
             dataUrl: dataUrl,
-            originalName: img.outputName || img.file.name
+            originalName: img.outputName || img.file.name,
           }
         })
       )
@@ -191,18 +198,15 @@ async function handleExportConfirm(settings: ExportSettings) {
           commentPageElements: settings.commentPageElements || [],
           includeFileName: true,
           includeImages: true,
-          orientation: settings.orientation || 'portrait'
+          orientation: settings.orientation || 'portrait',
         },
         'bilder-export.pdf'
       )
 
       toast.success(t('toast.pdfSuccess', { count: images.length }))
       showWizard('pdf', images.length)
-
     } else if (currentMode === 'zip') {
-      const imagesToExport = imageStore.hasSelection
-        ? imageStore.selectedImages
-        : imageStore.images
+      const imagesToExport = imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
       const total = imagesToExport.length
 
       loadingIndicator.value?.showWithProgress(
@@ -232,11 +236,8 @@ async function handleExportConfirm(settings: ExportSettings) {
       } finally {
         loadingIndicator.value?.hide()
       }
-
     } else if (currentMode === 'svg') {
-      const imagesToExport = imageStore.hasSelection
-        ? imageStore.selectedImages
-        : imageStore.images
+      const imagesToExport = imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
       const total = imagesToExport.length
 
       loadingIndicator.value?.showWithProgress(
@@ -255,7 +256,7 @@ async function handleExportConfirm(settings: ExportSettings) {
         const svgSettings = {
           colormode: settings.svgColormode || 'color',
           filter_speckle: settings.svgFilterSpeckle || 4,
-          quality: settings.svgQuality || 'high'
+          quality: settings.svgQuality || 'high',
         }
 
         if (total === 1) {
@@ -268,22 +269,25 @@ async function handleExportConfirm(settings: ExportSettings) {
             onSvgProgress
           )
         }
-        toast.success(t('toast.svgSuccess', { count: total }) || `${total} Bilder erfolgreich als SVG exportiert`)
+        toast.success(
+          t('toast.svgSuccess', { count: total }) ||
+            `${total} Bilder erfolgreich als SVG exportiert`
+        )
         showWizard('svg', total)
       } finally {
         loadingIndicator.value?.hide()
       }
-
     } else if (currentMode === 'save') {
-      const images = imageStore.images.filter(img => img.selected)
+      const images = imageStore.images.filter((img) => img.selected)
 
-      const bgColor = (settings.format === 'png' && !settings.pngTransparent)
-        ? (settings.pngBackgroundColor ?? '#ffffff')
-        : undefined
+      const bgColor =
+        settings.format === 'png' && !settings.pngTransparent
+          ? (settings.pngBackgroundColor ?? '#ffffff')
+          : undefined
 
       for (const image of images) {
         await downloadSingleImage(image, settings.format, (settings.quality ?? 92) / 100, bgColor)
-        await new Promise(resolve => setTimeout(resolve, 200))
+        await new Promise((resolve) => setTimeout(resolve, 200))
       }
 
       toast.success(t('toast.saveSuccess', { count: images.length }))
@@ -295,44 +299,53 @@ async function handleExportConfirm(settings: ExportSettings) {
   }
 }
 
-function downloadSingleImage(image: ImageObject, format?: string, quality?: number, backgroundColor?: string): Promise<void> {
+function downloadSingleImage(
+  image: ImageObject,
+  format?: string,
+  quality?: number,
+  backgroundColor?: string
+): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
       const exportFormat = format || image.exportFormat || 'png'
-      const exportQuality = quality !== undefined ? quality : (image.quality || 0.92)
+      const exportQuality = quality !== undefined ? quality : image.quality || 0.92
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
 
       const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
 
-      exportCanvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('Blob-Konvertierung fehlgeschlagen'))
-          return
-        }
+      exportCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Blob-Konvertierung fehlgeschlagen'))
+            return
+          }
 
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
 
-        let fileName = image.outputName || `bild_${Date.now()}`
-        if (!fileName.includes('.')) {
-          fileName += `.${exportFormat}`
-        } else {
-          fileName = fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
-        }
+          let fileName = image.outputName || `bild_${Date.now()}`
+          if (!fileName.includes('.')) {
+            fileName += `.${exportFormat}`
+          } else {
+            fileName = fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
+          }
 
-        link.download = fileName
-        link.style.display = 'none'
+          link.download = fileName
+          link.style.display = 'none'
 
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
 
-        setTimeout(() => {
-          URL.revokeObjectURL(url)
-          resolve()
-        }, 100)
-      }, mimeType, exportQuality)
+          setTimeout(() => {
+            URL.revokeObjectURL(url)
+            resolve()
+          }, 100)
+        },
+        mimeType,
+        exportQuality
+      )
     } catch (error) {
       reject(error)
     }
@@ -340,7 +353,7 @@ function downloadSingleImage(image: ImageObject, format?: string, quality?: numb
 }
 
 async function handleSaveImages() {
-  const images = imageStore.images.filter(img => img.selected)
+  const images = imageStore.images.filter((img) => img.selected)
 
   if (images.length === 0) {
     alert(t('alerts.noImagesToSave'))
@@ -371,16 +384,29 @@ function closeBatchEditPanel() {
   isBatchEditPanelOpen.value = false
 }
 
-function handleBulkRenameConfirm(baseName: string, startNumber: number, separator: string, lowercase: boolean) {
+function handleBulkRenameConfirm(
+  baseName: string,
+  startNumber: number,
+  separator: string,
+  lowercase: boolean
+) {
   const count = imageStore.batchRenameSelectedImages(baseName, startNumber, separator, lowercase)
   closeBulkRenameModal()
   toast.success(t('toast.bulkRenamed', { count }))
 }
 
 function handleKeyboard(event: KeyboardEvent) {
-  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value || isWizardOpen.value) return
+  if (
+    isEditorOpen.value ||
+    isPreviewOpen.value ||
+    isExportModalOpen.value ||
+    isBulkRenameModalOpen.value ||
+    isWizardOpen.value
+  )
+    return
   const target = event.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    return
 
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
   const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey
@@ -430,9 +456,17 @@ function handleKeyboard(event: KeyboardEvent) {
 }
 
 async function handlePaste(event: ClipboardEvent) {
-  if (isEditorOpen.value || isPreviewOpen.value || isExportModalOpen.value || isBulkRenameModalOpen.value || isWizardOpen.value) return
+  if (
+    isEditorOpen.value ||
+    isPreviewOpen.value ||
+    isExportModalOpen.value ||
+    isBulkRenameModalOpen.value ||
+    isWizardOpen.value
+  )
+    return
   const target = event.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    return
 
   const items = event.clipboardData?.items
   if (!items) return
@@ -585,10 +619,7 @@ onUnmounted(() => {
       @confirm="handleBulkRenameConfirm"
     />
 
-    <BatchEditPanel
-      :is-open="isBatchEditPanelOpen"
-      @close="closeBatchEditPanel"
-    />
+    <BatchEditPanel :is-open="isBatchEditPanelOpen" @close="closeBatchEditPanel" />
 
     <WizardNavigator
       :is-open="isWizardOpen"
