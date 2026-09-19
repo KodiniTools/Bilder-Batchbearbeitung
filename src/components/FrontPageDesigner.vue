@@ -371,6 +371,9 @@ export const CUSTOM_FONT_FAMILIES = [
   'Satoshi',
   'Supreme',
   'Switzer',
+  'Tanker',
+  'Telma',
+  'Zodiak',
 ] as const
 
 export interface FrontPageElement {

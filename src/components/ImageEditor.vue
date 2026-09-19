@@ -307,7 +307,7 @@
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms } from '@/lib/core/types'
+import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import ImagePreview from './ImagePreview.vue'
@@ -1141,20 +1141,7 @@ function addTextItem() {
     text: '',
     x: 10,
     y: 10,
-    fontSize: 36,
-    fontFamily: 'Arial, sans-serif',
-    color: '#ffffff',
-    bold: false,
-    italic: false,
-    align: 'left',
-    opacity: 100,
-    strokeWidth: 0,
-    strokeColor: '#000000',
-    shadowColor: '#000000',
-    shadowOpacity: 60,
-    shadowBlur: 0,
-    shadowOffsetX: 2,
-    shadowOffsetY: 2,
+    ...defaultTextStyle,
   }
   textItems.value = [...textItems.value, newItem]
   selectedTextId.value = id
