@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
 const props = defineProps<{
@@ -52,64 +51,6 @@ const imageFormat = computed(() => {
   return format.toUpperCase()
 })
 
-// Computed CSS transform style (border, radius, shadow)
-const transformStyle = computed(() => {
-  if (!props.image) return {}
-  const t = props.image.transforms || defaultTransforms
-  const style: Record<string, string> = {}
-  if (t.borderWidth > 0) {
-    style.border = `${t.borderWidth}px solid ${t.borderColor}`
-  }
-  if (t.borderRadius > 0) {
-    const pct = (t.borderRadius / 200) * 50
-    style.borderRadius = `${pct}%`
-  }
-  if (ImageProcessor.hasVisibleShadow(t)) {
-    const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
-    style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
-  }
-  return style
-})
-
-// Watermark state
-const watermarkActive = computed(() => {
-  if (!props.image) return false
-  const w = props.image.watermark || defaultWatermark
-  return w.enabled && w.text.trim().length > 0
-})
-
-const watermarkCanvasRef = ref<HTMLCanvasElement | null>(null)
-
-function renderWatermarkPreview() {
-  if (!props.image || !watermarkCanvasRef.value) return
-  const w = props.image.watermark || defaultWatermark
-  if (!w.enabled || !w.text.trim()) return
-
-  const srcCanvas = props.image.canvas
-  const wmPreview = watermarkCanvasRef.value
-
-  // Gleiche Dimensionen wie das Preview-Canvas
-  if (previewCanvas.value) {
-    wmPreview.width = previewCanvas.value.width
-    wmPreview.height = previewCanvas.value.height
-  } else {
-    wmPreview.width = srcCanvas.width
-    wmPreview.height = srcCanvas.height
-  }
-
-  // Skaliertes transparentes Canvas erstellen
-  const transparentCanvas = document.createElement('canvas')
-  transparentCanvas.width = wmPreview.width
-  transparentCanvas.height = wmPreview.height
-
-  const wmCanvas = ImageProcessor.getCanvasWithWatermark(transparentCanvas, w)
-  const ctx = wmPreview.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, wmPreview.width, wmPreview.height)
-    ctx.drawImage(wmCanvas, 0, 0)
-  }
-}
-
 function updatePreview() {
   if (!previewCanvas.value || !props.image) return
 
@@ -127,23 +68,42 @@ function updatePreview() {
     1 // Don't scale up
   )
 
-  canvas.width = props.image.canvas.width * scale
-  canvas.height = props.image.canvas.height * scale
-
-  // Draw the image with all filters baked in (matches the exported result)
-  const scaled = document.createElement('canvas')
-  scaled.width = canvas.width
-  scaled.height = canvas.height
-  scaled.getContext('2d')?.drawImage(props.image.canvas, 0, 0, canvas.width, canvas.height)
-  const filtered = ImageProcessor.applyFiltersToCanvas(
-    scaled,
-    props.image.filters || defaultFilters
-  )
+  // Stufe 1 (sofort): Export-Pipeline in reduzierter Auflösung – schnell,
+  // bis auf Resampling-Reihenfolge identisch mit dem Export.
+  const preview = ImageProcessor.getPreviewCanvas(props.image, scale)
+  canvas.width = preview.width
+  canvas.height = preview.height
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  ctx.drawImage(filtered, 0, 0)
+  ctx.drawImage(preview, 0, 0)
 
-  // Wasserzeichen auch aktualisieren
-  nextTick(() => renderWatermarkPreview())
+  // Stufe 2 (Leerlauf): das echte Export-Canvas in voller Auflösung rendern
+  // und hochwertig verkleinern – pixelgenau das, was exportiert wird.
+  scheduleExactPreview(scale)
+}
+
+let exactToken = 0
+
+function scheduleExactPreview(scale: number) {
+  const token = ++exactToken
+  const run = () => {
+    // Verwerfen, wenn inzwischen ein neuerer Render angestoßen wurde
+    if (token !== exactToken || !props.isOpen || !props.image || !previewCanvas.value) return
+    const canvas = previewCanvas.value
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const exact = ImageProcessor.getExportCanvas(props.image)
+    canvas.width = Math.max(1, Math.round(exact.width * scale))
+    canvas.height = Math.max(1, Math.round(exact.height * scale))
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(exact, 0, 0, canvas.width, canvas.height)
+  }
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(run, { timeout: 500 })
+  } else {
+    setTimeout(run, 0)
+  }
 }
 
 function handleClose() {
@@ -179,13 +139,11 @@ watch(
   }
 )
 
-// Wasserzeichen bei Änderung aktualisieren
+// Live-Änderungen (Stapelbearbeitung) bei offener Vorschau nachziehen
 watch(
-  () => props.image?.watermark,
+  () => [props.image?.filters, props.image?.watermark, props.image?.transforms],
   () => {
-    if (props.isOpen && watermarkActive.value) {
-      nextTick(() => renderWatermarkPreview())
-    }
+    if (props.isOpen) updatePreview()
   },
   { deep: true }
 )
@@ -205,12 +163,7 @@ onUnmounted(() => {
       <div class="preview-container" @click.stop>
         <div class="preview-content">
           <div class="preview-canvas-wrapper">
-            <canvas ref="previewCanvas" :style="[transformStyle]"></canvas>
-            <canvas
-              v-if="watermarkActive"
-              ref="watermarkCanvasRef"
-              class="watermark-canvas"
-            ></canvas>
+            <canvas ref="previewCanvas"></canvas>
             <button class="preview-close-float" aria-label="Schließen" @click.stop="handleClose">
               <i class="fa-solid fa-xmark"></i>
             </button>
@@ -442,16 +395,6 @@ onUnmounted(() => {
 .preview-canvas-wrapper {
   position: relative;
   display: inline-block;
-}
-
-/* Wasserzeichen-Canvas-Overlay */
-.watermark-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
 }
 
 /* Transitions */

@@ -2,7 +2,7 @@
 import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
-import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
+import { defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageStore } from '@/stores/imageStore'
 
@@ -21,102 +21,14 @@ const imageStore = useImageStore()
 const previewContainer = ref<HTMLDivElement | null>(null)
 const displayCanvas = ref<HTMLCanvasElement | null>(null)
 
-// Alle Filter werden echt pixelbasiert in das Display-Canvas gebacken
-// (siehe ImageProcessor.applyFiltersToCanvas) – es werden keine CSS-Filter
-// mehr auf das DOM angewendet. `hasActiveFilters` prüft nur noch, ob überhaupt
-// Filter aktiv sind, um bei unveränderten Bildern das rohe Canvas zu zeigen.
-const hasActiveFilters = computed(() => {
-  const f = props.image.filters || defaultFilters
-  return (
-    f.brightness !== 100 ||
-    f.contrast !== 100 ||
-    f.saturation !== 100 ||
-    f.hue !== 0 ||
-    f.grayscale !== 0 ||
-    f.sepia !== 0 ||
-    f.invert !== 0 ||
-    f.temperature !== 0 ||
-    f.vibrance !== 0 ||
-    f.blur > 0 ||
-    f.opacity !== 100 ||
-    f.vignette !== 0
-  )
-})
-
-// Computed CSS transform style (border, radius, shadow)
-const transformStyle = computed(() => {
+// Rahmen, Ecken und Schatten werden – wie Filter und Wasserzeichen – exakt
+// über die Export-Pipeline in das Display-Canvas gebacken (keine CSS-Näherung).
+// Sobald sie aktiv sind, zeigt die Kachel das ganze Ergebnis (object-fit: contain)
+// statt eines 4:3-Ausschnitts, damit Rand und Schatten vollständig sichtbar sind.
+const hasTransforms = computed(() => {
   const t = props.image.transforms || defaultTransforms
-  const style: Record<string, string> = {}
-  if (t.borderWidth > 0) {
-    style.border = `${t.borderWidth}px solid ${t.borderColor}`
-  }
-  if (t.borderRadius > 0) {
-    // Prozent-basiert: Slider 0-200 → 0%-50% (bei 200 = voller Kreis)
-    const pct = (t.borderRadius / 200) * 50
-    style.borderRadius = `${pct}%`
-  }
-  if (ImageProcessor.hasVisibleShadow(t)) {
-    const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
-    style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
-  }
-  return style
+  return t.borderWidth > 0 || t.borderRadius > 0 || ImageProcessor.hasVisibleShadow(t)
 })
-
-// Der Wrapper schneidet ab (overflow: hidden). Für einen sichtbaren Schatten
-// reserviert er denselben Platz, den auch der Export-Renderer hinzufügt.
-const shadowPadding = computed(() =>
-  ImageProcessor.getShadowPadding(props.image.transforms || defaultTransforms)
-)
-const previewWrapperStyle = computed(() =>
-  shadowPadding.value > 0 ? { padding: `${shadowPadding.value}px` } : {}
-)
-// Wasserzeichen-Overlay deckt nur das Bild ab, nicht den Schattenbereich
-const watermarkOverlayStyle = computed(() => {
-  const p = shadowPadding.value
-  return p > 0
-    ? { inset: `${p}px`, width: `calc(100% - ${2 * p}px)`, height: `calc(100% - ${2 * p}px)` }
-    : {}
-})
-
-// Watermark state
-const watermarkActive = computed(() => {
-  const w = props.image.watermark || defaultWatermark
-  return w.enabled && w.text.trim().length > 0
-})
-
-const watermarkCanvasRef = ref<HTMLCanvasElement | null>(null)
-
-// Wasserzeichen auf separates Canvas rendern (Preview)
-function renderWatermarkPreview() {
-  const w = props.image.watermark || defaultWatermark
-  if (!w.enabled || !w.text.trim() || !watermarkCanvasRef.value || !props.image.canvas) return
-
-  const srcCanvas = props.image.canvas
-  const previewCanvas = watermarkCanvasRef.value
-
-  // Preview-Canvas hat die gleichen CSS-Dimensionen wie das Bild-Canvas
-  // Wir nutzen die Originaldimensionen, da CSS das skaliert
-  previewCanvas.width = srcCanvas.width
-  previewCanvas.height = srcCanvas.height
-
-  const wmCanvas = ImageProcessor.getCanvasWithWatermark(
-    // Transparentes Canvas als Quelle (nur Wasserzeichen)
-    createTransparentCanvas(srcCanvas.width, srcCanvas.height),
-    w
-  )
-  const ctx = previewCanvas.getContext('2d')
-  if (ctx) {
-    ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height)
-    ctx.drawImage(wmCanvas, 0, 0)
-  }
-}
-
-function createTransparentCanvas(width: number, height: number): HTMLCanvasElement {
-  const c = document.createElement('canvas')
-  c.width = width
-  c.height = height
-  return c
-}
 
 // Wenn das Bild bearbeitet wurde (version erhöht), Display-Canvas neu synchronisieren
 watch(
@@ -136,22 +48,14 @@ watch(
   { deep: true }
 )
 
-// Wasserzeichen-Canvas aktualisieren wenn sich Einstellungen ändern
+// Wasserzeichen und Transformationen sind Teil des gebackenen Display-Canvas
 watch(
-  () => props.image.watermark,
+  () => [props.image.watermark, props.image.transforms],
   () => {
-    if (watermarkActive.value) {
-      renderWatermarkPreview()
-    }
+    nextTick(() => syncDisplayCanvas())
   },
   { deep: true }
 )
-
-watch(watermarkActive, (active) => {
-  if (active) {
-    nextTick(() => renderWatermarkPreview())
-  }
-})
 
 // Inline-Umbenennung
 const isEditing = ref(false)
@@ -231,11 +135,9 @@ const handleEditKeydown = (event: KeyboardEvent) => {
   }
 }
 
-// Kopiert den Inhalt von props.image.canvas in den sichtbaren displayCanvas im Template.
-// Verhindert Probleme, die entstehen wenn das Canvas-Element im DOM verschoben wird.
-// Max. Kantenlänge für den gebackenen Thumbnail-Bake. Da die Kachel ohnehin
-// per CSS skaliert wird, reicht eine reduzierte Auflösung – das hält die
-// Pixel-Passage (getImageData) auch bei Live-Stapelbearbeitung flüssig.
+// Rendert die Kachel über die Export-Pipeline in reduzierter Auflösung.
+// Max. Kantenlänge: Die Kachel wird ohnehin per CSS skaliert, eine reduzierte
+// Auflösung hält die Pixel-Passage (getImageData) bei Live-Stapelbearbeitung flüssig.
 const THUMB_BAKE_MAX = 600
 
 function syncDisplayCanvas() {
@@ -245,28 +147,15 @@ function syncDisplayCanvas() {
   const ctx = dst.getContext('2d')
   if (!ctx) return
 
-  if (hasActiveFilters.value) {
-    // Auf Thumbnail-Größe herunterskalieren, dann die volle Pixel-Pipeline
-    // backen (Helligkeit, Kontrast, Blur, Temperatur, Vignette, …).
+  if (ImageProcessor.hasAnyEffect(props.image)) {
     const scale = Math.min(THUMB_BAKE_MAX / src.width, THUMB_BAKE_MAX / src.height, 1)
-    let bakeSource: HTMLCanvasElement = src
-    if (scale < 1) {
-      const scaled = document.createElement('canvas')
-      scaled.width = Math.max(1, Math.round(src.width * scale))
-      scaled.height = Math.max(1, Math.round(src.height * scale))
-      scaled.getContext('2d')?.drawImage(src, 0, 0, scaled.width, scaled.height)
-      bakeSource = scaled
-    }
-    const baked = ImageProcessor.applyFiltersToCanvas(
-      bakeSource,
-      props.image.filters || defaultFilters
-    )
-    dst.width = baked.width
-    dst.height = baked.height
+    const preview = ImageProcessor.getPreviewCanvas(props.image, scale)
+    dst.width = preview.width
+    dst.height = preview.height
     ctx.clearRect(0, 0, dst.width, dst.height)
-    ctx.drawImage(baked, 0, 0)
+    ctx.drawImage(preview, 0, 0)
   } else {
-    // Keine Filter aktiv: rohes Canvas direkt anzeigen.
+    // Kein Effekt aktiv: rohes Canvas in voller Auflösung anzeigen
     dst.width = src.width
     dst.height = src.height
     ctx.clearRect(0, 0, dst.width, dst.height)
@@ -287,9 +176,6 @@ onMounted(() => {
       attributes: true,
       attributeFilter: ['width', 'height'],
     })
-    if (watermarkActive.value) {
-      nextTick(() => renderWatermarkPreview())
-    }
   }
 })
 
@@ -307,16 +193,14 @@ onUnmounted(() => {
       <i v-if="image.selected" class="fas fa-check"></i>
     </div>
 
-    <div class="image-preview-wrapper" :style="previewWrapperStyle" @click.stop="handlePreview">
-      <div ref="previewContainer" class="image-preview" :style="transformStyle">
+    <div class="image-preview-wrapper" @click.stop="handlePreview">
+      <div
+        ref="previewContainer"
+        class="image-preview"
+        :class="{ 'has-transforms': hasTransforms }"
+      >
         <canvas ref="displayCanvas"></canvas>
       </div>
-      <canvas
-        v-if="watermarkActive"
-        ref="watermarkCanvasRef"
-        class="watermark-canvas"
-        :style="watermarkOverlayStyle"
-      ></canvas>
     </div>
 
     <div class="image-meta">
@@ -516,6 +400,11 @@ onUnmounted(() => {
   transform: scale(1.05);
 }
 
+/* Mit Rahmen/Ecken/Schatten das ganze Export-Ergebnis zeigen statt eines Ausschnitts */
+.image-preview.has-transforms canvas {
+  object-fit: contain;
+}
+
 .image-meta {
   display: flex;
   flex-direction: column;
@@ -626,15 +515,5 @@ onUnmounted(() => {
 .image-preview-wrapper {
   position: relative;
   overflow: hidden;
-}
-
-/* Wasserzeichen-Canvas-Overlay */
-.watermark-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
 }
 </style>

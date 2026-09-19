@@ -441,12 +441,54 @@ function renderEditedPreview() {
   scaled.height = pc.height
   scaled.getContext('2d')?.drawImage(wc, 0, 0, pc.width, pc.height)
 
-  const filtered = ImageProcessor.applyFiltersToCanvas(scaled, localFilters.value)
+  // Blur-Radius (und CSS-Rahmen/Schatten) mit dem Vorschau-Maßstab skalieren
+  previewScale.value = pc.width / wc.width
+  const filtered = ImageProcessor.applyFiltersToCanvas(
+    scaled,
+    localFilters.value,
+    previewScale.value
+  )
   const ctx = pc.getContext('2d')
   if (ctx) {
     ctx.clearRect(0, 0, pc.width, pc.height)
     ctx.drawImage(filtered, 0, 0)
   }
+
+  // Stufe 2: nach einer kurzen Ruhepause das exakte Ergebnis aus der vollen
+  // Auflösung rendern (pixelgenau wie der Export, nur verkleinert).
+  scheduleExactPreview()
+}
+
+// Obergrenze für die exakte Stufe: darüber würde die Pixel-Passage in voller
+// Auflösung (v. a. mit Weichzeichnen) den Hauptthread spürbar blockieren.
+const EXACT_PREVIEW_MAX_PIXELS = 6_000_000
+const EXACT_PREVIEW_DELAY_MS = 300
+let exactTimer: ReturnType<typeof setTimeout> | null = null
+let exactToken = 0
+
+function scheduleExactPreview() {
+  const token = ++exactToken
+  if (exactTimer) clearTimeout(exactTimer)
+  exactTimer = setTimeout(() => {
+    exactTimer = null
+    renderExactPreview(token)
+  }, EXACT_PREVIEW_DELAY_MS)
+}
+
+function renderExactPreview(token: number) {
+  if (token !== exactToken || !props.isOpen) return
+  const pc = previewCanvas.value
+  const wc = getWorkingCanvas()
+  if (!pc || !wc || pc.width === 0 || pc.height === 0) return
+  if (wc.width * wc.height > EXACT_PREVIEW_MAX_PIXELS) return
+
+  const exact = ImageProcessor.applyFiltersToCanvas(wc, localFilters.value, 1)
+  const ctx = pc.getContext('2d')
+  if (!ctx) return
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+  ctx.clearRect(0, 0, pc.width, pc.height)
+  ctx.drawImage(exact, 0, 0, pc.width, pc.height)
 }
 
 // ── History composable ────────────────────────────────────────────
@@ -533,9 +575,18 @@ const availableFormats = computed(() => {
   return [...imageFormats, { name: 'PDF', mimeType: 'application/pdf', ext: 'pdf' }]
 })
 
+// Verhältnis Vorschau-Canvas zu Arbeits-Canvas; wird bei jedem Preview-Render gesetzt
+const previewScale = ref(1)
+
+// Rahmen/Ecken/Schatten werden hier nicht bearbeitet, nur angezeigt – per CSS,
+// damit Text- und Zuschneide-Overlays ihren Bezug zum Canvas behalten. Die
+// Pixelmaße werden mit previewScale skaliert und entsprechen damit dem Export.
 const transformStyle = computed(() => {
   if (!props.image) return {}
-  const tr = props.image.transforms || defaultTransforms
+  const tr = ImageProcessor.scaleTransforms(
+    props.image.transforms || defaultTransforms,
+    previewScale.value
+  )
   const style: Record<string, string> = {}
   if (tr.borderWidth > 0) style.border = `${tr.borderWidth}px solid ${tr.borderColor}`
   if (tr.borderRadius > 0) style.borderRadius = `${(tr.borderRadius / 200) * 50}%`
