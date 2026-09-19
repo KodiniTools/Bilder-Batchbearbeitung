@@ -426,20 +426,13 @@ export class ImageProcessor {
    */
   static applyFiltersToCanvas(
     sourceCanvas: HTMLCanvasElement,
-    filters: ImageFilters
+    filters: ImageFilters,
+    /** Verhältnis Quell-Canvas zu Originalbild (Vorschau < 1); skaliert Pixelmaße wie den Blur-Radius */
+    scale = 1
   ): HTMLCanvasElement {
     const f = { ...defaultFilters, ...filters }
 
-    const hasColor =
-      f.brightness !== 100 ||
-      f.contrast !== 100 ||
-      f.saturation !== 100 ||
-      f.hue !== 0 ||
-      f.grayscale !== 0 ||
-      f.sepia !== 0 ||
-      f.invert !== 0 ||
-      f.temperature !== 0 ||
-      f.vibrance !== 0
+    const hasColor = this.hasColorFilters(f)
     const hasBlur = f.blur > 0
     const hasOpacity = f.opacity !== 100
     const hasVignette = f.vignette !== 0
@@ -466,7 +459,7 @@ export class ImageProcessor {
 
     // 1) Weichzeichnen (räumliche Passage) – echter Gauß über Box-Blur
     if (hasBlur) {
-      this.applyGaussianBlur(data, width, height, f.blur)
+      this.applyGaussianBlur(data, width, height, f.blur * scale)
     }
 
     // 2) Farb-Pipeline (eine Pixel-Passage für alle Farboperationen)
@@ -490,6 +483,39 @@ export class ImageProcessor {
     }
 
     return filteredCanvas
+  }
+
+  private static hasColorFilters(f: ImageFilters): boolean {
+    return (
+      f.brightness !== 100 ||
+      f.contrast !== 100 ||
+      f.saturation !== 100 ||
+      f.hue !== 0 ||
+      f.grayscale !== 0 ||
+      f.sepia !== 0 ||
+      f.invert !== 0 ||
+      f.temperature !== 0 ||
+      f.vibrance !== 0
+    )
+  }
+
+  /** Weicht mindestens ein Filter vom Standard ab? */
+  static hasActiveFilters(filters: ImageFilters | undefined): boolean {
+    const f = { ...defaultFilters, ...(filters || {}) }
+    return this.hasColorFilters(f) || f.blur > 0 || f.opacity !== 100 || f.vignette !== 0
+  }
+
+  /** Ist mindestens ein Effekt (Filter, Wasserzeichen, Rahmen/Ecken/Schatten) aktiv? */
+  static hasAnyEffect(imageObj: ImageObject): boolean {
+    const w = imageObj.watermark
+    const t = imageObj.transforms || defaultTransforms
+    return (
+      this.hasActiveFilters(imageObj.filters) ||
+      (!!w && w.enabled && w.text.trim().length > 0) ||
+      t.borderWidth > 0 ||
+      t.borderRadius > 0 ||
+      this.hasVisibleShadow(t)
+    )
   }
 
   /**
@@ -647,8 +673,10 @@ export class ImageProcessor {
     height: number,
     blur: number
   ): void {
-    const sigma = Math.round(blur)
-    if (sigma < 1) return
+    // Gebrochene Sigma-Werte (skalierte Vorschau) werden nicht gerundet;
+    // boxesForGauss wählt daraus die passenden Box-Breiten.
+    const sigma = blur
+    if (sigma <= 0) return
 
     const n = width * height
     const r = new Float32Array(n)
@@ -828,7 +856,9 @@ export class ImageProcessor {
    */
   static getCanvasWithWatermark(
     sourceCanvas: HTMLCanvasElement,
-    watermark: WatermarkSettings
+    watermark: WatermarkSettings,
+    /** Verhältnis Quell-Canvas zu Originalbild (Vorschau < 1); skaliert die Schriftgröße */
+    scale = 1
   ): HTMLCanvasElement {
     if (!watermark.enabled || !watermark.text.trim()) {
       return sourceCanvas
@@ -847,7 +877,7 @@ export class ImageProcessor {
     // Wasserzeichen-Einstellungen
     const fontWeight = watermark.bold ? 'bold' : 'normal'
     const fontStyle = watermark.italic ? 'italic' : 'normal'
-    const fontSize = watermark.fontSize
+    const fontSize = watermark.fontSize * scale
     const fontFamily = watermark.fontFamily || 'Helvetica'
     ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px "${fontFamily}", Arial, sans-serif`
     ctx.fillStyle = watermark.color
@@ -1053,11 +1083,65 @@ export class ImageProcessor {
     )
   }
 
+  /**
+   * Skaliert alle Pixelmaße der Transformationen (Randbreite, Schatten-
+   * Unschärfe und -Versatz) mit `scale`. Der Eckenradius ist bereits relativ
+   * zur Bildgröße definiert und bleibt unverändert.
+   */
+  static scaleTransforms(t: ImageTransforms, scale: number): ImageTransforms {
+    if (scale === 1) return t
+    return {
+      ...t,
+      borderWidth: t.borderWidth * scale,
+      shadowBlur: t.shadowBlur * scale,
+      shadowOffsetX: t.shadowOffsetX * scale,
+      shadowOffsetY: t.shadowOffsetY * scale,
+    }
+  }
+
+  /**
+   * Vorschau = exakt die Export-Pipeline (Filter → Wasserzeichen →
+   * Transformationen) auf einer um `scale` verkleinerten Kopie des Bildes.
+   * Alle Pixelmaße werden mitskaliert, damit Vorschau und Export bis auf die
+   * Auflösung identisch sind (WYSIWYG).
+   * @param scale Verkleinerungsfaktor 0 < scale <= 1
+   */
+  static getPreviewCanvas(imageObj: ImageObject, scale: number): HTMLCanvasElement {
+    const src = imageObj.canvas
+    let base: HTMLCanvasElement = src
+    if (scale < 1) {
+      const scaled = document.createElement('canvas')
+      scaled.width = Math.max(1, Math.round(src.width * scale))
+      scaled.height = Math.max(1, Math.round(src.height * scale))
+      const sctx = scaled.getContext('2d')
+      if (sctx) {
+        // Hochwertiges Resampling, damit die verkleinerte Basis nicht aliasiert
+        sctx.imageSmoothingEnabled = true
+        sctx.imageSmoothingQuality = 'high'
+        sctx.drawImage(src, 0, 0, scaled.width, scaled.height)
+      }
+      base = scaled
+    }
+    const filtered = this.applyFiltersToCanvas(base, imageObj.filters || defaultFilters, scale)
+    const watermarked = this.getCanvasWithWatermark(
+      filtered,
+      imageObj.watermark || defaultWatermark,
+      scale
+    )
+    return this.getCanvasWithTransforms(
+      watermarked,
+      imageObj.transforms || defaultTransforms,
+      scale
+    )
+  }
+
   static getCanvasWithTransforms(
     sourceCanvas: HTMLCanvasElement,
-    transforms: ImageTransforms
+    transforms: ImageTransforms,
+    /** Verhältnis Quell-Canvas zu Originalbild (Vorschau < 1); skaliert Rand und Schatten */
+    scale = 1
   ): HTMLCanvasElement {
-    const t = transforms
+    const t = this.scaleTransforms(transforms, scale)
     const hasShadow = this.hasVisibleShadow(t)
     const hasTransforms = t.borderWidth > 0 || t.borderRadius > 0 || hasShadow
 
