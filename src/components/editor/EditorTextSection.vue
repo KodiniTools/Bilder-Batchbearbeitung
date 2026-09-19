@@ -39,7 +39,16 @@
           :value="selectedText.fontFamily"
           @change="emit('update-text', { fontFamily: ($event.target as HTMLSelectElement).value })"
         >
-          <option v-for="f in fontFamilies" :key="f.value" :value="f.value">{{ f.label }}</option>
+          <optgroup v-for="group in fontGroups" :key="group.label" :label="group.label">
+            <option
+              v-for="f in group.fonts"
+              :key="f.value"
+              :value="f.value"
+              :style="{ fontFamily: f.value }"
+            >
+              {{ f.label }}
+            </option>
+          </optgroup>
         </select>
       </div>
 
@@ -260,6 +269,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TextItem } from '@/lib/core/types'
 
@@ -268,9 +278,11 @@ const { t } = useI18n()
 interface FontFamily {
   label: string
   value: string
+  /** Gruppe in der Auswahl (z. B. System / Eigene Schriften) */
+  group?: string
 }
 
-defineProps<{
+const props = defineProps<{
   textItems: TextItem[]
   selectedTextId: string | null
   selectedText: TextItem | null
@@ -283,6 +295,21 @@ const emit = defineEmits<{
   'update-text': [patch: Partial<TextItem>]
   'update:selectedTextId': [id: string | null]
 }>()
+
+// Schriften nach Gruppe bündeln; Reihenfolge der ersten Nennung bleibt erhalten
+const fontGroups = computed(() => {
+  const groups: { label: string; fonts: FontFamily[] }[] = []
+  for (const f of props.fontFamilies) {
+    const label = f.group ?? ''
+    let g = groups.find((x) => x.label === label)
+    if (!g) {
+      g = { label, fonts: [] }
+      groups.push(g)
+    }
+    g.fonts.push(f)
+  }
+  return groups
+})
 </script>
 
 <style scoped>

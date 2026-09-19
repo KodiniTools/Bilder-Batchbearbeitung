@@ -595,7 +595,9 @@
       "shadowOffsetX": "Offset X",
       "shadowOffsetY": "Offset Y",
       "delete": "Delete text",
-      "hint": "Add text and position it on the image."
+      "hint": "Add text and position it on the image.",
+      "fontGroupSystem": "System",
+      "fontGroupCustom": "Custom fonts"
     },
     "compare": {
       "before": "Before",
