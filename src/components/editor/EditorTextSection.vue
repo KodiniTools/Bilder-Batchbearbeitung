@@ -113,21 +113,16 @@
         </div>
       </div>
 
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.opacity') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="0"
-            max="100"
-            step="1"
-            :value="selectedText.opacity"
-            @input="emit('update-text', { opacity: +($event.target as HTMLInputElement).value })"
-          />
-          <span class="filter-value">{{ selectedText.opacity }}%</span>
-        </div>
-      </div>
+      <SliderRow
+        :model-value="selectedText.opacity"
+        :label="t('imageEditor.text.opacity')"
+        :min="0"
+        :max="100"
+        :default="defaultTextStyle.opacity"
+        unit="%"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { opacity: $event })"
+      />
 
       <!-- Stroke (Umrandung) -->
       <div class="ctrl-subheader">{{ t('imageEditor.text.stroke') }}</div>
@@ -140,23 +135,17 @@
           @input="emit('update-text', { strokeColor: ($event.target as HTMLInputElement).value })"
         />
       </div>
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.strokeWidth') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="0"
-            max="20"
-            step="0.5"
-            :value="selectedText.strokeWidth"
-            @input="
-              emit('update-text', { strokeWidth: +($event.target as HTMLInputElement).value })
-            "
-          />
-          <span class="filter-value">{{ selectedText.strokeWidth }}px</span>
-        </div>
-      </div>
+      <SliderRow
+        :model-value="selectedText.strokeWidth"
+        :label="t('imageEditor.text.strokeWidth')"
+        :min="0"
+        :max="20"
+        :step="0.5"
+        :default="defaultTextStyle.strokeWidth"
+        unit="px"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { strokeWidth: $event })"
+      />
 
       <!-- Shadow (Schatten) -->
       <div class="ctrl-subheader">{{ t('imageEditor.text.shadow') }}</div>
@@ -169,72 +158,46 @@
           @input="emit('update-text', { shadowColor: ($event.target as HTMLInputElement).value })"
         />
       </div>
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.shadowOpacity') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="0"
-            max="100"
-            step="1"
-            :value="selectedText.shadowOpacity"
-            @input="
-              emit('update-text', { shadowOpacity: +($event.target as HTMLInputElement).value })
-            "
-          />
-          <span class="filter-value">{{ selectedText.shadowOpacity }}%</span>
-        </div>
-      </div>
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.shadowBlur') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="0"
-            max="30"
-            step="1"
-            :value="selectedText.shadowBlur"
-            @input="emit('update-text', { shadowBlur: +($event.target as HTMLInputElement).value })"
-          />
-          <span class="filter-value">{{ selectedText.shadowBlur }}px</span>
-        </div>
-      </div>
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.shadowOffsetX') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="-20"
-            max="20"
-            step="1"
-            :value="selectedText.shadowOffsetX"
-            @input="
-              emit('update-text', { shadowOffsetX: +($event.target as HTMLInputElement).value })
-            "
-          />
-          <span class="filter-value">{{ selectedText.shadowOffsetX }}px</span>
-        </div>
-      </div>
-      <div class="filter-row">
-        <label class="filter-label">{{ t('imageEditor.text.shadowOffsetY') }}</label>
-        <div class="filter-slider-wrap">
-          <input
-            type="range"
-            class="filter-slider"
-            min="-20"
-            max="20"
-            step="1"
-            :value="selectedText.shadowOffsetY"
-            @input="
-              emit('update-text', { shadowOffsetY: +($event.target as HTMLInputElement).value })
-            "
-          />
-          <span class="filter-value">{{ selectedText.shadowOffsetY }}px</span>
-        </div>
-      </div>
+      <SliderRow
+        :model-value="selectedText.shadowOpacity"
+        :label="t('imageEditor.text.shadowOpacity')"
+        :min="0"
+        :max="100"
+        :default="defaultTextStyle.shadowOpacity"
+        unit="%"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { shadowOpacity: $event })"
+      />
+      <SliderRow
+        :model-value="selectedText.shadowBlur"
+        :label="t('imageEditor.text.shadowBlur')"
+        :min="0"
+        :max="30"
+        :default="defaultTextStyle.shadowBlur"
+        unit="px"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { shadowBlur: $event })"
+      />
+      <SliderRow
+        :model-value="selectedText.shadowOffsetX"
+        :label="t('imageEditor.text.shadowOffsetX')"
+        :min="-20"
+        :max="20"
+        :default="defaultTextStyle.shadowOffsetX"
+        unit="px"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { shadowOffsetX: $event })"
+      />
+      <SliderRow
+        :model-value="selectedText.shadowOffsetY"
+        :label="t('imageEditor.text.shadowOffsetY')"
+        :min="-20"
+        :max="20"
+        :default="defaultTextStyle.shadowOffsetY"
+        unit="px"
+        :reset-title="t('imageEditor.filters.reset')"
+        @update:model-value="emit('update-text', { shadowOffsetY: $event })"
+      />
 
       <button
         type="button"
@@ -272,6 +235,8 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TextItem } from '@/lib/core/types'
+import { defaultTextStyle } from '@/lib/core/types'
+import SliderRow from '../SliderRow.vue'
 
 const { t } = useI18n()
 

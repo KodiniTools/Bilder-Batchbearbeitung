@@ -119,6 +119,24 @@ export interface TextItem {
   shadowOffsetY: number // -20–20, default 2
 }
 
+/** Standard-Gestaltung neuer Text-Elemente (Reset-Werte der Text-Slider) */
+export const defaultTextStyle: Omit<TextItem, 'id' | 'text' | 'x' | 'y'> = {
+  fontSize: 36,
+  fontFamily: 'Arial, sans-serif',
+  color: '#ffffff',
+  bold: false,
+  italic: false,
+  align: 'left',
+  opacity: 100,
+  strokeWidth: 0,
+  strokeColor: '#000000',
+  shadowColor: '#000000',
+  shadowOpacity: 60,
+  shadowBlur: 0,
+  shadowOffsetX: 2,
+  shadowOffsetY: 2,
+}
+
 export interface WatermarkSettings {
   enabled: boolean
   text: string
