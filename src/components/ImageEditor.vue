@@ -311,6 +311,7 @@ import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import ImagePreview from './ImagePreview.vue'
+import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 import { useToast } from '@/composables/useToast'
 import { useImageStore } from '@/stores/imageStore'
 import { useEditorHistory } from '@/composables/useEditorHistory'
@@ -329,14 +330,37 @@ const { t } = useI18n()
 const toast = useToast()
 const imageStore = useImageStore()
 
-const FONT_FAMILIES: { label: string; value: string }[] = [
-  { label: 'Arial', value: 'Arial, sans-serif' },
-  { label: 'Georgia', value: 'Georgia, serif' },
-  { label: 'Verdana', value: 'Verdana, sans-serif' },
-  { label: 'Times New Roman', value: '"Times New Roman", serif' },
-  { label: 'Courier New', value: '"Courier New", monospace' },
-  { label: 'Impact', value: 'Impact, sans-serif' },
+// Systemschriften plus die eigenen Schriften aus public/fonts (per @font-face in
+// assets/styles/fonts.css registriert; Namen zentral in CUSTOM_FONT_FAMILIES).
+const FONT_FAMILIES: { label: string; value: string; group: string }[] = [
+  ...[
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' },
+    { label: 'Times New Roman', value: '"Times New Roman", serif' },
+    { label: 'Courier New', value: '"Courier New", monospace' },
+    { label: 'Impact', value: 'Impact, sans-serif' },
+  ].map((f) => ({ ...f, group: t('imageEditor.text.fontGroupSystem') })),
+  ...CUSTOM_FONT_FAMILIES.filter((name) => name !== 'Helvetica').map((name) => ({
+    label: name,
+    value: `"${name}", sans-serif`,
+    group: t('imageEditor.text.fontGroupCustom'),
+  })),
 ]
+
+/**
+ * Stellt sicher, dass die Schriften der Text-Elemente geladen sind, bevor sie in
+ * ein Canvas gezeichnet werden (fillText nutzt sonst still die Fallback-Schrift).
+ */
+async function ensureTextFontsLoaded(items: TextItem[]): Promise<void> {
+  if (!('fonts' in document)) return
+  const specs = new Set<string>()
+  for (const item of items) {
+    const style = [item.italic ? 'italic' : '', item.bold ? 'bold' : ''].filter(Boolean).join(' ')
+    specs.add(`${style} 16px ${item.fontFamily}`.trim())
+  }
+  await Promise.all([...specs].map((spec) => document.fonts.load(spec).catch(() => [])))
+}
 
 const CROP_RATIO_PRESETS = [
   { label: t('imageEditor.crop.ratioFree'), ratio: null },
@@ -517,6 +541,9 @@ const {
 } = useEditorHistory(localFilters, textItems, changesApplied)
 
 function updateSelectedText(patch: Partial<TextItem>) {
+  if (patch.fontFamily && 'fonts' in document) {
+    document.fonts.load(`16px ${patch.fontFamily}`).catch(() => [])
+  }
   if (!selectedTextId.value) return
   textItems.value = textItems.value.map((i) =>
     i.id === selectedTextId.value ? { ...i, ...patch } : i
@@ -640,9 +667,12 @@ const canOpenLightbox = computed(() => !isCropMode.value)
  * unbearbeitete Original, sonst das Arbeits-Canvas mit den aktuellen Filtern
  * (plus Wasserzeichen/Transformationen des Bildes, wie beim Export).
  */
-function openLightbox() {
+async function openLightbox() {
   const original = getOriginalImageObj()
   if (!original) return
+  if (compareMode.value !== 'before' && textItems.value.length > 0) {
+    await ensureTextFontsLoaded(textItems.value)
+  }
   if (compareMode.value === 'before') {
     const canvas = getOriginalCanvas()
     if (!canvas) return
@@ -1076,11 +1106,12 @@ function drawTextItems(target: HTMLCanvasElement, items: TextItem[], scale: numb
   }
 }
 
-function saveChanges() {
+async function saveChanges() {
   const workingCanvas = getWorkingCanvas()
   if (!props.image || !workingCanvas) return
 
   // Bake any pending text items into the canvas before saving
+  if (textItems.value.length > 0) await ensureTextFontsLoaded(textItems.value)
   bakeTextToCanvas()
   textItems.value = []
   selectedTextId.value = null

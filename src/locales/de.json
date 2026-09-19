@@ -726,7 +726,9 @@
       "shadowOffsetX": "Versatz X",
       "shadowOffsetY": "Versatz Y",
       "delete": "Text löschen",
-      "hint": "Text hinzufügen und auf dem Bild positionieren."
+      "hint": "Text hinzufügen und auf dem Bild positionieren.",
+      "fontGroupSystem": "System",
+      "fontGroupCustom": "Eigene Schriften"
     },
     "compare": {
       "before": "Vorher",
