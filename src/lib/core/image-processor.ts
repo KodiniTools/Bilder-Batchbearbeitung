@@ -1030,12 +1030,36 @@ export class ImageProcessor {
    * @param transforms Die Transformations-Einstellungen
    * @returns Canvas mit angewendeten Transformationen
    */
+  /**
+   * Ist der Schatten sichtbar? Er muss Deckkraft haben und über das Bild
+   * hinausragen: entweder weichgezeichnet oder versetzt. Ein harter Schatten
+   * (Weichzeichnen 0) mit Versatz ist ein gültiger Look.
+   */
+  static hasVisibleShadow(t: ImageTransforms): boolean {
+    return (
+      t.shadowOpacity > 0 && (t.shadowBlur > 0 || t.shadowOffsetX !== 0 || t.shadowOffsetY !== 0)
+    )
+  }
+
+  /**
+   * Platz (px pro Seite), den ein sichtbarer Schatten über das Bild hinaus
+   * braucht: Unschärfe-Radius plus Versatz. 0, wenn kein Schatten sichtbar ist.
+   * Wird vom Export-Renderer und von den Vorschauen gleichermaßen genutzt.
+   */
+  static getShadowPadding(t: ImageTransforms): number {
+    if (!this.hasVisibleShadow(t)) return 0
+    return Math.ceil(
+      t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY))
+    )
+  }
+
   static getCanvasWithTransforms(
     sourceCanvas: HTMLCanvasElement,
     transforms: ImageTransforms
   ): HTMLCanvasElement {
     const t = transforms
-    const hasTransforms = t.borderWidth > 0 || t.borderRadius > 0 || t.shadowBlur > 0
+    const hasShadow = this.hasVisibleShadow(t)
+    const hasTransforms = t.borderWidth > 0 || t.borderRadius > 0 || hasShadow
 
     if (!hasTransforms) {
       return sourceCanvas
@@ -1050,13 +1074,8 @@ export class ImageProcessor {
     const innerRx = radiusFraction * imgW
     const innerRy = radiusFraction * imgH
 
-    // Padding für Schatten berechnen
-    const shadowPadding =
-      t.shadowBlur > 0
-        ? Math.ceil(
-            t.shadowBlur * 2 + Math.max(Math.abs(t.shadowOffsetX), Math.abs(t.shadowOffsetY))
-          )
-        : 0
+    // Padding für Schatten berechnen (Unschärfe-Radius + Versatz), damit er nicht abgeschnitten wird
+    const shadowPadding = this.getShadowPadding(t)
 
     // Gesamtpadding pro Seite
     const padding = t.borderWidth + shadowPadding
@@ -1081,7 +1100,7 @@ export class ImageProcessor {
     const innerY = shadowPadding + t.borderWidth
 
     // Schatten zeichnen
-    if (t.shadowBlur > 0) {
+    if (hasShadow) {
       ctx.save()
       ctx.shadowBlur = t.shadowBlur
       ctx.shadowColor = this.hexToRgba(t.shadowColor, t.shadowOpacity / 100)

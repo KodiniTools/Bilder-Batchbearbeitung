@@ -55,11 +55,27 @@ const transformStyle = computed(() => {
     const pct = (t.borderRadius / 200) * 50
     style.borderRadius = `${pct}%`
   }
-  if (t.shadowBlur > 0) {
+  if (ImageProcessor.hasVisibleShadow(t)) {
     const rgba = ImageProcessor.hexToRgba(t.shadowColor, t.shadowOpacity / 100)
     style.boxShadow = `${t.shadowOffsetX}px ${t.shadowOffsetY}px ${t.shadowBlur}px ${rgba}`
   }
   return style
+})
+
+// Der Wrapper schneidet ab (overflow: hidden). Für einen sichtbaren Schatten
+// reserviert er denselben Platz, den auch der Export-Renderer hinzufügt.
+const shadowPadding = computed(() =>
+  ImageProcessor.getShadowPadding(props.image.transforms || defaultTransforms)
+)
+const previewWrapperStyle = computed(() =>
+  shadowPadding.value > 0 ? { padding: `${shadowPadding.value}px` } : {}
+)
+// Wasserzeichen-Overlay deckt nur das Bild ab, nicht den Schattenbereich
+const watermarkOverlayStyle = computed(() => {
+  const p = shadowPadding.value
+  return p > 0
+    ? { inset: `${p}px`, width: `calc(100% - ${2 * p}px)`, height: `calc(100% - ${2 * p}px)` }
+    : {}
 })
 
 // Watermark state
@@ -291,11 +307,16 @@ onUnmounted(() => {
       <i v-if="image.selected" class="fas fa-check"></i>
     </div>
 
-    <div class="image-preview-wrapper" @click.stop="handlePreview">
+    <div class="image-preview-wrapper" :style="previewWrapperStyle" @click.stop="handlePreview">
       <div ref="previewContainer" class="image-preview" :style="transformStyle">
         <canvas ref="displayCanvas"></canvas>
       </div>
-      <canvas v-if="watermarkActive" ref="watermarkCanvasRef" class="watermark-canvas"></canvas>
+      <canvas
+        v-if="watermarkActive"
+        ref="watermarkCanvasRef"
+        class="watermark-canvas"
+        :style="watermarkOverlayStyle"
+      ></canvas>
     </div>
 
     <div class="image-meta">

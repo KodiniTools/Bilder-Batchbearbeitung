@@ -76,7 +76,7 @@
       :label="t('batchEdit.transforms.shadow.offsetX')"
       :min="-25"
       :max="25"
-      :default="5"
+      :default="0"
       unit="px"
       :reset-title="t('batchEdit.resetSlider')"
     />
@@ -85,7 +85,7 @@
       :label="t('batchEdit.transforms.shadow.offsetY')"
       :min="-25"
       :max="25"
-      :default="5"
+      :default="0"
       unit="px"
       :reset-title="t('batchEdit.resetSlider')"
     />
