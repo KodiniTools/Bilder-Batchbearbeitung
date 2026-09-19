@@ -58,7 +58,7 @@
                   class="canvas-crop-wrapper"
                   :class="{ zoomable: canOpenLightbox }"
                   :title="canOpenLightbox ? t('imageEditor.preview.zoomHint') : undefined"
-                  @click="onPreviewClick"
+                  @click.capture="onPreviewClick"
                 >
                   <!-- Edited canvas (base, determines wrapper size) -->
                   <canvas
@@ -655,8 +655,19 @@ function openLightbox() {
       watermark: undefined,
     }
   } else {
-    const canvas = getWorkingCanvas()
-    if (!canvas) return
+    const working = getWorkingCanvas()
+    if (!working) return
+    // Noch nicht übernommene Text-Elemente auf einer Kopie mitzeichnen,
+    // damit die Großansicht dem späteren Speicher-/Exportergebnis entspricht
+    let canvas = working
+    if (textItems.value.some((item) => item.text.trim())) {
+      const copy = document.createElement('canvas')
+      copy.width = working.width
+      copy.height = working.height
+      copy.getContext('2d')?.drawImage(working, 0, 0)
+      drawTextItems(copy, textItems.value, textBakeScale(working))
+      canvas = copy
+    }
     lightboxImage.value = {
       ...original,
       canvas,
@@ -671,7 +682,11 @@ function closeLightbox() {
   lightboxOpen.value = false
 }
 
-/** Klick auf das Vorschaubild (nicht auf Text-Elemente, Split-Griff oder Crop-Werkzeug) */
+/**
+ * Klick auf das Vorschaubild (nicht auf Text-Elemente, Split-Griff oder Crop-Werkzeug).
+ * Läuft in der Capture-Phase, damit die Textauswahl noch vor dem Overlay-Handler
+ * geprüft wird, der sie beim selben Klick aufhebt.
+ */
 function onPreviewClick(event: MouseEvent) {
   if (!canOpenLightbox.value) return
   const target = event.target as HTMLElement | null
@@ -986,15 +1001,29 @@ function applyChanges() {
   changesApplied.value = true
 }
 
+/** Maßstab Arbeits-Canvas : Vorschau-Canvas (Text-Elemente sind in Vorschau-Pixeln definiert) */
+function textBakeScale(workingCanvas: HTMLCanvasElement): number {
+  const pw = previewCanvas.value?.width ?? workingCanvas.width
+  return workingCanvas.width / pw
+}
+
+/** Schreibt die aktuellen Text-Elemente unwiderruflich in das Arbeits-Canvas (beim Speichern) */
 function bakeTextToCanvas() {
   const workingCanvas = getWorkingCanvas()
   if (!workingCanvas || textItems.value.length === 0) return
-  const ctx = workingCanvas.getContext('2d')
-  if (!ctx) return
-  const pw = previewCanvas.value?.width ?? workingCanvas.width
-  const scale = workingCanvas.width / pw
+  drawTextItems(workingCanvas, textItems.value, textBakeScale(workingCanvas))
+}
 
-  for (const item of textItems.value) {
+/**
+ * Zeichnet Text-Elemente auf ein beliebiges Canvas – identisch zum Speichern,
+ * aber ohne Seiteneffekt auf das Arbeits-Canvas (z. B. für die Großansicht).
+ */
+function drawTextItems(target: HTMLCanvasElement, items: TextItem[], scale: number) {
+  const ctx = target.getContext('2d')
+  if (!ctx) return
+  const workingCanvas = target
+
+  for (const item of items) {
     if (!item.text.trim()) continue
     const x = (item.x / 100) * workingCanvas.width
     const y = (item.y / 100) * workingCanvas.height
