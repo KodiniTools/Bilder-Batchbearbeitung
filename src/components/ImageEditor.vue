@@ -53,7 +53,13 @@
               </div>
 
               <div class="preview-area">
-                <div ref="canvasWrapperRef" class="canvas-crop-wrapper">
+                <div
+                  ref="canvasWrapperRef"
+                  class="canvas-crop-wrapper"
+                  :class="{ zoomable: canOpenLightbox }"
+                  :title="canOpenLightbox ? t('imageEditor.preview.zoomHint') : undefined"
+                  @click="onPreviewClick"
+                >
                   <!-- Edited canvas (base, determines wrapper size) -->
                   <canvas
                     ref="previewCanvas"
@@ -289,6 +295,12 @@
     <!-- Batch-Fortschritt: liegt (später im DOM) über dem Editor-Modal -->
     <LoadingIndicator ref="batchLoader" />
   </Teleport>
+
+  <!-- Großansicht des aktuellen Vorschaubilds (Klick auf das Bild); eigener
+       Teleport nach body, damit sie über dem (ebenfalls teleportierten) Editor liegt -->
+  <Teleport to="body">
+    <ImagePreview :image="lightboxImage" :is-open="lightboxOpen" @close="closeLightbox" />
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -298,6 +310,7 @@ import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import ImagePreview from './ImagePreview.vue'
 import { useToast } from '@/composables/useToast'
 import { useImageStore } from '@/stores/imageStore'
 import { useEditorHistory } from '@/composables/useEditorHistory'
@@ -539,7 +552,10 @@ watch(
   () => props.isOpen,
   (open) => {
     if (open) document.addEventListener('keydown', handleUndoRedo)
-    else document.removeEventListener('keydown', handleUndoRedo)
+    else {
+      document.removeEventListener('keydown', handleUndoRedo)
+      lightboxOpen.value = false
+    }
   }
 )
 
@@ -610,6 +626,63 @@ const editedCanvasStyle = computed(() => {
   if (compareMode.value === 'before') return { opacity: '0' }
   return {}
 })
+
+// ── Großansicht (Lightbox) ────────────────────────────────────────
+
+const lightboxOpen = ref(false)
+const lightboxImage = ref<ImageObject | null>(null)
+
+// Im Zuschneide-Modus liegt das Crop-Werkzeug über dem Bild; dann kein Zoom
+const canOpenLightbox = computed(() => !isCropMode.value)
+
+/**
+ * Baut ein temporäres Bildobjekt für die Großansicht: im Modus "Vorher" das
+ * unbearbeitete Original, sonst das Arbeits-Canvas mit den aktuellen Filtern
+ * (plus Wasserzeichen/Transformationen des Bildes, wie beim Export).
+ */
+function openLightbox() {
+  const original = getOriginalImageObj()
+  if (!original) return
+  if (compareMode.value === 'before') {
+    const canvas = getOriginalCanvas()
+    if (!canvas) return
+    lightboxImage.value = {
+      ...original,
+      canvas,
+      ctx: canvas.getContext('2d') as CanvasRenderingContext2D,
+      filters: { ...defaultFilters },
+      transforms: undefined,
+      watermark: undefined,
+    }
+  } else {
+    const canvas = getWorkingCanvas()
+    if (!canvas) return
+    lightboxImage.value = {
+      ...original,
+      canvas,
+      ctx: canvas.getContext('2d') as CanvasRenderingContext2D,
+      filters: { ...localFilters.value },
+    }
+  }
+  lightboxOpen.value = true
+}
+
+function closeLightbox() {
+  lightboxOpen.value = false
+}
+
+/** Klick auf das Vorschaubild (nicht auf Text-Elemente, Split-Griff oder Crop-Werkzeug) */
+function onPreviewClick(event: MouseEvent) {
+  if (!canOpenLightbox.value) return
+  const target = event.target as HTMLElement | null
+  if (!target) return
+  const onCanvas = target === previewCanvas.value || target === originalPreviewCanvas.value
+  // Leere Fläche des Text-Overlays: nur zoomen, wenn kein Text ausgewählt ist
+  // (sonst hebt der Klick lediglich die Auswahl auf)
+  const onOverlayBackground =
+    target.classList.contains('text-overlay') && selectedTextId.value === null
+  if (onCanvas || onOverlayBackground) openLightbox()
+}
 
 // ── Watchers ──────────────────────────────────────────────────────
 
@@ -1216,6 +1289,11 @@ function closeEditor() {
 }
 
 /* Edited canvas (determines wrapper size) */
+.canvas-crop-wrapper.zoomable .preview-canvas,
+.canvas-crop-wrapper.zoomable :deep(.text-overlay) {
+  cursor: zoom-in;
+}
+
 .edited-canvas {
   display: block;
   max-width: 100%;

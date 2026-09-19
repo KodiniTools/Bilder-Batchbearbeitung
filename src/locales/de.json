@@ -824,6 +824,9 @@
       "redo": "Wiederholen",
       "redoTitle": "Wiederholen (Strg+Y)",
       "hint": "Strg+Z / Strg+Y"
+    },
+    "preview": {
+      "zoomHint": "Klicken für Großansicht"
     }
   },
   "bulkRename": {
