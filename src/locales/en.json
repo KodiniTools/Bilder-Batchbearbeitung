@@ -649,6 +649,9 @@
       "redo": "Redo",
       "redoTitle": "Redo (Ctrl+Y)",
       "hint": "Ctrl+Z / Ctrl+Y"
+    },
+    "preview": {
+      "zoomHint": "Click to enlarge"
     }
   },
   "bulkRename": {
