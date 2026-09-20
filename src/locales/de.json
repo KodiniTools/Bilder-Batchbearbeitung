@@ -289,6 +289,14 @@
     "themeToggle": "Design umschalten"
   },
   "statusBar": {
+    "ariaLabel": "Werkzeugleiste",
+    "groups": {
+      "selection": "Auswahl",
+      "history": "Verlauf",
+      "view": "Ansicht",
+      "edit": "Bearbeiten",
+      "export": "Export"
+    },
     "images": "Bilder",
     "selected": "ausgewählt",
     "gridSize": {

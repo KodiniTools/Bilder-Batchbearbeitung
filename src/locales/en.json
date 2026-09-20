@@ -114,6 +114,14 @@
     "themeToggle": "Toggle theme"
   },
   "statusBar": {
+    "ariaLabel": "Toolbar",
+    "groups": {
+      "selection": "Selection",
+      "history": "History",
+      "view": "View",
+      "edit": "Edit",
+      "export": "Export"
+    },
     "images": "Images",
     "selected": "selected",
     "gridSize": {
