@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
@@ -7,6 +7,8 @@ import { useToast } from '@/composables/useToast'
 const imageStore = useImageStore()
 const { t } = useI18n()
 const toast = useToast()
+
+const hasSelection = computed(() => imageStore.hasSelection)
 
 // Dropdown für Seitenverhältnis
 const isAspectRatioDropdownOpen = ref(false)
@@ -128,81 +130,88 @@ const handleRedo = () => {
 
 <template>
   <div class="status-bar">
-    <!-- Stats Section -->
-    <div class="toolbar-section stats-section">
-      <span class="stat">
-        <i class="fa-solid fa-images"></i>
-        <strong>{{ imageStore.imageCount }}</strong>
-      </span>
-      <span class="stat stat-selected" :class="{ 'has-selection': imageStore.hasSelection }">
-        <i class="fa-solid fa-check-double"></i>
-        <strong>{{ imageStore.selectedCount }}</strong>
-      </span>
-    </div>
-
-    <div class="toolbar-divider"></div>
-
-    <!-- Undo/Redo (global) -->
-    <div class="toolbar-section">
-      <div class="btn-group">
-        <button
-          class="btn btn-icon"
-          :disabled="!imageStore.canUndo"
-          :title="t('statusBar.tooltips.undo')"
-          @click="handleUndo"
-        >
-          <i class="fa-solid fa-reply"></i>
-        </button>
-        <button
-          class="btn btn-icon"
-          :disabled="!imageStore.canRedo"
-          :title="t('statusBar.tooltips.redo')"
-          @click="handleRedo"
-        >
-          <i class="fa-solid fa-share"></i>
-        </button>
+    <div class="status-bar__row" role="toolbar" :aria-label="t('statusBar.ariaLabel')">
+      <!-- Status: Anzahl Bilder / Auswahl -->
+      <div class="status-pill" :class="{ 'has-selection': hasSelection }">
+        <span class="status-pill__item">
+          <i class="fa-solid fa-images"></i>
+          <strong>{{ imageStore.imageCount }}</strong>
+          <span class="status-pill__text">{{ t('statusBar.images') }}</span>
+        </span>
+        <span class="status-pill__sep"></span>
+        <span class="status-pill__item status-pill__item--selected">
+          <i class="fa-solid fa-check-double"></i>
+          <strong>{{ imageStore.selectedCount }}</strong>
+          <span class="status-pill__text">{{ t('statusBar.selected') }}</span>
+        </span>
       </div>
-    </div>
 
-    <div class="toolbar-divider"></div>
-
-    <!-- Selection Actions -->
-    <div class="toolbar-section">
-      <button
-        class="btn btn-icon"
-        :title="t('statusBar.tooltips.selectAll')"
-        @click="handleSelectAll"
-      >
-        <i class="fa-solid fa-border-all"></i>
-      </button>
-
-      <button
-        class="btn btn-icon btn-danger"
-        :disabled="!imageStore.hasSelection"
-        :title="t('statusBar.tooltips.deleteSelected')"
-        @click="handleDelete"
-      >
-        <i class="fa-solid fa-trash-can"></i>
-      </button>
-
-      <button
-        class="btn btn-icon btn-batch-edit"
-        :class="{ 'has-selection': imageStore.hasSelection }"
-        :title="t('statusBar.tooltips.batchEdit')"
-        @click="emit('batch-edit')"
-      >
-        <i class="fa-solid fa-sliders"></i>
-      </button>
-    </div>
-
-    <!-- Grid-Größe (klein / mittel / groß) -->
-    <template v-if="imageStore.hasImages">
-      <div class="toolbar-divider"></div>
-
-      <div class="toolbar-section">
-        <div class="btn-group" role="group" :aria-label="t('statusBar.gridSize.label')">
+      <!-- Auswahl -->
+      <div class="tool-group">
+        <span class="tool-group__label">{{ t('statusBar.groups.selection') }}</span>
+        <div class="tool-group__buttons">
           <button
-            class="btn btn-icon"
+            class="tool-btn"
+            type="button"
+            :title="t('statusBar.tooltips.selectAll')"
+            @click="handleSelectAll"
+          >
+            <i class="fa-solid fa-border-all"></i>
+          </button>
+          <button
+            class="tool-btn tool-btn--accent"
+            type="button"
+            :class="{ 'is-ready': hasSelection }"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.batchEdit')"
+            @click="emit('batch-edit')"
+          >
+            <i class="fa-solid fa-sliders"></i>
+          </button>
+          <button
+            class="tool-btn tool-btn--danger"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.deleteSelected')"
+            @click="handleDelete"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Verlauf -->
+      <div class="tool-group">
+        <span class="tool-group__label">{{ t('statusBar.groups.history') }}</span>
+        <div class="tool-group__buttons">
+          <button
+            class="tool-btn"
+            type="button"
+            :disabled="!imageStore.canUndo"
+            :title="t('statusBar.tooltips.undo')"
+            @click="handleUndo"
+          >
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+          </button>
+          <button
+            class="tool-btn"
+            type="button"
+            :disabled="!imageStore.canRedo"
+            :title="t('statusBar.tooltips.redo')"
+            @click="handleRedo"
+          >
+            <i class="fa-solid fa-arrow-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ansicht -->
+      <div class="tool-group">
+        <span class="tool-group__label">{{ t('statusBar.groups.view') }}</span>
+        <div class="tool-group__buttons" role="group" :aria-label="t('statusBar.gridSize.label')">
+          <button
+            class="tool-btn"
+            type="button"
             :class="{ active: imageStore.gridSize === 'small' }"
             :title="t('statusBar.gridSize.small')"
             :aria-pressed="imageStore.gridSize === 'small'"
@@ -211,7 +220,8 @@ const handleRedo = () => {
             <i class="fa-solid fa-table-cells"></i>
           </button>
           <button
-            class="btn btn-icon"
+            class="tool-btn"
+            type="button"
             :class="{ active: imageStore.gridSize === 'medium' }"
             :title="t('statusBar.gridSize.medium')"
             :aria-pressed="imageStore.gridSize === 'medium'"
@@ -220,7 +230,8 @@ const handleRedo = () => {
             <i class="fa-solid fa-table-cells-large"></i>
           </button>
           <button
-            class="btn btn-icon"
+            class="tool-btn"
+            type="button"
             :class="{ active: imageStore.gridSize === 'large' }"
             :title="t('statusBar.gridSize.large')"
             :aria-pressed="imageStore.gridSize === 'large'"
@@ -230,157 +241,181 @@ const handleRedo = () => {
           </button>
         </div>
       </div>
-    </template>
 
-    <!-- Transformations Section -->
-    <template v-if="imageStore.hasSelection">
-      <div class="toolbar-divider"></div>
-
-      <div class="toolbar-section">
-        <div class="btn-group">
+      <!-- Bearbeiten (nur mit Auswahl aktiv; bleibt sichtbar, damit das Layout nicht springt) -->
+      <div class="tool-group" :class="{ 'is-inactive': !hasSelection }">
+        <span class="tool-group__label">{{ t('statusBar.groups.edit') }}</span>
+        <div class="tool-group__buttons">
           <button
-            class="btn btn-icon"
+            class="tool-btn"
+            type="button"
+            :disabled="!hasSelection"
             :title="t('statusBar.tooltips.rotateLeft')"
             @click="handleRotateLeft"
           >
             <i class="fa-solid fa-rotate-left"></i>
           </button>
           <button
-            class="btn btn-icon"
+            class="tool-btn"
+            type="button"
+            :disabled="!hasSelection"
             :title="t('statusBar.tooltips.rotateRight')"
             @click="handleRotateRight"
           >
             <i class="fa-solid fa-rotate-right"></i>
           </button>
-        </div>
-
-        <div class="btn-group">
-          <button class="btn btn-icon" :title="t('statusBar.tooltips.flipH')" @click="handleFlipH">
+          <span class="tool-group__sep"></span>
+          <button
+            class="tool-btn"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.flipH')"
+            @click="handleFlipH"
+          >
             <i class="fa-solid fa-arrows-left-right"></i>
           </button>
-          <button class="btn btn-icon" :title="t('statusBar.tooltips.flipV')" @click="handleFlipV">
+          <button
+            class="tool-btn"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.flipV')"
+            @click="handleFlipV"
+          >
             <i class="fa-solid fa-arrows-up-down"></i>
           </button>
-        </div>
+          <span class="tool-group__sep"></span>
 
-        <!-- Aspect Ratio Dropdown -->
-        <div class="dropdown-wrapper">
-          <button
-            class="btn btn-icon"
-            :title="t('statusBar.tooltips.aspectRatio')"
-            @click="toggleAspectRatioDropdown"
-          >
-            <i class="fa-solid fa-crop"></i>
-          </button>
-          <div
-            v-if="isAspectRatioDropdownOpen"
-            class="dropdown-menu"
-            @mouseleave="closeAspectRatioDropdown"
-          >
-            <button class="dropdown-item" @click="handleCropToAspectRatio(1)">
-              <i class="fa-solid fa-square"></i>
-              <span>1:1</span>
+          <!-- Seitenverhältnis -->
+          <div class="dropdown-wrapper">
+            <button
+              class="tool-btn tool-btn--menu"
+              type="button"
+              :class="{ active: isAspectRatioDropdownOpen }"
+              :disabled="!hasSelection"
+              :title="t('statusBar.tooltips.aspectRatio')"
+              :aria-expanded="isAspectRatioDropdownOpen"
+              @click="toggleAspectRatioDropdown"
+            >
+              <i class="fa-solid fa-crop"></i>
+              <i class="fa-solid fa-chevron-down tool-btn__chevron"></i>
             </button>
-            <button class="dropdown-item" @click="handleCropToAspectRatio(16 / 9)">
-              <i class="fa-solid fa-rectangle-wide"></i>
-              <span>16:9</span>
-            </button>
-            <button class="dropdown-item" @click="handleCropToAspectRatio(2 / 3)">
-              <i class="fa-solid fa-rectangle-portrait"></i>
-              <span>2:3</span>
-            </button>
+            <div
+              v-if="isAspectRatioDropdownOpen"
+              class="dropdown-menu"
+              @mouseleave="closeAspectRatioDropdown"
+            >
+              <button class="dropdown-item" type="button" @click="handleCropToAspectRatio(1)">
+                <i class="fa-solid fa-square"></i>
+                <span>1:1</span>
+              </button>
+              <button class="dropdown-item" type="button" @click="handleCropToAspectRatio(16 / 9)">
+                <i class="fa-solid fa-tv"></i>
+                <span>16:9</span>
+              </button>
+              <button class="dropdown-item" type="button" @click="handleCropToAspectRatio(2 / 3)">
+                <i class="fa-solid fa-mobile-screen"></i>
+                <span>2:3</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <button class="btn btn-icon" :title="t('statusBar.tooltips.reset')" @click="handleReset">
-          <i class="fa-solid fa-arrow-rotate-left"></i>
-        </button>
-
-        <button
-          class="btn btn-icon"
-          :title="t('statusBar.tooltips.bulkRename')"
-          @click="handleBulkRename"
-        >
-          <i class="fa-solid fa-pen"></i>
-        </button>
-      </div>
-    </template>
-
-    <div class="header-spacer"></div>
-
-    <!-- Export Section -->
-    <div class="toolbar-section export-section">
-      <!-- PDF Split-Button mit Dropdown -->
-      <div class="dropdown-wrapper">
-        <div class="btn-group btn-group-split">
           <button
-            class="btn btn-icon"
-            :title="t('statusBar.tooltips.exportAllPdf')"
-            @click="handleExportPdf('all')"
+            class="tool-btn"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.bulkRename')"
+            @click="handleBulkRename"
           >
-            <i class="fa-solid fa-file-pdf"></i>
+            <i class="fa-solid fa-pen"></i>
           </button>
+          <span class="tool-group__sep"></span>
           <button
-            class="btn btn-icon btn-chevron"
-            :title="t('statusBar.tooltips.exportSelectedPdf')"
-            :class="{ active: isPdfDropdownOpen }"
-            @click="togglePdfDropdown"
+            class="tool-btn tool-btn--danger"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.reset')"
+            @click="handleReset"
           >
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-        </div>
-        <div v-if="isPdfDropdownOpen" class="dropdown-menu" @mouseleave="closePdfDropdown">
-          <button class="dropdown-item" @click="selectPdfExport('all')">
-            <i class="fa-solid fa-images"></i>
-            <span>{{ t('statusBar.tooltips.exportAllPdf') }}</span>
-          </button>
-          <button
-            class="dropdown-item"
-            :class="{ 'dropdown-item--disabled': !imageStore.hasSelection }"
-            :disabled="!imageStore.hasSelection"
-            @click="selectPdfExport('selected')"
-          >
-            <i class="fa-solid fa-check-double"></i>
-            <span>{{ t('statusBar.tooltips.exportSelectedPdf') }}</span>
+            <i class="fa-solid fa-eraser"></i>
           </button>
         </div>
       </div>
 
-      <button
-        class="btn btn-icon"
-        :title="t('statusBar.tooltips.downloadZip')"
-        @click="handleExportZip"
-      >
-        <i class="fa-solid fa-file-zipper"></i>
-      </button>
+      <!-- Export -->
+      <div class="tool-group tool-group--export">
+        <span class="tool-group__label">{{ t('statusBar.groups.export') }}</span>
+        <div class="tool-group__buttons">
+          <!-- PDF mit Auswahlmenü -->
+          <div class="dropdown-wrapper">
+            <button
+              class="tool-btn tool-btn--menu"
+              type="button"
+              :class="{ active: isPdfDropdownOpen }"
+              :title="t('statusBar.tooltips.exportAllPdf')"
+              :aria-expanded="isPdfDropdownOpen"
+              @click="togglePdfDropdown"
+            >
+              <i class="fa-solid fa-file-pdf"></i>
+              <i class="fa-solid fa-chevron-down tool-btn__chevron"></i>
+            </button>
+            <div
+              v-if="isPdfDropdownOpen"
+              class="dropdown-menu dropdown-menu--right"
+              @mouseleave="closePdfDropdown"
+            >
+              <button class="dropdown-item" type="button" @click="selectPdfExport('all')">
+                <i class="fa-solid fa-images"></i>
+                <span>{{ t('statusBar.tooltips.exportAllPdf') }}</span>
+              </button>
+              <button
+                class="dropdown-item"
+                type="button"
+                :disabled="!hasSelection"
+                @click="selectPdfExport('selected')"
+              >
+                <i class="fa-solid fa-check-double"></i>
+                <span>{{ t('statusBar.tooltips.exportSelectedPdf') }}</span>
+              </button>
+            </div>
+          </div>
 
-      <button
-        class="btn btn-icon btn-svg"
-        :title="t('statusBar.tooltips.exportSvg') || 'Als SVG exportieren (Vektorisierung)'"
-        @click="handleExportSvg"
-      >
-        <i class="fa-solid fa-bezier-curve"></i>
-      </button>
+          <button
+            class="tool-btn"
+            type="button"
+            :title="t('statusBar.tooltips.downloadZip')"
+            @click="handleExportZip"
+          >
+            <i class="fa-solid fa-file-zipper"></i>
+          </button>
 
-      <button
-        class="btn btn-icon btn-primary"
-        :disabled="!imageStore.hasSelection"
-        :title="t('statusBar.tooltips.saveSelected')"
-        @click="handleSaveImages"
-      >
-        <i class="fa-solid fa-download"></i>
-      </button>
+          <button
+            class="tool-btn"
+            type="button"
+            :title="t('statusBar.tooltips.exportSvg')"
+            @click="handleExportSvg"
+          >
+            <i class="fa-solid fa-bezier-curve"></i>
+          </button>
+
+          <button
+            class="tool-btn tool-btn--primary"
+            type="button"
+            :disabled="!hasSelection"
+            :title="t('statusBar.tooltips.saveSelected')"
+            @click="handleSaveImages"
+          >
+            <i class="fa-solid fa-download"></i>
+            <span class="tool-btn__text">{{ t('statusBar.buttons.save') }}</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .status-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   margin: var(--space-4) 0;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -389,277 +424,238 @@ const handleRedo = () => {
   box-shadow: var(--surface-elevation);
   position: relative;
   z-index: 10;
-  overflow: visible;
+  container-type: inline-size;
 }
 
-/* Toolbar Sections */
-.toolbar-section {
+.status-bar__row {
   display: flex;
-  align-items: center;
-  gap: var(--space-1);
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
 }
 
-.toolbar-divider {
-  width: 1px;
-  height: 28px;
-  background: var(--border-color);
-  margin: 0 var(--space-1);
-  opacity: 0.5;
+.tool-group--export {
+  margin-left: auto;
 }
 
-.header-spacer {
-  flex: 1;
-  min-width: var(--space-2);
-}
-
-/* Stats Section */
-.stats-section {
-  gap: var(--space-2);
-}
-
-.stat {
+/* Status-Pill */
+.status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
+  gap: var(--space-2);
+  height: 38px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
   background: color-mix(in oklab, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in oklab, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 18%, transparent);
+  font-size: 0.82rem;
   color: var(--text);
-  font-weight: 600;
-  font-size: 0.875rem;
+  white-space: nowrap;
   transition: all 0.2s var(--ease-smooth);
 }
 
-.stat i {
-  font-size: 0.875rem;
+.status-pill__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-pill__item i {
+  font-size: 0.8rem;
   color: var(--accent);
-  opacity: 0.8;
 }
 
-.stat-selected.has-selection {
-  background: color-mix(in oklab, var(--green) 12%, transparent);
-  border-color: color-mix(in oklab, var(--green) 25%, transparent);
+.status-pill__item strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-.stat-selected.has-selection i {
+.status-pill__text {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.status-pill__sep {
+  width: 1px;
+  height: 16px;
+  background: color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.status-pill__item--selected {
+  opacity: 0.6;
+}
+
+.status-pill.has-selection .status-pill__item--selected {
+  opacity: 1;
+}
+
+.status-pill.has-selection .status-pill__item--selected i {
   color: var(--green);
 }
 
-/* Base Button Styles */
-.btn {
+/* Werkzeuggruppe: Label + segmentierte Buttonleiste */
+.tool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: opacity 0.2s var(--ease-smooth);
+}
+
+.tool-group.is-inactive {
+  opacity: 0.55;
+}
+
+.tool-group__label {
+  padding-left: 2px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
+  user-select: none;
+}
+
+.tool-group__buttons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 38px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--bg) 70%, var(--panel));
+  border: 1px solid var(--border-color);
+}
+
+.tool-group__sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 2px;
+  background: var(--border-color);
+}
+
+/* Einheitlicher Werkzeug-Button */
+.tool-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
+  height: 30px;
+  min-width: 32px;
+  padding: 0 7px;
+  border: none;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text);
+  font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.15s var(--ease-smooth);
   cursor: pointer;
-  position: relative;
+  transition: all 0.15s var(--ease-smooth);
 }
 
-.btn:hover:not(:disabled) {
-  background: var(--btn-hover);
-  transform: translateY(-1px);
+.tool-btn i {
+  font-size: 0.85rem;
 }
 
-.btn:active:not(:disabled) {
-  transform: translateY(0);
+.tool-btn:hover:not(:disabled) {
+  background: var(--panel);
+  color: var(--accent);
+  box-shadow: 0 1px 4px color-mix(in oklab, var(--shadow-color) 40%, transparent);
 }
 
-.btn:disabled {
+.tool-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.tool-btn:disabled {
   opacity: 0.35;
-  pointer-events: none;
+  cursor: not-allowed;
 }
 
-/* Icon Button */
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: var(--radius-md);
-  background: var(--btn);
-  border: 1px solid var(--border-color);
-}
-
-.btn-icon i {
-  font-size: 0.9rem;
-}
-
-.btn-icon:hover:not(:disabled) {
-  background: var(--btn-hover);
-  border-color: var(--accent);
+.tool-btn.active {
+  background: var(--panel);
   color: var(--accent);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 15%, transparent);
+  box-shadow: 0 1px 4px color-mix(in oklab, var(--shadow-color) 40%, transparent);
 }
 
-/* Danger Button */
-.btn-danger:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--red) 15%, transparent);
-  border-color: var(--red);
-  color: var(--red);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--red) 15%, transparent);
+.tool-btn--menu {
+  padding-right: 5px;
 }
 
-/* Batch Edit Button – neutral ohne Auswahl, grün mit Auswahl */
-.btn-batch-edit {
-  background: var(--btn);
-  border: 1px solid var(--border-color);
-  color: var(--muted);
-}
-
-.btn-batch-edit:hover:not(:disabled) {
-  background: var(--btn-hover);
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 15%, transparent);
-}
-
-.btn-batch-edit.has-selection {
-  background: color-mix(in oklab, var(--green) 12%, transparent);
-  border-color: color-mix(in oklab, var(--green) 50%, transparent);
-  color: var(--green);
-}
-
-.btn-batch-edit.has-selection:hover {
-  background: color-mix(in oklab, var(--green) 20%, transparent);
-  border-color: var(--green);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--green) 20%, transparent);
-}
-
-/* SVG Button */
-.btn-svg {
-  background: color-mix(in oklab, var(--orange, #f97316) 10%, transparent);
-  border: 1px solid color-mix(in oklab, var(--orange, #f97316) 40%, transparent);
-  color: var(--orange, #f97316);
-}
-
-.btn-svg:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--orange, #f97316) 20%, transparent);
-  border-color: var(--orange, #f97316);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--orange, #f97316) 25%, transparent);
-}
-
-/* Primary Button */
-.btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--accent) 0%,
-    color-mix(in oklab, var(--accent) 85%, var(--purple)) 100%
-  );
-  color: var(--accent-text);
-  border-color: transparent;
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 25%, transparent);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 90%, black) 0%,
-    color-mix(in oklab, var(--accent) 75%, var(--purple)) 100%
-  );
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 35%, transparent);
-  transform: translateY(-2px);
-}
-
-/* Button Group */
-.btn-group {
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  background: color-mix(in oklab, var(--border-color) 30%, transparent);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-}
-
-.btn-group .btn-icon {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-}
-
-.btn-group .btn-icon:hover:not(:disabled) {
-  background: var(--btn);
-  box-shadow: none;
-}
-
-/* Aktiver Zustand (z. B. gewählte Grid-Größe) */
-.btn-group .btn-icon.active {
-  background: color-mix(in oklab, var(--accent) 22%, transparent);
-  color: var(--accent);
-}
-
-/* Split-Button Chevron */
-.btn-group-split {
-  gap: 1px;
-}
-
-.btn-chevron {
-  width: 22px !important;
-  padding: 0;
-}
-
-.btn-chevron i {
-  font-size: 0.65rem;
+.tool-btn__chevron {
+  font-size: 0.55rem !important;
+  opacity: 0.7;
   transition: transform 0.2s var(--ease-smooth);
 }
 
-.btn-chevron.active i {
+.tool-btn.active .tool-btn__chevron {
   transform: rotate(180deg);
 }
 
-/* Disabled dropdown item */
-.dropdown-item--disabled {
-  opacity: 0.35;
-  pointer-events: none;
+.tool-btn--danger:hover:not(:disabled) {
+  color: var(--red);
 }
 
-/* Export Section */
-.export-section {
-  gap: var(--space-2);
+/* Stapelbearbeitung: hervorgehoben, sobald eine Auswahl vorliegt */
+.tool-btn--accent.is-ready {
+  background: color-mix(in oklab, var(--green) 14%, transparent);
+  color: var(--green);
 }
 
-/* Dropdown Styles */
+.tool-btn--accent.is-ready:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--green) 22%, transparent);
+  color: var(--green);
+}
+
+/* Primäre Aktion mit Text */
+.tool-btn--primary {
+  padding: 0 12px;
+  margin-left: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: var(--accent-text);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.tool-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+  color: var(--accent-text);
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.tool-btn__text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Dropdown */
 .dropdown-wrapper {
   position: relative;
 }
 
-.dropdown-icon {
-  font-size: 0.75rem;
-  margin-left: 4px;
-  transition: transform 0.2s var(--ease-smooth);
-}
-
-.dropdown-icon.dropdown-open {
-  transform: rotate(180deg);
-}
-
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   left: 0;
-  margin-top: 4px;
-  min-width: 140px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  min-width: 160px;
+  padding: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   box-shadow: var(--surface-elevation);
   z-index: 100;
-  overflow: hidden;
-  animation: dropdown-appear 0.2s var(--ease-smooth);
+  animation: dropdown-appear 0.18s var(--ease-smooth);
+}
+
+.dropdown-menu--right {
+  left: auto;
+  right: 0;
 }
 
 @keyframes dropdown-appear {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
@@ -672,106 +668,76 @@ const handleRedo = () => {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 12px 16px;
+  padding: 9px 12px;
   border: none;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s var(--ease-smooth);
   text-align: left;
+  white-space: nowrap;
+  transition: all 0.15s var(--ease-smooth);
 }
 
-.dropdown-item:hover {
-  background: color-mix(in oklab, var(--accent) 15%, transparent);
+.dropdown-item:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
   color: var(--accent);
+}
+
+.dropdown-item:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .dropdown-item i {
-  font-size: 1rem;
-  width: 20px;
+  width: 18px;
+  font-size: 0.9rem;
   text-align: center;
   color: var(--muted);
-  transition: color 0.2s var(--ease-smooth);
 }
 
-.dropdown-item:hover i {
+.dropdown-item:hover:not(:disabled) i {
   color: var(--accent);
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .status-bar {
-    gap: var(--space-2);
-    padding: var(--space-2);
-  }
-
-  .toolbar-section {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .toolbar-divider {
+/* Responsive: Beschriftungen stufenweise einklappen, bevor umgebrochen wird */
+@container (max-width: 1180px) {
+  .status-pill__text {
     display: none;
-  }
-
-  .header-spacer {
-    width: 100%;
-    min-height: 0;
-    flex-basis: 100%;
-  }
-
-  .stats-section {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .export-section {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .btn-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .btn-group .btn-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .dropdown-menu {
-    left: 50%;
-    transform: translateX(-50%);
   }
 }
 
-@media (max-width: 480px) {
+@container (max-width: 1000px) {
+  .status-bar__row {
+    column-gap: var(--space-2);
+  }
+
+  .tool-btn__text {
+    display: none;
+  }
+
+  .tool-btn--primary {
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 768px) {
   .status-bar {
-    padding: var(--space-2);
-    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
   }
 
-  .stat {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+  .status-bar__row {
+    gap: var(--space-2) var(--space-3);
   }
 
-  .btn-icon {
-    width: 44px;
-    height: 44px;
+  .tool-group__label {
+    display: none;
   }
 
-  .btn-group .btn-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .dropdown-item {
-    padding: 14px 16px;
-    min-height: 44px;
+  .tool-group--export {
+    margin-left: 0;
   }
 }
 </style>
