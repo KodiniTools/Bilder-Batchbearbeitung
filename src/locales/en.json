@@ -15,6 +15,10 @@
     "blog": {
       "title": "Batch Image Editor: Features and Guide | KodiniTools",
       "description": "Discover all features: batch filters, PDF export with designer, SVG conversion, bulk renaming, and more."
+    },
+    "articles": {
+      "title": "Blog Articles on the Batch Image Editor | KodiniTools",
+      "description": "Guides and tips from the KodiniTools blog about batch image editing: watermarks, resizing, export and more."
     }
   },
   "landing": {
@@ -24,7 +28,7 @@
       "app": "Launch App",
       "faq": "FAQ",
       "blog": "Features",
-      "blogExternal": "Blog"
+      "articles": "Blog"
     },
     "hero": {
       "title": "Professional Image Editing Right in Your Browser",
@@ -1006,5 +1010,11 @@
     "from": "Transferred from {tool}",
     "accept": "Import Images",
     "dismiss": "Dismiss"
+  },
+  "articles": {
+    "title": "Blog – Tips & Guides",
+    "subtitle": "Posts from the KodiniTools blog about the batch image editor. Articles open in a new tab.",
+    "readArticle": "Read article",
+    "minutes": "{count} min"
   }
 }

@@ -34,4 +34,12 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://kodinitools.com/bilderseriebearbeiten/artikel</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://kodinitools.com/bilderseriebearbeiten/artikel"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://kodinitools.com/bilderseriebearbeiten/artikel?lang=en"/>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
 </urlset>

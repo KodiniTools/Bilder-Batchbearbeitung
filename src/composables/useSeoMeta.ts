@@ -9,6 +9,11 @@ const routeSeoConfig: Record<string, { titleKey: string; descriptionKey: string;
   app: { titleKey: 'seo.app.title', descriptionKey: 'seo.app.description', path: '/app' },
   faq: { titleKey: 'seo.faq.title', descriptionKey: 'seo.faq.description', path: '/faq' },
   blog: { titleKey: 'seo.blog.title', descriptionKey: 'seo.blog.description', path: '/blog' },
+  articles: {
+    titleKey: 'seo.articles.title',
+    descriptionKey: 'seo.articles.description',
+    path: '/artikel',
+  },
 }
 
 function routeUrl(path: string): string {

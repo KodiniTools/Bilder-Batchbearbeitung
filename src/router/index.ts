@@ -24,6 +24,11 @@ const webRoutes = [
     name: 'blog',
     component: () => import('@/views/BlogPage.vue'),
   },
+  {
+    path: '/artikel',
+    name: 'articles',
+    component: () => import('@/views/BlogArticlesPage.vue'),
+  },
   // Ehemalige Seiten entfernt; alte Links und Suchindex-Einträge landen auf der Startseite
   {
     path: '/downloads',
