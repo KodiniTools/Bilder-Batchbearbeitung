@@ -9,9 +9,6 @@ const router = useRouter()
 const isElectron = !!(window as any).electronAPI?.isElectron
 const theme = ref<'light' | 'dark'>('light')
 
-/** Externer Blog-Artikel (kodinitools.com), wird in neuem Tab geöffnet */
-const BLOG_ARTICLE_URL = 'https://kodinitools.com/blog/bilder-batch-verkleinern/'
-
 const goToApp = () => {
   router.push('/app')
 }
@@ -22,6 +19,11 @@ const goToFaq = () => {
 
 const goToBlog = () => {
   router.push('/blog')
+}
+
+/** Interne Artikel-Übersicht mit Beiträgen aus kodinitools.com/blog */
+const goToArticles = () => {
+  router.push('/artikel')
 }
 
 const setLanguage = (lang: string) => {
@@ -62,9 +64,7 @@ onMounted(() => {
           <button class="nav-link" @click="goToApp">{{ t('landing.nav.app') }}</button>
           <button class="nav-link" @click="goToBlog">{{ t('landing.nav.blog') }}</button>
           <button class="nav-link" @click="goToFaq">{{ t('landing.nav.faq') }}</button>
-          <a class="nav-link" :href="BLOG_ARTICLE_URL" target="_blank" rel="noopener noreferrer">
-            {{ t('landing.nav.blogExternal') }}
-          </a>
+          <button class="nav-link" @click="goToArticles">{{ t('landing.nav.articles') }}</button>
         </div>
         <!-- In Electron: eigene Sprach-/Theme-Umschalter (SSI nav fehlt) -->
         <div v-if="isElectron" class="nav-actions">

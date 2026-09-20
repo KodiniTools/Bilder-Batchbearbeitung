@@ -15,6 +15,10 @@
     "blog": {
       "title": "Bilder-Batchbearbeitung: Funktionen und Anleitung | KodiniTools",
       "description": "Entdecken Sie alle Funktionen: Batch-Filter, PDF-Export mit Designer, SVG-Konvertierung, Stapelumbenennung und mehr."
+    },
+    "articles": {
+      "title": "Blog-Artikel zu Bilderserie bearbeiten | KodiniTools",
+      "description": "Anleitungen und Tipps aus dem KodiniTools-Blog rund um die Batch-Bildbearbeitung: Wasserzeichen, Grösse ändern, Export und mehr."
     }
   },
   "landing": {
@@ -24,7 +28,7 @@
       "app": "App starten",
       "blog": "Funktionen",
       "faq": "FAQ",
-      "blogExternal": "Blog"
+      "articles": "Blog"
     },
     "hero": {
       "title": "Professionelle Bildbearbeitung direkt im Browser",
@@ -1006,5 +1010,11 @@
     "from": "Aus {tool} uebertragen",
     "accept": "Bilder uebernehmen",
     "dismiss": "Verwerfen"
+  },
+  "articles": {
+    "title": "Blog – Tipps & Anleitungen",
+    "subtitle": "Beiträge aus dem KodiniTools-Blog rund um Bilderserie bearbeiten. Artikel öffnen in einem neuen Tab.",
+    "readArticle": "Artikel lesen",
+    "minutes": "{count} Min."
   }
 }
