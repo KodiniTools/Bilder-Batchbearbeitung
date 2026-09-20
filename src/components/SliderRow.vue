@@ -54,7 +54,7 @@ function resetValue() {
 </script>
 
 <template>
-  <div class="slider-group">
+  <div class="slider-group" :class="{ 'is-modified': isModified }">
     <div class="slider-head">
       <i v-if="icon" :class="['fa-solid', icon]"></i>
       <span class="slider-name" :title="label">{{ label }}</span>
@@ -126,6 +126,10 @@ function resetValue() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.slider-group.is-modified .slider-head > i {
+  color: var(--accent);
 }
 
 /* Spinner + Reset-Button; der Reset-Slot ist immer reserviert,
