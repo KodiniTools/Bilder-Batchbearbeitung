@@ -51,6 +51,16 @@ const isBatchEditPanelOpen = ref(false)
 
 const loadingIndicator = ref<InstanceType<typeof LoadingIndicator> | null>(null)
 
+// Höhe des (sticky) App-Headers, damit die Sidebar darunter andockt
+const appHeader = ref<InstanceType<typeof AppHeader> | null>(null)
+const appHeaderHeight = ref(0)
+let headerObserver: ResizeObserver | null = null
+
+function measureHeader() {
+  const el = appHeader.value?.$el as HTMLElement | undefined
+  appHeaderHeight.value = el && el.offsetParent !== null ? el.offsetHeight : 0
+}
+
 const isWizardOpen = ref(false)
 const wizardExportType = ref<'pdf' | 'zip' | 'svg' | 'save' | null>(null)
 const wizardExportCount = ref(0)
@@ -553,38 +563,55 @@ onMounted(() => {
 
   window.addEventListener('keydown', handleKeyboard)
   window.addEventListener('paste', handlePaste)
+
+  measureHeader()
+  const headerEl = appHeader.value?.$el as HTMLElement | undefined
+  if (headerEl && typeof ResizeObserver !== 'undefined') {
+    headerObserver = new ResizeObserver(measureHeader)
+    headerObserver.observe(headerEl)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyboard)
   window.removeEventListener('paste', handlePaste)
+  headerObserver?.disconnect()
+  headerObserver = null
 })
 </script>
 
 <template>
   <div class="app-page">
-    <AppHeader />
+    <AppHeader ref="appHeader" />
 
-    <main class="container" :class="{ 'panel-open': isBatchEditPanelOpen }">
-      <StatusBar
-        v-if="imageStore.hasImages"
-        @export-pdf="handleExportPdf"
-        @export-zip="handleExportZip"
-        @export-svg="handleExportSvg"
-        @save-images="handleSaveImages"
-        @bulk-rename="handleBulkRename"
-        @batch-edit="handleBatchEdit"
-      />
+    <div
+      class="workspace"
+      :class="{ 'panel-open': isBatchEditPanelOpen }"
+      :style="{ '--app-header-height': `${appHeaderHeight}px` }"
+    >
+      <BatchEditPanel :is-open="isBatchEditPanelOpen" @close="closeBatchEditPanel" />
 
-      <DropZone />
+      <main class="container">
+        <StatusBar
+          v-if="imageStore.hasImages"
+          @export-pdf="handleExportPdf"
+          @export-zip="handleExportZip"
+          @export-svg="handleExportSvg"
+          @save-images="handleSaveImages"
+          @bulk-rename="handleBulkRename"
+          @batch-edit="handleBatchEdit"
+        />
 
-      <ImageGrid
-        v-if="imageStore.hasImages"
-        :only-selected="isBatchEditPanelOpen"
-        @open-editor="openEditor"
-        @open-preview="openPreview"
-      />
-    </main>
+        <DropZone />
+
+        <ImageGrid
+          v-if="imageStore.hasImages"
+          :only-selected="isBatchEditPanelOpen"
+          @open-editor="openEditor"
+          @open-preview="openPreview"
+        />
+      </main>
+    </div>
 
     <LoadingIndicator ref="loadingIndicator" />
     <ToastContainer />
@@ -619,8 +646,6 @@ onUnmounted(() => {
       @confirm="handleBulkRenameConfirm"
     />
 
-    <BatchEditPanel :is-open="isBatchEditPanelOpen" @close="closeBatchEditPanel" />
-
     <WizardNavigator
       :is-open="isWizardOpen"
       :export-type="wizardExportType"
@@ -642,18 +667,29 @@ onUnmounted(() => {
   background-attachment: fixed;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-6) var(--space-5);
-  margin-top: var(--space-7);
+/* Workspace: optionale Sidebar-Spalte links, Inhalt nutzt den Rest der Breite */
+.workspace {
+  --batch-sidebar-width: 360px;
   flex: 1;
   width: 100%;
-  transition: padding-left 0.3s var(--ease-smooth, ease);
+  display: flex;
+  align-items: flex-start;
 }
 
-.container.panel-open {
-  padding-left: calc(320px + var(--space-5));
+.container {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: var(--space-7) auto 0;
+  padding: var(--space-6) var(--space-5);
+  transition: max-width 0.3s var(--ease-smooth, ease);
+}
+
+/* Bei geöffneter Sidebar darf der Inhalt breiter werden und zentriert sich
+   im verbleibenden Raum neben der Sidebar. */
+.workspace.panel-open .container {
+  max-width: 1400px;
 }
 
 @media (max-width: 768px) {

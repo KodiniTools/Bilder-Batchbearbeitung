@@ -890,6 +890,15 @@
       "reset": "Zurücksetzen"
     },
     "resetSlider": "Zurücksetzen",
+    "liveHint": "Änderungen werden sofort auf die Auswahl angewendet",
+    "tabs": {
+      "filters": "Filter"
+    },
+    "groups": {
+      "light": "Licht",
+      "color": "Farbe",
+      "effects": "Effekte"
+    },
     "transforms": {
       "title": "Transformationen",
       "resize": {

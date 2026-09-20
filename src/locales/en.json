@@ -715,6 +715,15 @@
       "reset": "Reset"
     },
     "resetSlider": "Reset",
+    "liveHint": "Changes are applied to the selection immediately",
+    "tabs": {
+      "filters": "Filters"
+    },
+    "groups": {
+      "light": "Light",
+      "color": "Color",
+      "effects": "Effects"
+    },
     "transforms": {
       "title": "Transformations",
       "resize": {
