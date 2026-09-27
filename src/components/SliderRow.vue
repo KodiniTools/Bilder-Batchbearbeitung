@@ -2,23 +2,35 @@
 import { computed } from 'vue'
 import NumberSpinner from './NumberSpinner.vue'
 
+/**
+ * Regler im Visualizer-Muster: Label oben, darunter eine Zeile aus
+ * Verlaufsspur, Zahlen-Spinner und Reset-Button (↺). Der Reset-Button ist am
+ * Standardwert deaktiviert; ohne `default` gibt es keinen.
+ */
 const props = withDefaults(
   defineProps<{
     modelValue: number
     label: string
     min: number
     max: number
-    default: number
+    /** Neutraler Wert für den Reset-Button; ohne Angabe kein Reset-Button */
+    default?: number
     icon?: string
     step?: number
     unit?: string
     resetTitle?: string
+    disabled?: boolean
+    /** id des Reglers, damit ein äußeres <label for> daran binden kann */
+    id?: string
   }>(),
   {
+    default: undefined,
     icon: '',
     step: 1,
     unit: '',
     resetTitle: '',
+    disabled: false,
+    id: undefined,
   }
 )
 
@@ -26,13 +38,16 @@ const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
 
-const progress = computed(() => {
-  const range = props.max - props.min
-  if (range <= 0) return 0
-  return ((props.modelValue - props.min) / range) * 100
-})
+const hasDefault = computed(() => typeof props.default === 'number')
+const isModified = computed(() => hasDefault.value && props.modelValue !== props.default)
 
-const isModified = computed(() => props.modelValue !== props.default)
+// Bereiche um null (z. B. −100…100) zeigen den Nullpunkt mittig.
+const centered = computed(() => props.min < 0 && props.max > 0)
+
+const resetLabel = computed(() => {
+  const value = `${props.default}${props.unit}`
+  return props.resetTitle ? `${props.resetTitle} (${value})` : value
+})
 
 function clamp(value: number): number {
   return Math.min(props.max, Math.max(props.min, value))
@@ -49,29 +64,32 @@ function onRangeInput(event: Event) {
 }
 
 function resetValue() {
-  emitValue(props.default)
+  if (hasDefault.value && isModified.value) emitValue(props.default as number)
 }
 </script>
 
 <template>
-  <div class="slider-group" :class="{ 'is-modified': isModified }">
-    <div class="slider-head">
+  <div class="slider-group" :class="{ 'is-modified': isModified, 'is-disabled': disabled }">
+    <label class="slider-head" :for="id">
       <i v-if="icon" :class="['fa-solid', icon]"></i>
       <span class="slider-name" :title="label">{{ label }}</span>
-    </div>
+    </label>
 
-    <input
-      class="slider"
-      type="range"
-      :min="min"
-      :max="max"
-      :step="step"
-      :value="modelValue"
-      :style="{ '--progress': `${progress}%` }"
-      @input="onRangeInput"
-    />
+    <div class="slider-row">
+      <input
+        :id="id"
+        class="slider"
+        :class="{ 'slider--center': centered }"
+        type="range"
+        :min="min"
+        :max="max"
+        :step="step"
+        :value="modelValue"
+        :disabled="disabled"
+        :aria-label="label"
+        @input="onRangeInput"
+      />
 
-    <div class="slider-controls">
       <NumberSpinner
         :model-value="modelValue"
         :min="min"
@@ -79,46 +97,55 @@ function resetValue() {
         :step="step"
         :unit="unit"
         :fallback="props.default"
+        :disabled="disabled"
         @update:model-value="emitValue"
       />
 
       <button
+        v-if="hasDefault"
+        type="button"
         class="btn-reset-slider"
-        :title="resetTitle"
-        :class="{ 'is-visible': isModified }"
+        :title="resetLabel"
+        :aria-label="resetLabel"
+        :disabled="disabled || !isModified"
         @click="resetValue"
       >
-        <i class="fa-solid fa-rotate-left"></i>
+        ↺
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Alles in einer Reihe: Label · Slider · Spinner · Reset.
-   Der kurze Slider lässt Platz für Spinner und Reset-Button. */
+/* Label oben, darunter eine Zeile: Regler · Spinner · Reset */
 .slider-group {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.slider-group.is-disabled {
+  opacity: 0.55;
 }
 
 .slider-head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-  /* darf schrumpfen (Ellipsis) statt den Slider zu verdrängen */
-  flex: 0 1 auto;
+  gap: 5px;
   min-width: 0;
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--control-muted);
 }
 
 .slider-head > i {
-  width: 16px;
+  width: 12px;
+  font-size: 0.7rem;
   text-align: center;
-  color: var(--muted);
   flex-shrink: 0;
 }
 
@@ -132,95 +159,128 @@ function resetValue() {
   color: var(--accent);
 }
 
-/* Spinner + Reset-Button; der Reset-Slot ist immer reserviert,
-   sodass bei Aktivierung Leerraum für den Button vorhanden ist. */
-.slider-controls {
+.slider-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
+  gap: 6px;
+  min-width: 0;
 }
 
-.btn-reset-slider {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: transparent;
-  border-radius: var(--radius-sm);
-  cursor: default;
-  font-size: 0.7rem;
-  pointer-events: none;
-  transition:
-    opacity 0.15s ease,
-    background 0.15s ease,
-    color 0.15s ease;
-  opacity: 0;
-}
-
-.btn-reset-slider.is-visible {
-  background: color-mix(in oklab, var(--muted) 15%, transparent);
-  color: var(--muted);
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.btn-reset-slider.is-visible:hover {
-  background: color-mix(in oklab, var(--accent) 20%, transparent);
-  color: var(--accent);
-}
-
+/* Dünne Verlaufsspur, kleiner Thumb mit weißem Rand */
 .slider {
-  flex: 1 1 44px;
-  min-width: 44px;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 3px;
+  margin: 0;
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  background: linear-gradient(
-    to right,
-    var(--accent) 0%,
-    var(--accent) var(--progress, 50%),
-    var(--border-color) var(--progress, 50%),
-    var(--border-color) 100%
-  );
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--slider-track-from) 0%, var(--slider-track-to) 100%);
   cursor: pointer;
   touch-action: none;
+  outline: none;
+}
+
+.slider--center {
+  background: linear-gradient(
+    90deg,
+    var(--slider-track-to) 0%,
+    var(--slider-track-from) 50%,
+    var(--slider-track-to) 100%
+  );
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid var(--panel);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: grab;
+  background: var(--slider-thumb);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
-.slider::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 .slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
   border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid var(--panel);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: grab;
+  background: var(--slider-thumb);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
-.slider::-moz-range-thumb:active {
-  cursor: grabbing;
+.slider::-moz-range-track {
+  background: transparent;
+}
+
+.slider:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-gold) 30%, transparent);
+}
+
+.slider:disabled {
+  cursor: not-allowed;
+}
+
+.btn-reset-slider {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  color: var(--control-muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-reset-slider:hover:not(:disabled) {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+.btn-reset-slider:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 1px;
+}
+
+.btn-reset-slider:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Touch: größerer Thumb und Reset */
+@media (max-width: 768px) {
+  .slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .btn-reset-slider {
+    width: 28px;
+    height: 28px;
+    font-size: 0.95rem;
+  }
 }
 </style>

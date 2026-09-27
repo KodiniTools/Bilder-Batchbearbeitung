@@ -21,15 +21,13 @@
 
       <div class="ctrl-row">
         <span class="ctrl-sublabel">{{ t('imageEditor.text.fontSize') }}</span>
-        <input
-          type="number"
-          class="size-input"
-          min="6"
-          max="300"
-          :value="selectedText.fontSize"
-          @input="emit('update-text', { fontSize: +($event.target as HTMLInputElement).value })"
+        <NumberSpinner
+          :model-value="selectedText.fontSize"
+          :min="6"
+          :max="300"
+          unit="px"
+          @update:model-value="(v: number) => emit('update-text', { fontSize: v })"
         />
-        <span class="size-unit">px</span>
       </div>
 
       <div class="ctrl-row">
@@ -237,6 +235,7 @@ import { useI18n } from 'vue-i18n'
 import type { TextItem } from '@/lib/core/types'
 import { defaultTextStyle } from '@/lib/core/types'
 import SliderRow from '../SliderRow.vue'
+import NumberSpinner from '../NumberSpinner.vue'
 
 const { t } = useI18n()
 

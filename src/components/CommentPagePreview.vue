@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import SliderRow from './SliderRow.vue'
 
 interface Props {
   commentText: string
@@ -18,6 +19,13 @@ const imagePreviewUrl = ref<string | null>(null)
 const isDragging = ref(false)
 const imagePosition = ref({ x: 50, y: 30 }) // Percentage-based positioning
 const imageScale = ref(0.3) // Scale factor (0.1 to 1)
+/** Bildgröße als Prozent für den Regler (10–100 in 5er-Schritten) */
+const imageScalePercent = computed({
+  get: () => Math.round(imageScale.value * 100),
+  set: (value: number) => {
+    imageScale.value = value / 100
+  },
+})
 
 // Preview container ref
 const previewContainer = ref<HTMLDivElement | null>(null)
@@ -103,22 +111,17 @@ const pageAspectRatio = computed(() => {
       </h4>
 
       <div v-if="commentImage" class="preview-controls">
-        <div class="scale-control">
-          <label>
-            <i class="fa-solid fa-search-minus"></i>
-            Größe
-            <i class="fa-solid fa-search-plus"></i>
-          </label>
-          <input
-            v-model.number="imageScale"
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.05"
-            class="scale-slider"
-          />
-          <span class="scale-value">{{ Math.round(imageScale * 100) }}%</span>
-        </div>
+        <SliderRow
+          v-model="imageScalePercent"
+          class="scale-slider-row"
+          label="Größe"
+          icon="fa-search-plus"
+          :min="10"
+          :max="100"
+          :step="5"
+          :default="30"
+          unit="%"
+        />
 
         <button class="reset-btn" title="Position zurücksetzen" @click="resetPosition">
           <i class="fa-solid fa-arrows-rotate"></i>
@@ -218,64 +221,9 @@ const pageAspectRatio = computed(() => {
   flex-wrap: wrap;
 }
 
-.scale-control {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.scale-control label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.scale-slider {
-  width: 120px;
-  height: 6px;
-  border-radius: 3px;
-  background: color-mix(in oklab, var(--border-color) 50%, transparent);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.scale-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s var(--ease-smooth);
-}
-
-.scale-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-.scale-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.scale-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent);
-  min-width: 45px;
-  text-align: right;
+.scale-slider-row {
+  flex: 1 1 200px;
+  max-width: 280px;
 }
 
 .reset-btn {
@@ -451,13 +399,8 @@ const pageAspectRatio = computed(() => {
     align-items: stretch;
   }
 
-  .scale-control {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .scale-slider {
-    flex: 1;
+  .scale-slider-row {
+    max-width: none;
   }
 
   .reset-btn {

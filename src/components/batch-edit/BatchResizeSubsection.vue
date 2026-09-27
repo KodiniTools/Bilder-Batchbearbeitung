@@ -65,13 +65,16 @@
         }}
       </button>
       <button
-        class="btn btn-undo-resize"
+        class="btn-history btn-reset btn-history--full"
         type="button"
         :disabled="!canUndo"
         :title="t('batchEdit.transforms.resize.undoTitle')"
         @click="emit('undo')"
       >
-        <i class="fa-solid fa-rotate-left"></i>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7v6h6" />
+          <path d="M3 13C5.33 7.5 10 4 16 4a9 9 0 0 1 0 18H8" />
+        </svg>
         {{ t('batchEdit.transforms.resize.undo') }}
       </button>
     </div>
@@ -202,33 +205,5 @@ function onKeepAspectInput(event: Event) {
 .btn-apply-resize[aria-busy='true'] {
   opacity: 0.85;
   cursor: progress;
-}
-
-.btn-undo-resize {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  background: var(--btn);
-  color: var(--text);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  transition: all 0.2s var(--ease-smooth);
-}
-
-.btn-undo-resize:hover:not(:disabled) {
-  background: var(--btn-hover);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.btn-undo-resize:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

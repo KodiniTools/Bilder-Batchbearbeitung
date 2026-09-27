@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import SliderRow from './SliderRow.vue'
 
 interface CommentEntry {
   id: string
@@ -305,30 +306,24 @@ function startDrag(event: MouseEvent) {
             <div v-else class="image-uploaded">
               <img :src="activeEntry.imagePreviewUrl ?? undefined" alt="Preview" />
               <div class="image-controls">
-                <div class="scale-control">
-                  <label>
-                    <i class="fa-solid fa-search-minus"></i>
-                    Größe
-                    <i class="fa-solid fa-search-plus"></i>
-                  </label>
-                  <input
-                    type="range"
-                    :value="activeEntry.position.scale"
-                    min="0.1"
-                    max="1"
-                    step="0.05"
-                    class="scale-slider"
-                    @input="
+                <SliderRow
+                  class="scale-slider-row"
+                  label="Größe"
+                  icon="fa-search-plus"
+                  :model-value="Math.round(activeEntry.position.scale * 100)"
+                  :min="10"
+                  :max="100"
+                  :step="5"
+                  :default="30"
+                  unit="%"
+                  @update:model-value="
+                    (v: number) =>
                       updateImagePosition(activeEntryId, {
                         ...activeEntry.position,
-                        scale: parseFloat(($event.target as HTMLInputElement).value),
+                        scale: v / 100,
                       })
-                    "
-                  />
-                  <span class="scale-value">
-                    {{ Math.round(activeEntry.position.scale * 100) }}%
-                  </span>
-                </div>
+                  "
+                />
                 <button class="remove-image-btn" @click="removeImage(activeEntryId)">
                   <i class="fa-solid fa-trash"></i>
                   Entfernen
@@ -712,59 +707,8 @@ function startDrag(event: MouseEvent) {
   border: 1px solid var(--border-color);
 }
 
-.scale-control {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.scale-control label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 0.85rem;
-  color: var(--muted);
-  font-weight: 500;
-  margin: 0;
-}
-
-.scale-slider {
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
-  background: color-mix(in oklab, var(--border-color) 50%, transparent);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.scale-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.scale-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.scale-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent);
-  min-width: 45px;
-  text-align: right;
+.scale-slider-row {
+  min-width: 0;
 }
 
 .remove-image-btn {

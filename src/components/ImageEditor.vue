@@ -129,26 +129,15 @@
             <div class="controls-panel">
               <!-- Undo / Redo bar -->
               <div class="undo-redo-bar">
-                <button
-                  type="button"
-                  class="undo-redo-btn"
-                  :disabled="!canUndo"
-                  :title="t('imageEditor.undoRedo.undoTitle')"
-                  @click="undo"
-                >
-                  <i class="fa-solid fa-rotate-left"></i>
-                  {{ t('imageEditor.undoRedo.undo') }}
-                </button>
-                <button
-                  type="button"
-                  class="undo-redo-btn"
-                  :disabled="!canRedo"
-                  :title="t('imageEditor.undoRedo.redoTitle')"
-                  @click="redo"
-                >
-                  <i class="fa-solid fa-rotate-right"></i>
-                  {{ t('imageEditor.undoRedo.redo') }}
-                </button>
+                <HistoryActions
+                  compact
+                  :can-undo="canUndo"
+                  :can-redo="canRedo"
+                  :undo-title="t('imageEditor.undoRedo.undoTitle')"
+                  :redo-title="t('imageEditor.undoRedo.redoTitle')"
+                  @undo="undo"
+                  @redo="redo"
+                />
                 <span class="undo-redo-hint">{{ t('imageEditor.undoRedo.hint') }}</span>
               </div>
 
@@ -311,6 +300,7 @@ import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import ImagePreview from './ImagePreview.vue'
+import HistoryActions from './HistoryActions.vue'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 import { useToast } from '@/composables/useToast'
 import { useImageStore } from '@/stores/imageStore'
@@ -1444,30 +1434,6 @@ function closeEditor() {
   top: 0;
   z-index: 3;
   flex-shrink: 0;
-}
-
-.undo-redo-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--muted);
-  font-size: 0.73rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.undo-redo-btn:hover:not(:disabled) {
-  color: var(--text);
-  border-color: var(--accent);
-}
-.undo-redo-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
 }
 
 .undo-redo-hint {

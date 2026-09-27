@@ -266,12 +266,15 @@ function close() {
           {{ t('batchEdit.liveHint') }}
         </span>
         <button
-          class="btn btn-reset-all"
+          class="btn-history btn-reset btn-history--full"
           type="button"
           :disabled="!hasSelection || !hasAnyChange"
           @click="resetAll"
         >
-          <i class="fa-solid fa-arrow-rotate-left"></i>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
           {{ t('batchEdit.buttons.reset') }}
         </button>
       </footer>
@@ -495,19 +498,6 @@ function close() {
 
 .panel-footer__hint i {
   color: var(--secondary);
-}
-
-.btn-reset-all {
-  width: 100%;
-  background: var(--btn);
-  color: var(--text);
-  border: 1px solid var(--border-color);
-}
-
-.btn-reset-all:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--red) 15%, transparent);
-  border-color: var(--red);
-  color: var(--red);
 }
 
 /* Slide-Animation */

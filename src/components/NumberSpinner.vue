@@ -22,7 +22,7 @@
         @mousedown="startHold(1, $event)"
         @touchstart.prevent="startHold(1, $event)"
       >
-        <i class="fa-solid fa-chevron-up"></i>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6" /></svg>
       </button>
       <button
         type="button"
@@ -32,7 +32,7 @@
         @mousedown="startHold(-1, $event)"
         @touchstart.prevent="startHold(-1, $event)"
       >
-        <i class="fa-solid fa-chevron-down"></i>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
       </button>
     </div>
   </div>
@@ -91,27 +91,47 @@ function onChange(event: Event) {
   emitValue(Number.isNaN(v) ? (props.fallback ?? props.min) : clamp(v))
 }
 
-function stepBy(direction: 1 | -1) {
-  emitValue(clamp(props.modelValue + direction * props.step))
+function stepBy(direction: 1 | -1, factor = 1): boolean {
+  // toFixed entfernt Float-Drift bei Dezimalschritten (z. B. 0.1 + 0.2)
+  const next = clamp(Number((props.modelValue + direction * props.step * factor).toFixed(6)))
+  if (next === props.modelValue) return false
+  emitValue(next)
+  return true
 }
 
-// Press-and-hold: erst eine Verzögerung, dann fortlaufende Schritte,
-// die mit der Haltezeit leicht beschleunigen.
-let holdTimeout: ReturnType<typeof setTimeout> | null = null
-let holdInterval: ReturnType<typeof setInterval> | null = null
+// Press-and-hold: ein Schritt sofort, nach HOLD_DELAY ein Dauerlauf, der
+// langsam (für feines Nachjustieren) beginnt und immer schneller wird.
+const HOLD_DELAY = 400
+const HOLD_PHASES = [
+  { until: 5, interval: 140, factor: 1 },
+  { until: 15, interval: 70, factor: 1 },
+  { until: 30, interval: 40, factor: 1 },
+  { until: Infinity, interval: 40, factor: 5 },
+]
+
+let holdTimer: ReturnType<typeof setTimeout> | null = null
+let holdTicks = 0
 
 function stopHold() {
-  if (holdTimeout) {
-    clearTimeout(holdTimeout)
-    holdTimeout = null
+  if (holdTimer) {
+    clearTimeout(holdTimer)
+    holdTimer = null
   }
-  if (holdInterval) {
-    clearInterval(holdInterval)
-    holdInterval = null
-  }
+  holdTicks = 0
   window.removeEventListener('mouseup', stopHold)
   window.removeEventListener('touchend', stopHold)
   window.removeEventListener('touchcancel', stopHold)
+}
+
+function repeatHold(direction: 1 | -1) {
+  holdTicks += 1
+  const phase = HOLD_PHASES.find((p) => holdTicks <= p.until) ?? HOLD_PHASES[HOLD_PHASES.length - 1]
+  // An der Grenze anhalten
+  if (!stepBy(direction, phase.factor)) {
+    stopHold()
+    return
+  }
+  holdTimer = setTimeout(() => repeatHold(direction), phase.interval)
 }
 
 function startHold(direction: 1 | -1, event: Event) {
@@ -127,48 +147,31 @@ function startHold(direction: 1 | -1, event: Event) {
   window.addEventListener('touchend', stopHold)
   window.addEventListener('touchcancel', stopHold)
 
-  holdTimeout = setTimeout(() => {
-    let delay = 90
-    const tick = () => {
-      // An der Grenze anhalten
-      if (
-        (direction === 1 && props.modelValue >= props.max) ||
-        (direction === -1 && props.modelValue <= props.min)
-      ) {
-        stopHold()
-        return
-      }
-      stepBy(direction)
-      // sanft beschleunigen bis min. 30ms
-      if (delay > 30) {
-        delay = Math.max(30, delay - 8)
-        if (holdInterval) clearInterval(holdInterval)
-        holdInterval = setInterval(tick, delay)
-      }
-    }
-    holdInterval = setInterval(tick, delay)
-  }, 350)
+  holdTimer = setTimeout(() => repeatHold(direction), HOLD_DELAY)
 }
 
 onUnmounted(stopHold)
 </script>
 
 <style scoped>
+/* Kompaktes Zahlenfeld im Visualizer-Stil: 22px hoch, umrandet, Monospace.
+   Eigene Pfeile statt der nativen, weil sie das langsam→schnell tragen. */
 .num-spinner {
+  flex: none;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 1px;
-  height: 26px;
-  padding: 0 2px 0 5px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg);
+  width: 66px;
+  height: 22px;
+  padding: 0 0 0 4px;
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  background: var(--control-bg);
   transition: border-color 0.15s ease;
-  flex-shrink: 0;
 }
 
 .num-spinner:focus-within {
-  border-color: var(--accent);
+  border-color: var(--color-gold);
 }
 
 .num-spinner.disabled {
@@ -176,12 +179,16 @@ onUnmounted(stopHold)
 }
 
 .spin-input {
-  width: 30px;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
   border: none;
   background: transparent;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
+  color: var(--text);
+  font-family: 'Courier New', var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.3;
   text-align: right;
   outline: none;
   padding: 0;
@@ -196,40 +203,53 @@ onUnmounted(stopHold)
 }
 
 .spin-unit {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--muted);
-  flex-shrink: 0;
+  flex: none;
+  margin-left: 1px;
+  font-family: 'Courier New', var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--control-muted);
 }
 
 .spin-buttons {
+  flex: none;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
+  align-self: stretch;
+  margin-left: 2px;
+  border-left: 1px solid var(--control-border);
 }
 
 .spin-btn {
-  width: 16px;
-  height: 11px;
+  flex: 1 1 0;
+  width: 14px;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--muted);
+  color: var(--control-muted);
   cursor: pointer;
   padding: 0;
-  font-size: 0.5rem;
-  border-radius: 2px;
+  touch-action: none;
   transition:
     color 0.15s ease,
     background 0.15s ease;
 }
 
+.spin-btn svg {
+  width: 8px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .spin-btn:hover:not(:disabled) {
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 15%, transparent);
+  color: var(--color-gold);
+  background: color-mix(in oklab, var(--color-gold) 15%, transparent);
 }
 
 .spin-btn:disabled {
@@ -237,32 +257,46 @@ onUnmounted(stopHold)
   cursor: default;
 }
 
-/* Fluid-Variante: füllt den Container, Wert linksbündig, größere Pfeile */
+/* Fluid-Variante (Breite/Höhe-Felder): füllt den Container, Wert linksbündig */
 .num-spinner.fluid {
   width: 100%;
   height: 36px;
-  padding: 0 4px 0 var(--space-2);
+  padding: 0 0 0 var(--space-2);
   border-radius: var(--radius-md);
-  gap: var(--space-1);
 }
 
 .num-spinner.fluid .spin-input {
-  flex: 1;
-  width: auto;
-  min-width: 0;
   text-align: left;
-  color: var(--text);
   font-size: 0.875rem;
 }
 
 .num-spinner.fluid .spin-unit {
   font-size: 0.8rem;
-  padding-right: 2px;
+  padding-right: 4px;
 }
 
 .num-spinner.fluid .spin-btn {
-  width: 20px;
-  height: 14px;
-  font-size: 0.6rem;
+  width: 22px;
+}
+
+.num-spinner.fluid .spin-btn svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Touch: höheres Feld, damit die Pfeile treffbar bleiben */
+@media (max-width: 768px) {
+  .num-spinner:not(.fluid) {
+    width: 72px;
+    height: 28px;
+  }
+
+  .num-spinner:not(.fluid) .spin-input {
+    font-size: 0.75rem;
+  }
+
+  .spin-btn {
+    width: 18px;
+  }
 }
 </style>
