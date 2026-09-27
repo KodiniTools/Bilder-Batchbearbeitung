@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
+import HistoryActions from './HistoryActions.vue'
 
 const imageStore = useImageStore()
 const { t } = useI18n()
@@ -183,26 +184,16 @@ const handleRedo = () => {
       <!-- Verlauf -->
       <div class="tool-group">
         <span class="tool-group__label">{{ t('statusBar.groups.history') }}</span>
-        <div class="tool-group__buttons">
-          <button
-            class="tool-btn"
-            type="button"
-            :disabled="!imageStore.canUndo"
-            :title="t('statusBar.tooltips.undo')"
-            @click="handleUndo"
-          >
-            <i class="fa-solid fa-arrow-rotate-left"></i>
-          </button>
-          <button
-            class="tool-btn"
-            type="button"
-            :disabled="!imageStore.canRedo"
-            :title="t('statusBar.tooltips.redo')"
-            @click="handleRedo"
-          >
-            <i class="fa-solid fa-arrow-rotate-right"></i>
-          </button>
-        </div>
+        <HistoryActions
+          class="toolbar-history"
+          compact
+          :can-undo="imageStore.canUndo"
+          :can-redo="imageStore.canRedo"
+          :undo-title="t('statusBar.tooltips.undo')"
+          :redo-title="t('statusBar.tooltips.redo')"
+          @undo="handleUndo"
+          @redo="handleRedo"
+        />
       </div>
 
       <!-- Ansicht -->
@@ -535,6 +526,11 @@ const handleRedo = () => {
 }
 
 /* Einheitlicher Werkzeug-Button */
+/* Verlaufs-Buttons in Höhe der übrigen Werkzeug-Gruppen */
+.toolbar-history :deep(.btn-history) {
+  height: 38px;
+}
+
 .tool-btn {
   display: inline-flex;
   align-items: center;

@@ -60,21 +60,14 @@
     </div>
 
     <!-- Freie Rotation / Begradigen -->
-    <div class="filter-row">
-      <label class="filter-label">{{ t('imageEditor.transformations.straighten.label') }}</label>
-      <div class="filter-slider-wrap">
-        <input
-          type="range"
-          class="filter-slider"
-          min="-45"
-          max="45"
-          step="1"
-          :value="straightenAngle"
-          @input="onStraighten($event)"
-        />
-        <span class="filter-value">{{ straightenAngle }}°</span>
-      </div>
-    </div>
+    <SliderRow
+      :model-value="straightenAngle"
+      :label="t('imageEditor.transformations.straighten.label')"
+      :min="-45"
+      :max="45"
+      unit="°"
+      @update:model-value="(v: number) => emit('straighten', v)"
+    />
     <div v-if="isStraightenMode" class="btn-row">
       <button type="button" class="btn btn-sm btn-primary" @click="emit('straighten-apply')">
         <i class="fa-solid fa-check"></i>
@@ -89,6 +82,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import SliderRow from '../SliderRow.vue'
 
 const { t } = useI18n()
 
@@ -104,10 +98,6 @@ const emit = defineEmits<{
   'straighten-apply': []
   'straighten-reset': []
 }>()
-
-function onStraighten(event: Event) {
-  emit('straighten', Number((event.target as HTMLInputElement).value))
-}
 </script>
 
 <style scoped>

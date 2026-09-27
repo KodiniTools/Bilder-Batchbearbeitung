@@ -234,13 +234,13 @@
               </div>
 
               <div class="setting-group">
-                <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
-                <input
-                  v-model.number="settings.quality"
-                  type="range"
-                  min="1"
-                  max="100"
-                  class="quality-slider"
+                <SliderRow
+                  v-model="settings.quality"
+                  :label="t('exportModal.format.quality.label')"
+                  :min="1"
+                  :max="100"
+                  :default="92"
+                  unit="%"
                 />
               </div>
 
@@ -305,15 +305,12 @@
               </div>
 
               <div class="setting-group">
-                <label>
-                  {{ t('exportModal.svg.detail') || 'Detailgrad' }}: {{ settings.svgFilterSpeckle }}
-                </label>
-                <input
-                  v-model.number="settings.svgFilterSpeckle"
-                  type="range"
-                  min="1"
-                  max="32"
-                  class="quality-slider"
+                <SliderRow
+                  v-model="settings.svgFilterSpeckle"
+                  :label="t('exportModal.svg.detail') || 'Detailgrad'"
+                  :min="1"
+                  :max="32"
+                  :default="4"
                 />
                 <p class="setting-hint">
                   {{
@@ -356,13 +353,13 @@
               </div>
 
               <div class="setting-group">
-                <label>{{ t('exportModal.format.quality.label') }}: {{ settings.quality }}%</label>
-                <input
-                  v-model.number="settings.quality"
-                  type="range"
-                  min="1"
-                  max="100"
-                  class="quality-slider"
+                <SliderRow
+                  v-model="settings.quality"
+                  :label="t('exportModal.format.quality.label')"
+                  :min="1"
+                  :max="100"
+                  :default="92"
+                  unit="%"
                 />
               </div>
 
@@ -463,6 +460,7 @@ import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FrontPageDesigner from './FrontPageDesigner.vue'
 import CommentPageDesigner from './CommentPageDesigner.vue'
+import SliderRow from './SliderRow.vue'
 import type { FrontPageElement } from './FrontPageDesigner.vue'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 
@@ -684,11 +682,6 @@ function handleConfirm() {
 .setting-group select:focus {
   outline: none;
   border-color: var(--accent);
-}
-
-.quality-slider {
-  width: 100%;
-  margin-top: var(--space-2);
 }
 
 .designer-section {

@@ -56,10 +56,15 @@
       </div>
 
       <div class="property-group">
-        <label for="font-size">
-          {{ t('commentPageDesigner.properties.fontSize', { size: element.fontSize }) }}
-        </label>
-        <input id="font-size" v-model.number="fontSize" type="range" min="10" max="72" step="1" />
+        <SliderRow
+          id="font-size"
+          :model-value="fontSize ?? 10"
+          :label="t('commentPageDesigner.properties.fontSize')"
+          :min="10"
+          :max="72"
+          unit="px"
+          @update:model-value="fontSize = $event"
+        />
       </div>
 
       <div class="property-group">
@@ -145,30 +150,28 @@
       </div>
 
       <div class="property-group">
-        <label for="text-width">
-          {{ t('commentPageDesigner.properties.width', { width: element.width }) }}
-        </label>
-        <input
+        <SliderRow
           id="text-width"
-          v-model.number="width"
-          type="range"
-          min="80"
+          :model-value="width ?? 80"
+          :label="t('commentPageDesigner.properties.width')"
+          :min="80"
           :max="pageWidth"
-          step="10"
+          :step="10"
+          unit="px"
+          @update:model-value="width = $event"
         />
       </div>
 
       <div class="property-group">
-        <label for="text-height">
-          {{ t('commentPageDesigner.properties.height', { height: element.height }) }}
-        </label>
-        <input
+        <SliderRow
           id="text-height"
-          v-model.number="height"
-          type="range"
-          min="30"
+          :model-value="height ?? 30"
+          :label="t('commentPageDesigner.properties.height')"
+          :min="30"
           :max="pageHeight"
-          step="10"
+          :step="10"
+          unit="px"
+          @update:model-value="height = $event"
         />
       </div>
     </template>
@@ -176,27 +179,28 @@
     <!-- Image Properties -->
     <template v-if="element.type === 'image'">
       <div class="property-group">
-        <label for="img-width">
-          {{ t('commentPageDesigner.properties.width', { width: element.width }) }}
-        </label>
-        <input id="img-width" v-model.number="width" type="range" min="50" max="500" step="10" />
+        <SliderRow
+          id="img-width"
+          :model-value="width ?? 50"
+          :label="t('commentPageDesigner.properties.width')"
+          :min="50"
+          :max="500"
+          :step="10"
+          unit="px"
+          @update:model-value="width = $event"
+        />
       </div>
 
       <div class="property-group">
-        <label for="img-opacity">
-          {{
-            t('commentPageDesigner.properties.opacity', {
-              opacity: Math.round((element.opacity ?? 1) * 100),
-            })
-          }}
-        </label>
-        <input
+        <SliderRow
           id="img-opacity"
-          v-model.number="opacity"
-          type="range"
-          min="0.1"
-          max="1"
-          step="0.1"
+          :model-value="opacityPercent"
+          :label="t('commentPageDesigner.properties.opacity')"
+          :min="10"
+          :max="100"
+          :step="10"
+          unit="%"
+          @update:model-value="opacityPercent = $event"
         />
       </div>
     </template>
@@ -283,6 +287,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SliderRow from '../SliderRow.vue'
 import { CUSTOM_FONT_FAMILIES } from '../FrontPageDesigner.vue'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 
@@ -320,6 +325,13 @@ const italic = field('italic')
 const width = field('width')
 const height = field('height')
 const opacity = field('opacity')
+/** Deckkraft (0.1–1) als Prozent für den Regler */
+const opacityPercent = computed({
+  get: () => Math.round((opacity.value ?? 1) * 100),
+  set: (value: number) => {
+    opacity.value = value / 100
+  },
+})
 const x = field('x')
 const y = field('y')
 </script>
@@ -405,26 +417,6 @@ const y = field('y')
 .property-group input[type='number']:focus {
   outline: none;
   border-color: var(--accent);
-}
-
-.property-group input[type='range'] {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border-color);
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.property-group input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .property-group input[type='color'] {

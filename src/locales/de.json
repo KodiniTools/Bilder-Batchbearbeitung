@@ -593,7 +593,7 @@
       "elementType": "Element-Typ:",
       "typeText": "Text",
       "typeImage": "Bild",
-      "fontSize": "Schriftgröße:",
+      "fontSize": "Schriftgröße",
       "fontFamily": "Schriftart:",
       "fontWeight": "Schriftstärke:",
       "fontWeightNormal": "Normal",
@@ -657,7 +657,7 @@
       "textLabel": "Text:",
       "textPlaceholder": "Text eingeben...",
       "fontFamily": "Schriftart:",
-      "fontSize": "Schriftgröße: {size}px",
+      "fontSize": "Schriftgröße",
       "textColor": "Textfarbe:",
       "textAlignment": "Text-Ausrichtung:",
       "alignLeft": "Linksbündig",
@@ -665,9 +665,9 @@
       "alignRight": "Rechtsbündig",
       "bold": "Fett",
       "italic": "Kursiv",
-      "width": "Breite: {width}px",
-      "height": "Höhe: {height}px",
-      "opacity": "Deckkraft: {opacity}%",
+      "width": "Breite",
+      "height": "Höhe",
+      "opacity": "Deckkraft",
       "position": "Position:",
       "layer": "Ebene:",
       "toFrontTooltip": "Nach vorne",
@@ -796,7 +796,7 @@
         "verticalTitle": "Vertikal spiegeln"
       },
       "straighten": {
-        "label": "Begradigen:",
+        "label": "Begradigen",
         "apply": "Anwenden",
         "reset": "Zurücksetzen"
       }

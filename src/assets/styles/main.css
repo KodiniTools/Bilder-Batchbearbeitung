@@ -96,6 +96,14 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Regler, Zahlenfelder, Verlaufs-Buttons (Visualizer-Muster) */
+  --slider-track-from: #9aa7b4;
+  --slider-track-to: var(--color-gold);
+  --slider-thumb: var(--color-gold);
+  --control-bg: #ffffff;
+  --control-border: rgb(201 152 77 / 45%);
+  --control-muted: var(--color-gray);
 }
 
 /* Dark Theme Overrides – Navy/Gold Palette */
@@ -113,6 +121,13 @@
   --ring: #c9984d;
   --border-color: rgb(201 152 77 / 18%);
   --shadow-color: rgb(0 0 0 / 60%);
+
+  --slider-track-from: #7a8da0;
+  --slider-track-to: #c9984d;
+  --slider-thumb: #f8e1a9;
+  --control-bg: #0e1c32;
+  --control-border: rgb(201 152 77 / 30%);
+  --control-muted: #7a8da0;
 
   --glass-bg: color-mix(in oklab, var(--panel) 75%, transparent);
   --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
@@ -278,5 +293,87 @@ body > footer {
 
   body {
     background: white !important;
+  }
+}
+
+/* =============================
+   Verlaufs-Buttons (Visualizer-Muster)
+   Gleich breite, beschriftete Buttons mit kleinem Icon für Rückgängig,
+   Wiederholen und Zurücksetzen – über <HistoryActions> oder einzeln
+   (.btn-history.btn-reset).
+   ============================= */
+.history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* In Werkzeugleisten: Buttons in Inhaltsbreite, keine Umbrüche */
+.history-actions--compact {
+  flex-wrap: nowrap;
+}
+
+.history-actions--compact .btn-history {
+  flex: 0 0 auto;
+}
+
+.btn-history {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn-history svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-history:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-history:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-history.btn-reset:hover:not(:disabled) {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.btn-history--full {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .btn-history {
+    min-height: 36px;
   }
 }

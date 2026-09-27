@@ -44,9 +44,13 @@
   gap: var(--space-2);
 }
 
+/* Feld-Labels im Regler-Muster (SliderRow): klein, Großbuchstaben, gedämpft */
 .ctrl-sublabel {
-  font-size: 0.78rem;
-  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--control-muted);
   min-width: 68px;
   flex-shrink: 0;
 }
@@ -158,68 +162,6 @@
   margin-top: 1px;
 }
 
-/* ── Filter sliders ──────────────────────────────────────── */
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.filter-label {
-  font-size: 0.78rem;
-  color: var(--muted);
-  min-width: 84px;
-  flex-shrink: 0;
-}
-
-.filter-slider-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: 1;
-  min-width: 0;
-}
-
-.filter-slider {
-  flex: 1;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  border-radius: 2px;
-  background: var(--border-color);
-  outline: none;
-  cursor: pointer;
-  min-width: 0;
-}
-
-.filter-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.filter-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: none;
-}
-
-.filter-value {
-  font-size: 0.73rem;
-  color: var(--muted);
-  min-width: 38px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-
 /* ── Size row ────────────────────────────────────────────── */
 .size-row {
   display: flex;
@@ -232,26 +174,6 @@
   font-weight: 600;
   color: var(--muted);
   min-width: 12px;
-}
-
-.size-input {
-  width: 68px;
-  padding: 5px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.875rem;
-  text-align: center;
-  transition: border-color 0.15s;
-}
-.size-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-.size-unit {
-  font-size: 0.75rem;
-  color: var(--muted);
 }
 
 .link-btn {

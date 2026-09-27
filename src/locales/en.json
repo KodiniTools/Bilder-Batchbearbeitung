@@ -418,7 +418,7 @@
       "elementType": "Element Type:",
       "typeText": "Text",
       "typeImage": "Image",
-      "fontSize": "Font Size:",
+      "fontSize": "Font Size",
       "fontFamily": "Font:",
       "fontWeight": "Font Weight:",
       "fontWeightNormal": "Normal",
@@ -482,7 +482,7 @@
       "textLabel": "Text:",
       "textPlaceholder": "Enter text...",
       "fontFamily": "Font:",
-      "fontSize": "Font Size: {size}px",
+      "fontSize": "Font Size",
       "textColor": "Text Color:",
       "textAlignment": "Text Alignment:",
       "alignLeft": "Left",
@@ -490,9 +490,9 @@
       "alignRight": "Right",
       "bold": "Bold",
       "italic": "Italic",
-      "width": "Width: {width}px",
-      "height": "Height: {height}px",
-      "opacity": "Opacity: {opacity}%",
+      "width": "Width",
+      "height": "Height",
+      "opacity": "Opacity",
       "position": "Position:",
       "layer": "Layer:",
       "toFrontTooltip": "Move to Front",
@@ -555,7 +555,7 @@
         "verticalTitle": "Flip vertically"
       },
       "straighten": {
-        "label": "Straighten:",
+        "label": "Straighten",
         "apply": "Apply",
         "reset": "Reset"
       }

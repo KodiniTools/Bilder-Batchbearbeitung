@@ -41,11 +41,14 @@
       </div>
 
       <div class="property-group">
-        <label>{{ t('frontPageDesigner.properties.fontSize') }}</label>
-        <div class="slider-group">
-          <input v-model.number="fontSize" type="range" min="12" max="72" class="property-slider" />
-          <span class="slider-value">{{ element.fontSize }}px</span>
-        </div>
+        <SliderRow
+          :model-value="fontSize ?? 12"
+          :label="t('frontPageDesigner.properties.fontSize')"
+          :min="12"
+          :max="72"
+          unit="px"
+          @update:model-value="fontSize = $event"
+        />
       </div>
 
       <div class="property-group">
@@ -183,6 +186,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SliderRow from './SliderRow.vue'
 import { CUSTOM_FONT_FAMILIES } from './FrontPageDesigner.vue'
 import type { FrontPageElement } from './FrontPageDesigner.vue'
 
@@ -255,24 +259,6 @@ const y = field('y')
   border-radius: 6px;
   font-size: 13px;
   color: var(--muted);
-}
-
-.slider-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.property-slider {
-  flex: 1;
-}
-
-.slider-value {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  min-width: 40px;
-  text-align: right;
 }
 
 .property-select {
