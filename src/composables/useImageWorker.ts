@@ -14,6 +14,10 @@ import type {
 // ?worker lässt Vite den Worker korrekt als separaten Chunk bundeln –
 // behebt den URL-Auflösungsfehler mit @/-Alias im Production-Build.
 import ImageWorker from '@/workers/image.worker.ts?worker'
+// Eingebettete Kopie (Blob-URL, ~1,5 KB) als Reserve: startet auch dann, wenn
+// die Worker-Datei vom Server nicht geladen werden kann (404, MIME-Typ,
+// fehlende COEP/CORP-Header o. Ä.), weil kein zweiter Abruf nötig ist.
+import InlineImageWorker from '@/workers/image.worker.ts?worker&inline'
 
 type PendingResolve = (result: WorkerResult) => void
 type PendingReject = (error: Error) => void
@@ -47,8 +51,11 @@ function isSupported(): boolean {
   return typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined'
 }
 
+/** Welche Worker-Quelle gerade genutzt wird; wechselt höchstens einmal auf 'inline'. */
+let workerSource: 'file' | 'inline' = 'file'
+
 function createWorker(): Worker {
-  return new ImageWorker()
+  return workerSource === 'inline' ? new InlineImageWorker() : new ImageWorker()
 }
 
 function rejectAllPending(entry: PoolEntry, reason: string): void {
@@ -63,53 +70,72 @@ function rejectAllPending(entry: PoolEntry, reason: string): void {
 
 let poolInitialized = false
 
+/** Erzeugt einen Worker samt Nachrichten- und Fehlerbehandlung und nimmt ihn in den Pool auf. */
+function spawnEntry(): PoolEntry {
+  const worker = createWorker()
+  const entry: PoolEntry = { worker, busy: false }
+  const source = workerSource
+  pool.push(entry)
+
+  worker.onmessage = (e: MessageEvent<WorkerResult | WorkerError>) => {
+    const { id } = e.data
+    const pending = pendingById.get(id)
+    if (!pending) return
+
+    clearTimeout(pending.timer)
+    pendingById.delete(id)
+    entry.busy = false
+
+    if ('error' in e.data) {
+      pending.reject(new Error(e.data.error))
+    } else {
+      pending.resolve(e.data as WorkerResult)
+    }
+
+    processQueue(entry)
+  }
+
+  worker.onerror = (err) => {
+    // Worker permanent aus Pool entfernen und beenden
+    const idx = pool.indexOf(entry)
+    if (idx !== -1) pool.splice(idx, 1)
+    entry.worker.terminate()
+    // Alle laufenden Operationen dieses Workers rejekten (Aufrufer fallen auf
+    // den Hauptthread zurück)
+    rejectAllPending(entry, 'Worker-Fehler: ' + ((err as ErrorEvent).message || 'nicht ladbar'))
+
+    // Worker-Datei nicht ladbar → einmalig auf die eingebettete Kopie umstellen
+    // und den ausgefallenen Platz im Pool damit neu besetzen.
+    if (source === 'file') {
+      if (workerSource === 'file') {
+        workerSource = 'inline'
+        console.warn('[ImageWorker] Worker-Datei nicht ladbar – nutze eingebetteten Worker.')
+      }
+      const replacement = spawnEntry()
+      processQueue(replacement)
+      return
+    }
+
+    // Auch die eingebettete Kopie scheitert: Queue leeren – nicht an kaputte
+    // Worker weiterleiten
+    for (const queued of pendingQueue.splice(0)) {
+      queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
+    }
+    // Späte dispatch()-Aufrufe (nach createImageBitmap) sofort rejecten,
+    // damit sie nicht ewig in der nun leeren Queue hängen.
+    if (pool.length === 0 && !workerPoolFailed) {
+      workerPoolFailed = true
+      console.warn('[ImageWorker] Kein Worker verfügbar – Bildverarbeitung im Hauptthread.')
+    }
+  }
+
+  return entry
+}
+
 function initPool(): void {
   if (poolInitialized || !isSupported()) return
   poolInitialized = true
-
-  pool = Array.from({ length: POOL_SIZE }, () => {
-    const worker = createWorker()
-    const entry: PoolEntry = { worker, busy: false }
-
-    worker.onmessage = (e: MessageEvent<WorkerResult | WorkerError>) => {
-      const { id } = e.data
-      const pending = pendingById.get(id)
-      if (!pending) return
-
-      clearTimeout(pending.timer)
-      pendingById.delete(id)
-      entry.busy = false
-
-      if ('error' in e.data) {
-        pending.reject(new Error(e.data.error))
-      } else {
-        pending.resolve(e.data as WorkerResult)
-      }
-
-      processQueue(entry)
-    }
-
-    worker.onerror = (err) => {
-      console.error('[ImageWorker] Worker-Fehler — falle auf Hauptthread zurück:', err)
-      // Worker permanent aus Pool entfernen und beenden
-      const idx = pool.indexOf(entry)
-      if (idx !== -1) pool.splice(idx, 1)
-      entry.worker.terminate()
-      // Alle laufenden Operationen dieses Workers rejekten
-      rejectAllPending(entry, 'Worker-Fehler: ' + (err as ErrorEvent).message)
-      // Queue sofort leeren – nicht an kaputte Worker weiterleiten
-      for (const queued of pendingQueue.splice(0)) {
-        queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
-      }
-      // Späte dispatch()-Aufrufe (nach createImageBitmap) sofort rejecten,
-      // damit sie nicht ewig in der nun leeren Queue hängen.
-      if (pool.length === 0) {
-        workerPoolFailed = true
-      }
-    }
-
-    return entry
-  })
+  for (let i = 0; i < POOL_SIZE; i++) spawnEntry()
 }
 
 function processQueue(entry: PoolEntry): void {
@@ -177,7 +203,8 @@ export function useImageWorker() {
     operation: WorkerOperation,
     params: RotateParams | FlipParams | ResizeParams | CropParams
   ): Promise<boolean> {
-    if (!supported) return false
+    // Pool dauerhaft ausgefallen: direkt Hauptthread, ohne Warnung pro Aufruf
+    if (!supported || workerPoolFailed) return false
     try {
       const bitmap = await createImageBitmap(canvas)
       const result = await dispatch(operation, bitmap, params)
@@ -194,7 +221,7 @@ export function useImageWorker() {
     operation: WorkerOperation,
     params: RotateParams | FlipParams | ResizeParams | CropParams
   ): Promise<boolean> {
-    if (!supported || canvases.length === 0) return false
+    if (!supported || workerPoolFailed || canvases.length === 0) return false
     try {
       await Promise.all(
         canvases.map(async (canvas) => {
