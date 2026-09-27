@@ -267,11 +267,15 @@ body > footer {
   margin-top: auto;
 }
 
-/* Make sure Vue app doesn't cover footer */
+/* Make sure Vue app doesn't cover footer.
+   Die Seiten werden per Lazy-Load nachgeladen; bis dahin ist #app leer. Ohne
+   reservierte Höhe stünde der SSI-Footer beim ersten Rendern mitten im
+   Viewport und spränge danach nach unten (Cumulative Layout Shift). Die Seiten
+   selbst sind mindestens 100vh hoch, daher ändert das am fertigen Layout nichts. */
 #app {
   position: relative;
   z-index: 1;
-  min-height: auto;
+  min-height: 100vh;
 }
 
 /* =============================
