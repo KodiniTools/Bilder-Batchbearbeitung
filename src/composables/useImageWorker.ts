@@ -11,12 +11,11 @@ import type {
   CropParams,
 } from '@/workers/image.worker'
 
-// ?worker lässt Vite den Worker korrekt als separaten Chunk bundeln –
-// behebt den URL-Auflösungsfehler mit @/-Alias im Production-Build.
-import ImageWorker from '@/workers/image.worker.ts?worker'
-// Eingebettete Kopie (Blob-URL, ~1,5 KB) als Reserve: startet auch dann, wenn
-// die Worker-Datei vom Server nicht geladen werden kann (404, MIME-Typ,
-// fehlende COEP/CORP-Header o. Ä.), weil kein zweiter Abruf nötig ist.
+// Der Worker (~1,5 KB) wird eingebettet und per Blob-URL gestartet. Eine
+// separate Worker-Datei würde auf kodinitools.com blockiert: Die Seite läuft mit
+// Cross-Origin-Embedder-Policy, und Chrome verlangt diesen Header dann auch auf
+// dem Worker-Skript. Blob-Worker erben die Policy der Seite und brauchen weder
+// den Header noch einen zweiten Abruf.
 import InlineImageWorker from '@/workers/image.worker.ts?worker&inline'
 
 type PendingResolve = (result: WorkerResult) => void
@@ -51,11 +50,8 @@ function isSupported(): boolean {
   return typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined'
 }
 
-/** Welche Worker-Quelle gerade genutzt wird; wechselt höchstens einmal auf 'inline'. */
-let workerSource: 'file' | 'inline' = 'file'
-
 function createWorker(): Worker {
-  return workerSource === 'inline' ? new InlineImageWorker() : new ImageWorker()
+  return new InlineImageWorker()
 }
 
 function rejectAllPending(entry: PoolEntry, reason: string): void {
@@ -74,7 +70,6 @@ let poolInitialized = false
 function spawnEntry(): PoolEntry {
   const worker = createWorker()
   const entry: PoolEntry = { worker, busy: false }
-  const source = workerSource
   pool.push(entry)
 
   worker.onmessage = (e: MessageEvent<WorkerResult | WorkerError>) => {
@@ -104,20 +99,7 @@ function spawnEntry(): PoolEntry {
     // den Hauptthread zurück)
     rejectAllPending(entry, 'Worker-Fehler: ' + ((err as ErrorEvent).message || 'nicht ladbar'))
 
-    // Worker-Datei nicht ladbar → einmalig auf die eingebettete Kopie umstellen
-    // und den ausgefallenen Platz im Pool damit neu besetzen.
-    if (source === 'file') {
-      if (workerSource === 'file') {
-        workerSource = 'inline'
-        console.warn('[ImageWorker] Worker-Datei nicht ladbar – nutze eingebetteten Worker.')
-      }
-      const replacement = spawnEntry()
-      processQueue(replacement)
-      return
-    }
-
-    // Auch die eingebettete Kopie scheitert: Queue leeren – nicht an kaputte
-    // Worker weiterleiten
+    // Queue leeren – nicht an kaputte Worker weiterleiten
     for (const queued of pendingQueue.splice(0)) {
       queued.reject(new Error('Worker nicht verfügbar – Fallback auf Hauptthread'))
     }
