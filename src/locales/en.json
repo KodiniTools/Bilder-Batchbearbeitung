@@ -680,6 +680,7 @@
       "title": "Preview",
       "more": "+{count} more..."
     },
+    "selectedCount": "{count} image(s) selected",
     "info": "{count} image(s) will be renamed",
     "seo": {
       "label": "SEO Options",

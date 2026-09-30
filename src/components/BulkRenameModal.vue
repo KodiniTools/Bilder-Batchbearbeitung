@@ -4,7 +4,13 @@
       <div v-if="isOpen" class="modal-overlay" @click.self="$emit('close')">
         <div class="modal-content">
           <div class="modal-header">
-            <h2>{{ t('bulkRename.title') }}</h2>
+            <div class="modal-title">
+              <h2>{{ t('bulkRename.title') }}</h2>
+              <span class="modal-title__meta">
+                <i class="fa-solid fa-images"></i>
+                {{ t('bulkRename.selectedCount', { count: selectedCount }) }}
+              </span>
+            </div>
             <button class="close-btn" :title="t('bulkRename.close')" @click="$emit('close')">
               ×
             </button>
@@ -236,6 +242,25 @@ function handleConfirm() {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.modal-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.modal-title__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.modal-title__meta i {
+  color: var(--accent);
 }
 
 .close-btn {
