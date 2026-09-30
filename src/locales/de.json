@@ -855,6 +855,7 @@
       "title": "Vorschau",
       "more": "+{count} weitere..."
     },
+    "selectedCount": "{count} Bild(er) ausgewählt",
     "info": "{count} Bild(er) werden umbenannt",
     "seo": {
       "label": "SEO-Optionen",
