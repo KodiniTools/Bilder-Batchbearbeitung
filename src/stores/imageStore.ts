@@ -1,6 +1,6 @@
 // src/stores/imageStore.ts
 import { defineStore } from 'pinia'
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import type {
   ImageObject,
   ImageFilters,
@@ -11,6 +11,7 @@ import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageWorker } from '@/composables/useImageWorker'
 import { createImageHistory } from './imageHistory'
+import { parseSearchQuery, matchesSearchTerms } from '@/utils/search'
 
 const { processBatch, processCanvas, supported: workerSupported } = useImageWorker()
 
@@ -41,6 +42,20 @@ export const useImageStore = defineStore('images', () => {
     }
   }
 
+  // Suche im Bildergrid (nur Anzeige-Filter, beeinflusst keine Auswahl)
+  const searchQuery = ref('')
+  function setSearchQuery(query: string) {
+    searchQuery.value = query
+  }
+  // Ohne Bilder keinen Suchbegriff behalten – sonst wären neu geladene
+  // Bilder unerwartet ausgeblendet.
+  watch(
+    () => images.value.length,
+    (count) => {
+      if (count === 0) searchQuery.value = ''
+    }
+  )
+
   // Globale Undo/Redo-Historie
   const history = createImageHistory(images)
 
@@ -50,6 +65,15 @@ export const useImageStore = defineStore('images', () => {
   const selectedImages = computed(() => images.value.filter((img) => img.selected))
   const hasImages = computed(() => images.value.length > 0)
   const hasSelection = computed(() => selectedCount.value > 0)
+  const searchTerms = computed(() => parseSearchQuery(searchQuery.value))
+  const isSearchActive = computed(() => searchTerms.value.length > 0)
+  /** Bilder, deren (umbenannter oder ursprünglicher) Dateiname zur Suche passt. */
+  const filteredImages = computed(() => {
+    if (!isSearchActive.value) return images.value
+    return images.value.filter((img) =>
+      matchesSearchTerms(`${img.outputName} ${img.file.name}`, searchTerms.value)
+    )
+  })
 
   // Actions
   async function addImage(file: File): Promise<ImageObject | null> {
@@ -102,6 +126,13 @@ export const useImageStore = defineStore('images', () => {
     const allSelected = images.value.every((img) => img.selected)
     images.value.forEach((img) => {
       img.selected = !allSelected
+    })
+  }
+
+  /** Alle aktuellen Suchtreffer zusätzlich zur bestehenden Auswahl auswählen. */
+  function selectFilteredImages(): void {
+    filteredImages.value.forEach((img) => {
+      img.selected = true
     })
   }
 
@@ -409,6 +440,7 @@ export const useImageStore = defineStore('images', () => {
   function $reset(): void {
     images.value = []
     currentImageIndex.value = 0
+    searchQuery.value = ''
     history.reset()
   }
 
@@ -428,6 +460,7 @@ export const useImageStore = defineStore('images', () => {
     resizeProgress,
     cropProgress,
     gridSize,
+    searchQuery,
 
     // Getters
     imageCount,
@@ -435,6 +468,8 @@ export const useImageStore = defineStore('images', () => {
     selectedImages,
     hasImages,
     hasSelection,
+    isSearchActive,
+    filteredImages,
     canUndo: history.canUndo,
     canRedo: history.canRedo,
     historyVersion: history.version,
@@ -446,6 +481,7 @@ export const useImageStore = defineStore('images', () => {
     removeSelectedImages,
     toggleImageSelection,
     selectAllImages,
+    selectFilteredImages,
     deselectAllImages,
     getImageById,
     updateImageName,
@@ -453,6 +489,7 @@ export const useImageStore = defineStore('images', () => {
     clearAllImages,
     moveImage,
     setGridSize,
+    setSearchQuery,
     rotateSelectedImages,
     flipSelectedImages,
     cropSelectedImagesToAspectRatio,

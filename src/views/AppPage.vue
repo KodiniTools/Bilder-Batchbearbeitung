@@ -626,7 +626,7 @@ onUnmounted(() => {
     <ImagePreview
       :image="previewImage"
       :is-open="isPreviewOpen"
-      :images="imageStore.images"
+      :images="imageStore.filteredImages"
       @close="closePreview"
       @navigate="navigatePreview"
     />
