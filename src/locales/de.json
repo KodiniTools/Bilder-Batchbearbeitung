@@ -358,6 +358,15 @@
     "cancel": "Abbrechen",
     "close": "Schließen"
   },
+  "imageSearch": {
+    "label": "Bilder durchsuchen",
+    "placeholder": "Nach Dateiname suchen …",
+    "clear": "Suche löschen",
+    "results": "{count} von {total} Bildern",
+    "noResults": "Keine Bilder gefunden",
+    "selectMatches": "Treffer auswählen",
+    "selectMatchesTooltip": "Alle Suchtreffer zur Auswahl hinzufügen"
+  },
   "imageCard": {
     "remove": "Bild entfernen",
     "edit": "Bearbeiten und Exportieren"

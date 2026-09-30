@@ -183,6 +183,15 @@
     "cancel": "Cancel",
     "close": "Close"
   },
+  "imageSearch": {
+    "label": "Search images",
+    "placeholder": "Search by file name …",
+    "clear": "Clear search",
+    "results": "{count} of {total} images",
+    "noResults": "No images found",
+    "selectMatches": "Select matches",
+    "selectMatchesTooltip": "Add all search matches to the selection"
+  },
   "imageCard": {
     "remove": "Remove image",
     "edit": "Edit and Export"

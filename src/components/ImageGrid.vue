@@ -2,10 +2,13 @@
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import ImageCard from './ImageCard.vue'
+import ImageSearch from './ImageSearch.vue'
 import type { ImageObject } from '@/lib/core/types'
 import { getTopOverlayBottom } from '@/utils/viewport'
+import { useI18n } from 'vue-i18n'
 
 const imageStore = useImageStore()
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -22,10 +25,16 @@ const emit = defineEmits<{
   'open-preview': [ImageObject]
 }>()
 
-// Angezeigte Bilder: im Bearbeiten-Modus nur die Auswahl, sonst alle.
-const displayedImages = computed(() =>
+// Basis: im Bearbeiten-Modus nur die Auswahl, sonst alle.
+const baseImages = computed(() =>
   props.onlySelected ? imageStore.selectedImages : imageStore.images
 )
+// Angezeigte Bilder: Basis eingeschränkt auf die Suchtreffer
+const displayedImages = computed(() => {
+  if (!imageStore.isSearchActive) return baseImages.value
+  const matches = new Set(imageStore.filteredImages)
+  return baseImages.value.filter((img) => matches.has(img))
+})
 
 // Kachel-Mindestbreite je nach gewählter Anzeigegröße (klein/mittel/groß)
 // Werte bewusst gestaffelt, damit sich die Spaltenzahl auch im schmalen
@@ -230,7 +239,15 @@ function handleDrop(event: DragEvent, toIndex: number) {
 </script>
 
 <template>
+  <ImageSearch :match-count="displayedImages.length" :total-count="baseImages.length" />
+
+  <p v-if="imageStore.isSearchActive && displayedImages.length === 0" class="search-empty">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    {{ t('imageSearch.noResults') }}
+  </p>
+
   <div
+    v-show="displayedImages.length > 0"
     ref="scrollContainer"
     class="images-scroll-container"
     :class="{ 'is-limited': maxHeight !== null }"
@@ -270,6 +287,17 @@ function handleDrop(event: DragEvent, toIndex: number) {
 </template>
 
 <style scoped>
+.search-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
+}
+
 .images-scroll-container {
   position: relative;
   box-sizing: content-box;
