@@ -43,6 +43,28 @@ const SITE = 'https://kodinitools.com'
 
 export const blogArticles: readonly BlogArticle[] = [
   {
+    id: 'single-image-editor',
+    date: '2026-09-30',
+    minutes: 7,
+    tag: { de: 'Bild', en: 'Image' },
+    url: {
+      de: `${SITE}/blog/einzelbild-editor/`,
+      en: `${SITE}/en/blog/single-image-editor/`,
+    },
+    image: {
+      de: `${SITE}/image/editor-blog-de.webp`,
+      en: `${SITE}/image/editor-blog-en.webp`,
+    },
+    title: {
+      de: 'Einzelbild-Editor: Ein Foto gezielt bearbeiten, vergleichen & exportieren',
+      en: 'Single Image Editor: Edit, Compare & Export One Photo in Detail',
+    },
+    description: {
+      de: '8 Presets, 11 Filter, Vorher-Nachher-Vergleich, Text mit Umrandung und Schatten, Zuschneiden, Begradigen, Grösse ändern und Export als PNG, JPEG, WebP oder PDF – ohne Upload.',
+      en: '8 presets, 11 filters, before/after comparison, text with stroke and shadow, crop, straighten, resize and export as PNG, JPEG, WebP or PDF — no upload.',
+    },
+  },
+  {
     id: 'watermark-multiple-images',
     date: '2026-09-20',
     minutes: 5,
