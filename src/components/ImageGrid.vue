@@ -39,65 +39,120 @@ const gridStyle = computed(() => ({
 }))
 
 // Maximal so viele Reihen sichtbar; weitere Reihen im Container scrollbar.
+// Zusätzlich wird der Container auf die sichtbare Fensterhöhe begrenzt.
 const MAX_VISIBLE_ROWS = 5
+// Abstand zu Fensterrand bzw. fixiertem Seiten-Header
+const VIEWPORT_MARGIN = 16
+// Untergrenze, damit das Grid auf sehr niedrigen Fenstern nutzbar bleibt
+const MIN_CONTAINER_HEIGHT = 240
 const scrollContainer = ref<HTMLElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
 const maxHeight = ref<number | null>(null)
 
 /**
- * Misst die Oberkante der ersten Kachel in Reihe MAX_VISIBLE_ROWS + 1 und
- * begrenzt den Container auf die Höhe davor. Funktioniert für jede
- * Spaltenzahl (klein/mittel/groß, responsive) und variable Kartenhöhen.
+ * Unterkante fixierter/sticky Elemente am oberen Fensterrand (z. B. der
+ * Seiten-Header), die den Container überdecken würden.
+ */
+function getTopOverlayBottom(): number {
+  let bottom = 0
+  const x = Math.round(window.innerWidth / 2)
+  for (const el of document.elementsFromPoint(x, 1)) {
+    let node: HTMLElement | null = el as HTMLElement
+    while (node && node !== document.body) {
+      const pos = getComputedStyle(node).position
+      if (pos === 'fixed' || pos === 'sticky') {
+        const rect = node.getBoundingClientRect()
+        if (rect.top <= 1) bottom = Math.max(bottom, rect.bottom)
+        break
+      }
+      node = node.parentElement
+    }
+  }
+  return Math.min(bottom, window.innerHeight / 2)
+}
+
+/**
+ * Begrenzt den Container auf das Minimum aus
+ * - Höhe der ersten MAX_VISIBLE_ROWS Reihen (gemessen an der ersten Kachel
+ *   der Folgereihe; gilt für jede Spaltenzahl und variable Kartenhöhen) und
+ * - verfügbarer Fensterhöhe unterhalb fixierter Header.
  */
 function updateMaxHeight() {
   const container = scrollContainer.value
   const grid = gridEl.value
   if (!container || !grid) return
+
   const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1
   const firstHidden = grid.children[columns * MAX_VISIBLE_ROWS] as HTMLElement | undefined
-  if (!firstHidden) {
-    maxHeight.value = null
-    return
+  const containerStyles = getComputedStyle(container)
+  const paddingTop = parseFloat(containerStyles.paddingTop) || 0
+  const paddingY = paddingTop + (parseFloat(containerStyles.paddingBottom) || 0)
+  let rowsLimit = Infinity
+  if (firstHidden) {
+    const rowGap = parseFloat(getComputedStyle(grid).rowGap) || 0
+    rowsLimit = Math.max(0, firstHidden.offsetTop - paddingTop - rowGap)
   }
-  const style = getComputedStyle(grid)
-  const rowGap = parseFloat(style.rowGap) || 0
-  const paddingTop = parseFloat(getComputedStyle(container).paddingTop) || 0
-  maxHeight.value = Math.max(0, firstHidden.offsetTop - paddingTop - rowGap)
+
+  const viewportLimit = Math.max(
+    MIN_CONTAINER_HEIGHT,
+    window.innerHeight - getTopOverlayBottom() - 2 * VIEWPORT_MARGIN - paddingY
+  )
+  const limit = Math.min(rowsLimit, viewportLimit)
+  maxHeight.value = grid.offsetHeight > limit ? Math.floor(limit) : null
 }
 
 const containerStyle = computed(() =>
   maxHeight.value === null ? undefined : { maxHeight: `${maxHeight.value}px` }
 )
 
-// Erreicht der interne Scrollbereich sein Ende, die Seite so weit
-// nachziehen, dass die Unterkante des Grids im Fenster sichtbar wird.
-const PAGE_FOLLOW_MARGIN = 24
-let wasAtBottom = false
+/**
+ * Seite mitziehen, sobald im Grid gescrollt wird: Liegt der Container
+ * teilweise außerhalb des sichtbaren Bereichs (oben unter dem Header oder
+ * unten außerhalb des Fensters), wird die Seite so weit gescrollt, dass er
+ * vollständig sichtbar ist. Gilt in beide Richtungen.
+ */
+let followLocked = false
 function handleContainerScroll() {
   const container = scrollContainer.value
-  if (!container || maxHeight.value === null) return
-  const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1
-  // Nur beim Übergang auslösen, nicht bei jedem Scroll-Event am Ende
-  if (atBottom && !wasAtBottom) {
-    const overflow = container.getBoundingClientRect().bottom - window.innerHeight
-    if (overflow > 0) {
-      window.scrollBy({ top: overflow + PAGE_FOLLOW_MARGIN, behavior: 'smooth' })
-    }
+  if (!container || maxHeight.value === null || followLocked) return
+
+  const rect = container.getBoundingClientRect()
+  const topLimit = getTopOverlayBottom() + VIEWPORT_MARGIN
+  const bottomLimit = window.innerHeight - VIEWPORT_MARGIN
+  let delta = 0
+  if (rect.top < topLimit) delta = rect.top - topLimit
+  else if (rect.bottom > bottomLimit) delta = rect.bottom - bottomLimit
+  if (Math.abs(delta) < 1) return
+
+  // Während der Seiten-Animation nicht erneut auslösen (verhindert Ruckeln)
+  followLocked = true
+  let fallbackTimer: ReturnType<typeof setTimeout> | undefined
+  const unlock = () => {
+    followLocked = false
+    clearTimeout(fallbackTimer)
+    window.removeEventListener('scrollend', unlock)
   }
-  wasAtBottom = atBottom
+  window.addEventListener('scrollend', unlock)
+  fallbackTimer = setTimeout(unlock, 600) // Fallback für Browser ohne 'scrollend'
+  window.scrollBy({ top: delta, behavior: 'smooth' })
 }
 
 let resizeObserver: ResizeObserver | null = null
+function handleWindowResize() {
+  updateMaxHeight()
+}
 onMounted(() => {
   updateMaxHeight()
   if (typeof ResizeObserver !== 'undefined' && gridEl.value) {
     resizeObserver = new ResizeObserver(() => updateMaxHeight())
     resizeObserver.observe(gridEl.value)
   }
+  window.addEventListener('resize', handleWindowResize)
 })
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
+  window.removeEventListener('resize', handleWindowResize)
 })
 watch(
   () => [displayedImages.value.length, imageStore.gridSize],
@@ -210,14 +265,16 @@ function handleDrop(event: DragEvent, toIndex: number) {
 .images-scroll-container {
   position: relative;
   box-sizing: content-box;
-}
-
-/* Ab mehr als 5 Reihen: interner Scrollbereich. Padding verhindert, dass
-   Rahmen/Schatten/Hover-Effekte der Karten am Rand abgeschnitten werden. */
-.images-scroll-container.is-limited {
-  overflow-y: auto;
+  /* Padding (per negativer Margin ausgeglichen) verhindert, dass Rahmen,
+     Schatten und Hover-Effekte der Karten im Scrollbereich abgeschnitten
+     werden. Dauerhaft gesetzt, damit die Höhenmessung stabil bleibt. */
   padding: var(--space-2);
   margin: calc(-1 * var(--space-2));
+}
+
+/* Ab mehr als 5 Reihen bzw. mehr als Fensterhöhe: interner Scrollbereich */
+.images-scroll-container.is-limited {
+  overflow-y: auto;
   scrollbar-gutter: stable;
 }
 
