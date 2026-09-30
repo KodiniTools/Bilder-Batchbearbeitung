@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { getTopOverlayBottom } from '@/utils/viewport'
 
 const props = defineProps<{
   image: ImageObject | null
@@ -40,6 +41,46 @@ function goNext() {
 }
 
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
+const overlayEl = ref<HTMLElement | null>(null)
+const contentEl = ref<HTMLElement | null>(null)
+const infoEl = ref<HTMLElement | null>(null)
+
+// Höhe fixierter Elemente über dem Overlay (globale SSI-Navigation)
+const topOffset = ref(0)
+// Verfügbare Anzeigehöhe für das Bild, damit es vollständig sichtbar ist
+const canvasMaxHeight = ref<number | null>(null)
+
+const overlayStyle = computed(() => ({ '--preview-top-offset': `${topOffset.value}px` }))
+const canvasStyle = computed(() =>
+  canvasMaxHeight.value === null ? undefined : { maxHeight: `${canvasMaxHeight.value}px` }
+)
+
+/**
+ * Misst die überdeckende Navigation und berechnet die Höhe, die dem Bild
+ * nach Abzug von Overlay-Abständen, Inhalts-Padding und Infoleiste bleibt.
+ */
+function updateLayout() {
+  const overlay = overlayEl.value
+  if (!overlay) return
+  topOffset.value = Math.round(getTopOverlayBottom(overlay))
+
+  const overlayStyles = getComputedStyle(overlay)
+  const overlayPaddingBottom = parseFloat(overlayStyles.paddingBottom) || 0
+  // padding-top = Navigation + Basisabstand (per CSS-Variable gesetzt)
+  const overlayPaddingTop = topOffset.value + overlayPaddingBottom
+  let available = window.innerHeight - overlayPaddingTop - overlayPaddingBottom
+  if (contentEl.value) {
+    const contentStyles = getComputedStyle(contentEl.value)
+    available -=
+      (parseFloat(contentStyles.paddingTop) || 0) + (parseFloat(contentStyles.paddingBottom) || 0)
+  }
+  available -= infoEl.value?.offsetHeight ?? 0
+  canvasMaxHeight.value = Math.max(120, Math.floor(available))
+}
+
+function handleResize() {
+  if (props.isOpen) updateLayout()
+}
 
 const imageFormat = computed(() => {
   if (!props.image) return ''
@@ -53,6 +94,8 @@ const imageFormat = computed(() => {
 
 function updatePreview() {
   if (!previewCanvas.value || !props.image) return
+
+  updateLayout()
 
   const canvas = previewCanvas.value
   const ctx = canvas.getContext('2d')
@@ -150,20 +193,28 @@ watch(
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <template>
   <Transition name="preview">
-    <div v-if="isOpen" class="preview-overlay" @click="handleClose">
+    <div
+      v-if="isOpen"
+      ref="overlayEl"
+      class="preview-overlay"
+      :style="overlayStyle"
+      @click="handleClose"
+    >
       <div class="preview-container" @click.stop>
-        <div class="preview-content">
+        <div ref="contentEl" class="preview-content">
           <div class="preview-canvas-wrapper">
-            <canvas ref="previewCanvas"></canvas>
+            <canvas ref="previewCanvas" :style="canvasStyle"></canvas>
             <button class="preview-close-float" aria-label="Schließen" @click.stop="handleClose">
               <i class="fa-solid fa-xmark"></i>
             </button>
@@ -189,7 +240,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div v-if="image" class="preview-info">
+        <div v-if="image" ref="infoEl" class="preview-info">
           <span>{{ image.canvas.width }} × {{ image.canvas.height }} px</span>
           <span class="format-badge">{{ imageFormat }}</span>
           <span v-if="hasGallery" class="preview-counter">
@@ -212,12 +263,15 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   padding: var(--space-4);
+  /* Unterhalb der globalen Navigation beginnen, damit nichts verdeckt wird */
+  padding-top: calc(var(--preview-top-offset, 0px) + var(--space-4));
 }
 
 .preview-container {
   position: relative;
   max-width: 95vw;
-  max-height: 95vh;
+  max-height: calc(100vh - var(--preview-top-offset, 0px) - 2 * var(--space-4));
+  max-height: calc(100dvh - var(--preview-top-offset, 0px) - 2 * var(--space-4));
   background: var(--panel);
   border-radius: 0;
   overflow: hidden;
@@ -356,6 +410,8 @@ onUnmounted(() => {
   padding: var(--space-5);
   background: var(--bg);
   overflow: auto;
+  /* Erlaubt Schrumpfen im Flex-Container → Scrollen statt Abschneiden */
+  min-height: 0;
 }
 
 .preview-content canvas {

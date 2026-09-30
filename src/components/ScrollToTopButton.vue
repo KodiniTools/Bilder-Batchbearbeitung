@@ -30,8 +30,17 @@ function updateFooterEl() {
   footerEl = document.querySelector('footer, .footer, #footer, [role="contentinfo"]')
 }
 
+/** Interne Scrollbereiche (z. B. Bildergrid), die ebenfalls nach oben sollen. */
+const SCROLL_TARGET_SELECTOR = '[data-scroll-top-target]'
+
+function getScrollTargets(): HTMLElement[] {
+  return Array.from(document.querySelectorAll<HTMLElement>(SCROLL_TARGET_SELECTOR))
+}
+
 function update() {
-  isVisible.value = window.scrollY > props.threshold
+  isVisible.value =
+    window.scrollY > props.threshold ||
+    getScrollTargets().some((el) => el.scrollTop > props.threshold)
 
   if (!footerEl || !footerEl.isConnected) {
     updateFooterEl()
@@ -50,21 +59,23 @@ function update() {
 
 function scrollToTop() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  window.scrollTo({
-    top: 0,
-    behavior: prefersReducedMotion ? 'auto' : 'smooth',
-  })
+  const behavior: 'auto' | 'smooth' = prefersReducedMotion ? 'auto' : 'smooth'
+  for (const el of getScrollTargets()) {
+    el.scrollTo({ top: 0, behavior })
+  }
+  window.scrollTo({ top: 0, behavior })
 }
 
 onMounted(() => {
   updateFooterEl()
-  window.addEventListener('scroll', update, { passive: true })
+  // Capture auf document erfasst Seiten-Scroll und interne Scrollbereiche
+  document.addEventListener('scroll', update, { passive: true, capture: true })
   window.addEventListener('resize', update, { passive: true })
   update()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', update)
+  document.removeEventListener('scroll', update, { capture: true })
   window.removeEventListener('resize', update)
 })
 </script>

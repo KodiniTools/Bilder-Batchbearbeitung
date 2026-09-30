@@ -3,6 +3,7 @@ import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import ImageCard from './ImageCard.vue'
 import type { ImageObject } from '@/lib/core/types'
+import { getTopOverlayBottom } from '@/utils/viewport'
 
 const imageStore = useImageStore()
 
@@ -50,28 +51,6 @@ const gridEl = ref<HTMLElement | null>(null)
 const maxHeight = ref<number | null>(null)
 
 /**
- * Unterkante fixierter/sticky Elemente am oberen Fensterrand (z. B. der
- * Seiten-Header), die den Container überdecken würden.
- */
-function getTopOverlayBottom(): number {
-  let bottom = 0
-  const x = Math.round(window.innerWidth / 2)
-  for (const el of document.elementsFromPoint(x, 1)) {
-    let node: HTMLElement | null = el as HTMLElement
-    while (node && node !== document.body) {
-      const pos = getComputedStyle(node).position
-      if (pos === 'fixed' || pos === 'sticky') {
-        const rect = node.getBoundingClientRect()
-        if (rect.top <= 1) bottom = Math.max(bottom, rect.bottom)
-        break
-      }
-      node = node.parentElement
-    }
-  }
-  return Math.min(bottom, window.innerHeight / 2)
-}
-
-/**
  * Begrenzt den Container auf das Minimum aus
  * - Höhe der ersten MAX_VISIBLE_ROWS Reihen (gemessen an der ersten Kachel
  *   der Folgereihe; gilt für jede Spaltenzahl und variable Kartenhöhen) und
@@ -112,9 +91,32 @@ const containerStyle = computed(() =>
  * vollständig sichtbar ist. Gilt in beide Richtungen.
  */
 let followLocked = false
+// Nur auf Nutzereingaben reagieren – nicht auf programmatisches Scrollen
+// (z. B. „Nach oben“-Button), sonst würde die Seite gegengesteuert.
+const USER_INTENT_WINDOW_MS = 250
+let lastUserIntent = 0
+let pointerActive = false
+function markUserIntent() {
+  lastUserIntent = performance.now()
+}
+function handlePointerDown() {
+  pointerActive = true
+  window.addEventListener('pointerup', handlePointerUp, { once: true })
+  window.addEventListener('pointercancel', handlePointerUp, { once: true })
+}
+function handlePointerUp() {
+  pointerActive = false
+  markUserIntent()
+  window.removeEventListener('pointerup', handlePointerUp)
+  window.removeEventListener('pointercancel', handlePointerUp)
+}
+function isUserScroll(): boolean {
+  return pointerActive || performance.now() - lastUserIntent < USER_INTENT_WINDOW_MS
+}
+
 function handleContainerScroll() {
   const container = scrollContainer.value
-  if (!container || maxHeight.value === null || followLocked) return
+  if (!container || maxHeight.value === null || followLocked || !isUserScroll()) return
 
   const rect = container.getBoundingClientRect()
   const topLimit = getTopOverlayBottom() + VIEWPORT_MARGIN
@@ -153,6 +155,7 @@ onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
   window.removeEventListener('resize', handleWindowResize)
+  handlePointerUp()
 })
 watch(
   () => [displayedImages.value.length, imageStore.gridSize],
@@ -232,7 +235,12 @@ function handleDrop(event: DragEvent, toIndex: number) {
     class="images-scroll-container"
     :class="{ 'is-limited': maxHeight !== null }"
     :style="containerStyle"
+    data-scroll-top-target
     @scroll.passive="handleContainerScroll"
+    @wheel.passive="markUserIntent"
+    @touchmove.passive="markUserIntent"
+    @keydown="markUserIntent"
+    @pointerdown="handlePointerDown"
   >
     <section ref="gridEl" class="image-container" :style="gridStyle">
       <div
