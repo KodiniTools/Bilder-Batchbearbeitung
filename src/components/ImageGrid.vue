@@ -69,6 +69,24 @@ const containerStyle = computed(() =>
   maxHeight.value === null ? undefined : { maxHeight: `${maxHeight.value}px` }
 )
 
+// Erreicht der interne Scrollbereich sein Ende, die Seite so weit
+// nachziehen, dass die Unterkante des Grids im Fenster sichtbar wird.
+const PAGE_FOLLOW_MARGIN = 24
+let wasAtBottom = false
+function handleContainerScroll() {
+  const container = scrollContainer.value
+  if (!container || maxHeight.value === null) return
+  const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1
+  // Nur beim Übergang auslösen, nicht bei jedem Scroll-Event am Ende
+  if (atBottom && !wasAtBottom) {
+    const overflow = container.getBoundingClientRect().bottom - window.innerHeight
+    if (overflow > 0) {
+      window.scrollBy({ top: overflow + PAGE_FOLLOW_MARGIN, behavior: 'smooth' })
+    }
+  }
+  wasAtBottom = atBottom
+}
+
 let resizeObserver: ResizeObserver | null = null
 onMounted(() => {
   updateMaxHeight()
@@ -159,6 +177,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
     class="images-scroll-container"
     :class="{ 'is-limited': maxHeight !== null }"
     :style="containerStyle"
+    @scroll.passive="handleContainerScroll"
   >
     <section ref="gridEl" class="image-container" :style="gridStyle">
       <div
