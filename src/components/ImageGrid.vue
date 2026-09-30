@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import ImageCard from './ImageCard.vue'
 import type { ImageObject } from '@/lib/core/types'
@@ -37,6 +37,54 @@ const CARD_MIN_WIDTH: Record<string, string> = {
 const gridStyle = computed(() => ({
   '--card-min': CARD_MIN_WIDTH[imageStore.gridSize] || CARD_MIN_WIDTH.medium,
 }))
+
+// Maximal so viele Reihen sichtbar; weitere Reihen im Container scrollbar.
+const MAX_VISIBLE_ROWS = 5
+const scrollContainer = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
+const maxHeight = ref<number | null>(null)
+
+/**
+ * Misst die Oberkante der ersten Kachel in Reihe MAX_VISIBLE_ROWS + 1 und
+ * begrenzt den Container auf die Höhe davor. Funktioniert für jede
+ * Spaltenzahl (klein/mittel/groß, responsive) und variable Kartenhöhen.
+ */
+function updateMaxHeight() {
+  const container = scrollContainer.value
+  const grid = gridEl.value
+  if (!container || !grid) return
+  const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1
+  const firstHidden = grid.children[columns * MAX_VISIBLE_ROWS] as HTMLElement | undefined
+  if (!firstHidden) {
+    maxHeight.value = null
+    return
+  }
+  const style = getComputedStyle(grid)
+  const rowGap = parseFloat(style.rowGap) || 0
+  const paddingTop = parseFloat(getComputedStyle(container).paddingTop) || 0
+  maxHeight.value = Math.max(0, firstHidden.offsetTop - paddingTop - rowGap)
+}
+
+const containerStyle = computed(() =>
+  maxHeight.value === null ? undefined : { maxHeight: `${maxHeight.value}px` }
+)
+
+let resizeObserver: ResizeObserver | null = null
+onMounted(() => {
+  updateMaxHeight()
+  if (typeof ResizeObserver !== 'undefined' && gridEl.value) {
+    resizeObserver = new ResizeObserver(() => updateMaxHeight())
+    resizeObserver.observe(gridEl.value)
+  }
+})
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+})
+watch(
+  () => [displayedImages.value.length, imageStore.gridSize],
+  () => nextTick(updateMaxHeight)
+)
 
 // Drag & Drop State
 const draggedIndex = ref<number | null>(null)
@@ -106,8 +154,13 @@ function handleDrop(event: DragEvent, toIndex: number) {
 </script>
 
 <template>
-  <div class="images-scroll-container">
-    <section class="image-container" :style="gridStyle">
+  <div
+    ref="scrollContainer"
+    class="images-scroll-container"
+    :class="{ 'is-limited': maxHeight !== null }"
+    :style="containerStyle"
+  >
+    <section ref="gridEl" class="image-container" :style="gridStyle">
       <div
         v-for="(image, index) in displayedImages"
         :key="getImageKey(image)"
@@ -137,6 +190,16 @@ function handleDrop(event: DragEvent, toIndex: number) {
 <style scoped>
 .images-scroll-container {
   position: relative;
+  box-sizing: content-box;
+}
+
+/* Ab mehr als 5 Reihen: interner Scrollbereich. Padding verhindert, dass
+   Rahmen/Schatten/Hover-Effekte der Karten am Rand abgeschnitten werden. */
+.images-scroll-container.is-limited {
+  overflow-y: auto;
+  padding: var(--space-2);
+  margin: calc(-1 * var(--space-2));
+  scrollbar-gutter: stable;
 }
 
 .image-container {
