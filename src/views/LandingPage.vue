@@ -224,8 +224,9 @@ onMounted(() => {
   top: 0;
   z-index: 100;
   backdrop-filter: saturate(1.8) blur(24px);
-  background: var(--glass-bg);
-  border-bottom: 1px solid var(--glass-border);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: var(--subnav-shadow);
   transition: all 0.3s var(--ease-smooth);
 }
 
@@ -261,8 +262,9 @@ onMounted(() => {
 }
 
 .nav-link:hover {
-  background: var(--btn);
-  border-color: var(--border-color);
+  background: var(--header-btn-hover-bg);
+  border-color: var(--header-btn-hover-border);
+  color: var(--header-btn-hover-color);
   transform: translateY(-1px);
 }
 
@@ -296,10 +298,10 @@ a.nav-link {
 
 .theme-toggle:hover,
 .lang-toggle:hover {
-  color: var(--text);
+  color: var(--header-btn-hover-color);
   transform: scale(1.1);
-  border-color: var(--border-color);
-  background: var(--btn);
+  border-color: var(--header-btn-hover-border);
+  background: var(--header-btn-hover-bg);
 }
 
 .lang-toggle.active {
