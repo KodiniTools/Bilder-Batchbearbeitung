@@ -77,7 +77,13 @@ npm run build
 
 # Production Build testen
 npm run preview
+
+# Unit-Tests (Vitest + Vue Test Utils, happy-dom)
+npm test
+npm run test:watch
 ```
+
+Tests liegen unter `tests/unit/**/*.spec.ts`. Konfiguration: `vitest.config.ts`.
 
 ## 📦 Die `src/lib/` Struktur
 
