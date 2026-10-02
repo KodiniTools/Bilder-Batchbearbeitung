@@ -85,11 +85,9 @@ onMounted(() => {
   z-index: 100;
   padding: var(--space-3) var(--space-5);
   backdrop-filter: saturate(1.8) blur(24px);
-  background: var(--glass-bg);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow:
-    0 8px 32px color-mix(in oklab, var(--shadow-color) 8%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 10%, transparent);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: var(--header-shadow);
   transition: all 0.3s var(--ease-smooth);
 }
 
@@ -123,8 +121,8 @@ onMounted(() => {
 .home-btn:hover {
   color: var(--accent);
   transform: scale(1.1);
-  border-color: var(--border-color);
-  background: var(--btn);
+  border-color: var(--header-btn-hover-border);
+  background: var(--header-btn-hover-bg);
 }
 
 .app-header__title-container {
@@ -179,10 +177,10 @@ onMounted(() => {
 
 .theme-toggle:hover,
 .lang-toggle:hover {
-  color: var(--text);
+  color: var(--header-btn-hover-color);
   transform: scale(1.1);
-  border-color: var(--border-color);
-  background: var(--btn);
+  border-color: var(--header-btn-hover-border);
+  background: var(--header-btn-hover-bg);
 }
 
 .lang-toggle.active {

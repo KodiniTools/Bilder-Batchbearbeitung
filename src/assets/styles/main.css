@@ -29,11 +29,17 @@
   --purple: #8b5cf6;
   --cyan: #06b6d4;
 
-  /* Light Theme (Standard) */
-  --bg: #f8f7f4;
+  /* Light Theme (Standard) – 1:1 vom Bildkonverter übernommen
+     (Bildkonverter: src/styles/variables.scss + theme.scss) */
+  --color-bk-text: #212529; /* $color-gray-900 */
+  --color-bk-text-light: #6c757d; /* $color-gray-600 */
+  --color-bk-border: #dee2e6; /* $color-gray-300 */
+  --color-bk-bg-gradient: #f5f4d6; /* $color-bg-gradient */
+
+  --bg: #ffffff;
   --panel: #ffffff;
-  --text: var(--color-dark);
-  --muted: var(--color-gray);
+  --text: var(--color-bk-text);
+  --muted: var(--color-bk-text-light);
   --accent: var(--color-blue);
   --accent-hover: var(--color-blue-dark);
   --accent-text: #f5f4d6;
@@ -41,34 +47,28 @@
   --btn: var(--color-cream);
   --btn-hover: var(--color-gold-light);
   --ring: var(--color-blue);
-  --border-color: var(--color-silver);
-  --shadow-color: rgb(12 12 16 / 12%);
+  --border-color: var(--color-bk-border);
+  --shadow-color: rgb(0 0 0 / 10%);
   --canvas-bg: var(--color-dark);
 
-  /* Neue moderne Variablen */
-  --glass-bg: color-mix(in oklab, var(--panel) 85%, transparent);
-  --glass-border: color-mix(in oklab, var(--border-color) 50%, transparent);
-  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 20%, transparent);
-  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 30%, transparent);
-  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 25%, transparent);
+  /* Flächen: im Light Mode deckend wie die Karten des Bildkonverters */
+  --glass-bg: var(--panel);
+  --glass-border: var(--border-color);
+  --surface-elevation: 0 1px 4px rgb(0 0 0 / 5%);
+  --surface-hover: 0 3px 10px rgb(0 0 0 / 8%);
+  --surface-active: 0 1px 2px rgb(0 0 0 / 5%);
 
-  /* Dynamische Hintergründe */
-  --body-gradient:
-    radial-gradient(
-      circle at 25% 25%,
-      color-mix(in oklab, var(--color-gold-light) 8%, transparent) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 75% 75%,
-      color-mix(in oklab, var(--color-blue) 5%, transparent) 0%,
-      transparent 60%
-    ),
-    linear-gradient(
-      135deg,
-      var(--bg) 0%,
-      color-mix(in oklab, var(--bg) 96%, var(--color-gold-light)) 100%
-    );
+  /* App-Header wie Bildkonverter-Header */
+  --header-bg: var(--color-cream);
+  --header-border: var(--border-color);
+  --header-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+  --subnav-shadow: var(--header-shadow);
+  --header-btn-hover-bg: rgb(1 79 153 / 10%);
+  --header-btn-hover-border: transparent;
+  --header-btn-hover-color: var(--accent);
+
+  /* Seitenhintergrund wie Bildkonverter (body: Weiß → Creme, vertikal) */
+  --body-gradient: linear-gradient(180deg, var(--bg) 0%, var(--color-bk-bg-gradient) 100%);
 
   /* Layout-Variablen */
   --radius-sm: 8px;
@@ -103,7 +103,7 @@
   --slider-thumb: var(--color-gold);
   --control-bg: #ffffff;
   --control-border: rgb(201 152 77 / 45%);
-  --control-muted: var(--color-gray);
+  --control-muted: var(--muted);
 }
 
 /* Dark Theme Overrides – Navy/Gold Palette */
@@ -131,6 +131,19 @@
 
   --glass-bg: color-mix(in oklab, var(--panel) 75%, transparent);
   --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
+  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 20%, transparent);
+  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 30%, transparent);
+  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 25%, transparent);
+
+  --header-bg: var(--glass-bg);
+  --header-border: var(--glass-border);
+  --header-shadow:
+    0 8px 32px color-mix(in oklab, var(--shadow-color) 8%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 10%, transparent);
+  --subnav-shadow: none;
+  --header-btn-hover-bg: var(--btn);
+  --header-btn-hover-border: var(--border-color);
+  --header-btn-hover-color: var(--text);
 
   --body-gradient:
     radial-gradient(
