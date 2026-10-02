@@ -31,6 +31,16 @@ export default [
     },
   },
 
+  // Build-/Test-Konfiguration läuft in Node
+  {
+    files: ['vite.config*.ts', 'vitest.config.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
   // Vue flat/recommended — includes vue-parser for .vue files
   ...pluginVue.configs['flat/recommended'],
 

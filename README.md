@@ -78,12 +78,19 @@ npm run build
 # Production Build testen
 npm run preview
 
-# Unit-Tests (Vitest + Vue Test Utils, happy-dom)
+# Alle Tests (Vitest)
 npm test
+npm run test:unit      # Logik/Komponenten in happy-dom
+npm run test:browser   # Canvas-Tests in echtem Chromium (Playwright)
 npm run test:watch
 ```
 
-Tests liegen unter `tests/unit/**/*.spec.ts`. Konfiguration: `vitest.config.ts`.
+- `tests/unit/**/*.spec.ts` – schnell, ohne echten Canvas (happy-dom)
+- `tests/browser/**/*.spec.ts` – echter Canvas und Layout (z. B. Bild-Editor)
+
+Für den Browser-Modus einmalig `npx playwright install chromium` ausführen.
+Ein vorhandenes Chromium wird alternativ über `PLAYWRIGHT_BROWSERS_PATH` bzw.
+`VITEST_CHROMIUM` gefunden. Konfiguration: `vitest.config.ts`.
 
 ## 📦 Die `src/lib/` Struktur
 
