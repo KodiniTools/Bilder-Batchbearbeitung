@@ -156,6 +156,35 @@ function applyLockedRatio(
   return { left, top, right, bottom }
 }
 
+/**
+ * Passt ein Rechteck nachträglich an das gesperrte Verhältnis an, nachdem es an
+ * Overlay-Rand oder Mindestgröße begrenzt wurde. Es wird nur verkleinert; die
+ * Kante gegenüber dem gezogenen Griff bleibt fix (n/w-Seiten verschieben sich).
+ */
+function fitToRatio(
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  sides: (typeof HANDLE_SIDES)[Handle]
+) {
+  const ratio = getDisplayRatio()
+  if (ratio === null) return { left, top, right, bottom }
+  const w = right - left
+  const h = bottom - top
+  if (w <= 0 || h <= 0) return { left, top, right, bottom }
+  if (w / h > ratio) {
+    const newW = h * ratio
+    if (sides.w) left = right - newW
+    else right = left + newW
+  } else {
+    const newH = w / ratio
+    if (sides.n) top = bottom - newH
+    else bottom = top + newH
+  }
+  return { left, top, right, bottom }
+}
+
 function initFullCrop() {
   const { w, h } = overlaySize()
   const ratio = getDisplayRatio()
@@ -181,16 +210,22 @@ watch(
     const ratio = getDisplayRatio()
     if (ratio === null) return
 
-    const cw = crop.value.w
-    const ch = cw / ratio
-
-    let newH = ch
-    if (crop.value.y + newH > oh) {
-      newH = oh - crop.value.y
-      const newW = newH * ratio
-      crop.value = { ...crop.value, w: Math.min(newW, ow - crop.value.x), h: newH }
-    } else {
-      crop.value = { ...crop.value, h: newH }
+    // Breite beibehalten, Höhe ableiten; passt es nicht, ins Overlay einpassen
+    let w = crop.value.w
+    let h = w / ratio
+    if (h > oh) {
+      h = oh
+      w = h * ratio
+    }
+    if (w > ow) {
+      w = ow
+      h = w / ratio
+    }
+    crop.value = {
+      x: Math.max(0, Math.min(crop.value.x, ow - w)),
+      y: Math.max(0, Math.min(crop.value.y, oh - h)),
+      w,
+      h,
     }
     emitCrop()
   }
@@ -242,36 +277,45 @@ function onDocMouseMove(event: MouseEvent) {
   const dy = cy - dragStart.y
 
   if (action === 'drawing') {
-    let x = dragStart.x
-    let y = dragStart.y
-    let w = cx - dragStart.x
-    let h = cy - dragStart.y
+    const signX = cx >= dragStart.x ? 1 : -1
+    const signY = cy >= dragStart.y ? 1 : -1
+    // Verfügbarer Platz vom Startpunkt in Zugrichtung
+    const availW = signX > 0 ? ow - dragStart.x : dragStart.x
+    const availH = signY > 0 ? oh - dragStart.y : dragStart.y
+    let w = Math.min(Math.abs(cx - dragStart.x), availW)
+    let h = Math.min(Math.abs(cy - dragStart.y), availH)
 
     const ratio = getDisplayRatio()
     if (ratio !== null) {
-      const signX = w >= 0 ? 1 : -1
-      const signY = h >= 0 ? 1 : -1
-      const aw = Math.abs(w)
-      const ah = Math.abs(h)
-      if (aw / ratio > ah) {
-        h = signY * (aw / ratio)
-      } else {
-        w = signX * (ah * ratio)
+      // Größere Zugrichtung bestimmt, dann in den verfügbaren Platz einpassen
+      if (w / ratio > h) h = w / ratio
+      else w = h * ratio
+      if (w > availW) {
+        w = availW
+        h = w / ratio
+      }
+      if (h > availH) {
+        h = availH
+        w = h * ratio
       }
     }
 
-    if (w < 0) {
-      x += w
-      w = -w
+    // Mindestgröße (bei Verhältnis proportional); nie größer als das Overlay
+    if (w < MIN_SIZE || h < MIN_SIZE) {
+      if (ratio !== null) {
+        const scale = Math.max(MIN_SIZE / Math.max(w, 1e-6), MIN_SIZE / Math.max(h, 1e-6))
+        w = Math.min(w * scale, ow)
+        h = Math.min(h * scale, oh)
+        if (w / h > ratio) w = h * ratio
+        else h = w / ratio
+      } else {
+        w = Math.max(MIN_SIZE, w)
+        h = Math.max(MIN_SIZE, h)
+      }
     }
-    if (h < 0) {
-      y += h
-      h = -h
-    }
-    x = Math.max(0, Math.min(x, ow - MIN_SIZE))
-    y = Math.max(0, Math.min(y, oh - MIN_SIZE))
-    w = Math.max(MIN_SIZE, Math.min(w, ow - x))
-    h = Math.max(MIN_SIZE, Math.min(h, oh - y))
+
+    const x = Math.max(0, Math.min(signX > 0 ? dragStart.x : dragStart.x - w, ow - w))
+    const y = Math.max(0, Math.min(signY > 0 ? dragStart.y : dragStart.y - h, oh - h))
     crop.value = { x, y, w, h }
   } else if (action === 'moving') {
     crop.value = {
@@ -304,11 +348,14 @@ function onDocMouseMove(event: MouseEvent) {
     right = Math.min(ow, locked.right)
     bottom = Math.min(oh, locked.bottom)
 
+    // Begrenzung am Rand darf das Verhältnis nicht verzerren
+    const fitted = fitToRatio(left, top, right, bottom, sides)
+
     crop.value = {
-      x: left,
-      y: top,
-      w: Math.max(MIN_SIZE, right - left),
-      h: Math.max(MIN_SIZE, bottom - top),
+      x: fitted.left,
+      y: fitted.top,
+      w: fitted.right - fitted.left,
+      h: fitted.bottom - fitted.top,
     }
   }
 
