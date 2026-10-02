@@ -1,7 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isOpen" class="modal-overlay" @click.self="closeEditor">
+      <div
+        v-if="isOpen"
+        class="modal-overlay"
+        @mousedown="overlayPressed = $event.target === $event.currentTarget"
+        @click.self="onOverlayClick"
+      >
         <div class="modal-container">
           <!-- Header -->
           <div class="modal-header">
@@ -746,6 +751,16 @@ watch([resizeWidth, resizeHeight], () => {
   }
 })
 
+// Zuschneiden, 90°-Drehen und Begradigen ändern die Maße des Arbeits-Canvas.
+// Die Größe-Felder müssen folgen, sonst skaliert applyChanges() das Ergebnis
+// wieder auf die alten Maße (z. B. 1:1-Zuschnitt 768×768 → 1376×768 verzerrt).
+watch([currentWidth, currentHeight], ([w, h]) => {
+  if (w > 0 && h > 0) {
+    resizeWidth.value = w
+    resizeHeight.value = h
+  }
+})
+
 // ── Init ──────────────────────────────────────────────────────────
 
 function initializeEditor(image: ImageObject) {
@@ -1142,6 +1157,14 @@ function deleteTextItem(id: string) {
   textItems.value = textItems.value.filter((i) => i.id !== id)
   if (selectedTextId.value === id) selectedTextId.value = null
   snapshotNow()
+}
+
+// Nur schließen, wenn der Klick auch auf dem Overlay begann. Sonst würde z. B.
+// das Loslassen eines Zuschneide-Griffs außerhalb des Modals den Editor schließen.
+const overlayPressed = ref(false)
+function onOverlayClick() {
+  if (overlayPressed.value) closeEditor()
+  overlayPressed.value = false
 }
 
 function closeEditor() {

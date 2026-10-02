@@ -164,10 +164,12 @@ export function useEditorCanvas(
 
   function applyCrop() {
     if (!_workingCanvas) return
-    const x = Math.round(cropNorm.value.x * _workingCanvas.width)
-    const y = Math.round(cropNorm.value.y * _workingCanvas.height)
-    const w = Math.max(1, Math.round(cropNorm.value.w * _workingCanvas.width))
-    const h = Math.max(1, Math.round(cropNorm.value.h * _workingCanvas.height))
+    const { x, y, w, h } = cropNormToPixels(
+      cropNorm.value,
+      _workingCanvas.width,
+      _workingCanvas.height,
+      cropLockedRatio.value
+    )
     const tempCanvas = document.createElement('canvas')
     tempCanvas.width = w
     tempCanvas.height = h
@@ -395,4 +397,34 @@ export function useEditorCanvas(
     getAspectRatio,
     setAspectRatio,
   }
+}
+
+/**
+ * Rechnet einen normierten Zuschnitt (0..1) in ganzzahlige Bildpixel um.
+ * Bei festem Seitenverhältnis wird die Höhe aus der gerundeten Breite
+ * abgeleitet, damit z. B. 1:1 exakt quadratisch wird (getrenntes Runden
+ * könnte sonst 768 × 767 ergeben). Das Ergebnis liegt immer im Bild.
+ */
+export function cropNormToPixels(
+  norm: { x: number; y: number; w: number; h: number },
+  imageWidth: number,
+  imageHeight: number,
+  ratio: number | null
+): { x: number; y: number; w: number; h: number } {
+  let w = Math.max(1, Math.min(imageWidth, Math.round(norm.w * imageWidth)))
+  let h = Math.max(1, Math.min(imageHeight, Math.round(norm.h * imageHeight)))
+
+  if (ratio !== null && ratio > 0) {
+    h = Math.round(w / ratio)
+    if (h > imageHeight) {
+      h = imageHeight
+      w = Math.round(h * ratio)
+    }
+    w = Math.max(1, Math.min(imageWidth, w))
+    h = Math.max(1, Math.min(imageHeight, h))
+  }
+
+  const x = Math.max(0, Math.min(imageWidth - w, Math.round(norm.x * imageWidth)))
+  const y = Math.max(0, Math.min(imageHeight - h, Math.round(norm.y * imageHeight)))
+  return { x, y, w, h }
 }
