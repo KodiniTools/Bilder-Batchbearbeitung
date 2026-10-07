@@ -144,19 +144,9 @@ const handleDrop = async (event: DragEvent) => {
   gap: var(--space-2);
   min-height: 120px;
   padding: var(--space-4);
-  border: 2px dashed color-mix(in oklab, var(--border-color) 50%, transparent);
-  border-radius: var(--radius-2xl);
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--panel) 60%, transparent) 0%,
-      color-mix(in oklab, var(--panel) 30%, transparent) 100%
-    ),
-    radial-gradient(
-      circle at center,
-      color-mix(in oklab, var(--accent) 4%, transparent) 0%,
-      transparent 70%
-    );
+  border: 2px dashed var(--ds-border-strong);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface-2);
   color: var(--muted);
   transition: all 0.4s var(--ease-spring);
   cursor: default;
@@ -166,30 +156,9 @@ const handleDrop = async (event: DragEvent) => {
   margin-bottom: var(--space-7);
 }
 
-.drop-area::before {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  background: linear-gradient(45deg, var(--accent), var(--green), var(--purple), var(--accent));
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.4s var(--ease-smooth);
-  z-index: -1;
-}
-
 .drop-area.highlight {
-  border-color: transparent;
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 15%, transparent) 0%,
-    color-mix(in oklab, var(--green) 10%, transparent) 100%
-  );
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: var(--surface-hover);
-}
-
-.drop-area.highlight::before {
-  opacity: 0.1;
+  border-color: var(--ds-accent);
+  background: var(--ds-accent-soft);
 }
 
 .drop-area.loading {
@@ -227,14 +196,11 @@ const handleDrop = async (event: DragEvent) => {
   background: var(--accent);
   color: var(--accent-text);
   border: none;
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
   transition: all 0.25s var(--ease-smooth);
 }
 
 .upload-btn.pill-btn:hover {
   background: var(--accent-hover, var(--accent));
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .folder-btn {
@@ -248,7 +214,6 @@ const handleDrop = async (event: DragEvent) => {
   background: var(--btn-hover);
   border-color: var(--accent) !important;
   color: var(--accent);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 15%, transparent);
 }
 
 .btn {
@@ -267,7 +232,6 @@ const handleDrop = async (event: DragEvent) => {
 }
 
 .btn:hover {
-  transform: translateY(-2px);
   background: var(--btn-hover);
   box-shadow: var(--surface-elevation);
 }

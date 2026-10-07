@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="modal">
       <div v-if="isOpen" class="modal-overlay" @click.self="$emit('close')">
         <div class="modal-content">
@@ -204,7 +204,6 @@ function handleConfirm() {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,9 +220,7 @@ function handleConfirm() {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .modal-header {
@@ -549,14 +546,9 @@ function handleConfirm() {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  background: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .btn-primary:active:not(:disabled) {

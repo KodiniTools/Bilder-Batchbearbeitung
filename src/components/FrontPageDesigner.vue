@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="designer-modal">
       <div v-if="modelValue" class="designer-overlay" @click.self="closeDesigner">
         <div class="designer-container">
@@ -790,7 +790,6 @@ function closeDesigner() {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -806,7 +805,7 @@ function closeDesigner() {
   height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 /* Header */
@@ -914,7 +913,6 @@ function closeDesigner() {
 .tool-btn:hover:not(:disabled) {
   background: var(--panel);
   border-color: var(--accent);
-  transform: translateY(-1px);
 }
 
 .tool-btn:disabled {
@@ -1066,14 +1064,9 @@ function closeDesigner() {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  background: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .btn-preview {
@@ -1106,7 +1099,6 @@ function closeDesigner() {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
 }
 
 .preview-modal {
@@ -1117,7 +1109,7 @@ function closeDesigner() {
   max-width: 95vw;
   max-height: 95vh;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .preview-header {

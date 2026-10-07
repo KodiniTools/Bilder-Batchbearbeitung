@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { getBlogArticles, formatArticleDate } from '@/data/blogArticles'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { locale, t } = useI18n()
 const router = useRouter()
@@ -21,10 +22,8 @@ const articles = computed(() => getBlogArticles(locale.value))
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
-    document.documentElement.dataset.theme = theme
+    const theme = readStoredTheme()
+    applyTheme(theme)
     localStorage.setItem('theme', theme)
   }
 
@@ -116,7 +115,6 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: saturate(1.8) blur(24px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   box-shadow: var(--subnav-shadow);
@@ -158,7 +156,6 @@ onMounted(() => {
   background: var(--header-btn-hover-bg);
   border-color: var(--header-btn-hover-border);
   color: var(--header-btn-hover-color);
-  transform: translateY(-1px);
 }
 
 .nav-link.primary {
@@ -169,8 +166,6 @@ onMounted(() => {
 
 .nav-link.primary:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 /* Main Content */
@@ -196,10 +191,7 @@ onMounted(() => {
   font-weight: 800;
   margin: 0 0 var(--space-3);
   line-height: 1.2;
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 .articles-subtitle {
@@ -213,7 +205,6 @@ onMounted(() => {
 /* Panel um die Karten, wie auf kodinitools.com/blog */
 .articles-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   padding: clamp(1.25rem, 4vw, 2.25rem);
@@ -245,7 +236,6 @@ onMounted(() => {
 .article-card:focus-visible {
   border-color: var(--accent);
   box-shadow: var(--surface-hover);
-  transform: translateY(-2px);
   text-decoration: none;
 }
 
@@ -322,7 +312,6 @@ onMounted(() => {
   padding: var(--space-6);
   text-align: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
 }
@@ -355,8 +344,6 @@ onMounted(() => {
 
 .cta-button:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
 @media (max-width: 640px) {

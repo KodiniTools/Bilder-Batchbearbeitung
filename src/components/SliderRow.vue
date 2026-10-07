@@ -175,19 +175,10 @@ function resetValue() {
   -webkit-appearance: none;
   appearance: none;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--slider-track-from) 0%, var(--slider-track-to) 100%);
+  background: var(--ds-border-strong);
   cursor: pointer;
   touch-action: none;
   outline: none;
-}
-
-.slider--center {
-  background: linear-gradient(
-    90deg,
-    var(--slider-track-to) 0%,
-    var(--slider-track-from) 50%,
-    var(--slider-track-to) 100%
-  );
 }
 
 .slider::-webkit-slider-thumb {
@@ -197,14 +188,9 @@ function resetValue() {
   height: 12px;
   border-radius: 50%;
   background: var(--slider-thumb);
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--ds-surface-1);
   cursor: pointer;
   transition: transform 0.15s ease;
-}
-
-.slider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
 }
 
 .slider::-moz-range-thumb {
@@ -213,8 +199,7 @@ function resetValue() {
   box-sizing: border-box;
   border-radius: 50%;
   background: var(--slider-thumb);
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--ds-surface-1);
   cursor: pointer;
 }
 
@@ -223,7 +208,7 @@ function resetValue() {
 }
 
 .slider:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-gold) 30%, transparent);
+  box-shadow: var(--ds-focus-ring);
 }
 
 .slider:disabled {

@@ -259,7 +259,6 @@ onUnmounted(() => {
   inset: 0;
   z-index: 10000;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
   display: grid;
   place-items: center;
   padding: var(--space-4);
@@ -276,8 +275,8 @@ onUnmounted(() => {
   border-radius: 0;
   overflow: hidden;
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.3),
-    0 0 0 1px var(--border-color);
+    var(--ds-shadow-overlay),
+    0 0 0 1px var(--ds-border);
   display: flex;
   flex-direction: column;
 }
@@ -320,7 +319,6 @@ onUnmounted(() => {
 .preview-close-btn:hover {
   background: var(--accent);
   color: white;
-  transform: scale(1.1);
   border-color: var(--accent);
 }
 
@@ -335,7 +333,6 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
   font-size: 1.1rem;
@@ -347,8 +344,6 @@ onUnmounted(() => {
 .preview-close-float:hover {
   background: var(--accent);
   border-color: var(--accent);
-  transform: scale(1.1);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 50%, transparent);
 }
 
 /* Galerie-Navigation (vor / nächst) */
@@ -363,7 +358,6 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: white;
   font-size: 1.25rem;
@@ -383,8 +377,6 @@ onUnmounted(() => {
 .preview-nav:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
-  transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 50%, transparent);
 }
 
 .preview-nav:disabled {
@@ -435,12 +427,8 @@ onUnmounted(() => {
 
 .format-badge {
   padding: var(--space-2) var(--space-3);
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 15%, transparent),
-    color-mix(in oklab, var(--green) 12%, transparent)
-  );
-  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  background: var(--ds-accent-soft);
+  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--radius-md);
   color: var(--text);
   font-weight: 600;

@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="preview-fade">
       <div v-if="modelValue" class="preview-overlay" @click.self="close">
         <div class="preview-modal">
@@ -265,18 +265,17 @@ function save() {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
 }
 
 .preview-modal {
-  background: var(--panel, #1e1e2e);
+  background: var(--panel);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   max-width: 95vw;
   max-height: 95vh;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .preview-header {
@@ -284,7 +283,7 @@ function save() {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border-color, #333);
+  border-bottom: 1px solid var(--border-color);
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -295,7 +294,7 @@ function save() {
   gap: 10px;
   font-weight: 600;
   font-size: 1rem;
-  color: var(--text, #fff);
+  color: var(--text);
 }
 
 .preview-page-nav {
@@ -306,16 +305,16 @@ function save() {
 
 .preview-nav-btn {
   background: none;
-  border: 1px solid var(--border-color, #444);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   cursor: pointer;
-  color: var(--text, #fff);
+  color: var(--text);
   padding: 4px 8px;
   display: flex;
   transition: background 0.15s;
 }
 .preview-nav-btn:hover:not(:disabled) {
-  background: var(--bg, #111);
+  background: var(--bg);
 }
 .preview-nav-btn:disabled {
   opacity: 0.3;
@@ -324,7 +323,7 @@ function save() {
 
 .preview-page-info {
   font-size: 0.875rem;
-  color: var(--muted, #aaa);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -332,14 +331,14 @@ function save() {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--muted, #888);
+  color: var(--muted);
   padding: 4px;
   border-radius: 6px;
   display: flex;
   transition: color 0.15s;
 }
 .preview-close-btn:hover {
-  color: var(--text, #fff);
+  color: var(--text);
 }
 
 .preview-body {
@@ -406,7 +405,7 @@ function save() {
   height: 10px;
   border-radius: 50%;
   border: none;
-  background: var(--border-color, #444);
+  background: var(--border-color);
   cursor: pointer;
   padding: 0;
   transition:
@@ -423,7 +422,7 @@ function save() {
   justify-content: flex-end;
   gap: 10px;
   padding: 14px 20px;
-  border-top: 1px solid var(--border-color, #333);
+  border-top: 1px solid var(--border-color);
 }
 
 .btn-secondary,
@@ -451,15 +450,10 @@ function save() {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   border: none;
   color: var(--accent-text);
   font-weight: 600;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .preview-fade-enter-active,

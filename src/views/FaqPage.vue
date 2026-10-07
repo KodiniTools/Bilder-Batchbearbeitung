@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { locale, t } = useI18n()
 const router = useRouter()
@@ -17,10 +18,8 @@ const goToApp = () => {
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
-    document.documentElement.dataset.theme = theme
+    const theme = readStoredTheme()
+    applyTheme(theme)
     localStorage.setItem('theme', theme)
   }
 
@@ -95,7 +94,6 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: saturate(1.8) blur(24px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   box-shadow: var(--subnav-shadow);
@@ -137,7 +135,6 @@ onMounted(() => {
   background: var(--header-btn-hover-bg);
   border-color: var(--header-btn-hover-border);
   color: var(--header-btn-hover-color);
-  transform: translateY(-1px);
 }
 
 .nav-link.primary {
@@ -148,8 +145,6 @@ onMounted(() => {
 
 .nav-link.primary:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 /* Main Content */
@@ -170,10 +165,7 @@ onMounted(() => {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   font-weight: 800;
   margin: 0 0 var(--space-6);
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 /* Privacy Notice */
@@ -182,13 +174,9 @@ onMounted(() => {
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 8%, transparent) 0%,
-    color-mix(in oklab, var(--green) 6%, transparent) 100%
-  );
-  border-radius: var(--radius-2xl);
-  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  background: var(--ds-accent-soft);
+  border-radius: var(--ds-radius-lg);
+  border: var(--ds-border-width) solid var(--ds-border);
   margin-bottom: var(--space-6);
 }
 
@@ -216,7 +204,6 @@ onMounted(() => {
 /* FAQ List */
 .faq-list {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   overflow: hidden;
@@ -311,22 +298,14 @@ onMounted(() => {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(
-    135deg,
-    var(--accent) 0%,
-    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
-  );
+  background: var(--ds-accent);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
   transition: all 0.3s var(--ease-spring);
-  box-shadow:
-    0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 20%, transparent);
 }
 
 .cta-button:hover {
-  transform: translateY(-3px) scale(1.02);
   box-shadow:
     0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 20%, transparent);

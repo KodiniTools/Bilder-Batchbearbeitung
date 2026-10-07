@@ -398,12 +398,8 @@ function startDrag(event: MouseEvent) {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-4);
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 10%, transparent),
-    color-mix(in oklab, var(--green) 8%, transparent)
-  );
-  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  background: var(--ds-accent-soft);
+  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--radius-xl);
 }
 
@@ -476,11 +472,6 @@ function startDrag(event: MouseEvent) {
   transition: all 0.2s var(--ease-smooth);
 }
 
-.add-entry-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
-}
-
 .entries-scroll {
   flex: 1;
   overflow-y: auto;
@@ -503,7 +494,6 @@ function startDrag(event: MouseEvent) {
 
 .entry-item:hover {
   border-color: var(--accent);
-  transform: translateX(4px);
 }
 
 .entry-item.active {
@@ -576,9 +566,9 @@ function startDrag(event: MouseEvent) {
 }
 
 .remove-btn:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--ds-danger);
   color: white;
-  border-color: #dc2626;
+  border-color: var(--ds-danger);
 }
 
 .move-btn:disabled {
@@ -717,7 +707,7 @@ function startDrag(event: MouseEvent) {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: #dc2626;
+  background: var(--ds-danger);
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -728,8 +718,7 @@ function startDrag(event: MouseEvent) {
 }
 
 .remove-image-btn:hover {
-  background: #b91c1c;
-  transform: translateY(-2px);
+  background: color-mix(in oklab, var(--ds-danger) 85%, black);
 }
 
 /* Mini Preview */

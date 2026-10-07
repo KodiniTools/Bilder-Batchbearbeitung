@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { locale, t } = useI18n()
 const router = useRouter()
@@ -24,10 +25,8 @@ const scrollToSection = (id: string) => {
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
-    document.documentElement.dataset.theme = theme
+    const theme = readStoredTheme()
+    applyTheme(theme)
     localStorage.setItem('theme', theme)
   }
 
@@ -454,7 +453,6 @@ const sections = [
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: saturate(1.8) blur(24px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   box-shadow: var(--subnav-shadow);
@@ -504,7 +502,6 @@ const sections = [
 
 .nav-link.primary:hover {
   background: var(--accent-hover);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 /* Hero */
@@ -526,10 +523,7 @@ const sections = [
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   font-weight: 800;
   margin: 0 0 var(--space-4);
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 .hero-subtitle {
@@ -559,7 +553,6 @@ const sections = [
   top: var(--space-4);
   height: fit-content;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
@@ -600,7 +593,6 @@ const sections = [
 /* Article */
 .article {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
@@ -778,11 +770,7 @@ const sections = [
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--green) 10%, transparent),
-    color-mix(in oklab, var(--accent) 5%, transparent)
-  );
+  background: color-mix(in oklab, var(--ds-success) 10%, transparent);
   border-radius: var(--radius-xl);
   margin-bottom: var(--space-4);
 }
@@ -888,21 +876,11 @@ kbd {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in oklab, var(--accent) 80%, var(--secondary))
-  );
+  background: var(--ds-accent);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
   transition: all 0.3s var(--ease-spring);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
-}
-
-.cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 /* Responsive */

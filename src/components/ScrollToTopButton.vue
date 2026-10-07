@@ -111,8 +111,6 @@ onUnmounted(() => {
   border: 1px solid var(--glass-border);
   border-radius: 50%;
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   color: var(--text);
   font-size: 0.95rem;
   cursor: pointer;
@@ -128,7 +126,6 @@ onUnmounted(() => {
 
 .scroll-to-top:hover {
   opacity: 1;
-  transform: translateY(-2px);
   background: var(--accent);
   color: var(--accent-text);
   box-shadow: var(--surface-hover);

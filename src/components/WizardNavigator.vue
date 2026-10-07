@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="wizard">
       <div v-if="isOpen" class="wizard-overlay" @click.self="handleClose">
         <div class="wizard-content">
@@ -272,7 +272,6 @@ function handleToolNavigation(target: HandoffTarget) {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,8 +289,8 @@ function handleToolNavigation(target: HandoffTarget) {
   display: flex;
   flex-direction: column;
   box-shadow:
-    0 24px 48px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px var(--glass-border);
+    var(--ds-shadow-overlay),
+    0 0 0 1px var(--ds-border);
 }
 
 /* Header */
@@ -302,11 +301,6 @@ function handleToolNavigation(target: HandoffTarget) {
   align-items: center;
   padding: var(--space-6) var(--space-5) var(--space-4);
   text-align: center;
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--green) 8%, transparent) 0%,
-    transparent 100%
-  );
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -317,12 +311,8 @@ function handleToolNavigation(target: HandoffTarget) {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--green),
-    color-mix(in oklab, var(--green) 70%, var(--cyan))
-  );
-  color: white;
+  background: var(--ds-success);
+  color: var(--ds-surface-1);
   margin-bottom: var(--space-3);
   animation: successPop 0.5s var(--ease-spring) both;
 }
@@ -408,7 +398,6 @@ function handleToolNavigation(target: HandoffTarget) {
 }
 
 .action-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--surface-elevation);
 }
 
@@ -499,7 +488,6 @@ function handleToolNavigation(target: HandoffTarget) {
 }
 
 .tool-card:hover {
-  transform: translateX(4px);
   border-color: color-mix(in oklab, var(--accent) 30%, var(--glass-border));
   box-shadow: var(--surface-elevation);
 }
@@ -572,7 +560,6 @@ function handleToolNavigation(target: HandoffTarget) {
 }
 
 .tool-card:hover .tool-arrow {
-  transform: translateX(4px);
   color: var(--accent);
 }
 

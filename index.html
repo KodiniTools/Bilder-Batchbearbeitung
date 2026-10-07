@@ -51,9 +51,22 @@
     <!-- OG Locale Alternate -->
     <meta property="og:locale:alternate" content="en_US" />
 
-    <!-- PWA Theme Colors (beibehalten) -->
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <!-- PWA Theme Colors (Design-Tokens --ds-surface-0, Light/Dark) -->
+    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a1324" media="(prefers-color-scheme: dark)" />
+    <!-- Theme vor dem ersten Paint setzen (Tokens: Dark auf :root, Light über data-theme),
+         damit Light-Nutzer keinen dunklen Flash sehen. src/utils/theme.ts übernimmt danach. -->
+    <script>
+      try {
+        var storedTheme = localStorage.getItem('theme')
+        document.documentElement.setAttribute(
+          'data-theme',
+          storedTheme === 'dark' ? 'dark' : 'light'
+        )
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light')
+      }
+    </script>
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- OPEN GRAPH META TAGS (Facebook, LinkedIn, WhatsApp) -->

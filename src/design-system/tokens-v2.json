@@ -1,0 +1,574 @@
+{
+  "$name": "KodiniTools · Tokens v2 (Bilderserie bearbeiten)",
+  "$version": "2.0.0",
+  "$description": "Gemeinsame Tokens der KodiniTools-Apps: flache Flächen, ein Akzent, 1 px Rahmen, drei Radien, 150 ms Motion. CSS-Namespace --ds-*, Laufzeit-Quelle tokens-v2.css im selben Ordner. Kopie aus KodiniTools/Collage-Maker (src/design-system/tokens-v2.json, Stand 9dc4eca), dort aus KodiniTools/Playlist-Generator; Werte dort pflegen und hierher übernehmen.",
+  "color": {
+    "dark": {
+      "surface0": {
+        "$type": "color",
+        "$value": "#0a1324",
+        "$description": "Seite",
+        "$extensions": { "css": "--ds-surface-0" }
+      },
+      "surface1": {
+        "$type": "color",
+        "$value": "#111d33",
+        "$description": "Panel, Kopfzeile, Player, Toast",
+        "$extensions": { "css": "--ds-surface-1" }
+      },
+      "surface2": {
+        "$type": "color",
+        "$value": "#182741",
+        "$description": "Eingaben, Dropzone, Chips, aktives Segment, Sekundär-Button",
+        "$extensions": { "css": "--ds-surface-2" }
+      },
+      "surface3": {
+        "$type": "color",
+        "$value": "#1f3050",
+        "$description": "Hover auf Flächen und Zeilen",
+        "$extensions": { "css": "--ds-surface-3" }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "#223553",
+        "$description": "Rahmen, Trennlinien",
+        "$extensions": { "css": "--ds-border" }
+      },
+      "borderStrong": {
+        "$type": "color",
+        "$value": "#2f4668",
+        "$description": "Rahmen von Feldern und Sekundär-Buttons",
+        "$extensions": { "css": "--ds-border-strong" }
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#f2eee2",
+        "$description": "Primärtext",
+        "$extensions": { "css": "--ds-text" }
+      },
+      "text2": {
+        "$type": "color",
+        "$value": "#a7b3c4",
+        "$description": "Sekundärtext, Labels, Meta",
+        "$extensions": { "css": "--ds-text-2" }
+      },
+      "text3": {
+        "$type": "color",
+        "$value": "#8593a8",
+        "$description": "Tertiärtext, Platzhalter, Icons in Ruhe",
+        "$extensions": { "css": "--ds-text-3" }
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "#d4a257",
+        "$description": "Primäraktion, Fokus, aktive Zustände",
+        "$extensions": { "css": "--ds-accent" }
+      },
+      "accentHover": {
+        "$type": "color",
+        "$value": "#e0b06a",
+        "$description": "Primäraktion :hover",
+        "$extensions": { "css": "--ds-accent-hover" }
+      },
+      "accentSoft": {
+        "$type": "color",
+        "$value": "rgba(212, 162, 87, 0.14)",
+        "$description": "Ausgewählte Zeile, aktive Fläche",
+        "$extensions": { "css": "--ds-accent-soft" }
+      },
+      "onAccent": {
+        "$type": "color",
+        "$value": "#0a1324",
+        "$description": "Text und Icons auf Akzent",
+        "$extensions": { "css": "--ds-on-accent" }
+      },
+      "link": {
+        "$type": "color",
+        "$value": "#6aaef5",
+        "$description": "Links im Fließtext",
+        "$extensions": { "css": "--ds-link" }
+      },
+      "success": {
+        "$type": "color",
+        "$value": "#5fcf8a",
+        "$extensions": { "css": "--ds-success" }
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#e3b341",
+        "$extensions": { "css": "--ds-warning" }
+      },
+      "danger": {
+        "$type": "color",
+        "$value": "#ef6b6b",
+        "$extensions": { "css": "--ds-danger" }
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#6aaef5",
+        "$extensions": { "css": "--ds-info" }
+      }
+    },
+    "light": {
+      "surface0": {
+        "$type": "color",
+        "$value": "#f6f5f1",
+        "$description": "Seite",
+        "$extensions": { "css": "--ds-surface-0" }
+      },
+      "surface1": {
+        "$type": "color",
+        "$value": "#ffffff",
+        "$description": "Panel, Kopfzeile, Player, Toast",
+        "$extensions": { "css": "--ds-surface-1" }
+      },
+      "surface2": {
+        "$type": "color",
+        "$value": "#f0eee8",
+        "$description": "Eingaben, Dropzone, Chips, aktives Segment",
+        "$extensions": { "css": "--ds-surface-2" }
+      },
+      "surface3": {
+        "$type": "color",
+        "$value": "#e8e5dd",
+        "$description": "Hover auf Flächen und Zeilen",
+        "$extensions": { "css": "--ds-surface-3" }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "#e2dfd7",
+        "$description": "Rahmen, Trennlinien",
+        "$extensions": { "css": "--ds-border" }
+      },
+      "borderStrong": {
+        "$type": "color",
+        "$value": "#cbc6ba",
+        "$description": "Rahmen von Feldern und Sekundär-Buttons",
+        "$extensions": { "css": "--ds-border-strong" }
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#14213a",
+        "$description": "Primärtext",
+        "$extensions": { "css": "--ds-text" }
+      },
+      "text2": {
+        "$type": "color",
+        "$value": "#3f4a60",
+        "$description": "Sekundärtext, Labels, Meta",
+        "$extensions": { "css": "--ds-text-2" }
+      },
+      "text3": {
+        "$type": "color",
+        "$value": "#5f6b84",
+        "$description": "Tertiärtext, Platzhalter, Icons in Ruhe",
+        "$extensions": { "css": "--ds-text-3" }
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "#c9984d",
+        "$description": "Primäraktion, Fokus, aktive Zustände",
+        "$extensions": { "css": "--ds-accent" }
+      },
+      "accentHover": {
+        "$type": "color",
+        "$value": "#b8842f",
+        "$description": "Primäraktion :hover",
+        "$extensions": { "css": "--ds-accent-hover" }
+      },
+      "accentSoft": {
+        "$type": "color",
+        "$value": "rgba(201, 152, 77, 0.16)",
+        "$description": "Ausgewählte Zeile, aktive Fläche",
+        "$extensions": { "css": "--ds-accent-soft" }
+      },
+      "onAccent": {
+        "$type": "color",
+        "$value": "#14213a",
+        "$description": "Text und Icons auf Akzent",
+        "$extensions": { "css": "--ds-on-accent" }
+      },
+      "link": {
+        "$type": "color",
+        "$value": "#0f5aa8",
+        "$description": "Links im Fließtext",
+        "$extensions": { "css": "--ds-link" }
+      },
+      "success": {
+        "$type": "color",
+        "$value": "#177a42",
+        "$extensions": { "css": "--ds-success" }
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#9a6416",
+        "$extensions": { "css": "--ds-warning" }
+      },
+      "danger": {
+        "$type": "color",
+        "$value": "#c93c3c",
+        "$extensions": { "css": "--ds-danger" }
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#0f5aa8",
+        "$extensions": { "css": "--ds-info" }
+      }
+    }
+  },
+  "effect": {
+    "$description": "Theme-abhängige Composite-Tokens; in beiden Light-Selektoren erneut deklariert.",
+    "dark": {
+      "focusRing": {
+        "$type": "shadow",
+        "$value": "0 0 0 2px var(--ds-surface-0), 0 0 0 4px var(--ds-accent)",
+        "$description": "Fokus-Ring mit 2 px Abstand, ersetzt den Glow",
+        "$extensions": { "css": "--ds-focus-ring" }
+      },
+      "shadowOverlay": {
+        "$type": "shadow",
+        "$value": "0 8px 24px rgba(0, 0, 0, 0.35)",
+        "$description": "Einziger Schatten: Dialog, Popover, Menü",
+        "$extensions": { "css": "--ds-shadow-overlay" }
+      }
+    },
+    "light": {
+      "focusRing": {
+        "$type": "shadow",
+        "$value": "0 0 0 2px var(--ds-surface-0), 0 0 0 4px var(--ds-accent)",
+        "$description": "Fokus-Ring mit 2 px Abstand, ersetzt den Glow",
+        "$extensions": { "css": "--ds-focus-ring" }
+      },
+      "shadowOverlay": {
+        "$type": "shadow",
+        "$value": "0 8px 24px rgba(20, 33, 58, 0.12)",
+        "$description": "Einziger Schatten: Dialog, Popover, Menü",
+        "$extensions": { "css": "--ds-shadow-overlay" }
+      }
+    }
+  },
+  "typography": {
+    "fontSans": {
+      "$type": "fontFamily",
+      "$value": "'Supreme', sans-serif",
+      "$description": "Supreme in 400/500/600/700 als echte Schnitte deployen (/fonts/)",
+      "$extensions": { "css": "--ds-font-sans" }
+    },
+    "fontMono": {
+      "$type": "fontFamily",
+      "$value": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+      "$description": "Code-Block, Chips, Dateinamen in Meta",
+      "$extensions": { "css": "--ds-font-mono" }
+    },
+    "size": {
+      "xs": {
+        "$type": "dimension",
+        "$value": "12px",
+        "$description": "Chips, Zeilennummern, Kbd",
+        "$extensions": { "css": "--ds-text-xs" }
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": "13px",
+        "$description": "Labels, Meta, Captions, Code",
+        "$extensions": { "css": "--ds-text-sm" }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "14px",
+        "$description": "Fließtext, Buttons, Felder",
+        "$extensions": { "css": "--ds-text-md" }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$description": "Panel-Titel, Dialog-Titel",
+        "$extensions": { "css": "--ds-text-lg" }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "20px",
+        "$description": "Abschnitts-Titel",
+        "$extensions": { "css": "--ds-text-xl" }
+      },
+      "2xl": {
+        "$type": "dimension",
+        "$value": "24px",
+        "$description": "Seitentitel",
+        "$extensions": { "css": "--ds-text-2xl" }
+      },
+      "3xl": {
+        "$type": "dimension",
+        "$value": "32px",
+        "$description": "Hero",
+        "$extensions": { "css": "--ds-text-3xl" }
+      }
+    },
+    "weight": {
+      "regular": {
+        "$type": "fontWeight",
+        "$value": 400,
+        "$extensions": { "css": "--ds-weight-regular" }
+      },
+      "medium": {
+        "$type": "fontWeight",
+        "$value": 500,
+        "$extensions": { "css": "--ds-weight-medium" }
+      },
+      "semibold": {
+        "$type": "fontWeight",
+        "$value": 600,
+        "$extensions": { "css": "--ds-weight-semibold" }
+      },
+      "bold": {
+        "$type": "fontWeight",
+        "$value": 700,
+        "$extensions": { "css": "--ds-weight-bold" }
+      }
+    },
+    "leading": {
+      "base": {
+        "$type": "number",
+        "$value": 1.5,
+        "$extensions": { "css": "--ds-leading" }
+      },
+      "tight": {
+        "$type": "number",
+        "$value": 1.25,
+        "$description": "Titel ab 24 px",
+        "$extensions": { "css": "--ds-leading-tight" }
+      }
+    },
+    "tracking": {
+      "tight": {
+        "$type": "dimension",
+        "$value": "-0.01em",
+        "$description": "Titel ab 24 px",
+        "$extensions": { "css": "--ds-tracking-tight" }
+      }
+    }
+  },
+  "spacing": {
+    "$description": "4er-Raster. Schlüssel = Vielfaches von 4 px.",
+    "1": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$extensions": { "css": "--ds-space-1" }
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$extensions": { "css": "--ds-space-2" }
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$extensions": { "css": "--ds-space-3" }
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$extensions": { "css": "--ds-space-4" }
+    },
+    "5": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$extensions": { "css": "--ds-space-5" }
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$extensions": { "css": "--ds-space-6" }
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$extensions": { "css": "--ds-space-8" }
+    },
+    "10": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$extensions": { "css": "--ds-space-10" }
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$extensions": { "css": "--ds-space-12" }
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "64px",
+      "$extensions": { "css": "--ds-space-16" }
+    }
+  },
+  "radius": {
+    "sm": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Controls, Chips, Segmente",
+      "$extensions": { "css": "--ds-radius-sm" }
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Felder, Buttons, Karten, Code-Block",
+      "$extensions": { "css": "--ds-radius-md" }
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$description": "Panels, Dialoge",
+      "$extensions": { "css": "--ds-radius-lg" }
+    },
+    "full": {
+      "$type": "dimension",
+      "$value": "999px",
+      "$description": "Pills, Play-Button",
+      "$extensions": { "css": "--ds-radius-full" }
+    }
+  },
+  "border": {
+    "width": {
+      "$type": "dimension",
+      "$value": "1px",
+      "$description": "Einzige Rahmenstärke",
+      "$extensions": { "css": "--ds-border-width" }
+    }
+  },
+  "motion": {
+    "duration": {
+      "$type": "duration",
+      "$value": "150ms",
+      "$description": "Hover, Fokus, Segment-Wechsel",
+      "$extensions": { "css": "--ds-duration" }
+    },
+    "durationSlow": {
+      "$type": "duration",
+      "$value": "250ms",
+      "$description": "Dialog, Toast, Popover",
+      "$extensions": { "css": "--ds-duration-slow" }
+    },
+    "ease": {
+      "$type": "cubicBezier",
+      "$value": "cubic-bezier(0.2, 0, 0, 1)",
+      "$description": "Standard-Easing, keine Spring-Kurven",
+      "$extensions": { "css": "--ds-ease" }
+    }
+  },
+  "size": {
+    "control": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "28px",
+        "$description": "Segment, Zeilen-Aktion, Chip-Button",
+        "$extensions": { "css": "--ds-control-sm" }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "36px",
+        "$description": "Buttons, Select, Icon-Button",
+        "$extensions": { "css": "--ds-control-md" }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "40px",
+        "$description": "Textfelder",
+        "$extensions": { "css": "--ds-control-lg" }
+      }
+    },
+    "row": {
+      "$type": "dimension",
+      "$value": "44px",
+      "$description": "Listenzeile",
+      "$extensions": { "css": "--ds-row-height" }
+    },
+    "topbar": {
+      "$type": "dimension",
+      "$value": "56px",
+      "$description": "Kopfzeile",
+      "$extensions": { "css": "--ds-topbar-height" }
+    },
+    "player": {
+      "$type": "dimension",
+      "$value": "60px",
+      "$description": "Player-Bar",
+      "$extensions": { "css": "--ds-player-height" }
+    },
+    "icon": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$description": "In Buttons und Zeilen",
+        "$extensions": { "css": "--ds-icon-sm" }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "20px",
+        "$description": "Freistehend, Kopfzeile",
+        "$extensions": { "css": "--ds-icon-md" }
+      },
+      "stroke": {
+        "$type": "number",
+        "$value": 1.75,
+        "$description": "Lucide stroke-width",
+        "$extensions": { "css": "--ds-icon-stroke" }
+      }
+    }
+  },
+  "layout": {
+    "container": {
+      "$type": "dimension",
+      "$value": "1200px",
+      "$extensions": { "css": "--ds-container" }
+    },
+    "gutter": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$description": "Seitenrand",
+      "$extensions": { "css": "--ds-gutter" }
+    },
+    "gap": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Abstand zwischen Panels",
+      "$extensions": { "css": "--ds-gap" }
+    },
+    "breakpoint": {
+      "$description": "Nur für Media Queries und JS.",
+      "phone": { "$type": "dimension", "$value": "480px" },
+      "tablet": {
+        "$type": "dimension",
+        "$value": "768px",
+        "$description": "Panels stapeln sich darunter"
+      },
+      "desktop": { "$type": "dimension", "$value": "1024px" }
+    }
+  },
+  "zIndex": {
+    "topbar": {
+      "$type": "number",
+      "$value": 500,
+      "$extensions": { "css": "--ds-z-topbar" }
+    },
+    "player": {
+      "$type": "number",
+      "$value": 900,
+      "$extensions": { "css": "--ds-z-player" }
+    },
+    "backdrop": {
+      "$type": "number",
+      "$value": 1000,
+      "$extensions": { "css": "--ds-z-backdrop" }
+    },
+    "dialog": {
+      "$type": "number",
+      "$value": 1001,
+      "$extensions": { "css": "--ds-z-dialog" }
+    },
+    "toast": {
+      "$type": "number",
+      "$value": 9999,
+      "$extensions": { "css": "--ds-z-toast" }
+    }
+  }
+}

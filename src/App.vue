@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSeoMeta } from '@/composables/useSeoMeta'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { locale } = useI18n()
 
@@ -23,11 +24,8 @@ function onLanguageChanged(e: Event) {
 }
 
 onMounted(() => {
-  // Apply saved theme on app mount
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const theme = savedTheme || (prefersDark ? 'dark' : 'light')
-  document.documentElement.dataset.theme = theme
+  // Gespeichertes Theme anwenden (Standard Light, wie im Collage Maker)
+  applyTheme(readStoredTheme())
 
   // Listen for language changes from SSI nav — no interception needed,
   // nav.html handles everything and dispatches this event
@@ -40,6 +38,9 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Ziel aller App-Modals (<Teleport to="#modal-portal">); steht vor der
+       RouterView, damit es beim Mounten der Seiten bereits im DOM ist. -->
+  <div id="modal-portal"></div>
   <RouterView />
 </template>
 

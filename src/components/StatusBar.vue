@@ -409,7 +409,6 @@ const handleRedo = () => {
   padding: var(--space-3) var(--space-4);
   margin: var(--space-4) 0;
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--surface-elevation);
@@ -607,15 +606,13 @@ const handleRedo = () => {
 .tool-btn--primary {
   padding: 0 12px;
   margin-left: 2px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  background: var(--accent);
   color: var(--accent-text);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 .tool-btn--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+  background: var(--accent-hover);
   color: var(--accent-text);
-  box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .tool-btn__text {

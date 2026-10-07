@@ -225,7 +225,7 @@ const emit = defineEmits<{
 }
 
 .ptb-thumb.active {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   color: var(--accent-text);
   border-color: transparent;
   font-weight: 600;
@@ -267,7 +267,7 @@ const emit = defineEmits<{
 }
 
 .ptb-action.primary {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   color: var(--accent-text);
   border-color: transparent;
 }
@@ -278,12 +278,12 @@ const emit = defineEmits<{
 }
 
 .ptb-action.danger {
-  border-color: var(--red, #e53e3e);
-  color: var(--red, #e53e3e);
+  border-color: var(--red);
+  color: var(--red);
 }
 
 .ptb-action.danger:hover:not(:disabled) {
-  background: var(--red, #e53e3e);
+  background: var(--red);
   color: white;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="modal">
       <div
         v-if="isOpen"
@@ -292,7 +292,7 @@
 
   <!-- Großansicht des aktuellen Vorschaubilds (Klick auf das Bild); eigener
        Teleport nach body, damit sie über dem (ebenfalls teleportierten) Editor liegt -->
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <ImagePreview :image="lightboxImage" :is-open="lightboxOpen" @close="closeLightbox" />
   </Teleport>
 </template>
@@ -1183,7 +1183,6 @@ function closeEditor() {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1201,7 +1200,7 @@ function closeEditor() {
   height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--ds-shadow-overlay);
   overflow: hidden;
 }
 
@@ -1514,14 +1513,14 @@ function closeEditor() {
 }
 
 .btn-save {
-  background: var(--green, #22c55e);
-  border-color: var(--green, #22c55e);
+  background: var(--green);
+  border-color: var(--green);
   color: white;
   font-weight: 600;
 }
 .btn-save:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--green, #22c55e) 85%, black);
-  border-color: color-mix(in oklab, var(--green, #22c55e) 85%, black);
+  background: color-mix(in oklab, var(--green) 85%, black);
+  border-color: color-mix(in oklab, var(--green) 85%, black);
 }
 
 .btn-swap-enter-active,

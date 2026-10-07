@@ -183,7 +183,7 @@ watch(
   font-weight: inherit;
   text-align: inherit;
   color: inherit;
-  background: rgba(102, 126, 234, 0.06);
+  background: var(--ds-accent-soft);
   box-sizing: border-box;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -237,9 +237,8 @@ watch(
 .resize-handle:hover {
   box-shadow:
     0 0 0 1.5px var(--accent),
-    0 0 0 5px rgba(102, 126, 234, 0.35),
+    0 0 0 5px color-mix(in oklab, var(--ds-accent) 35%, transparent),
     0 2px 8px rgba(0, 0, 0, 0.5);
-  transform: translate(-50%, -50%) scale(1.3);
 }
 
 /* Ecken */

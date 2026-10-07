@@ -313,7 +313,6 @@ function close() {
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--border-color);
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
 }
 
 .panel-title {
@@ -330,10 +329,9 @@ function close() {
   display: grid;
   place-items: center;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  background: var(--accent);
   color: var(--accent-text);
   font-size: 1rem;
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
 .panel-title__text {
@@ -485,7 +483,6 @@ function close() {
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--border-color);
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
 }
 
 .panel-footer__hint {
