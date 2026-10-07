@@ -261,7 +261,6 @@ onUnmounted(() => {
   height: 28px;
   border-radius: 50%;
   background: var(--glass-bg);
-  backdrop-filter: blur(8px);
   border: 2px solid var(--border-color);
   display: grid;
   place-items: center;
@@ -273,19 +272,13 @@ onUnmounted(() => {
 
 .checkbox-overlay:hover {
   opacity: 1;
-  transform: scale(1.1);
   border-color: var(--accent);
 }
 
 .checkbox-overlay.checked {
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in oklab, var(--accent) 80%, var(--green))
-  );
-  border-color: var(--accent);
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
   opacity: 1;
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .checkbox-overlay.checked i {
@@ -307,24 +300,11 @@ onUnmounted(() => {
   background: var(--panel);
   border: 2px solid var(--border-color);
   border-radius: 0;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 2px 6px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.4s var(--ease-spring);
   cursor: pointer;
   opacity: 0;
   transform: translateY(40px);
   animation: cardFadeIn 0.6s var(--ease-smooth) forwards;
-
-  background:
-    var(--panel) padding-box,
-    linear-gradient(
-        135deg,
-        color-mix(in oklab, var(--border-color) 60%, transparent),
-        color-mix(in oklab, var(--accent) 25%, transparent)
-      )
-      border-box;
 }
 
 @keyframes cardFadeIn {
@@ -334,46 +314,14 @@ onUnmounted(() => {
   }
 }
 
-.image-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent) 8%, transparent) 0%,
-    transparent 40%,
-    color-mix(in oklab, var(--green) 6%, transparent) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.4s var(--ease-smooth);
-  pointer-events: none;
-}
-
 .image-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.15),
-    0 6px 12px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border-color: color-mix(in oklab, var(--accent) 40%, var(--border-color));
 }
 
-.image-card:hover::before {
-  opacity: 1;
-}
-
 .image-card.selected {
-  background:
-    var(--panel) padding-box,
-    linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 70%, var(--green)))
-      border-box;
-  border-color: var(--accent);
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.15),
-    0 6px 12px rgba(0, 0, 0, 0.08),
-    0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--ds-surface-1);
+  border-color: var(--ds-accent);
+  box-shadow: 0 0 0 2px var(--ds-accent-soft);
 }
 
 .image-preview {
@@ -382,9 +330,6 @@ onUnmounted(() => {
   border-radius: 0;
   background: var(--bg);
   border: 1px solid color-mix(in oklab, var(--border-color) 50%, transparent);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .image-preview canvas {
@@ -394,10 +339,6 @@ onUnmounted(() => {
   aspect-ratio: 4 / 3;
   object-fit: cover;
   transition: all 0.4s var(--ease-smooth);
-}
-
-.image-card:hover .image-preview canvas {
-  transform: scale(1.05);
 }
 
 /* Mit Rahmen/Ecken/Schatten das ganze Export-Ergebnis zeigen statt eines Ausschnitts */
@@ -502,11 +443,9 @@ onUnmounted(() => {
   transition: all 0.3s var(--ease-spring);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .image-action-btn:hover {
-  transform: translateY(-3px) scale(1.1);
   box-shadow: 0 8px 20px var(--shadow-color);
   color: var(--text);
   border-color: var(--accent);

@@ -340,7 +340,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
   content: '';
   position: absolute;
   z-index: 20;
-  background: linear-gradient(135deg, var(--accent), var(--green));
+  background: var(--ds-accent);
   border-radius: var(--radius-lg);
   pointer-events: none;
   animation: dropPulse 0.5s ease infinite alternate;
@@ -373,7 +373,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
 
 /* Deep selector für ImageCard im Drag-Zustand */
 .drag-wrapper.dragging :deep(.image-card) {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 @media (max-width: 768px) {

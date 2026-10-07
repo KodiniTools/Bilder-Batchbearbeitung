@@ -125,13 +125,9 @@ onMounted(() => {
   right: 0;
   z-index: 1050;
   padding: var(--space-2, 10px) var(--space-3, 14px);
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--accent, #014f99) 15%, var(--panel, #fff)),
-    color-mix(in oklab, var(--secondary, #c9984d) 8%, var(--panel, #fff))
-  );
-  border-bottom: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  background: var(--ds-surface-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .handoff-inner {
@@ -150,8 +146,8 @@ onMounted(() => {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md, 12px);
-  background: color-mix(in oklab, var(--accent, #014f99) 12%, transparent);
-  color: var(--accent, #014f99);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -165,12 +161,12 @@ onMounted(() => {
 
 .handoff-text strong {
   font-size: 0.9rem;
-  color: var(--text, #0c0c10);
+  color: var(--text);
 }
 
 .handoff-source {
   font-size: 0.8rem;
-  color: var(--muted, #5e5f69);
+  color: var(--muted);
 }
 
 .handoff-thumbs {
@@ -184,7 +180,7 @@ onMounted(() => {
   height: 36px;
   border-radius: var(--radius-sm, 8px);
   overflow: hidden;
-  border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--glass-border);
 }
 
 .handoff-thumb img {
@@ -195,7 +191,7 @@ onMounted(() => {
 
 .handoff-more {
   font-size: 0.8rem;
-  color: var(--muted, #5e5f69);
+  color: var(--muted);
   font-weight: 600;
   padding-left: 4px;
 }
@@ -209,30 +205,29 @@ onMounted(() => {
 .btn-accept {
   padding: 6px 16px;
   border-radius: var(--radius-md, 12px);
-  background: var(--accent, #014f99);
-  color: var(--accent-text, #f5f4d6);
+  background: var(--accent);
+  color: var(--accent-text);
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.2s;
 }
 
 .btn-accept:hover {
-  background: var(--accent-hover, #003971);
-  transform: translateY(-1px);
+  background: var(--accent-hover);
 }
 
 .btn-dismiss {
   padding: 6px 12px;
   border-radius: var(--radius-md, 12px);
   background: transparent;
-  color: var(--muted, #5e5f69);
+  color: var(--muted);
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 
 .btn-dismiss:hover {
-  background: color-mix(in oklab, var(--text, #0c0c10) 8%, transparent);
-  color: var(--text, #0c0c10);
+  background: color-mix(in oklab, var(--text) 8%, transparent);
+  color: var(--text);
 }
 
 /* Transition */

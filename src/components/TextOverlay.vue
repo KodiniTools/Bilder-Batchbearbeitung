@@ -168,8 +168,8 @@ function textBodyStyle(item: TextItem) {
 }
 
 .text-item--selected {
-  border-color: rgba(99, 102, 241, 0.75);
-  background: rgba(99, 102, 241, 0.06);
+  border-color: var(--ds-accent);
+  background: var(--ds-accent-soft);
 }
 
 .text-body {
@@ -186,7 +186,7 @@ function textBodyStyle(item: TextItem) {
   height: 18px;
   border-radius: 50%;
   border: none;
-  background: #ef4444;
+  background: var(--ds-danger);
   color: white;
   font-size: 13px;
   line-height: 1;

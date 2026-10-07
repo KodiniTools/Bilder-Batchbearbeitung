@@ -32,6 +32,7 @@ import {
   checkSvgServiceAvailable,
   type SvgProgressCallback,
 } from '@/lib/features/export-svg'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
@@ -554,10 +555,8 @@ watch(
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light')
-    document.documentElement.dataset.theme = theme
+    const theme = readStoredTheme()
+    applyTheme(theme)
     localStorage.setItem('theme', theme)
   }
 

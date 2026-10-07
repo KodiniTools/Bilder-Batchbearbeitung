@@ -167,7 +167,6 @@ const sliderGroups: ReadonlyArray<SliderGroup> = [
 .preset-chip:hover {
   border-color: var(--accent);
   color: var(--accent);
-  transform: translateY(-1px);
 }
 
 .preset-chip:active {

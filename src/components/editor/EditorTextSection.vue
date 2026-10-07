@@ -200,7 +200,7 @@
       <button
         type="button"
         class="btn btn-xs btn-ghost"
-        style="color: #ef4444; align-self: flex-start"
+        style="color: var(--ds-danger); align-self: flex-start"
         @click="emit('delete', selectedText.id)"
       >
         <i class="fa-solid fa-trash"></i>

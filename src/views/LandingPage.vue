@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const { locale, t } = useI18n()
 const router = useRouter()
@@ -34,17 +35,15 @@ const setLanguage = (lang: string) => {
 const toggleTheme = () => {
   const newTheme = theme.value === 'dark' ? 'light' : 'dark'
   theme.value = newTheme
-  document.documentElement.dataset.theme = newTheme
+  applyTheme(newTheme)
   localStorage.setItem('theme', newTheme)
 }
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  theme.value = savedTheme || (prefersDark ? 'dark' : 'light')
+  theme.value = readStoredTheme()
 
   if (!document.documentElement.getAttribute('data-theme')) {
-    document.documentElement.dataset.theme = theme.value
+    applyTheme(theme.value)
     localStorage.setItem('theme', theme.value)
   }
 
@@ -223,7 +222,6 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: saturate(1.8) blur(24px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   box-shadow: var(--subnav-shadow);
@@ -265,7 +263,6 @@ onMounted(() => {
   background: var(--header-btn-hover-bg);
   border-color: var(--header-btn-hover-border);
   color: var(--header-btn-hover-color);
-  transform: translateY(-1px);
 }
 
 /* <a>-Variante optisch identisch zum <button> */
@@ -299,7 +296,6 @@ a.nav-link {
 .theme-toggle:hover,
 .lang-toggle:hover {
   color: var(--header-btn-hover-color);
-  transform: scale(1.1);
   border-color: var(--header-btn-hover-border);
   background: var(--header-btn-hover-bg);
 }
@@ -307,7 +303,6 @@ a.nav-link {
 .lang-toggle.active {
   background: var(--accent);
   color: var(--accent-text);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 /* Hero Section */
@@ -332,10 +327,7 @@ a.nav-link {
   font-weight: 800;
   line-height: 1.1;
   margin: 0 0 var(--space-4);
-  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--secondary) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 .hero-subtitle {
@@ -354,22 +346,14 @@ a.nav-link {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent-text);
-  background: linear-gradient(
-    135deg,
-    var(--accent) 0%,
-    color-mix(in oklab, var(--accent) 80%, var(--secondary)) 100%
-  );
+  background: var(--ds-accent);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
   transition: all 0.3s var(--ease-spring);
-  box-shadow:
-    0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 20%, transparent);
 }
 
 .hero-cta:hover {
-  transform: translateY(-3px) scale(1.02);
   box-shadow:
     0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 20%, transparent);
@@ -389,7 +373,6 @@ a.nav-link {
 
 .feature-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
@@ -405,13 +388,12 @@ a.nav-link {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--secondary));
+  background: var(--ds-accent);
   opacity: 0;
   transition: opacity 0.3s var(--ease-smooth);
 }
 
 .feature-card:hover {
-  transform: translateY(-8px);
   box-shadow: var(--surface-hover);
   border-color: color-mix(in oklab, var(--accent) 30%, var(--glass-border));
 }
@@ -470,10 +452,7 @@ a.nav-link {
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 700;
   margin: 0 0 var(--space-6);
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 .details-grid {
@@ -492,7 +471,6 @@ a.nav-link {
 }
 
 .detail-item:hover {
-  transform: translateY(-4px);
   box-shadow: var(--surface-elevation);
   border-color: color-mix(in oklab, var(--accent) 25%, var(--glass-border));
 }
@@ -544,7 +522,6 @@ a.nav-link {
   text-align: center;
   padding: var(--space-5);
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   text-decoration: none;
@@ -561,13 +538,12 @@ a.nav-link {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--secondary));
+  background: var(--ds-accent);
   opacity: 0;
   transition: opacity 0.3s var(--ease-smooth);
 }
 
 .tool-card:hover {
-  transform: translateY(-8px);
   box-shadow: var(--surface-hover);
   border-color: color-mix(in oklab, var(--accent) 30%, var(--glass-border));
 }

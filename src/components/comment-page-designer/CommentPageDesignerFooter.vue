@@ -140,15 +140,10 @@ const emit = defineEmits<{
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   border: none;
   color: var(--accent-text);
   font-weight: 600;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 40%, transparent);
 }
 
 .btn-primary:disabled {

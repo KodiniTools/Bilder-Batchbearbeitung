@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <Transition name="modal">
       <div v-if="modelValue" class="modal-overlay" @click.self="handleClose">
         <div class="designer-modal">
@@ -335,7 +335,6 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -349,7 +348,7 @@ onUnmounted(() => {
   max-width: 1400px;
   background: var(--bg);
   border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--ds-shadow-overlay);
   display: flex;
   flex-direction: column;
   overflow: hidden;

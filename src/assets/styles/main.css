@@ -1,171 +1,127 @@
-/*
-  main.css – Vollständig modernisiertes Layout
-  -----------------------------------------------------------------------
-  • Glassmorphism, Micro-Animationen und moderne Designsprache
-  • Performance-optimiert mit Hardware-Beschleunigung
-*/
+/* ==========================================================================
+   Bilderserie bearbeiten · Globale Basis-Styles
+   --------------------------------------------------------------------------
+   Design-System wie im Collage Maker (KodiniTools/Collage-Maker, src/style.css
+   und src/design-system/): Tokens --ds-* aus src/design-system/tokens-v2.css,
+   Dark auf :root, Light über html[data-theme='light'] und body.light-theme.
+
+   Die App-Variablen (--bg, --panel, --text, --accent …) bleiben als Brücke
+   erhalten und zeigen auf die Tokens, damit die scoped Styles der Komponenten
+   ohne Umbau dieselbe Palette, dieselben Radien und dieselbe Motion nutzen.
+   Neue Styles verwenden --ds-* direkt. Regeln: src/design-system/README.md
+   ========================================================================== */
+
+@import '../../design-system/tokens-v2.css';
 
 /* =============================
-   Farbvariablen (erweitert)
+   Brücke: App-Variablen → Tokens
+   Alle Werte hängen an --ds-*; das Theme wechselt über die Tokens, deshalb gibt
+   es keine eigenen Dark-Overrides mehr. Deklariert auf :root, wo auch
+   html[data-theme] die Tokens umschaltet.
    ============================= */
 :root {
   /* Höhe der globalen SSI-Navigation (position: relative, im Document Flow) */
   --global-nav-height: 70px;
 
-  /* Farbpalette */
-  --color-gold: #c9984d;
-  --color-blue: #014f99;
-  --color-blue-dark: #003971;
-  --color-gold-light: #f8e1a9;
-  --color-cream: #f9f2d5;
-  --color-gray: #5e5f69;
-  --color-silver: #aeafb7;
-  --color-dark: #0c0c10;
+  /* Markenfarben (Altnamen) */
+  --color-gold: var(--ds-accent);
+  --color-gold-light: var(--ds-accent-hover);
+  --color-blue: var(--ds-link);
+  --color-blue-dark: var(--ds-link);
+  --color-cream: var(--ds-surface-2);
+  --color-gray: var(--ds-text-2);
+  --color-silver: var(--ds-text-3);
+  --color-dark: var(--ds-surface-0);
 
-  /* Basis-Farben */
-  --green: #22c55e;
-  --red: #ef4444;
-  --yellow: var(--color-gold);
-  --purple: #8b5cf6;
-  --cyan: #06b6d4;
+  /* Status */
+  --green: var(--ds-success);
+  --red: var(--ds-danger);
+  --yellow: var(--ds-warning);
+  --orange: var(--ds-warning);
+  --cyan: var(--ds-info);
+  --purple: var(--ds-info);
 
-  /* Light Theme (Standard) – 1:1 vom Bildkonverter übernommen
-     (Bildkonverter: src/styles/variables.scss + theme.scss) */
-  --color-bk-text: #212529; /* $color-gray-900 */
-  --color-bk-text-light: #6c757d; /* $color-gray-600 */
-  --color-bk-border: #dee2e6; /* $color-gray-300 */
-  --color-bk-bg-gradient: #f5f4d6; /* $color-bg-gradient */
+  /* Flächen, Text, Akzent */
+  --bg: var(--ds-surface-0);
+  --panel: var(--ds-surface-1);
+  --text: var(--ds-text);
+  --muted: var(--ds-text-2);
+  --accent: var(--ds-accent);
+  --accent-hover: var(--ds-accent-hover);
+  --accent-text: var(--ds-on-accent);
+  --secondary: var(--ds-link);
+  --btn: var(--ds-surface-2);
+  --btn-hover: var(--ds-surface-3);
+  --ring: var(--ds-accent);
+  --border-color: var(--ds-border);
+  --canvas-bg: var(--ds-surface-0);
 
-  --bg: #ffffff;
-  --panel: #ffffff;
-  --text: var(--color-bk-text);
-  --muted: var(--color-bk-text-light);
-  --accent: var(--color-blue);
-  --accent-hover: var(--color-blue-dark);
-  --accent-text: #f5f4d6;
-  --secondary: var(--color-gold);
-  --btn: var(--color-cream);
-  --btn-hover: var(--color-gold-light);
-  --ring: var(--color-blue);
-  --border-color: var(--color-bk-border);
-  --shadow-color: rgb(0 0 0 / 10%);
-  --canvas-bg: var(--color-dark);
+  /* Keine Karten-Schatten, kein Glas: Flächen sind deckend mit 1 px Rahmen.
+     Schatten gibt es nur für Overlays (--ds-shadow-overlay). */
+  --shadow-color: transparent;
+  --glass-bg: var(--ds-surface-1);
+  --glass-border: var(--ds-border);
+  --surface-elevation: none;
+  --surface-hover: none;
+  --surface-active: none;
 
-  /* Flächen: im Light Mode deckend wie die Karten des Bildkonverters */
-  --glass-bg: var(--panel);
-  --glass-border: var(--border-color);
-  --surface-elevation: 0 1px 4px rgb(0 0 0 / 5%);
-  --surface-hover: 0 3px 10px rgb(0 0 0 / 8%);
-  --surface-active: 0 1px 2px rgb(0 0 0 / 5%);
+  /* App-Kopfzeile */
+  --header-bg: var(--ds-surface-1);
+  --header-border: var(--ds-border);
+  --header-shadow: none;
+  --subnav-shadow: none;
+  --header-btn-hover-bg: var(--ds-surface-3);
+  --header-btn-hover-border: var(--ds-border);
+  --header-btn-hover-color: var(--ds-text);
 
-  /* App-Header wie Bildkonverter-Header */
-  --header-bg: var(--color-cream);
-  --header-border: var(--border-color);
-  --header-shadow: 0 1px 2px rgb(0 0 0 / 5%);
-  --subnav-shadow: var(--header-shadow);
-  --header-btn-hover-bg: rgb(1 79 153 / 10%);
-  --header-btn-hover-border: transparent;
-  --header-btn-hover-color: var(--accent);
+  /* Seitenhintergrund: flach */
+  --body-gradient: var(--ds-surface-0);
 
-  /* Seitenhintergrund wie Bildkonverter (body: Weiß → Creme, vertikal) */
-  --body-gradient: linear-gradient(180deg, var(--bg) 0%, var(--color-bk-bg-gradient) 100%);
+  /* Drei Radien: 6 / 10 / 16 */
+  --radius-sm: var(--ds-radius-sm);
+  --radius-md: var(--ds-radius-md);
+  --radius-lg: var(--ds-radius-lg);
+  --radius-xl: var(--ds-radius-lg);
+  --radius-2xl: var(--ds-radius-lg);
 
-  /* Layout-Variablen */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  /* Abstände im 4er-Raster */
+  --space-1: var(--ds-space-1);
+  --space-2: var(--ds-space-2);
+  --space-3: var(--ds-space-3);
+  --space-4: var(--ds-space-4);
+  --space-5: var(--ds-space-6);
+  --space-6: var(--ds-space-8);
+  --space-7: var(--ds-space-12);
 
-  --space-1: 6px;
-  --space-2: 10px;
-  --space-3: 14px;
-  --space-4: 18px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
+  /* Schrift */
+  --font-sans: var(--ds-font-sans);
+  --font-mono: var(--ds-font-mono);
 
-  --font-sans:
-    'Supreme', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, 'Helvetica Neue',
-    Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-    monospace;
+  /* Motion: eine Kurve, kein Überschwingen */
+  --ease-spring: var(--ds-ease);
+  --ease-smooth: var(--ds-ease);
+  --ease-bounce: var(--ds-ease);
 
-  /* Animation Curves */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-  /* Regler, Zahlenfelder, Verlaufs-Buttons (Visualizer-Muster) */
-  --slider-track-from: #9aa7b4;
-  --slider-track-to: var(--color-gold);
-  --slider-thumb: var(--color-gold);
-  --control-bg: #ffffff;
-  --control-border: rgb(201 152 77 / 45%);
-  --control-muted: var(--muted);
+  /* Regler, Zahlenfelder, Verlaufs-Buttons */
+  --slider-track-from: var(--ds-border-strong);
+  --slider-track-to: var(--ds-border-strong);
+  --slider-thumb: var(--ds-accent);
+  --control-bg: var(--ds-surface-2);
+  --control-border: var(--ds-border-strong);
+  --control-muted: var(--ds-text-3);
 }
 
-/* Dark Theme Overrides – Navy/Gold Palette */
+/* === Farbschema für native Controls (Select-Listen, Scrollbalken) === */
 :root[data-theme='dark'] {
-  --bg: #091428;
-  --panel: #142640;
-  --text: #f9f2d5;
-  --muted: #7a8da0;
-  --accent: #c9984d;
-  --accent-hover: #f8e1a9;
-  --accent-text: #091428;
-  --secondary: #014f99;
-  --btn: #0e1c32;
-  --btn-hover: #1a3050;
-  --ring: #c9984d;
-  --border-color: rgb(201 152 77 / 18%);
-  --shadow-color: rgb(0 0 0 / 60%);
+  color-scheme: dark;
+}
 
-  --slider-track-from: #7a8da0;
-  --slider-track-to: #c9984d;
-  --slider-thumb: #f8e1a9;
-  --control-bg: #0e1c32;
-  --control-border: rgb(201 152 77 / 30%);
-  --control-muted: #7a8da0;
-
-  --glass-bg: color-mix(in oklab, var(--panel) 75%, transparent);
-  --glass-border: color-mix(in oklab, var(--border-color) 70%, transparent);
-  --surface-elevation: 0 8px 32px color-mix(in oklab, var(--shadow-color) 20%, transparent);
-  --surface-hover: 0 16px 48px color-mix(in oklab, var(--shadow-color) 30%, transparent);
-  --surface-active: 0 4px 16px color-mix(in oklab, var(--shadow-color) 25%, transparent);
-
-  --header-bg: var(--glass-bg);
-  --header-border: var(--glass-border);
-  --header-shadow:
-    0 8px 32px color-mix(in oklab, var(--shadow-color) 8%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 10%, transparent);
-  --subnav-shadow: none;
-  --header-btn-hover-bg: var(--btn);
-  --header-btn-hover-border: var(--border-color);
-  --header-btn-hover-color: var(--text);
-
-  --body-gradient:
-    radial-gradient(
-      circle at 20% 80%,
-      color-mix(in oklab, #c9984d 6%, transparent) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
-      color-mix(in oklab, #014f99 8%, transparent) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 40% 40%,
-      color-mix(in oklab, #0e1c32 10%, transparent) 0%,
-      transparent 70%
-    ),
-    linear-gradient(135deg, #091428 0%, #0e1c32 100%);
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 /* =============================
-   Base / Reset (verbessert)
+   Reset
    ============================= */
 * {
   box-sizing: border-box;
@@ -178,21 +134,20 @@ body {
 }
 
 /* =============================
-   Typography - Korrekte Groß-/Kleinschreibung beibehalten
-   (text-transform: lowercase entfernt - verstößt gegen deutsche Rechtschreibung)
+   Body
    ============================= */
-
 body {
   margin: 0;
-  font-family: var(--font-sans);
-  color: var(--text);
-  background: var(--body-gradient);
-  background-attachment: fixed;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-lg);
+  line-height: var(--ds-leading);
+  color: var(--ds-text);
+  background: var(--ds-surface-0);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition:
-    background-color 0.5s var(--ease-smooth),
-    color 0.3s var(--ease-smooth);
+    background-color var(--ds-duration-slow) var(--ds-ease),
+    color var(--ds-duration-slow) var(--ds-ease);
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
@@ -215,32 +170,7 @@ button {
 
 :focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 3px var(--bg),
-    0 0 0 6px var(--accent),
-    0 8px 20px color-mix(in oklab, var(--accent) 20%, transparent);
-  border-radius: var(--radius-sm);
-  transition: box-shadow 200ms var(--ease-smooth);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* =============================
-   Dark Mode Specific Enhancements
-   ============================= */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --surface-elevation: 0 8px 32px color-mix(in oklab, black 40%, transparent);
-    --surface-hover: 0 16px 48px color-mix(in oklab, black 60%, transparent);
-  }
+  box-shadow: var(--ds-focus-ring);
 }
 
 /* =============================
@@ -251,21 +181,81 @@ button {
 }
 
 .muted {
-  color: var(--muted);
-  font-size: 0.9rem;
+  color: var(--ds-text-2);
+  font-size: var(--ds-text-md);
 }
 
 /* =============================
-   Global Navigation & Footer Fixes
+   SSI-Partials (nav/footer/cookie-banner außerhalb von #app)
+   Übernommen aus dem Collage Maker. App-Modals rendern per <Teleport> nach
+   #modal-portal innerhalb von #app und sind deshalb nicht betroffen.
    ============================= */
-/* Ensure global navigation from /partials/nav.html has higher z-index than app header */
+
+/* Eigene Hintergründe entfernen, damit die Seitenfläche durchscheint — außer
+   beim Cookie-Banner. Direkte Wrapper (nav, footer): normale Spezifität. */
+body > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']) {
+  background-color: transparent !important;
+}
+/* Alle inneren Nachfahren: :where() hat Spezifität 0, damit die Restore-Regeln gewinnen */
+:where(
+    body > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie'])
+  )
+  :where(*:not(.cookie-banner):not(.cookie-consent):not([class*='cookie'])) {
+  background-color: transparent !important;
+}
+
+/* Dropdowns/Submenüs der SSI-Navigation bekommen wieder eine feste Fläche */
+body > :not(#app):not(script) [class*='drop'],
+body > :not(#app):not(script) [class*='sub-menu'],
+body > :not(#app):not(script) [class*='submenu'],
+body > :not(#app):not(script) [class*='popup'],
+body > :not(#app):not(script) [class*='popover'],
+body > :not(#app):not(script) [class*='megamenu'] {
+  background-color: var(--ds-surface-1) !important;
+}
+
+/* ── Hamburger / Toggle-Menü in der SSI-Navigation ── */
+/* 1. Leere Spans sind dekorative Elemente (Hamburger-Balken via background-color) */
+body > :not(#app):not(script) span:empty {
+  background-color: currentColor !important;
+  border-color: currentColor !important;
+}
+/* 2. Spans in aria-expanded-Toggles (Hamburger-Buttons nutzen dieses Attribut) */
+body > :not(#app):not(script) [aria-expanded] > span:empty,
+body > :not(#app):not(script) [aria-expanded] > span > span:empty,
+body > :not(#app):not(script) [aria-expanded] > div > span:empty {
+  background-color: currentColor !important;
+  border-color: currentColor !important;
+}
+/* 3. SVG-Hamburger-Icons in Buttons / Toggles — stroke & fill erzwingen */
+body > :not(#app):not(script) button svg line,
+body > :not(#app):not(script) button svg path,
+body > :not(#app):not(script) button svg rect,
+body > :not(#app):not(script) [aria-expanded] svg line,
+body > :not(#app):not(script) [aria-expanded] svg path,
+body > :not(#app):not(script) [aria-expanded] svg rect,
+body > :not(#app):not(script) [role='button'] svg line,
+body > :not(#app):not(script) [role='button'] svg path,
+body > :not(#app):not(script) [role='button'] svg rect {
+  stroke: currentColor !important;
+  fill: currentColor !important;
+}
+/* 4. Bootstrap toggler-icon (background-image SVG) — Kontrast per CSS-Filter */
+body > :not(#app):not(script) [class*='toggler-icon'] {
+  filter: brightness(0) saturate(100%) !important;
+}
+:root[data-theme='dark'] body > :not(#app):not(script) [class*='toggler-icon'] {
+  filter: brightness(0) saturate(100%) invert(1) !important;
+}
+
+/* Die globale Navigation liegt über der sticky App-Kopfzeile (z-index 100),
+   ihre Dropdowns über allem außer Modals und Cookie-Banner. */
 body > nav,
 body > header {
   position: relative;
   z-index: 1000 !important;
 }
 
-/* Ensure navigation dropdowns are above everything */
 body > nav .dropdown,
 body > nav .dropdown-menu,
 body > nav [class*='dropdown'],
@@ -273,22 +263,161 @@ body > nav [class*='menu'] {
   z-index: 1001 !important;
 }
 
-/* Ensure footer from /partials/footer.html is visible */
+/* Footer am Seitenende (body ist eine Flex-Spalte) */
 body > footer {
   position: relative;
   z-index: 10;
   margin-top: auto;
 }
 
-/* Make sure Vue app doesn't cover footer.
-   Die Seiten werden per Lazy-Load nachgeladen; bis dahin ist #app leer. Ohne
+/* Die Seiten werden per Lazy-Load nachgeladen; bis dahin ist #app leer. Ohne
    reservierte Höhe stünde der SSI-Footer beim ersten Rendern mitten im
-   Viewport und spränge danach nach unten (Cumulative Layout Shift). Die Seiten
-   selbst sind mindestens 100vh hoch, daher ändert das am fertigen Layout nichts. */
+   Viewport und spränge danach nach unten (Cumulative Layout Shift). Kein
+   z-index: #app darf keinen Stacking-Context bilden, sonst lägen die Modals
+   in #modal-portal unter der Navigation. */
 #app {
   position: relative;
-  z-index: 1;
   min-height: 100vh;
+}
+
+/* App-Modals (Editor, Vorschau, Designer, Dialoge, Toasts) werden per <Teleport>
+   nach #modal-portal gerendert. Ein eigener Stacking-Context hebt alle
+   teleportierten Modals gemeinsam über die globale SSI-Navigation und deren
+   Dropdowns, hält sie aber unter dem Cookie-Banner (10000). */
+#modal-portal {
+  position: relative;
+  z-index: var(--ds-z-backdrop);
+}
+
+/* Cookie Banner: immer im Vordergrund, über Nav und Dropdowns */
+.cookie-banner,
+.cookie-consent,
+[class*='cookie-banner'],
+[class*='cookie-consent'],
+[id*='cookie-banner'],
+[id*='cookie-consent'] {
+  z-index: 10000 !important;
+  position: fixed !important;
+}
+
+/* Textfarben der SSI-Partials aus den Tokens; die Variablen wechseln mit dem
+   Theme, deshalb gibt es keine Dark-Varianten. Cookie-Banner ausgenommen. */
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  ),
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  )
+  *:not([class*='cookie']):not([id*='cookie']) {
+  color: var(--ds-text) !important;
+}
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  )
+  a:not([class*='cookie']):not([id*='cookie']),
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  )
+  a:not([class*='cookie']):not([id*='cookie'])
+  * {
+  color: var(--ds-link) !important;
+}
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  )
+  a:hover:not([class*='cookie']):not([id*='cookie']),
+body
+  > :not(#app):not(script):not(.cookie-banner):not(.cookie-consent):not([class*='cookie']):not(
+    [id*='cookie']
+  )
+  a:hover:not([class*='cookie']):not([id*='cookie'])
+  * {
+  color: var(--ds-accent) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Touch / Mobile
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Kein grauer Tap-Highlight, keine 300ms-Klickverzögerung auf Bedienelementen */
+#app button,
+#app [role='button'],
+#app select,
+#app input[type='range'],
+#app input[type='color'] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Range-Slider im System-Look (Spur Rahmenfarbe, Daumen Akzent, Fokus-Ring).
+   Vertikales Scrollen bleibt möglich, horizontales Ziehen bewegt den Regler. */
+#app input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-border-strong);
+  outline: none;
+  touch-action: pan-y;
+}
+#app input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ds-accent);
+  border: 2px solid var(--ds-surface-1);
+  cursor: pointer;
+}
+#app input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ds-accent);
+  border: 2px solid var(--ds-surface-1);
+  cursor: pointer;
+}
+#app input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-border-strong);
+}
+#app input[type='range']:focus-visible {
+  box-shadow: var(--ds-focus-ring);
+}
+
+/* Auf Touch-Geräten (grober Zeiger) größere Trefferflächen */
+@media (pointer: coarse) {
+  #app input[type='range'] {
+    height: 8px;
+  }
+  #app input[type='range']::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  #app input[type='range']::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* === Reduzierte Bewegung === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* =============================
@@ -314,7 +443,7 @@ body > footer {
 }
 
 /* =============================
-   Verlaufs-Buttons (Visualizer-Muster)
+   Verlaufs-Buttons
    Gleich breite, beschriftete Buttons mit kleinem Icon für Rückgängig,
    Wiederholen und Zurücksetzen – über <HistoryActions> oder einzeln
    (.btn-history.btn-reset).
@@ -322,7 +451,7 @@ body > footer {
 .history-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--ds-space-1);
 }
 
 /* In Werkzeugleisten: Buttons in Inhaltsbreite, keine Umbrüche */
@@ -341,22 +470,22 @@ body > footer {
   justify-content: center;
   gap: 5px;
   padding: 6px 9px;
-  border: 1px solid var(--control-border);
-  border-radius: 5px;
-  background: var(--control-bg);
-  color: var(--text);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-2);
+  color: var(--ds-text);
   font-family: inherit;
   font-size: 0.62rem;
-  font-weight: 600;
+  font-weight: var(--ds-weight-semibold);
   letter-spacing: 0.03em;
   line-height: 1.2;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    border-color 0.2s ease,
-    color 0.2s ease,
-    background 0.2s ease;
+    border-color var(--ds-duration) var(--ds-ease),
+    color var(--ds-duration) var(--ds-ease),
+    background var(--ds-duration) var(--ds-ease);
 }
 
 .btn-history svg {
@@ -371,18 +500,13 @@ body > footer {
 }
 
 .btn-history:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
 }
 
 .btn-history:disabled {
   opacity: 0.35;
   cursor: not-allowed;
-}
-
-.btn-history.btn-reset:hover:not(:disabled) {
-  border-color: var(--color-gold);
-  color: var(--color-gold);
 }
 
 .btn-history--full {

@@ -19,7 +19,7 @@ const getIcon = (type: string) => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport to="#modal-portal">
     <div class="toast-container" aria-live="polite">
       <TransitionGroup name="toast">
         <div
@@ -75,11 +75,8 @@ const getIcon = (type: string) => {
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
   border-radius: var(--radius-xl);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ds-shadow-overlay);
   border: 1px solid var(--glass-border);
   cursor: pointer;
   pointer-events: auto;
@@ -87,10 +84,7 @@ const getIcon = (type: string) => {
 }
 
 .toast:hover {
-  transform: translateX(-4px);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.2),
-    0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .toast-icon {
@@ -135,19 +129,19 @@ const getIcon = (type: string) => {
 }
 
 .toast--error {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--ds-danger);
 }
 
 .toast--error .toast-icon {
-  color: #ef4444;
+  color: var(--ds-danger);
 }
 
 .toast--warning {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--ds-warning);
 }
 
 .toast--warning .toast-icon {
-  color: #f59e0b;
+  color: var(--ds-warning);
 }
 
 .toast--info {

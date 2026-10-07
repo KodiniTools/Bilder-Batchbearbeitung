@@ -82,7 +82,7 @@ const emit = defineEmits<{
   gap: 16px;
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-color);
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   color: var(--accent-text);
 }
 
@@ -117,7 +117,6 @@ const emit = defineEmits<{
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  backdrop-filter: blur(10px);
 }
 
 .close-btn {
@@ -136,6 +135,5 @@ const emit = defineEmits<{
 
 .close-btn:hover {
   background: color-mix(in oklab, var(--accent-text) 25%, transparent);
-  transform: scale(1.05);
 }
 </style>

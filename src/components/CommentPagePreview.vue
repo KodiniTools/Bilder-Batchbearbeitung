@@ -243,7 +243,6 @@ const pageAspectRatio = computed(() => {
 
 .reset-btn:hover {
   background: color-mix(in oklab, var(--text) 15%, transparent);
-  transform: translateY(-2px);
 }
 
 .page-preview {

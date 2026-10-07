@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { readStoredTheme, applyTheme } from '@/utils/theme'
 
 const router = useRouter()
 const { locale, t } = useI18n()
@@ -21,14 +22,12 @@ const setLanguage = (lang: string) => {
 const toggleTheme = () => {
   const newTheme = theme.value === 'dark' ? 'light' : 'dark'
   theme.value = newTheme
-  document.documentElement.dataset.theme = newTheme
+  applyTheme(newTheme)
   localStorage.setItem('theme', newTheme)
 }
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  theme.value = savedTheme || (prefersDark ? 'dark' : 'light')
+  theme.value = readStoredTheme()
 })
 </script>
 
@@ -84,7 +83,6 @@ onMounted(() => {
   top: 0;
   z-index: 100;
   padding: var(--space-3) var(--space-5);
-  backdrop-filter: saturate(1.8) blur(24px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   box-shadow: var(--header-shadow);
@@ -120,7 +118,6 @@ onMounted(() => {
 
 .home-btn:hover {
   color: var(--accent);
-  transform: scale(1.1);
   border-color: var(--header-btn-hover-border);
   background: var(--header-btn-hover-bg);
 }
@@ -138,14 +135,7 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: linear-gradient(
-    135deg,
-    var(--text),
-    color-mix(in oklab, var(--text) 70%, var(--accent))
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ds-text);
 }
 
 .app-header__trailing {
@@ -178,7 +168,6 @@ onMounted(() => {
 .theme-toggle:hover,
 .lang-toggle:hover {
   color: var(--header-btn-hover-color);
-  transform: scale(1.1);
   border-color: var(--header-btn-hover-border);
   background: var(--header-btn-hover-bg);
 }
@@ -186,7 +175,6 @@ onMounted(() => {
 .lang-toggle.active {
   background: var(--accent);
   color: var(--accent-text);
-  box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 @media (max-width: 768px) {

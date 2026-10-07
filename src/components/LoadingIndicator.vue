@@ -88,7 +88,6 @@ defineExpose({
   display: grid;
   place-items: center;
   background: color-mix(in oklab, black 40%, transparent);
-  backdrop-filter: blur(8px);
   opacity: 0;
   pointer-events: none;
   transition: all 0.4s var(--ease-smooth);
@@ -105,7 +104,6 @@ defineExpose({
   gap: 20px;
   padding: 28px 36px;
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
   border-radius: var(--radius-2xl);
   box-shadow: var(--surface-elevation);
   border: 1px solid var(--glass-border);
@@ -117,18 +115,10 @@ defineExpose({
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-  background: conic-gradient(from 0deg, var(--accent), var(--green), var(--purple), var(--accent));
+  border: 4px solid var(--ds-border-strong);
+  border-top-color: var(--ds-accent);
   border-radius: 50%;
-  position: relative;
-  animation: spinGlow 2s linear infinite;
-}
-
-.spinner::before {
-  content: '';
-  position: absolute;
-  inset: 5px;
-  background: var(--panel);
-  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
 }
 
 .loading-content {
@@ -162,27 +152,10 @@ defineExpose({
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--green));
+  background: var(--ds-accent);
   border-radius: 999px;
   transition: width 0.3s var(--ease-smooth);
   position: relative;
-}
-
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 .progress-info {
@@ -201,14 +174,9 @@ defineExpose({
   font-weight: 600;
 }
 
-@keyframes spinGlow {
-  0% {
-    transform: rotate(0deg);
-    filter: hue-rotate(0deg);
-  }
-  100% {
+@keyframes spin {
+  to {
     transform: rotate(360deg);
-    filter: hue-rotate(360deg);
   }
 }
 </style>
