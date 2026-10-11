@@ -1,8 +1,9 @@
 import { ref, computed, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { PdfElement } from '@/lib/features/export-pdf'
+import type { PdfElement, PdfShapeKind } from '@/lib/features/export-pdf'
 import { useConfirm } from '@/composables/useConfirm'
 import { alignBoxes, distributeBoxes, elementBox, type AlignMode } from '@/lib/designer/arrange'
+import { createColorBackground, createImageBackground, createShape } from '@/lib/designer/shapes'
 
 export interface PdfPage {
   id: string
@@ -62,6 +63,10 @@ export function usePdfPages(options: UsePdfPagesOptions) {
   const selectedElements = computed(() =>
     currentElements.value.filter((el) => selectedIds.value.includes(el.id))
   )
+  /** Seitenhintergrund der aktuellen Seite (Farbe oder Bild) */
+  const currentBackground = computed(
+    () => currentElements.value.find((el) => el.background) ?? null
+  )
 
   // Wer selectedElement direkt setzt, wählt genau dieses Element aus
   watch(
@@ -101,7 +106,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
   }
 
   function selectAll() {
-    const els = currentElements.value
+    const els = currentElements.value.filter((el) => !el.background)
     if (els.length === 0) return
     selectedIds.value = els.map((el) => el.id)
     selectedElement.value = els[els.length - 1]
@@ -272,6 +277,73 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     change()
     currentElements.value.push(newElement)
     selectedElement.value = newElement
+  }
+
+  function addShapeElement(kind: PdfShapeKind) {
+    if (currentElements.value.length >= MAX_ELEMENTS_PER_PAGE) return
+    const z = Math.max(...currentElements.value.map((el) => el.zIndex), 0) + 1
+    const shape = createShape(
+      kind,
+      generateId(),
+      { width: pageWidth.value, height: pageHeight.value },
+      z
+    )
+    change()
+    currentElements.value.push(shape)
+    const added = currentElements.value[currentElements.value.length - 1]
+    selectedIds.value = [added.id]
+    selectedElement.value = added
+  }
+
+  // ── Seitenhintergrund ───────────────────────────────────────────
+  function replaceBackground(next: PdfElement | null) {
+    const page = pages.value[currentPageIndex.value]
+    const rest = page.elements.filter((el) => !el.background)
+    page.elements = next ? [next, ...rest] : rest
+  }
+
+  /** Hintergrundfarbe setzen; schnelle Folgeänderungen (Farbwähler) = ein Undo-Schritt. */
+  function setBackgroundColor(color: string) {
+    const bg = currentBackground.value
+    if (bg && bg.type === 'shape') {
+      change(`bg-color:${bg.id}`)
+      bg.fillColor = color
+      return
+    }
+    if (!bg && currentElements.value.length >= MAX_ELEMENTS_PER_PAGE) return
+    change()
+    const page = { width: pageWidth.value, height: pageHeight.value }
+    replaceBackground(createColorBackground(generateId(), color, page))
+  }
+
+  function setBackgroundImage(src: string) {
+    if (!currentBackground.value && currentElements.value.length >= MAX_ELEMENTS_PER_PAGE) return
+    change()
+    const page = { width: pageWidth.value, height: pageHeight.value }
+    replaceBackground(createImageBackground(generateId(), src, page))
+  }
+
+  function removeBackground() {
+    if (!currentBackground.value) return
+    change()
+    replaceBackground(null)
+  }
+
+  // ── Vorlagen ────────────────────────────────────────────────────
+  /** Inhalt der aktuellen Seite durch Vorlagen-Elemente ersetzen (Rückfrage, wenn nicht leer). */
+  async function applyTemplateElements(elements: PdfElement[]): Promise<boolean> {
+    const page = pages.value[currentPageIndex.value]
+    if (page.elements.length > 0) {
+      const ok = await dialog.confirm({
+        message: t('commentPageDesigner.templates.confirmReplace'),
+        confirmLabel: t('commentPageDesigner.templates.replace'),
+      })
+      if (!ok || !pages.value.includes(page)) return false
+    }
+    change()
+    page.elements = elements.slice(0, MAX_ELEMENTS_PER_PAGE)
+    clearSelection()
+    return true
   }
 
   function triggerImageUpload() {
@@ -469,6 +541,12 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     reselectAfterRestore,
     // element management
     addTextElement,
+    addShapeElement,
+    currentBackground,
+    setBackgroundColor,
+    setBackgroundImage,
+    removeBackground,
+    applyTemplateElements,
     triggerImageUpload,
     handleImageUpload,
     clearCurrentPage,

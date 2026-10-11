@@ -707,7 +707,14 @@
       "title": "Werkzeuge",
       "addText": "Text hinzufügen",
       "addImage": "Bild hinzufügen",
-      "clearPage": "Seite leeren"
+      "clearPage": "Seite leeren",
+      "shapes": "Formen",
+      "rect": "Rechteck",
+      "ellipse": "Kreis",
+      "line": "Linie",
+      "addRect": "Rechteck hinzufügen",
+      "addEllipse": "Kreis/Ellipse hinzufügen",
+      "addLine": "Linie hinzufügen"
     },
     "properties": {
       "title": "Eigenschaften",
@@ -736,7 +743,19 @@
       "toBackButton": "Hinten",
       "deleteElement": "Element löschen",
       "inlineEditHint": "Doppelklick auf Text im Canvas zum direkten Bearbeiten",
-      "noSelection": "Klicken Sie auf ein Element, um es zu bearbeiten"
+      "noSelection": "Klicken Sie auf ein Element, um es zu bearbeiten",
+      "fillColor": "Füllfarbe",
+      "noFill": "Keine Füllung",
+      "strokeColor": "Randfarbe",
+      "lineColor": "Linienfarbe",
+      "strokeWidth": "Randstärke",
+      "cornerRadius": "Eckenradius",
+      "placeholdersHint": "Platzhalter: {'{title}'}, {'{date}'}, {'{images}'}, {'{author}'}",
+      "shape": {
+        "rect": "Rechteck",
+        "ellipse": "Kreis/Ellipse",
+        "line": "Linie"
+      }
     },
     "zoom": {
       "zoomOut": "Verkleinern",
@@ -779,7 +798,45 @@
       "undoTitle": "Rückgängig (Strg+Z)",
       "redoTitle": "Wiederholen (Strg+Y)"
     },
-    "shortcutsHint": "Umschalt+Klick: Mehrfachauswahl · Strg+A: alles · Strg+D: duplizieren · Strg+C/V: kopieren/einfügen · Pfeiltasten: verschieben · Alt beim Ziehen: ohne Einrasten"
+    "shortcutsHint": "Umschalt+Klick: Mehrfachauswahl · Strg+A: alles · Strg+D: duplizieren · Strg+C/V: kopieren/einfügen · Pfeiltasten: verschieben · Alt beim Ziehen: ohne Einrasten",
+    "background": {
+      "title": "Seitenhintergrund",
+      "color": "Farbe",
+      "image": "Bild wählen",
+      "replaceImage": "Bild ersetzen",
+      "remove": "Hintergrund entfernen"
+    },
+    "templates": {
+      "title": "Vorlagen",
+      "choose": "Vorlage wählen …",
+      "builtIn": "Mitgeliefert",
+      "own": "Eigene",
+      "apply": "Anwenden",
+      "replace": "Ersetzen",
+      "confirmReplace": "Die aktuelle Seite enthält schon Elemente. Durch die Vorlage ersetzen?",
+      "namePlaceholder": "Name für eigene Vorlage",
+      "save": "Speichern",
+      "saveHint": "Aktuelle Seite als Vorlage speichern",
+      "export": "Vorlagen exportieren",
+      "import": "Vorlagen importieren",
+      "saved": "Vorlage „{name}“ gespeichert",
+      "confirmDelete": "Vorlage „{name}“ löschen?",
+      "imported": "{count} Vorlage(n) importiert",
+      "importError": "Die Datei enthält keine gültigen Vorlagen.",
+      "storageFull": "Speichern nicht möglich: Der Browser-Speicher ist voll. Große Bilder in Vorlagen brauchen viel Platz.",
+      "names": {
+        "photobook": "Fotobuch",
+        "report": "Bericht",
+        "portfolio": "Portfolio",
+        "note": "Notiz",
+        "columns": "Zwei Spalten"
+      },
+      "sample": {
+        "heading": "Überschrift",
+        "body": "Hier steht Ihr Text. Doppelklick auf das Textfeld, um ihn zu bearbeiten.",
+        "images": "{'{images}'} Bilder"
+      }
+    }
   },
   "imageEditor": {
     "title": "Bild bearbeiten",

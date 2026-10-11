@@ -35,9 +35,11 @@ export interface PdfWatermark extends WatermarkSettings {
  * Element einer gestalteten PDF-Seite (Startseite oder Kommentarseite).
  * Koordinaten in px auf der A4-Fläche bei 96 DPI (794×1123 bzw. quer 1123×794).
  */
+export type PdfShapeKind = 'rect' | 'ellipse' | 'line'
+
 export interface PdfElement {
   id: string
-  type: 'text' | 'image'
+  type: 'text' | 'image' | 'shape'
   x: number
   y: number
   zIndex: number
@@ -57,6 +59,21 @@ export interface PdfElement {
   src?: string
   alt?: string
   opacity?: number
+  // Form-Eigenschaften (type 'shape')
+  shape?: PdfShapeKind
+  /** Füllfarbe (hex); leer = keine Füllung. Linien haben keine Füllung. */
+  fillColor?: string
+  /** Rand-/Linienfarbe (hex); leer = kein Rand */
+  strokeColor?: string
+  /** Rand-/Linienstärke in px */
+  strokeWidth?: number
+  /** Eckenradius für Rechtecke in px */
+  cornerRadius?: number
+  /**
+   * Seitenhintergrund: füllt die ganze Seite (Farbe als Rechteck-Form oder Bild),
+   * liegt immer ganz hinten und ist im Designer nicht verschiebbar.
+   */
+  background?: boolean
 }
 
 export interface ImageData {
@@ -217,9 +234,9 @@ export async function buildPdfDocument(
     author,
     includeTitlePage = true,
     includeCustomFrontPage = false, // ✨ NEU
-    frontPageElements = [], // ✨ NEU
+    frontPageElements: rawFrontPageElements = [],
     includeCommentPages = false,
-    commentPageElements = [],
+    commentPageElements: rawCommentPageElements = [],
     includeImages = true,
     imageQuality,
     maxImageDimension = 1920, // Standard: 1920px (Full HD)
@@ -243,6 +260,17 @@ export async function buildPdfDocument(
     ? imagesPerPage
     : 1
   const labels: PdfLabels = { ...DEFAULT_PDF_LABELS, ...settings.labels }
+  const exportDate = new Date().toLocaleDateString(labels.locale)
+
+  // Platzhalter in Designer-Texten ({title}, {date}, {images}, {author})
+  const placeholderValues = {
+    title,
+    date: exportDate,
+    images: images.length,
+    author: author?.trim() ?? '',
+  }
+  const frontPageElements = fillElementPlaceholders(rawFrontPageElements, placeholderValues)
+  const commentPageElements = fillElementPlaceholders(rawCommentPageElements, placeholderValues)
 
   // Bestimme JPEG-Qualität:
   // - Wenn imageQuality gesetzt ist, verwende diesen Wert
@@ -490,7 +518,7 @@ export async function buildPdfDocument(
     margin,
     skipFirstPage: hasCover,
     title,
-    date: new Date().toLocaleDateString(labels.locale),
+    date: exportDate,
     pageNumberText: labels.pageNumber,
   })
 
@@ -821,6 +849,25 @@ export function fillPlaceholders(
     .replace(/\{total\}/g, String(values.total))
     .replace(/\{title\}/g, values.title)
     .replace(/\{date\}/g, values.date)
+}
+
+/** Platzhalter in Designer-Texten ersetzen; andere Elemente bleiben unverändert. */
+export function fillElementPlaceholders(
+  elements: PdfElement[],
+  values: { title: string; date: string; images: number; author: string }
+): PdfElement[] {
+  return elements.map((el) =>
+    el.type === 'text' && el.content?.includes('{')
+      ? {
+          ...el,
+          content: el.content
+            .replace(/\{title\}/g, values.title)
+            .replace(/\{date\}/g, values.date)
+            .replace(/\{images\}/g, String(values.images))
+            .replace(/\{author\}/g, values.author),
+        }
+      : el
+  )
 }
 
 /** Lesezeichentitel: „Bild n“, ergänzt um die erste Kommentarzeile. */
@@ -1182,12 +1229,18 @@ async function renderPageElements(
     y: (pageHeight - canvasHeight * scale) / 2,
   }
 
-  // Sortiere Elemente nach z-Index für korrekte Render-Reihenfolge
-  const sortedElements = [...elements].sort((a, b) => a.zIndex - b.zIndex)
+  // Hintergrund zuerst, danach nach z-Index für korrekte Render-Reihenfolge
+  const sortedElements = [...elements].sort(
+    (a, b) => Number(!!b.background) - Number(!!a.background) || a.zIndex - b.zIndex
+  )
 
   for (const element of sortedElements) {
     try {
-      if (element.type === 'text') {
+      if (element.background) {
+        await renderPageBackground(pdf, element, jpegQuality, maxImageDimension)
+      } else if (element.type === 'shape') {
+        renderShape(pdf, element, scale, origin)
+      } else if (element.type === 'text') {
         // CSS PdfDesignerElement: .element-text padding 8px; .text-content line-height 1.5
         renderText(
           pdf,
@@ -1537,6 +1590,100 @@ async function renderImageElement(
   } catch (error) {
     console.error('❌ Fehler beim Hinzufügen von Bild zum PDF:', error)
   }
+}
+
+/**
+ * Zeichnet eine Form (Rechteck, Ellipse, Linie) wie im Designer: Der Rand
+ * liegt innerhalb der Box, Linien laufen mittig längs der längeren Seite.
+ */
+export function renderShape(
+  pdf: jsPDF,
+  element: PdfElement,
+  scale: number,
+  origin: { x: number; y: number }
+): void {
+  const x = origin.x + element.x * scale
+  const y = origin.y + element.y * scale
+  const width = (element.width ?? 100) * scale
+  const height = (element.height ?? 100) * scale
+  const isLine = element.shape === 'line'
+  const fill = isLine ? null : hexToRgb(element.fillColor ?? '')
+  const stroke = hexToRgb(element.strokeColor ?? '')
+  const lineWidth = Math.max(0, element.strokeWidth ?? 0) * scale
+  const hasStroke = stroke !== null && lineWidth > 0
+  if (!fill && !hasStroke) return
+
+  const opacity = element.opacity ?? 1
+  pdf.saveGraphicsState()
+  if (opacity < 1) pdf.setGState(new GState({ opacity, 'stroke-opacity': opacity }))
+  if (fill) pdf.setFillColor(fill.r, fill.g, fill.b)
+  if (stroke && hasStroke) {
+    pdf.setDrawColor(stroke.r, stroke.g, stroke.b)
+    pdf.setLineWidth(lineWidth)
+  }
+  const style = fill && hasStroke ? 'FD' : fill ? 'F' : 'S'
+  const inset = hasStroke && !isLine ? lineWidth / 2 : 0
+  const w = Math.max(0, width - 2 * inset)
+  const h = Math.max(0, height - 2 * inset)
+
+  if (isLine) {
+    if (width >= height) pdf.line(x, y + height / 2, x + width, y + height / 2)
+    else pdf.line(x + width / 2, y, x + width / 2, y + height)
+  } else if (element.shape === 'ellipse') {
+    pdf.ellipse(x + width / 2, y + height / 2, w / 2, h / 2, style)
+  } else {
+    const radius = Math.min((element.cornerRadius ?? 0) * scale, w / 2, h / 2)
+    if (radius > 0) pdf.roundedRect(x + inset, y + inset, w, h, radius, radius, style)
+    else pdf.rect(x + inset, y + inset, w, h, style)
+  }
+  pdf.restoreGraphicsState()
+}
+
+/**
+ * Seitenhintergrund über die ganze PDF-Seite (auch wenn die Designer-Fläche bei
+ * anderen Formaten nur eingepasst ist): Farbe oder Bild im Modus „Füllen“.
+ */
+async function renderPageBackground(
+  pdf: jsPDF,
+  element: PdfElement,
+  jpegQuality: number,
+  maxImageDimension: number
+): Promise<void> {
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  const opacity = element.opacity ?? 1
+
+  if (element.type === 'image') {
+    if (!element.src) return
+    const src = await resizeAndConvertDataUrl(element.src, maxImageDimension, jpegQuality)
+    const props = pdf.getImageProperties(src)
+    const fit = Math.max(pageWidth / props.width, pageHeight / props.height)
+    const width = props.width * fit
+    const height = props.height * fit
+    pdf.saveGraphicsState()
+    if (opacity < 1) pdf.setGState(new GState({ opacity }))
+    pdf.rect(0, 0, pageWidth, pageHeight, null)
+    pdf.clip()
+    pdf.discardPath()
+    pdf.addImage(
+      src,
+      src.startsWith('data:image/png') ? 'PNG' : 'JPEG',
+      (pageWidth - width) / 2,
+      (pageHeight - height) / 2,
+      width,
+      height
+    )
+    pdf.restoreGraphicsState()
+    return
+  }
+
+  const fill = hexToRgb(element.fillColor ?? '')
+  if (!fill) return
+  pdf.saveGraphicsState()
+  if (opacity < 1) pdf.setGState(new GState({ opacity }))
+  pdf.setFillColor(fill.r, fill.g, fill.b)
+  pdf.rect(0, 0, pageWidth, pageHeight, 'F')
+  pdf.restoreGraphicsState()
 }
 
 /**

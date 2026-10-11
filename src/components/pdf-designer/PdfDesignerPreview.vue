@@ -118,6 +118,22 @@
                   >
                     <div class="preview-text-content">{{ element.content }}</div>
                   </div>
+                  <!-- Form -->
+                  <div
+                    v-else-if="element.type === 'shape'"
+                    class="preview-element"
+                    :style="{ position: 'absolute', left: element.x + 'px', top: element.y + 'px' }"
+                  >
+                    <PdfShapeSvg :element="element" />
+                  </div>
+                  <!-- Seitenhintergrund (Bild) -->
+                  <img
+                    v-else-if="element.type === 'image' && element.background"
+                    :src="element.src"
+                    class="preview-background-image"
+                    :style="{ opacity: element.opacity ?? 1 }"
+                    draggable="false"
+                  />
                   <!-- Bild -->
                   <div
                     v-else-if="element.type === 'image'"
@@ -191,6 +207,8 @@ import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
 import type { PdfPage } from '@/composables/usePdfPages'
 import { commentFooterText } from '@/utils/i18nFormat'
+import { sortForRender } from '@/lib/designer/shapes'
+import PdfShapeSvg from './PdfShapeSvg.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -231,8 +249,8 @@ const previewScale = computed(() => {
   return Math.min(maxW / props.pageWidth, maxH / props.pageHeight, 1)
 })
 
-const previewElements = computed<PdfElement[]>(
-  () => props.pages[previewPageIndex.value]?.elements || []
+const previewElements = computed<PdfElement[]>(() =>
+  sortForRender(props.pages[previewPageIndex.value]?.elements || [])
 )
 
 function close() {
@@ -407,6 +425,14 @@ function save() {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.preview-background-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .preview-dots {

@@ -27,6 +27,21 @@
         >
           {{ el.content }}
         </div>
+        <div
+          v-else-if="el.type === 'shape'"
+          class="thumb-shape"
+          :style="{ left: el.x + 'px', top: el.y + 'px' }"
+        >
+          <PdfShapeSvg :element="el" />
+        </div>
+        <img
+          v-else-if="el.src && el.background"
+          class="thumb-image thumb-image--background"
+          :src="el.src"
+          alt=""
+          draggable="false"
+          :style="{ opacity: el.opacity ?? 1 }"
+        />
         <img
           v-else-if="el.src"
           class="thumb-image"
@@ -48,6 +63,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { PdfPage } from '@/composables/usePdfPages'
+import { sortForRender } from '@/lib/designer/shapes'
+import PdfShapeSvg from './PdfShapeSvg.vue'
 
 /** Verkleinerte, nicht interaktive Darstellung einer Designer-Seite. */
 const props = withDefaults(
@@ -63,7 +80,7 @@ const props = withDefaults(
 
 const scale = computed(() => props.height / props.pageHeight)
 const thumbWidth = computed(() => Math.round(props.pageWidth * scale.value))
-const sortedElements = computed(() => [...props.page.elements].sort((a, b) => a.zIndex - b.zIndex))
+const sortedElements = computed(() => sortForRender(props.page.elements))
 </script>
 
 <style scoped>
@@ -95,5 +112,17 @@ const sortedElements = computed(() => [...props.page.elements].sort((a, b) => a.
 .thumb-image {
   position: absolute;
   height: auto;
+}
+
+.thumb-image--background {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-shape {
+  position: absolute;
 }
 </style>

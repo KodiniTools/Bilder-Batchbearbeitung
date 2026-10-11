@@ -532,7 +532,14 @@
       "title": "Tools",
       "addText": "Add Text",
       "addImage": "Add Image",
-      "clearPage": "Clear Page"
+      "clearPage": "Clear Page",
+      "shapes": "Shapes",
+      "rect": "Rectangle",
+      "ellipse": "Circle",
+      "line": "Line",
+      "addRect": "Add rectangle",
+      "addEllipse": "Add circle/ellipse",
+      "addLine": "Add line"
     },
     "properties": {
       "title": "Properties",
@@ -561,7 +568,19 @@
       "toBackButton": "Back",
       "deleteElement": "Delete Element",
       "inlineEditHint": "Double-click text on canvas to edit directly",
-      "noSelection": "Click on an element to edit it"
+      "noSelection": "Click on an element to edit it",
+      "fillColor": "Fill color",
+      "noFill": "No fill",
+      "strokeColor": "Border color",
+      "lineColor": "Line color",
+      "strokeWidth": "Border width",
+      "cornerRadius": "Corner radius",
+      "placeholdersHint": "Placeholders: {'{title}'}, {'{date}'}, {'{images}'}, {'{author}'}",
+      "shape": {
+        "rect": "Rectangle",
+        "ellipse": "Circle/ellipse",
+        "line": "Line"
+      }
     },
     "zoom": {
       "zoomOut": "Zoom Out",
@@ -604,7 +623,45 @@
       "undoTitle": "Undo (Ctrl+Z)",
       "redoTitle": "Redo (Ctrl+Y)"
     },
-    "shortcutsHint": "Shift+click: multi-select · Ctrl+A: all · Ctrl+D: duplicate · Ctrl+C/V: copy/paste · Arrow keys: move · Alt while dragging: no snapping"
+    "shortcutsHint": "Shift+click: multi-select · Ctrl+A: all · Ctrl+D: duplicate · Ctrl+C/V: copy/paste · Arrow keys: move · Alt while dragging: no snapping",
+    "background": {
+      "title": "Page background",
+      "color": "Color",
+      "image": "Choose image",
+      "replaceImage": "Replace image",
+      "remove": "Remove background"
+    },
+    "templates": {
+      "title": "Templates",
+      "choose": "Choose template …",
+      "builtIn": "Built-in",
+      "own": "My templates",
+      "apply": "Apply",
+      "replace": "Replace",
+      "confirmReplace": "This page already has elements. Replace them with the template?",
+      "namePlaceholder": "Name for your template",
+      "save": "Save",
+      "saveHint": "Save current page as template",
+      "export": "Export templates",
+      "import": "Import templates",
+      "saved": "Template “{name}” saved",
+      "confirmDelete": "Delete template “{name}”?",
+      "imported": "{count} template(s) imported",
+      "importError": "The file does not contain valid templates.",
+      "storageFull": "Could not save: browser storage is full. Large images in templates take a lot of space.",
+      "names": {
+        "photobook": "Photo book",
+        "report": "Report",
+        "portfolio": "Portfolio",
+        "note": "Note",
+        "columns": "Two columns"
+      },
+      "sample": {
+        "heading": "Heading",
+        "body": "Your text goes here. Double-click the text box to edit it.",
+        "images": "{'{images}'} images"
+      }
+    }
   },
   "imageEditor": {
     "title": "Edit Image",
