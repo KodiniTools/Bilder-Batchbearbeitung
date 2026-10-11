@@ -220,6 +220,10 @@
     "pdfSuccess": "PDF with {count} images created successfully",
     "pdfPartial": "PDF with {count} images created, {failed} image(s) could not be included: {names}",
     "pdfCancelled": "PDF export cancelled",
+    "pdfPrintDialog": "Print dialog opened ({count} images)",
+    "pdfPrintWindow": "Print view opened: print with the printer icon or Ctrl+P",
+    "pdfPrintTab": "PDF opened in a new tab: print it via “Share → Print”",
+    "pdfPrintDownload": "PDF saved: open the file to print it",
     "zipSuccess": "ZIP with {count} images created successfully",
     "saveSuccess": "{count} images saved successfully",
     "svgSuccess": "{count} image(s) successfully exported as SVG",
@@ -450,7 +454,9 @@
     },
     "buttons": {
       "cancel": "Cancel",
-      "export": "Export"
+      "export": "Export",
+      "print": "Print",
+      "printTitle": "Create the PDF and print it directly on this device"
     },
     "info": {
       "image": "image",

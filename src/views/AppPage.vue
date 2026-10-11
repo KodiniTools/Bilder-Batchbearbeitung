@@ -28,6 +28,7 @@ import {
   type ExportSettings,
   type ImageData,
 } from '@/lib/features/export-pdf'
+import { cancelPrint, preparePrint, printPdf, type PrintMode } from '@/lib/features/print-pdf'
 
 import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
 import {
@@ -180,6 +181,9 @@ async function handleExportConfirm(settings: ExportSettings) {
 
   try {
     if (currentMode === 'pdf-all' || currentMode === 'pdf-selected') {
+      // Direktdruck: vor dem ersten await vorbereiten (Tab nur direkt nach dem Klick möglich)
+      const printTarget = settings.output === 'print' ? preparePrint() : null
+      let printMode: PrintMode | null = null
       const images =
         currentMode === 'pdf-all'
           ? imageStore.images
@@ -201,6 +205,8 @@ async function handleExportConfirm(settings: ExportSettings) {
       try {
         const blob = await buildPdf(imageDataArray, {
           ...pdfDocument.buildOptions,
+          // Gedruckt wird lokal; ein Passwort würde den Druck nur blockieren
+          ...(printTarget ? { password: '' } : {}),
           title: t('pdfExport.defaultTitle'),
           labels: {
             locale: dateLocale(locale.value),
@@ -223,8 +229,10 @@ async function handleExportConfirm(settings: ExportSettings) {
           signal: controller.signal,
           onImageError: (name) => failedImages.push(name),
         })
-        downloadPdf(blob, 'bilder-export.pdf')
+        if (printTarget) printMode = await printPdf(blob, printTarget, 'bilder-export.pdf')
+        else downloadPdf(blob, 'bilder-export.pdf')
       } catch (error) {
+        if (printTarget) cancelPrint(printTarget)
         if (error instanceof DOMException && error.name === 'AbortError') {
           toast.info(t('toast.pdfCancelled'))
           return
@@ -244,8 +252,17 @@ async function handleExportConfirm(settings: ExportSettings) {
           }),
           8000
         )
-      } else {
+      } else if (!printMode) {
         toast.success(t('toast.pdfSuccess', { count: exportedCount }))
+      }
+      if (printMode) {
+        const printMessages: Record<PrintMode, string> = {
+          dialog: t('toast.pdfPrintDialog', { count: exportedCount }),
+          electron: t('toast.pdfPrintWindow'),
+          tab: t('toast.pdfPrintTab'),
+          download: t('toast.pdfPrintDownload'),
+        }
+        toast.info(printMessages[printMode], 6000)
       }
       showWizard('pdf', exportedCount)
     } else if (currentMode === 'zip') {

@@ -395,6 +395,10 @@
     "pdfSuccess": "PDF mit {count} Bildern erfolgreich erstellt",
     "pdfPartial": "PDF mit {count} Bildern erstellt, {failed} Bild(er) konnten nicht übernommen werden: {names}",
     "pdfCancelled": "PDF-Export abgebrochen",
+    "pdfPrintDialog": "Druckdialog geöffnet ({count} Bilder)",
+    "pdfPrintWindow": "Druckansicht geöffnet: mit dem Drucksymbol oder Strg+P drucken",
+    "pdfPrintTab": "PDF in neuem Tab geöffnet: dort über „Teilen → Drucken“ drucken",
+    "pdfPrintDownload": "PDF gespeichert: Öffnen Sie die Datei, um sie zu drucken",
     "zipSuccess": "ZIP mit {count} Bildern erfolgreich erstellt",
     "saveSuccess": "{count} Bilder erfolgreich gespeichert",
     "svgSuccess": "{count} Bild(er) erfolgreich als SVG exportiert",
@@ -625,7 +629,9 @@
     },
     "buttons": {
       "cancel": "Abbrechen",
-      "export": "Exportieren"
+      "export": "Exportieren",
+      "print": "Drucken",
+      "printTitle": "PDF erstellen und direkt auf diesem Gerät drucken"
     },
     "info": {
       "image": "Bild",

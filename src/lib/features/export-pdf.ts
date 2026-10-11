@@ -1218,6 +1218,8 @@ export interface ExportSettings {
   password?: string
   /** Mit Passwort: Drucken erlauben */
   allowPrinting?: boolean
+  /** PDF speichern (Standard) oder direkt auf dem Gerät drucken */
+  output?: 'download' | 'print'
   includeCustomFrontPage?: boolean
   frontPageElements?: PdfElement[]
   includeCommentPages?: boolean
