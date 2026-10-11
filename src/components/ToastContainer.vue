@@ -53,7 +53,7 @@ const getIcon = (type: string) => {
   position: fixed;
   bottom: var(--space-5);
   right: var(--space-5);
-  z-index: 9999;
+  z-index: 10100; /* über Designer (9999) und App-Dialog (10050) */
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

@@ -53,6 +53,67 @@
       {{ t('commentPageDesigner.tools.addImage') }}
     </button>
 
+    <!-- Formen -->
+    <div class="shape-buttons" role="group" :aria-label="t('commentPageDesigner.tools.shapes')">
+      <button
+        class="shape-btn"
+        :disabled="limitReached"
+        :title="t('commentPageDesigner.tools.addRect')"
+        @click="emit('add-shape', 'rect')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="5" width="18" height="14" rx="1"></rect>
+        </svg>
+        <span>{{ t('commentPageDesigner.tools.rect') }}</span>
+      </button>
+      <button
+        class="shape-btn"
+        :disabled="limitReached"
+        :title="t('commentPageDesigner.tools.addEllipse')"
+        @click="emit('add-shape', 'ellipse')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="9"></circle>
+        </svg>
+        <span>{{ t('commentPageDesigner.tools.ellipse') }}</span>
+      </button>
+      <button
+        class="shape-btn"
+        :disabled="limitReached"
+        :title="t('commentPageDesigner.tools.addLine')"
+        @click="emit('add-shape', 'line')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+        </svg>
+        <span>{{ t('commentPageDesigner.tools.line') }}</span>
+      </button>
+    </div>
+
     <!-- Clear Current Page Button -->
     <button v-if="elementCount > 0" class="tool-btn danger" @click="emit('clear-page')">
       <svg
@@ -77,6 +138,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { PdfShapeKind } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
@@ -93,6 +155,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   'add-text': []
   'add-image': []
+  'add-shape': [kind: PdfShapeKind]
   'clear-page': []
 }>()
 
@@ -144,6 +207,39 @@ const limitReached = computed(() => props.elementCount >= props.maxElements)
 }
 
 .tool-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.shape-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.shape-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shape-btn:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.shape-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }

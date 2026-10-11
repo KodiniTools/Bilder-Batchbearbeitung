@@ -1,13 +1,16 @@
 <template>
   <div
-    :class="['canvas-element', { selected, editing }]"
+    :class="[
+      'canvas-element',
+      { selected, editing, 'canvas-element--background': element.background },
+    ]"
     :style="{
       position: 'absolute',
       left: element.x + 'px',
       top: element.y + 'px',
       width: element.width ? element.width + 'px' : undefined,
       height: element.height ? element.height + 'px' : undefined,
-      zIndex: element.zIndex,
+      zIndex: element.background ? BACKGROUND_Z : element.zIndex,
       cursor: 'move',
     }"
     @mousedown.stop="emit('select', element, $event)"
@@ -57,7 +60,7 @@
     <!-- Image Element -->
     <div
       v-if="element.type === 'image'"
-      class="element-image"
+      :class="['element-image', { 'element-image--background': element.background }]"
       :style="{
         width: element.width + 'px',
         height: element.height ? element.height + 'px' : 'auto',
@@ -67,8 +70,11 @@
       <img :src="element.src" alt="Uploaded image" draggable="false" />
     </div>
 
+    <!-- Form (Rechteck, Ellipse, Linie) -->
+    <PdfShapeSvg v-if="element.type === 'shape'" :element="element" />
+
     <!-- 8 Resize-Handles (Ecken + Kanten) für alle Elemente -->
-    <div v-if="selected && handles" class="resize-handles">
+    <div v-if="selected && handles && !element.background" class="resize-handles">
       <!-- Ecken -->
       <div class="resize-handle nw" @mousedown.stop="emit('resizeStart', $event, 'nw')"></div>
       <div class="resize-handle ne" @mousedown.stop="emit('resizeStart', $event, 'ne')"></div>
@@ -87,8 +93,12 @@
 import { ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import PdfShapeSvg from './PdfShapeSvg.vue'
 
 const { t } = useI18n()
+
+/** Seitenhintergrund liegt unter allen Elementen (auch nach „Nach hinten“) */
+const BACKGROUND_Z = -100000
 
 const props = withDefaults(
   defineProps<{
@@ -163,6 +173,20 @@ watch(
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Seitenhintergrund: nicht anklickbar, Bild füllt die Seite */
+.canvas-element--background {
+  pointer-events: none;
+}
+
+.element-image--background {
+  border-radius: 0;
+}
+
+.element-image--background img {
+  height: 100%;
+  object-fit: cover;
 }
 
 .text-content {

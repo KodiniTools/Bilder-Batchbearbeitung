@@ -258,11 +258,7 @@
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
                       <span>
-                        {{
-                          element.type === 'text'
-                            ? element.content?.substring(0, 25)
-                            : t('frontPageDesigner.properties.typeImage')
-                        }}
+                        {{ elementLabel(element) }}
                       </span>
                     </li>
                     <li v-if="settings.frontPageElements.length > 3" class="more-indicator">
@@ -353,11 +349,7 @@
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
                       <span>
-                        {{
-                          element.type === 'text'
-                            ? element.content?.substring(0, 25)
-                            : t('commentPageDesigner.properties.typeImage')
-                        }}
+                        {{ elementLabel(element) }}
                       </span>
                     </li>
                     <li v-if="settings.commentPageElements.length > 3" class="more-indicator">
@@ -629,6 +621,23 @@ const IMAGES_PER_PAGE: ImagesPerPage[] = [1, 2, 4, 6, 9]
 
 const { t } = useI18n()
 const dialog = useConfirm()
+
+/** Kurzbeschreibung eines Designer-Elements für die Listen im Exportdialog */
+function elementLabel(element: PdfElement): string {
+  if (element.background) return t('commentPageDesigner.background.title')
+  switch (element.type) {
+    case 'text':
+      return element.content?.substring(0, 25) ?? ''
+    case 'image':
+      return t('commentPageDesigner.properties.typeImage')
+    case 'shape':
+      return t(`commentPageDesigner.properties.shape.${element.shape ?? 'rect'}`)
+    default: {
+      const never: never = element.type
+      return never
+    }
+  }
+}
 
 interface Props {
   isOpen: boolean

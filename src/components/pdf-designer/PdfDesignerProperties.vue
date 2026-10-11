@@ -5,11 +5,7 @@
     <div class="property-group">
       <label>{{ t('commentPageDesigner.properties.elementType') }}</label>
       <div class="property-value">
-        {{
-          element.type === 'text'
-            ? t('commentPageDesigner.properties.typeText')
-            : t('commentPageDesigner.properties.typeImage')
-        }}
+        {{ typeLabel }}
       </div>
     </div>
 
@@ -38,6 +34,9 @@
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
           {{ t('commentPageDesigner.properties.inlineEditHint') }}
+        </div>
+        <div class="inline-edit-hint">
+          {{ t('commentPageDesigner.properties.placeholdersHint') }}
         </div>
       </div>
 
@@ -205,6 +204,109 @@
       </div>
     </template>
 
+    <!-- Form-Eigenschaften -->
+    <template v-if="element.type === 'shape'">
+      <div v-if="element.shape !== 'line'" class="property-group">
+        <label for="shape-fill">{{ t('commentPageDesigner.properties.fillColor') }}</label>
+        <div class="color-row">
+          <input
+            id="shape-fill"
+            type="color"
+            :value="fillColor || '#ffffff'"
+            :disabled="!fillColor"
+            @input="fillColor = ($event.target as HTMLInputElement).value"
+          />
+          <label class="inline-check">
+            <input
+              type="checkbox"
+              :checked="!fillColor"
+              @change="fillColor = ($event.target as HTMLInputElement).checked ? '' : '#e5e7eb'"
+            />
+            {{ t('commentPageDesigner.properties.noFill') }}
+          </label>
+        </div>
+      </div>
+
+      <div class="property-group">
+        <label for="shape-stroke">
+          {{
+            element.shape === 'line'
+              ? t('commentPageDesigner.properties.lineColor')
+              : t('commentPageDesigner.properties.strokeColor')
+          }}
+        </label>
+        <input
+          id="shape-stroke"
+          type="color"
+          :value="strokeColor || DEFAULT_STROKE"
+          @input="strokeColor = ($event.target as HTMLInputElement).value"
+        />
+      </div>
+
+      <div class="property-group">
+        <SliderRow
+          id="shape-stroke-width"
+          :model-value="strokeWidth ?? 0"
+          :label="t('commentPageDesigner.properties.strokeWidth')"
+          :min="element.shape === 'line' ? 1 : 0"
+          :max="20"
+          unit="px"
+          @update:model-value="setStrokeWidth"
+        />
+      </div>
+
+      <div v-if="element.shape === 'rect'" class="property-group">
+        <SliderRow
+          id="shape-radius"
+          :model-value="cornerRadius ?? 0"
+          :label="t('commentPageDesigner.properties.cornerRadius')"
+          :min="0"
+          :max="100"
+          unit="px"
+          @update:model-value="cornerRadius = $event"
+        />
+      </div>
+
+      <div class="property-group">
+        <SliderRow
+          id="shape-width"
+          :model-value="width ?? 10"
+          :label="t('commentPageDesigner.properties.width')"
+          :min="10"
+          :max="pageWidth"
+          :step="10"
+          unit="px"
+          @update:model-value="width = $event"
+        />
+      </div>
+
+      <div class="property-group">
+        <SliderRow
+          id="shape-height"
+          :model-value="height ?? 10"
+          :label="t('commentPageDesigner.properties.height')"
+          :min="10"
+          :max="pageHeight"
+          :step="10"
+          unit="px"
+          @update:model-value="height = $event"
+        />
+      </div>
+
+      <div class="property-group">
+        <SliderRow
+          id="shape-opacity"
+          :model-value="opacityPercent"
+          :label="t('commentPageDesigner.properties.opacity')"
+          :min="10"
+          :max="100"
+          :step="10"
+          unit="%"
+          @update:model-value="opacityPercent = $event"
+        />
+      </div>
+    </template>
+
     <!-- Position -->
     <div class="property-group">
       <label>{{ t('commentPageDesigner.properties.position') }}</label>
@@ -334,6 +436,35 @@ const opacityPercent = computed({
 })
 const x = field('x')
 const y = field('y')
+const fillColor = field('fillColor')
+const strokeColor = field('strokeColor')
+const strokeWidth = field('strokeWidth')
+const cornerRadius = field('cornerRadius')
+
+const DEFAULT_STROKE = '#374151'
+/** Rand einschalten: ohne Randfarbe (z. B. aus Vorlagen) die Standardfarbe setzen */
+function setStrokeWidth(value: number) {
+  const patch: Partial<PdfElement> = { strokeWidth: value }
+  if (value > 0 && !props.element?.strokeColor) patch.strokeColor = DEFAULT_STROKE
+  emit('update', patch)
+}
+
+const typeLabel = computed(() => {
+  const el = props.element
+  if (!el) return ''
+  switch (el.type) {
+    case 'text':
+      return t('commentPageDesigner.properties.typeText')
+    case 'image':
+      return t('commentPageDesigner.properties.typeImage')
+    case 'shape':
+      return t(`commentPageDesigner.properties.shape.${el.shape ?? 'rect'}`)
+    default: {
+      const never: never = el.type
+      return never
+    }
+  }
+})
 </script>
 
 <style scoped>
@@ -368,6 +499,21 @@ const y = field('y')
   font-weight: 500;
   color: var(--muted);
   margin-bottom: 6px;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.property-group .inline-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-weight: 400;
+  color: var(--text);
 }
 
 .property-value {

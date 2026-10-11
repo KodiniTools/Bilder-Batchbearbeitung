@@ -27,6 +27,7 @@
                 :element-count="currentElements.length"
                 @add-text="addTextElement"
                 @add-image="triggerImageUpload"
+                @add-shape="addShapeElement"
                 @clear-page="clearCurrentPage"
               />
               <input
@@ -80,6 +81,21 @@
                 <p>{{ t('commentPageDesigner.properties.noSelection') }}</p>
                 <p class="shortcut-hint">{{ t('commentPageDesigner.shortcutsHint') }}</p>
               </div>
+
+              <PdfDesignerBackground
+                :background="currentBackground"
+                @set-color="setBackgroundColor"
+                @set-image="setBackgroundImage"
+                @remove="removeBackground"
+              />
+
+              <PdfDesignerTemplates
+                :mode="mode"
+                :page-width="pageWidth"
+                :page-height="pageHeight"
+                :elements="currentElements"
+                @apply="applyTemplateElements"
+              />
             </div>
 
             <!-- Canvas Area -->
@@ -206,6 +222,8 @@ import PdfDesignerElement from './PdfDesignerElement.vue'
 import PdfDesignerProperties from './PdfDesignerProperties.vue'
 import PdfDesignerPreview from './PdfDesignerPreview.vue'
 import PdfDesignerArrange from './PdfDesignerArrange.vue'
+import PdfDesignerBackground from './PdfDesignerBackground.vue'
+import PdfDesignerTemplates from './PdfDesignerTemplates.vue'
 import HistoryActions from '../HistoryActions.vue'
 import { usePdfPages } from '@/composables/usePdfPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
@@ -280,6 +298,12 @@ const {
   clearSelection,
   reselectAfterRestore,
   addTextElement,
+  addShapeElement,
+  currentBackground,
+  setBackgroundColor,
+  setBackgroundImage,
+  removeBackground,
+  applyTemplateElements,
   triggerImageUpload,
   handleImageUpload,
   clearCurrentPage,
