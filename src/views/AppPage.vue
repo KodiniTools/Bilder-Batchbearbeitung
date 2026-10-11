@@ -188,6 +188,7 @@ async function handleExportConfirm(settings: ExportSettings) {
           return {
             dataUrl: dataUrl,
             originalName: img.outputName || img.file.name,
+            comment: img.comment,
           }
         })
       )
@@ -214,7 +215,6 @@ async function handleExportConfirm(settings: ExportSettings) {
           includeTitlePage: !useCustomFrontPage,
           includeCommentPages: settings.includeCommentPages || false,
           commentPageElements: settings.commentPageElements || [],
-          includeFileName: true,
           includeImages: true,
           orientation: settings.orientation || 'portrait',
           labels: {
