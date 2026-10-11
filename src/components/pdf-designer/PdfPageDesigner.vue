@@ -13,6 +13,16 @@
           <div class="modal-body">
             <!-- Left Sidebar - Tools & Settings -->
             <div class="sidebar">
+              <HistoryActions
+                compact
+                :can-undo="canUndo"
+                :can-redo="canRedo"
+                :undo-title="t('commentPageDesigner.history.undoTitle')"
+                :redo-title="t('commentPageDesigner.history.redoTitle')"
+                @undo="undo"
+                @redo="redo"
+              />
+
               <PdfDesignerTools
                 :element-count="currentElements.length"
                 @add-text="addTextElement"
@@ -27,9 +37,19 @@
                 @change="handleImageUpload"
               />
 
-              <!-- Element Properties -->
+              <!-- Ausrichten, Verteilen, Duplizieren (auch Mehrfachauswahl) -->
+              <PdfDesignerArrange
+                v-if="selectedIds.length > 0"
+                :count="selectedIds.length"
+                @align="alignSelected"
+                @distribute="distributeSelected"
+                @duplicate="duplicateSelected"
+                @delete="deleteSelectedElement"
+              />
+
+              <!-- Element Properties (nur Einzelauswahl) -->
               <PdfDesignerProperties
-                v-if="selectedElement"
+                v-if="selectedElement && selectedIds.length === 1"
                 :element="selectedElement"
                 :page-width="pageWidth"
                 :page-height="pageHeight"
@@ -40,7 +60,10 @@
               />
 
               <!-- Info when no element selected -->
-              <div v-else-if="currentElements.length > 0" class="no-selection">
+              <div
+                v-else-if="currentElements.length > 0 && selectedIds.length === 0"
+                class="no-selection"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="48"
@@ -55,6 +78,7 @@
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
                 <p>{{ t('commentPageDesigner.properties.noSelection') }}</p>
+                <p class="shortcut-hint">{{ t('commentPageDesigner.shortcutsHint') }}</p>
               </div>
             </div>
 
@@ -65,11 +89,15 @@
                 :pages="pages"
                 :current-page-index="currentPageIndex"
                 :element-count="currentElements.length"
+                :page-width="pageWidth"
+                :page-height="pageHeight"
                 @previous="previousPage"
                 @next="nextPage"
                 @go-to-page="goToPage"
                 @add-page="addNewPage"
                 @delete-page="deletePage"
+                @duplicate-page="duplicatePage"
+                @move-page="movePage"
               />
 
               <PdfDesignerZoomControls
@@ -110,7 +138,8 @@
                       v-for="element in currentElements"
                       :key="element.id"
                       :element="element"
-                      :selected="selectedElement?.id === element.id"
+                      :selected="selectedIds.includes(element.id)"
+                      :handles="selectedIds.length === 1"
                       :editing="editingTextId === element.id"
                       @select="selectElement"
                       @edit-start="startInlineEdit"
@@ -118,6 +147,20 @@
                       @resize-start="startTextResize"
                       @update-content="updateElementContent"
                     />
+
+                    <!-- Hilfslinien beim Ziehen (Einrasten) -->
+                    <div
+                      v-for="gx in guides.x"
+                      :key="'gx' + gx"
+                      class="snap-guide snap-guide--v"
+                      :style="{ left: gx + 'px' }"
+                    ></div>
+                    <div
+                      v-for="gy in guides.y"
+                      :key="'gy' + gy"
+                      class="snap-guide snap-guide--h"
+                      :style="{ top: gy + 'px' }"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -162,8 +205,11 @@ import PdfDesignerFooter from './PdfDesignerFooter.vue'
 import PdfDesignerElement from './PdfDesignerElement.vue'
 import PdfDesignerProperties from './PdfDesignerProperties.vue'
 import PdfDesignerPreview from './PdfDesignerPreview.vue'
+import PdfDesignerArrange from './PdfDesignerArrange.vue'
+import HistoryActions from '../HistoryActions.vue'
 import { usePdfPages } from '@/composables/usePdfPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
+import { useDesignerHistory } from '@/composables/useDesignerHistory'
 import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t, locale } = useI18n()
@@ -215,6 +261,8 @@ const {
   pages,
   currentPageIndex,
   selectedElement,
+  selectedIds,
+  selectedElements,
   editingTextId,
   currentElements,
   getTotalElementCount,
@@ -225,6 +273,12 @@ const {
   previousPage,
   nextPage,
   goToPage,
+  duplicatePage,
+  movePage,
+  selectElement: setSelection,
+  selectAll,
+  clearSelection,
+  reselectAfterRestore,
   addTextElement,
   triggerImageUpload,
   handleImageUpload,
@@ -232,15 +286,43 @@ const {
   deleteSelectedElement,
   moveToFront,
   moveToBack,
+  duplicateSelected,
+  copySelected,
+  pasteClipboard,
+  nudgeSelected,
+  alignSelected,
+  distributeSelected,
   startInlineEdit,
   stopInlineEdit,
   handleCanvasClick,
-} = usePdfPages({ pageWidth, pageHeight, imageInput, canvasRef, singlePage: isCover })
+} = usePdfPages({
+  pageWidth,
+  pageHeight,
+  imageInput,
+  canvasRef,
+  singlePage: isCover,
+  onBeforeChange: (key) => checkpoint(key),
+})
+
+// Undo/Redo (Strg+Z / Strg+Y)
+const {
+  canUndo,
+  canRedo,
+  checkpoint,
+  undo,
+  redo,
+  reset: resetHistory,
+} = useDesignerHistory({
+  pages,
+  currentPageIndex,
+  onRestore: reselectAfterRestore,
+})
 
 // Direct manipulation: drag / resize / zoom
 const {
   zoomLevel,
   canvasVerticalPadding,
+  guides,
   selectElement,
   startTextResize,
   zoomIn,
@@ -249,21 +331,31 @@ const {
   resetZoom,
 } = useCanvasInteraction({
   selectedElement,
+  selectedElements,
+  currentElements,
   editingTextId,
   pageWidth,
   pageHeight,
   canvasWrapperRef,
+  onSelect: setSelection,
+  onBeforeChange: () => checkpoint(),
 })
 
 // Property-Panel: Teil-Patch auf das ausgewählte Element anwenden (Single Source of Truth hier)
 function updateSelectedElement(patch: Partial<PdfElement>) {
-  if (selectedElement.value) Object.assign(selectedElement.value, patch)
+  const el = selectedElement.value
+  if (!el) return
+  // Fortlaufende Änderungen desselben Felds (Regler, Tippen) = ein Undo-Schritt
+  checkpoint(`prop:${el.id}:${Object.keys(patch).join(',')}`)
+  Object.assign(el, patch)
 }
 
 // Inline-Editor: Textinhalt eines Elements der aktuellen Seite setzen
 function updateElementContent(id: string, content: string) {
   const el = currentElements.value.find((e) => e.id === id)
-  if (el) el.content = content
+  if (!el) return
+  checkpoint(`content:${id}`)
+  el.content = content
 }
 
 // Info links im Footer: Seitenposition (Kommentarseiten) bzw. Elementanzahl (Startseite)
@@ -292,6 +384,7 @@ watch(
   (newVal) => {
     if (newVal) {
       initFromElements(props.initialElements)
+      resetHistory()
       nextTick(() => fitToScreen())
     }
   }
@@ -315,14 +408,76 @@ function handleSave() {
   emit('update:modelValue', false)
 }
 
+/** Tastatureingaben in Formularfeldern nicht als Designer-Kürzel behandeln */
+function isTypingTarget(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null
+  if (!el || !el.tagName) return false
+  return el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
+}
+
 // Keyboard shortcuts
 function handleKeyDown(event: KeyboardEvent) {
-  // Don't handle shortcuts while editing text inline
-  if (editingTextId.value) return
+  // Nur bei geöffnetem Designer (beide Instanzen sind dauerhaft gemountet)
+  if (!props.modelValue || showPreview.value) return
+  // Don't handle shortcuts while editing text inline or typing in the properties panel
+  if (editingTextId.value || isTypingTarget(event.target)) return
 
-  if ((event.key === 'Delete' || event.key === 'Backspace') && selectedElement.value) {
+  const mod = event.ctrlKey || event.metaKey
+  const key = event.key.toLowerCase()
+
+  if (mod && key === 'z' && !event.shiftKey) {
+    event.preventDefault()
+    undo()
+    return
+  }
+  if (mod && (key === 'y' || (key === 'z' && event.shiftKey))) {
+    event.preventDefault()
+    redo()
+    return
+  }
+  if (mod && key === 'a') {
+    event.preventDefault()
+    selectAll()
+    return
+  }
+  if (mod && key === 'd') {
+    event.preventDefault()
+    duplicateSelected()
+    return
+  }
+  if (mod && key === 'c') {
+    if (copySelected()) event.preventDefault()
+    return
+  }
+  if (mod && key === 'v') {
+    if (pasteClipboard()) event.preventDefault()
+    return
+  }
+
+  if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIds.value.length > 0) {
     event.preventDefault()
     deleteSelectedElement()
+    return
+  }
+
+  if (event.key === 'Escape' && selectedIds.value.length > 0) {
+    event.preventDefault()
+    clearSelection()
+    return
+  }
+
+  // Pfeiltasten verschieben die Auswahl (Umschalt: 10 px)
+  const NUDGE: Record<string, [number, number]> = {
+    ArrowLeft: [-1, 0],
+    ArrowRight: [1, 0],
+    ArrowUp: [0, -1],
+    ArrowDown: [0, 1],
+  }
+  if (!mod && NUDGE[event.key] && selectedIds.value.length > 0) {
+    event.preventDefault()
+    const step = event.shiftKey ? 10 : 1
+    nudgeSelected(NUDGE[event.key][0] * step, NUDGE[event.key][1] * step)
+    return
   }
 
   // Seiten-Shortcuts nur bei mehrseitigen Kommentarseiten
@@ -337,7 +492,7 @@ function handleKeyDown(event: KeyboardEvent) {
     nextPage()
   }
 
-  if (event.ctrlKey && event.key === 'n') {
+  if (event.ctrlKey && key === 'n') {
     event.preventDefault()
     addNewPage()
   }
@@ -414,6 +569,33 @@ onUnmounted(() => {
 .no-selection p {
   margin: 0;
   font-size: 13px;
+}
+
+.no-selection .shortcut-hint {
+  margin-top: var(--space-3);
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Hilfslinien beim Einrasten */
+.snap-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10000;
+  background: var(--accent);
+}
+
+.snap-guide--v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.snap-guide--h {
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 
 /* Canvas Area */

@@ -1,6 +1,7 @@
-import { ref, computed, type Ref } from 'vue'
+import { ref, computed, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import { alignBoxes, distributeBoxes, elementBox, type AlignMode } from '@/lib/designer/arrange'
 
 export interface PdfPage {
   id: string
@@ -11,6 +12,15 @@ export interface PdfPage {
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2)
 }
+
+/** Höchstzahl Elemente pro Seite (wie die Sperre in PdfDesignerTools) */
+export const MAX_ELEMENTS_PER_PAGE = 20
+
+/** Versatz für Duplikate und eingefügte Elemente in px */
+const PASTE_OFFSET = 20
+
+/** Zwischenablage, gemeinsam für Startseite und Kommentarseiten */
+let clipboard: PdfElement[] = []
 
 interface UsePdfPagesOptions {
   /** Current page width in px (depends on orientation). */
@@ -23,6 +33,11 @@ interface UsePdfPagesOptions {
   canvasRef: Ref<HTMLElement | null>
   /** Single-page document (cover page): no page management, all elements on page 1. */
   singlePage?: Ref<boolean>
+  /**
+   * Wird VOR jeder Änderung aufgerufen (Undo-Checkpoint). Gleicher Schlüssel
+   * in kurzer Folge = ein Schritt.
+   */
+  onBeforeChange?: (key?: string) => void
 }
 
 /**
@@ -30,15 +45,77 @@ interface UsePdfPagesOptions {
  * pages, current page, selection and all element / page CRUD operations.
  */
 export function usePdfPages(options: UsePdfPagesOptions) {
-  const { pageWidth, pageHeight, imageInput, canvasRef, singlePage } = options
+  const { pageWidth, pageHeight, imageInput, canvasRef, singlePage, onBeforeChange } = options
   const { t } = useI18n()
 
   const pages = ref<PdfPage[]>([{ id: generateId(), elements: [] }])
   const currentPageIndex = ref(0)
+  /** Primär ausgewähltes Element (Eigenschaften-Panel, Größenänderung) */
   const selectedElement = ref<PdfElement | null>(null)
+  /** Alle ausgewählten Elemente der aktuellen Seite (Mehrfachauswahl) */
+  const selectedIds = ref<string[]>([])
   const editingTextId = ref<string | null>(null)
 
   const currentElements = computed(() => pages.value[currentPageIndex.value].elements)
+  const selectedElements = computed(() =>
+    currentElements.value.filter((el) => selectedIds.value.includes(el.id))
+  )
+
+  // Wer selectedElement direkt setzt, wählt genau dieses Element aus
+  watch(
+    selectedElement,
+    (el) => {
+      if (!el) selectedIds.value = []
+      else if (!selectedIds.value.includes(el.id)) selectedIds.value = [el.id]
+    },
+    { flush: 'sync' }
+  )
+
+  function change(key?: string) {
+    onBeforeChange?.(key)
+  }
+
+  function clearSelection() {
+    selectedElement.value = null
+    editingTextId.value = null
+  }
+
+  /** Auswahl setzen; additiv (Umschalt/Strg) schaltet das Element in der Auswahl um. */
+  function selectElement(element: PdfElement, additive = false) {
+    if (!additive) {
+      selectedIds.value = [element.id]
+      selectedElement.value = element
+      return
+    }
+    if (selectedIds.value.includes(element.id)) {
+      const rest = selectedIds.value.filter((id) => id !== element.id)
+      selectedIds.value = rest
+      const lastId = rest[rest.length - 1]
+      selectedElement.value = currentElements.value.find((el) => el.id === lastId) ?? null
+    } else {
+      selectedIds.value = [...selectedIds.value, element.id]
+      selectedElement.value = element
+    }
+  }
+
+  function selectAll() {
+    const els = currentElements.value
+    if (els.length === 0) return
+    selectedIds.value = els.map((el) => el.id)
+    selectedElement.value = els[els.length - 1]
+  }
+
+  /** Auswahl nach Undo/Redo auf die neuen Objekte mit gleicher id setzen. */
+  function reselectAfterRestore() {
+    editingTextId.value = null
+    const ids = selectedIds.value.filter((id) => currentElements.value.some((el) => el.id === id))
+    const primaryId = selectedElement.value?.id
+    selectedIds.value = ids
+    selectedElement.value =
+      currentElements.value.find((el) => el.id === primaryId && ids.includes(el.id)) ??
+      currentElements.value.find((el) => el.id === ids[ids.length - 1]) ??
+      null
+  }
 
   /** Total element count across all pages. */
   function getTotalElementCount(): number {
@@ -94,6 +171,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
   // ── Page management ─────────────────────────────────────────────
   function addNewPage() {
     if (singlePage?.value) return
+    change()
     pages.value.push({ id: generateId(), elements: [] })
     currentPageIndex.value = pages.value.length - 1
     selectedElement.value = null
@@ -106,6 +184,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     }
 
     if (confirm(t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }))) {
+      change()
       pages.value.splice(currentPageIndex.value, 1)
 
       if (currentPageIndex.value >= pages.value.length) {
@@ -139,6 +218,30 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     editingTextId.value = null
   }
 
+  /** Kopie der aktuellen Seite (neue ids) direkt dahinter einfügen und anzeigen. */
+  function duplicatePage() {
+    if (singlePage?.value) return
+    change()
+    const source = pages.value[currentPageIndex.value]
+    const copy: PdfPage = {
+      id: generateId(),
+      elements: source.elements.map((el) => ({ ...el, id: generateId() })),
+    }
+    pages.value.splice(currentPageIndex.value + 1, 0, copy)
+    goToPage(currentPageIndex.value + 1)
+  }
+
+  /** Seite verschieben (Drag-and-Drop in der Thumbnail-Leiste); die angezeigte Seite bleibt. */
+  function movePage(from: number, to: number) {
+    const count = pages.value.length
+    if (from === to || from < 0 || to < 0 || from >= count || to >= count) return
+    change()
+    const current = pages.value[currentPageIndex.value]
+    const [moved] = pages.value.splice(from, 1)
+    pages.value.splice(to, 0, moved)
+    currentPageIndex.value = pages.value.indexOf(current)
+  }
+
   // ── Element management ──────────────────────────────────────────
   function addTextElement() {
     const newElement: PdfElement = {
@@ -158,6 +261,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
       zIndex: currentElements.value.length,
     }
 
+    change()
     currentElements.value.push(newElement)
     selectedElement.value = newElement
   }
@@ -190,6 +294,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
           opacity: 1,
           zIndex: currentElements.value.length,
         }
+        change()
         currentElements.value.push(newElement)
         selectedElement.value = newElement
       }
@@ -201,6 +306,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
 
   function clearCurrentPage() {
     if (confirm(t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }))) {
+      change()
       currentElements.value.length = 0
       selectedElement.value = null
       editingTextId.value = null
@@ -208,27 +314,100 @@ export function usePdfPages(options: UsePdfPagesOptions) {
   }
 
   function deleteSelectedElement() {
-    const selected = selectedElement.value
-    if (!selected) return
-
-    const index = currentElements.value.findIndex((el) => el.id === selected.id)
-    if (index !== -1) {
-      currentElements.value.splice(index, 1)
-      selectedElement.value = null
-      editingTextId.value = null
-    }
+    const ids = selectedIds.value
+    if (ids.length === 0) return
+    change()
+    const page = pages.value[currentPageIndex.value]
+    page.elements = page.elements.filter((el) => !ids.includes(el.id))
+    clearSelection()
   }
 
   function moveToFront() {
     if (!selectedElement.value) return
+    change()
     const maxZ = Math.max(...currentElements.value.map((el) => el.zIndex), 0)
     selectedElement.value.zIndex = maxZ + 1
   }
 
   function moveToBack() {
     if (!selectedElement.value) return
+    change()
     const minZ = Math.min(...currentElements.value.map((el) => el.zIndex), 0)
     selectedElement.value.zIndex = minZ - 1
+  }
+
+  // ── Duplizieren, Kopieren, Einfügen, Verschieben ───────────────
+  /** Kopien mit neuen ids, versetzt und obenauf; begrenzt auf die freien Plätze der Seite. */
+  function insertCopies(sources: PdfElement[]) {
+    const free = MAX_ELEMENTS_PER_PAGE - currentElements.value.length
+    if (sources.length === 0 || free <= 0) return
+    change()
+    let z = Math.max(...currentElements.value.map((el) => el.zIndex), 0)
+    const copies = sources.slice(0, free).map((el) => ({
+      ...el,
+      id: generateId(),
+      x: Math.min(el.x + PASTE_OFFSET, Math.max(0, pageWidth.value - 50)),
+      y: Math.min(el.y + PASTE_OFFSET, Math.max(0, pageHeight.value - 50)),
+      zIndex: ++z,
+    }))
+    currentElements.value.push(...copies)
+    const inserted = currentElements.value.slice(-copies.length)
+    selectedIds.value = inserted.map((el) => el.id)
+    selectedElement.value = inserted[inserted.length - 1]
+  }
+
+  function duplicateSelected() {
+    insertCopies(selectedElements.value)
+  }
+
+  function copySelected(): boolean {
+    if (selectedElements.value.length === 0) return false
+    clipboard = selectedElements.value.map((el) => ({ ...el }))
+    return true
+  }
+
+  function pasteClipboard(): boolean {
+    if (clipboard.length === 0) return false
+    insertCopies(clipboard)
+    // Wiederholtes Einfügen versetzt weiter
+    clipboard = clipboard.map((el) => ({ ...el, x: el.x + PASTE_OFFSET, y: el.y + PASTE_OFFSET }))
+    return true
+  }
+
+  /** Auswahl per Pfeiltaste verschieben; bleibt auf der Seite. */
+  function nudgeSelected(dx: number, dy: number) {
+    const els = selectedElements.value
+    if (els.length === 0) return
+    change('nudge')
+    for (const el of els) {
+      el.x = Math.max(0, Math.min(pageWidth.value - 50, el.x + dx))
+      el.y = Math.max(0, Math.min(pageHeight.value - 50, el.y + dy))
+    }
+  }
+
+  function alignSelected(mode: AlignMode) {
+    const els = selectedElements.value
+    if (els.length === 0) return
+    change()
+    const positions = alignBoxes(els.map(elementBox), mode, {
+      width: pageWidth.value,
+      height: pageHeight.value,
+    })
+    els.forEach((el, i) => {
+      el.x = Math.round(positions[i].x)
+      el.y = Math.round(positions[i].y)
+    })
+  }
+
+  function distributeSelected(axis: 'horizontal' | 'vertical') {
+    const els = selectedElements.value
+    if (els.length < 3) return
+    change()
+    const positions = distributeBoxes(els.map(elementBox), axis)
+    els.forEach((el, i) => {
+      el.x = Math.round(positions[i].x)
+      el.y = Math.round(positions[i].y)
+    })
   }
 
   // ── Inline text editing ─────────────────────────────────────────
@@ -245,8 +424,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
   function handleCanvasClick(event: MouseEvent) {
     const target = event.target as HTMLElement
     if (target === canvasRef.value || target.classList.contains('canvas-grid')) {
-      selectedElement.value = null
-      editingTextId.value = null
+      clearSelection()
     }
   }
 
@@ -255,6 +433,8 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     pages,
     currentPageIndex,
     selectedElement,
+    selectedIds,
+    selectedElements,
     editingTextId,
     currentElements,
     // document lifecycle
@@ -267,6 +447,13 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     previousPage,
     nextPage,
     goToPage,
+    duplicatePage,
+    movePage,
+    // selection
+    selectElement,
+    selectAll,
+    clearSelection,
+    reselectAfterRestore,
     // element management
     addTextElement,
     triggerImageUpload,
@@ -275,6 +462,12 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     deleteSelectedElement,
     moveToFront,
     moveToBack,
+    duplicateSelected,
+    copySelected,
+    pasteClipboard,
+    nudgeSelected,
+    alignSelected,
+    distributeSelected,
     // inline editing
     startInlineEdit,
     stopInlineEdit,
