@@ -1,6 +1,8 @@
 import jsPDF, { GState, type EncryptionOptions } from 'jspdf'
 import { applyPdfFont, registerPdfFonts, toPdfFontStyle, type PdfFontStyle } from './pdf-fonts'
 import type { WatermarkSettings } from '@/lib/core/types'
+import { PdfImageEncoder, type EncodedPdfImage, type PdfImageSource } from './pdf-image-encoder'
+import { scaledImageSize } from './pdf-image-size'
 
 /**
  * Wasserzeichen im PDF: dieselben Felder wie das Bild-Wasserzeichen
@@ -78,6 +80,11 @@ export interface PdfElement {
 
 export interface ImageData {
   canvas?: HTMLCanvasElement // Für direkte Canvas-Objekte
+  /**
+   * Erzeugt das Canvas erst beim Export (bevorzugt vor canvas/dataUrl):
+   * So liegen nie alle Bilder einer Serie gleichzeitig im Speicher.
+   */
+  getCanvas?: () => HTMLCanvasElement
   dataUrl?: string // Für Base64-Daten
   /** Nur für Fehlermeldungen; der Dateiname erscheint nicht im PDF */
   originalName: string
@@ -429,88 +436,104 @@ export async function buildPdfDocument(
     const commentLineMm = commentFontPt * PT_TO_MM * IMAGE_COMMENT_LINE_HEIGHT
     let slot = 0
 
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i]
+    // Skalieren + JPEG-Kodierung laufen im Worker-Pool; einige Bilder werden
+    // vorab kodiert, eingefügt wird weiterhin streng in Reihenfolge.
+    const encoder = new PdfImageEncoder(encodeOnMainThread)
+    const lookahead = encoder.concurrency + 1
+    const jobs: (Promise<EncodedPdfImage | null> | undefined)[] = []
+    const startJob = (k: number) => {
+      if (k >= images.length || jobs[k]) return
+      const image = images[k]
+      const job = (async () => {
+        const source = imageSource(image)
+        return source ? encoder.encode(source, maxImageDimension, jpegQuality) : null
+      })()
+      // Fehler werden beim Abholen behandelt; keine unbehandelte Ablehnung bei Abbruch
+      job.catch(() => {})
+      jobs[k] = job
+    }
 
-      try {
-        // Hole dataUrl - entweder direkt oder vom Canvas
-        let dataUrl: string
-        if (image.dataUrl) {
-          // Konvertiere und skaliere dataUrl (auch PNG→JPEG!)
-          dataUrl = await resizeAndConvertDataUrl(image.dataUrl, maxImageDimension, jpegQuality)
-        } else if (image.canvas) {
-          // Skaliere Canvas herunter wenn nötig
-          const resizedCanvas = resizeCanvas(image.canvas, maxImageDimension)
-          // Verwende JPEG-Komprimierung für kleinere Dateien und schnellere Speicherung
-          dataUrl = resizedCanvas.toDataURL('image/jpeg', jpegQuality)
-        } else {
-          console.warn(`⚠️ Bild ${i} hat weder canvas noch dataUrl`)
-          failedImages.push(image.originalName)
-          onImageError?.(image.originalName)
-          await step()
-          continue
-        }
-        const imgProps = pdf.getImageProperties(dataUrl)
+    try {
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i]
+        for (let k = i; k < i + lookahead; k++) startJob(k)
 
-        // Neue Seite erst, wenn das Bild geladen ist (fehlerhafte Bilder belegen keine Zelle)
-        if (slot === 0 && pageAdded) pdf.addPage()
-        pageAdded = true
-        const cell = cells[slot]
+        try {
+          const encoded = await jobs[i]
+          jobs[i] = undefined
+          if (!encoded) {
+            console.warn(`⚠️ Bild ${i} hat weder canvas noch dataUrl`)
+            failedImages.push(image.originalName)
+            onImageError?.(image.originalName)
+            await step()
+            continue
+          }
+          const imgProps =
+            encoded.width > 0 && encoded.height > 0
+              ? { width: encoded.width, height: encoded.height }
+              : pdf.getImageProperties(encoded.data)
 
-        // Kommentar umbrechen (Schrift muss vor splitTextToSize gesetzt sein)
-        pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(commentFontPt)
-        const maxLines = Math.max(
-          1,
-          Math.floor((cell.height * IMAGE_COMMENT_MAX_SHARE) / commentLineMm)
-        )
-        const commentLines = wrapImageComment(pdf, image.comment, cell.width, maxLines)
+          // Neue Seite erst, wenn das Bild geladen ist (fehlerhafte Bilder belegen keine Zelle)
+          if (slot === 0 && pageAdded) pdf.addPage()
+          pageAdded = true
+          const cell = cells[slot]
 
-        const layout = layoutImageCell(
-          cell,
-          imgProps.width / imgProps.height,
-          commentLines.length,
-          commentLineMm,
-          imageFit
-        )
+          // Kommentar umbrechen (Schrift muss vor splitTextToSize gesetzt sein)
+          pdf.setFont('helvetica', 'normal')
+          pdf.setFontSize(commentFontPt)
+          const maxLines = Math.max(
+            1,
+            Math.floor((cell.height * IMAGE_COMMENT_MAX_SHARE) / commentLineMm)
+          )
+          const commentLines = wrapImageComment(pdf, image.comment, cell.width, maxLines)
 
-        // Nach Konvertierung sollte es immer JPEG sein; zur Sicherheit prüfen
-        const imageFormat = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG'
-        if (layout.clip) {
-          // Füllen: Überstand an der Zelle beschneiden
-          pdf.saveGraphicsState()
-          pdf.rect(layout.clip.x, layout.clip.y, layout.clip.width, layout.clip.height, null)
-          pdf.clip()
-          pdf.discardPath()
-          pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
-          pdf.restoreGraphicsState()
-        } else {
-          pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
-        }
+          const layout = layoutImageCell(
+            cell,
+            imgProps.width / imgProps.height,
+            commentLines.length,
+            commentLineMm,
+            imageFit
+          )
 
-        // Bildkommentar zentriert unter dem Bild (der Dateiname erscheint nicht)
-        if (commentLines.length > 0) {
-          pdf.setTextColor(60, 60, 60)
-          pdf.text(commentLines, cell.x + cell.width / 2, layout.commentY, {
-            align: 'center',
-            baseline: 'top',
-            lineHeightFactor: IMAGE_COMMENT_LINE_HEIGHT,
+          const imageFormat = encoded.format
+          if (layout.clip) {
+            // Füllen: Überstand an der Zelle beschneiden
+            pdf.saveGraphicsState()
+            pdf.rect(layout.clip.x, layout.clip.y, layout.clip.width, layout.clip.height, null)
+            pdf.clip()
+            pdf.discardPath()
+            pdf.addImage(encoded.data, imageFormat, layout.x, layout.y, layout.width, layout.height)
+            pdf.restoreGraphicsState()
+          } else {
+            pdf.addImage(encoded.data, imageFormat, layout.x, layout.y, layout.width, layout.height)
+          }
+
+          // Bildkommentar zentriert unter dem Bild (der Dateiname erscheint nicht)
+          if (commentLines.length > 0) {
+            pdf.setTextColor(60, 60, 60)
+            pdf.text(commentLines, cell.x + cell.width / 2, layout.commentY, {
+              align: 'center',
+              baseline: 'top',
+              lineHeightFactor: IMAGE_COMMENT_LINE_HEIGHT,
+            })
+          }
+
+          outline.push({
+            title: imageBookmarkTitle(labels.bookmarkImage(i + 1), image.comment),
+            pageNumber: pdf.getNumberOfPages(),
           })
+          slot = (slot + 1) % perPage
+          console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
+        } catch (error) {
+          console.error(`❌ Fehler bei Bild ${i}:`, error)
+          failedImages.push(image.originalName)
+          onImageError?.(image.originalName, error)
         }
 
-        outline.push({
-          title: imageBookmarkTitle(labels.bookmarkImage(i + 1), image.comment),
-          pageNumber: pdf.getNumberOfPages(),
-        })
-        slot = (slot + 1) % perPage
-        console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
-      } catch (error) {
-        console.error(`❌ Fehler bei Bild ${i}:`, error)
-        failedImages.push(image.originalName)
-        onImageError?.(image.originalName, error)
+        await step()
       }
-
-      await step()
+    } finally {
+      encoder.dispose()
     }
   }
 
@@ -1745,6 +1768,22 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     : null
 }
 
+/** Bildquelle eines Eintrags: getCanvas vor dataUrl vor canvas; null = keine Quelle */
+function imageSource(image: ImageData): PdfImageSource | null {
+  if (image.getCanvas) return image.getCanvas()
+  return image.dataUrl || image.canvas || null
+}
+
+/** Bisheriger Weg im Hauptthread; Fallback, wenn kein Worker verfügbar ist */
+async function encodeOnMainThread(
+  source: PdfImageSource,
+  maxDimension: number,
+  quality: number
+): Promise<string> {
+  if (typeof source === 'string') return resizeAndConvertDataUrl(source, maxDimension, quality)
+  return resizeCanvas(source, maxDimension).toDataURL('image/jpeg', quality)
+}
+
 /**
  * Skaliert ein Canvas-Bild herunter, wenn es größer als maxDimension ist
  * Dies reduziert die Dateigröße erheblich ohne sichtbaren Qualitätsverlust
@@ -1759,16 +1798,7 @@ function resizeCanvas(sourceCanvas: HTMLCanvasElement, maxDimension: number): HT
   }
 
   // Berechne neue Dimensionen unter Beibehaltung des Seitenverhältnisses
-  let newWidth: number
-  let newHeight: number
-
-  if (width > height) {
-    newWidth = maxDimension
-    newHeight = Math.round((height / width) * maxDimension)
-  } else {
-    newHeight = maxDimension
-    newWidth = Math.round((width / height) * maxDimension)
-  }
+  const { width: newWidth, height: newHeight } = scaledImageSize(width, height, maxDimension)
 
   // Erstelle neues Canvas mit reduzierten Dimensionen
   const resizedCanvas = document.createElement('canvas')

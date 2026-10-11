@@ -183,18 +183,12 @@ async function handleExportConfirm(settings: ExportSettings) {
           ? imageStore.images
           : imageStore.images.filter((img) => img.selected)
 
-      const imageDataArray: ImageData[] = await Promise.all(
-        images.map(async (img) => {
-          const dataUrl = ImageProcessor.getDataUrlForExport(img, 'image/png', 0.92, {
-            backgroundColor: '#ffffff',
-          })
-          return {
-            dataUrl: dataUrl,
-            originalName: img.outputName || img.file.name,
-            comment: img.comment,
-          }
-        })
-      )
+      // Canvas erst beim Export erzeugen; Skalierung/JPEG übernimmt der Worker
+      const imageDataArray: ImageData[] = images.map((img) => ({
+        getCanvas: () => ImageProcessor.getExportCanvas(img, { backgroundColor: '#ffffff' }),
+        originalName: img.outputName || img.file.name,
+        comment: img.comment,
+      }))
 
       const useCustomFrontPage = Boolean(
         settings.includeCustomFrontPage === true &&
