@@ -324,6 +324,7 @@ import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { buildSingleImagePdf } from '@/lib/features/export-pdf'
 import ImagePreview from './ImagePreview.vue'
 import HistoryActions from './HistoryActions.vue'
 import { CUSTOM_FONT_FAMILIES } from '@/lib/core/custom-fonts'
@@ -954,17 +955,13 @@ async function downloadImage() {
     const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
 
     if (selectedFormat.value === 'application/pdf') {
-      const { default: jsPDF } = await import('jspdf')
       const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92)
-      const w = exportCanvas.width
-      const h = exportCanvas.height
-      const pdf = new jsPDF({
-        orientation: w >= h ? 'l' : 'p',
-        unit: 'px',
-        format: [w, h],
-        hotfixes: ['px_scaling'],
-      })
-      pdf.addImage(dataUrl, 'JPEG', 0, 0, w, h)
+      const pdf = buildSingleImagePdf(
+        dataUrl,
+        exportCanvas.width,
+        exportCanvas.height,
+        comment.value
+      )
       pdf.save(`${safeBase}.pdf`)
       return
     }
