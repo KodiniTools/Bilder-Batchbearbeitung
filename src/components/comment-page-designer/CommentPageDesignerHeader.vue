@@ -18,7 +18,7 @@
 
     <!-- Orientation Badge -->
     <div class="orientation-badge" :class="orientation">
-      {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+      {{ t(`designer.orientation.${orientation}`) }}
     </div>
 
     <!-- Page Counter Badge -->

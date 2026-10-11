@@ -71,6 +71,25 @@ export interface ImageData {
   originalName: string
 }
 
+/** Texte, die ins PDF geschrieben werden; die App übergibt sie in der UI-Sprache. */
+export interface PdfLabels {
+  /** BCP-47-Sprache für Datumsangaben, z. B. 'de' oder 'en' */
+  locale: string
+  imageCount: (count: number) => string
+  author: (name: string) => string
+  createdWith: string
+  commentFooter: (page: number, total: number) => string
+}
+
+const DEFAULT_PDF_LABELS: PdfLabels = {
+  locale: 'de-DE',
+  imageCount: (count) => `${count} Bild${count !== 1 ? 'er' : ''}`,
+  author: (name) => `Autor: ${name}`,
+  createdWith: 'Erstellt mit Kodini Tools',
+  commentFooter: (page, total) =>
+    `Erstellt am ${new Date().toLocaleDateString('de-DE')} • Kommentarseite ${page}${total > 1 ? ` von ${total}` : ''}`,
+}
+
 export interface PdfExportSettings {
   title?: string
   author?: string
@@ -85,6 +104,8 @@ export interface PdfExportSettings {
   imageQuality?: number // JPEG Qualität: 0.0 (niedrig) bis 1.0 (hoch), default 0.75
   maxImageDimension?: number // Maximale Breite/Höhe in Pixel, default 1920
   orientation?: 'portrait' | 'landscape'
+  /** Übersetzte PDF-Texte; fehlende Einträge fallen auf Deutsch zurück */
+  labels?: Partial<PdfLabels>
 }
 
 // ============================================================================
@@ -118,6 +139,7 @@ export async function exportMultipleImagesAsPdf(
     optimizeSize = false,
     orientation = 'portrait',
   } = settings
+  const labels: PdfLabels = { ...DEFAULT_PDF_LABELS, ...settings.labels }
 
   // Bestimme JPEG-Qualität:
   // - Wenn imageQuality gesetzt ist, verwende diesen Wert
@@ -160,7 +182,7 @@ export async function exportMultipleImagesAsPdf(
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
     console.log('📋 Erstelle automatische Titel-Seite...')
-    createTitlePage(pdf, title, images.length, author)
+    createTitlePage(pdf, title, images.length, labels, author)
     pageAdded = true
   }
 
@@ -182,7 +204,8 @@ export async function exportMultipleImagesAsPdf(
       elementsWithPages,
       jpegQuality,
       maxImageDimension,
-      orientation
+      orientation,
+      labels
     )
     pageAdded = true
   }
@@ -546,7 +569,13 @@ function assignPageNumbersIfMissing(elements: CanvasElement[]): CanvasElement[] 
 /**
  * Erstellt eine automatische Titel-Seite
  */
-function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?: string): void {
+function createTitlePage(
+  pdf: jsPDF,
+  title: string,
+  imageCount: number,
+  labels: PdfLabels,
+  author?: string
+): void {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
 
@@ -561,7 +590,7 @@ function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?:
   pdf.setFontSize(18)
   pdf.setFont('helvetica', 'normal')
   pdf.setTextColor(60, 60, 60)
-  const countText = `${imageCount} Bild${imageCount !== 1 ? 'er' : ''}`
+  const countText = labels.imageCount(imageCount)
   const countWidth = pdf.getTextWidth(countText)
   pdf.text(countText, (pageWidth - countWidth) / 2, pageHeight / 3 + 20)
 
@@ -569,7 +598,7 @@ function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?:
   if (author) {
     pdf.setFontSize(14)
     pdf.setTextColor(120, 120, 120)
-    const authorText = `Autor: ${author}`
+    const authorText = labels.author(author)
     const authorWidth = pdf.getTextWidth(authorText)
     pdf.text(authorText, (pageWidth - authorWidth) / 2, pageHeight / 3 + 35)
   }
@@ -577,7 +606,7 @@ function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?:
   // Date
   pdf.setFontSize(12)
   pdf.setTextColor(150, 150, 150)
-  const dateText = new Date().toLocaleDateString('de-DE', {
+  const dateText = new Date().toLocaleDateString(labels.locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -588,7 +617,7 @@ function createTitlePage(pdf: jsPDF, title: string, imageCount: number, author?:
   // Footer
   pdf.setFontSize(10)
   pdf.setTextColor(180, 180, 180)
-  const footer = 'Erstellt mit Kodini Tools'
+  const footer = labels.createdWith
   const footerWidth = pdf.getTextWidth(footer)
   pdf.text(footer, (pageWidth - footerWidth) / 2, pageHeight - 20)
 }
@@ -602,7 +631,8 @@ async function createCommentPagesFromElements(
   elements: CanvasElement[],
   jpegQuality: number,
   maxImageDimension: number,
-  orientation: 'portrait' | 'landscape' = 'portrait'
+  orientation: 'portrait' | 'landscape' = 'portrait',
+  labels: PdfLabels = DEFAULT_PDF_LABELS
 ): Promise<void> {
   if (elements.length === 0) return
 
@@ -644,7 +674,8 @@ async function createCommentPagesFromElements(
       pageNumbers.length,
       jpegQuality,
       maxImageDimension,
-      orientation
+      orientation,
+      labels
     )
   }
 }
@@ -659,7 +690,8 @@ async function renderSingleCommentPage(
   totalPages: number,
   jpegQuality: number,
   maxImageDimension: number,
-  orientation: 'portrait' | 'landscape' = 'portrait'
+  orientation: 'portrait' | 'landscape' = 'portrait',
+  labels: PdfLabels = DEFAULT_PDF_LABELS
 ): Promise<void> {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
@@ -691,8 +723,7 @@ async function renderSingleCommentPage(
   // Footer mit Seiten-Nummer
   pdf.setFontSize(9)
   pdf.setTextColor(150, 150, 150)
-  const dateStr = new Date().toLocaleDateString('de-DE')
-  const footerText = `Erstellt am ${dateStr} • Kommentarseite ${pageNumber}${totalPages > 1 ? ` von ${totalPages}` : ''}`
+  const footerText = labels.commentFooter(pageNumber, totalPages)
   pdf.text(footerText, (pageWidth - pdf.getTextWidth(footerText)) / 2, pageHeight - 10)
 }
 

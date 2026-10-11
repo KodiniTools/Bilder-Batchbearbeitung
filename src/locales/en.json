@@ -198,7 +198,10 @@
   },
   "accessibility": {
     "dropzone": "Drag files here or click to select images",
-    "scrollToTop": "Scroll to top"
+    "scrollToTop": "Scroll to top",
+    "close": "Close",
+    "previousImage": "Previous image",
+    "nextImage": "Next image"
   },
   "loading": {
     "text": "Please wait…",
@@ -247,7 +250,8 @@
     "confirmDeletePage": "Do you really want to delete page {page}?",
     "downloadError": "Error creating the image: {error}",
     "unknownError": "Unknown error",
-    "confirmClearPage": "Do you really want to delete all elements from page {page}?"
+    "confirmClearPage": "Do you really want to delete all elements from page {page}?",
+    "invalidFormat": "Invalid format"
   },
   "consent": {
     "text": "We use anonymous usage statistics to improve the app. May we collect this data?",
@@ -402,7 +406,8 @@
       "images": "images",
       "selectedImage": "selected image",
       "selectedImages": "selected images"
-    }
+    },
+    "moreElements": "+{count} more"
   },
   "frontPageDesigner": {
     "title": "Design Front Page",
@@ -445,8 +450,7 @@
       "noSelection": "Select an element to edit it"
     },
     "footer": {
-      "elementCount": "{count} Element",
-      "elementCount_plural": "{count} Elements",
+      "elementCount": "{count} element | {count} elements",
       "cancel": "Cancel",
       "save": "Save"
     },
@@ -459,7 +463,9 @@
       "zoomOut": "Zoom out",
       "zoomIn": "Zoom in",
       "reset": "Reset zoom"
-    }
+    },
+    "previewTitle": "Preview — Front page",
+    "confirmOrientationReset": "The orientation has changed. Reset elements?"
   },
   "commentPageDesigner": {
     "title": "Comment Page Designer (Multi-Page)",
@@ -467,8 +473,7 @@
     "pageManagement": {
       "title": "Manage Pages",
       "pageOf": "Page {current} of {total}",
-      "elementCount": "{count} Element",
-      "elementCount_plural": "{count} Elements",
+      "elementCount": "{count} element | {count} elements",
       "previousPage": "Previous Page",
       "nextPage": "Next Page",
       "pageTitle": "Page {number}",
@@ -529,7 +534,8 @@
     "element": {
       "singular": "Element",
       "plural": "Elements"
-    }
+    },
+    "previewTitle": "Preview — Comment pages"
   },
   "imageEditor": {
     "title": "Edit Image",
@@ -1026,5 +1032,22 @@
     "subtitle": "Posts from the KodiniTools blog about the batch image editor. Articles open in a new tab.",
     "readArticle": "Read article",
     "minutes": "{count} min"
+  },
+  "designer": {
+    "orientation": {
+      "portrait": "▯ Portrait",
+      "landscape": "⬛ Landscape"
+    },
+    "preview": "Preview",
+    "closeAndContinue": "Close & keep editing",
+    "save": "Save",
+    "commentFooter": "Created on {date} • Comment page {page}",
+    "commentFooterOf": "Created on {date} • Comment page {page} of {total}"
+  },
+  "pdfExport": {
+    "defaultTitle": "Image collection",
+    "imageCount": "{count} image | {count} images",
+    "author": "Author: {name}",
+    "createdWith": "Created with Kodini Tools"
   }
 }

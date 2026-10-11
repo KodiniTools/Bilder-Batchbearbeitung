@@ -17,9 +17,9 @@
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              Vorschau — Kommentarseiten
+              {{ t('commentPageDesigner.previewTitle') }}
               <span class="orientation-badge" :class="orientation">
-                {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+                {{ t(`designer.orientation.${orientation}`) }}
               </span>
             </div>
 
@@ -43,7 +43,12 @@
                 </svg>
               </button>
               <span class="preview-page-info">
-                Seite {{ previewPageIndex + 1 }} von {{ pages.length }}
+                {{
+                  t('commentPageDesigner.pageManagement.pageOf', {
+                    current: previewPageIndex + 1,
+                    total: pages.length,
+                  })
+                }}
               </span>
               <button
                 :disabled="previewPageIndex === pages.length - 1"
@@ -131,8 +136,7 @@
 
                 <!-- Footer-Vorschau wie im Editor -->
                 <div class="canvas-footer-preview">
-                  {{ new Date().toLocaleDateString('de-DE') }} · Kommentarseite
-                  {{ previewPageIndex + 1 }}{{ pages.length > 1 ? ` von ${pages.length}` : '' }}
+                  {{ footerText }}
                 </div>
               </div>
               <div
@@ -151,13 +155,15 @@
               v-for="(page, i) in pages"
               :key="page.id"
               :class="['preview-dot', { active: i === previewPageIndex }]"
-              :title="`Seite ${i + 1}`"
+              :title="t('commentPageDesigner.pageManagement.pageTitle', { number: i + 1 })"
               @click="previewPageIndex = i"
             ></button>
           </div>
 
           <div class="preview-footer">
-            <button class="btn-secondary" @click="close">Schließen &amp; weiter bearbeiten</button>
+            <button class="btn-secondary" @click="close">
+              {{ t('designer.closeAndContinue') }}
+            </button>
             <button class="btn-primary" @click="save">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +176,7 @@
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              Speichern
+              {{ t('designer.save') }}
             </button>
           </div>
         </div>
@@ -181,8 +187,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 import type { CommentPage } from '@/composables/useCommentPages'
+import { commentFooterText } from '@/utils/i18nFormat'
 
 const props = defineProps<{
   modelValue: boolean
@@ -200,6 +208,11 @@ const emit = defineEmits<{
 }>()
 
 const previewPageIndex = ref(0)
+
+const { t, locale } = useI18n()
+const footerText = computed(() =>
+  commentFooterText(t, locale.value, previewPageIndex.value + 1, props.pages.length)
+)
 
 // Jump to the requested page each time the preview is opened
 watch(

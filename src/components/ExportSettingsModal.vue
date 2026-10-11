@@ -115,7 +115,11 @@
                       </span>
                     </li>
                     <li v-if="settings.frontPageElements.length > 3" class="more-indicator">
-                      +{{ settings.frontPageElements.length - 3 }} weitere
+                      {{
+                        t('exportModal.moreElements', {
+                          count: settings.frontPageElements.length - 3,
+                        })
+                      }}
                     </li>
                   </ul>
                 </div>
@@ -206,7 +210,11 @@
                       </span>
                     </li>
                     <li v-if="settings.commentPageElements.length > 3" class="more-indicator">
-                      +{{ settings.commentPageElements.length - 3 }} weitere
+                      {{
+                        t('exportModal.moreElements', {
+                          count: settings.commentPageElements.length - 3,
+                        })
+                      }}
                     </li>
                   </ul>
                 </div>
@@ -297,26 +305,20 @@
                   </option>
                 </select>
                 <p class="setting-hint">
-                  {{
-                    t('exportModal.svg.qualityHint') ||
-                    'Höhere Qualität skaliert kleine Bilder vor der Vektorisierung hoch – schärfere Konturen, etwas größere Dateien.'
-                  }}
+                  {{ t('exportModal.svg.qualityHint') }}
                 </p>
               </div>
 
               <div class="setting-group">
                 <SliderRow
                   v-model="settings.svgFilterSpeckle"
-                  :label="t('exportModal.svg.detail') || 'Detailgrad'"
+                  :label="t('exportModal.svg.detail')"
                   :min="1"
                   :max="32"
                   :default="4"
                 />
                 <p class="setting-hint">
-                  {{
-                    t('exportModal.svg.detailHint') ||
-                    'Niedriger = mehr Details, Höher = glattere Kurven'
-                  }}
+                  {{ t('exportModal.svg.detailHint') }}
                 </p>
               </div>
 
@@ -333,10 +335,7 @@
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
                 <span>
-                  {{
-                    t('exportModal.svg.info') ||
-                    'SVG-Vektorisierung funktioniert am besten bei Logos, Icons und einfachen Grafiken.'
-                  }}
+                  {{ t('exportModal.svg.info') }}
                 </span>
               </div>
             </template>

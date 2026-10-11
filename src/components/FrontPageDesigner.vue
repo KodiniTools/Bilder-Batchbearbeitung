@@ -23,7 +23,7 @@
                 <p>
                   {{ t('frontPageDesigner.subtitle') }}
                   <span class="orientation-badge" :class="orientation">
-                    {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+                    {{ t(`designer.orientation.${orientation}`) }}
                   </span>
                 </p>
               </div>
@@ -200,7 +200,13 @@
           <!-- Footer -->
           <div class="designer-footer">
             <div class="element-count">
-              {{ elements.length === 1 ? '1 Element' : `${elements.length} Elemente` }}
+              {{
+                t(
+                  'frontPageDesigner.footer.elementCount',
+                  { count: elements.length },
+                  elements.length
+                )
+              }}
             </div>
             <div class="footer-actions">
               <button class="btn-secondary" @click="closeDesigner">
@@ -223,7 +229,7 @@
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
-                Vorschau
+                {{ t('designer.preview') }}
               </button>
               <button class="btn-primary" @click="saveAndClose">
                 <svg
@@ -263,9 +269,9 @@
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              Vorschau — Startseite
+              {{ t('frontPageDesigner.previewTitle') }}
               <span class="orientation-badge" :class="orientation">
-                {{ orientation === 'landscape' ? '⬛ Querformat' : '▯ Hochformat' }}
+                {{ t(`designer.orientation.${orientation}`) }}
               </span>
             </div>
             <button class="preview-close-btn" @click="showPreview = false">
@@ -335,7 +341,7 @@
           </div>
           <div class="preview-footer">
             <button class="btn-secondary" @click="showPreview = false">
-              Schließen &amp; weiter bearbeiten
+              {{ t('designer.closeAndContinue') }}
             </button>
             <button class="btn-primary" @click="saveFromPreview">
               <svg
@@ -349,7 +355,7 @@
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              Speichern
+              {{ t('designer.save') }}
             </button>
           </div>
         </div>
@@ -466,7 +472,7 @@ watch(
   () => props.orientation,
   () => {
     if (elements.value.length > 0) {
-      if (confirm('Die Orientierung hat sich geändert. Elemente zurücksetzen?')) {
+      if (confirm(t('frontPageDesigner.confirmOrientationReset'))) {
         elements.value = []
         selectedElementId.value = null
       }

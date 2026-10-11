@@ -33,8 +33,9 @@ import {
   type SvgProgressCallback,
 } from '@/lib/features/export-svg'
 import { readStoredTheme, applyTheme } from '@/utils/theme'
+import { commentFooterText, dateLocale } from '@/utils/i18nFormat'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const imageStore = useImageStore()
 const toast = useToast()
 
@@ -154,7 +155,7 @@ async function handleExportSvg() {
 
   const isAvailable = await checkSvgServiceAvailable()
   if (!isAvailable) {
-    alert(t('alerts.svgServiceUnavailable') || 'Der SVG-Konvertierungsservice ist nicht verfügbar.')
+    alert(t('alerts.svgServiceUnavailable'))
     return
   }
 
@@ -200,7 +201,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       await exportMultipleImagesAsPdf(
         imageDataArray,
         {
-          title: 'Bildersammlung',
+          title: t('pdfExport.defaultTitle'),
           author: settings.author || '',
           includeCustomFrontPage: useCustomFrontPage,
           frontPageElements: useCustomFrontPage ? settings.frontPageElements : [],
@@ -210,6 +211,13 @@ async function handleExportConfirm(settings: ExportSettings) {
           includeFileName: true,
           includeImages: true,
           orientation: settings.orientation || 'portrait',
+          labels: {
+            locale: dateLocale(locale.value),
+            imageCount: (count) => t('pdfExport.imageCount', { count }, count),
+            author: (name) => t('pdfExport.author', { name }),
+            createdWith: t('pdfExport.createdWith'),
+            commentFooter: (page, total) => commentFooterText(t, locale.value, page, total),
+          },
         },
         'bilder-export.pdf'
       )
@@ -280,10 +288,7 @@ async function handleExportConfirm(settings: ExportSettings) {
             onSvgProgress
           )
         }
-        toast.success(
-          t('toast.svgSuccess', { count: total }) ||
-            `${total} Bilder erfolgreich als SVG exportiert`
-        )
+        toast.success(t('toast.svgSuccess', { count: total }))
         showWizard('svg', total)
       } finally {
         loadingIndicator.value?.hide()

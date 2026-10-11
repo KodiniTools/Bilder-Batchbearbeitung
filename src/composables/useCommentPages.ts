@@ -141,7 +141,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
     const newElement: CanvasElement = {
       id: generateId(),
       type: 'text',
-      content: 'Neuer Text',
+      content: t('frontPageDesigner.element.text.default'),
       x: Math.random() * (pageWidth.value - 350),
       y: Math.random() * (pageHeight.value - 100),
       width: 300,
