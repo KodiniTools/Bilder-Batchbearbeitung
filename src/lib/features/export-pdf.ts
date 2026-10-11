@@ -1,5 +1,15 @@
 import jsPDF, { GState } from 'jspdf'
 import { applyPdfFont, registerPdfFonts, toPdfFontStyle, type PdfFontStyle } from './pdf-fonts'
+import type { WatermarkSettings } from '@/lib/core/types'
+
+/**
+ * Wasserzeichen im PDF: dieselben Felder wie das Bild-Wasserzeichen
+ * (fontSize in px bei 96 DPI, opacity 0–100, rotation im Uhrzeigersinn),
+ * optional zusätzlich ein Logo als Daten-URL.
+ */
+export interface PdfWatermark extends WatermarkSettings {
+  logoDataUrl?: string
+}
 
 /**
  * 🎨 VOLLSTÄNDIGE PDF-EXPORT-LÖSUNG
@@ -139,6 +149,8 @@ export interface PdfExportSettings {
   pageNumbers?: boolean
   /** PDF-Lesezeichen für Startseite, Kommentarseiten und Bilder, Standard an */
   bookmarks?: boolean
+  /** Wasserzeichen auf allen Seiten (Text und/oder Logo) */
+  watermark?: PdfWatermark
   /** Übersetzte PDF-Texte; fehlende Einträge fallen auf Deutsch zurück */
   labels?: Partial<PdfLabels>
   /** Fortschritt in Arbeitsschritten (Startseite, je Kommentarseite, je Bild) */
@@ -221,6 +233,7 @@ export async function buildPdfDocument(
     footer = '',
     pageNumbers = false,
     bookmarks = true,
+    watermark,
     onProgress,
     signal,
     onImageError,
@@ -256,9 +269,18 @@ export async function buildPdfDocument(
   // Eigene Schriften (Startseite + Kommentarseiten) vorab laden und einbetten
   const hasCoverPage = includeCustomFrontPage && frontPageElements.length > 0
   const hasCommentPages = includeCommentPages && commentPageElements.length > 0
+  const hasWatermarkText = Boolean(watermark?.enabled && watermark.text.trim())
   const fonts = await registerPdfFonts(pdf, [
     ...(hasCoverPage ? elementFontUsages(frontPageElements) : []),
     ...(hasCommentPages ? elementFontUsages(commentPageElements) : []),
+    ...(hasWatermarkText && watermark
+      ? [
+          {
+            fontFamily: watermark.fontFamily,
+            style: toPdfFontStyle(watermark.bold, watermark.italic),
+          },
+        ]
+      : []),
   ])
 
   // Fortschritt: ein Schritt je Startseite, Kommentarseite und Bild
@@ -471,6 +493,10 @@ export async function buildPdfDocument(
     date: new Date().toLocaleDateString(labels.locale),
     pageNumberText: labels.pageNumber,
   })
+
+  if (watermark?.enabled) {
+    await renderWatermark(pdf, watermark, fonts)
+  }
 
   if (bookmarks) {
     for (const entry of outline) {
@@ -859,6 +885,177 @@ function renderHeaderFooter(
   }
 }
 
+// ============================================================================
+// WASSERZEICHEN
+// ============================================================================
+
+/** Breite des Logo-Wasserzeichens als Anteil der Seitenbreite */
+const WATERMARK_LOGO_SHARE = 0.25
+
+/**
+ * Ankerpunkte (Mitte des Wasserzeichens) in mm, wie beim Bild-Wasserzeichen:
+ * Ecken bei 15 %/10 % bzw. 85 %/90 %, Kacheln als Raster über die Diagonale.
+ */
+export function watermarkAnchors(
+  position: WatermarkSettings['position'],
+  pageWidth: number,
+  pageHeight: number,
+  tileSpacing: { x: number; y: number } = { x: 80, y: 40 }
+): { x: number; y: number }[] {
+  switch (position) {
+    case 'top-left':
+      return [{ x: pageWidth * 0.15, y: pageHeight * 0.1 }]
+    case 'top-right':
+      return [{ x: pageWidth * 0.85, y: pageHeight * 0.1 }]
+    case 'bottom-left':
+      return [{ x: pageWidth * 0.15, y: pageHeight * 0.9 }]
+    case 'bottom-right':
+      return [{ x: pageWidth * 0.85, y: pageHeight * 0.9 }]
+    case 'tile': {
+      const anchors: { x: number; y: number }[] = []
+      const sx = Math.max(10, tileSpacing.x)
+      const sy = Math.max(10, tileSpacing.y)
+      for (let y = sy / 2; y < pageHeight + sy; y += sy) {
+        // Jede zweite Reihe versetzt, damit gedrehter Text die Fläche gleichmäßig deckt
+        const offset = Math.round(y / sy) % 2 === 0 ? 0 : sx / 2
+        for (let x = offset; x < pageWidth + sx; x += sx) anchors.push({ x, y })
+      }
+      return anchors
+    }
+    case 'center':
+    default:
+      return [{ x: pageWidth / 2, y: pageHeight / 2 }]
+  }
+}
+
+/**
+ * PNG und JPEG direkt übernehmen (PNG behält die Transparenz des Logos),
+ * andere Formate (WebP, SVG …) per Canvas in PNG umwandeln.
+ */
+function toPdfImageDataUrl(dataUrl: string): Promise<string> {
+  if (/^data:image\/(png|jpe?g);/i.test(dataUrl)) return Promise.resolve(dataUrl)
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth || img.width
+      canvas.height = img.naturalHeight || img.height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('Canvas-Context fehlt'))
+        return
+      }
+      ctx.drawImage(img, 0, 0)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => reject(new Error('Logo konnte nicht geladen werden'))
+    img.src = dataUrl
+  })
+}
+
+/** Text zentriert um (cx, cy) und im Uhrzeigersinn um `rotation` Grad gedreht schreiben. */
+function rotatedCenteredText(
+  pdf: jsPDF,
+  text: string,
+  cx: number,
+  cy: number,
+  rotation: number,
+  fontSizeMm: number
+): void {
+  const width = pdf.getTextWidth(text)
+  const rad = (rotation * Math.PI) / 180
+  // Lokale Startposition: halbe Breite links, Grundlinie ≈ 0,35 Schriftgrößen unter der Mitte
+  const lx = -width / 2
+  const ly = fontSizeMm * 0.35
+  const x = cx + Math.cos(rad) * lx - Math.sin(rad) * ly
+  const y = cy + Math.sin(rad) * lx + Math.cos(rad) * ly
+  // jsPDF dreht gegen den Uhrzeigersinn
+  pdf.text(text, x, y, { angle: -rotation })
+}
+
+/** Wasserzeichen (Text und/oder Logo) auf jede Seite legen. */
+async function renderWatermark(
+  pdf: jsPDF,
+  watermark: PdfWatermark,
+  fonts: ReadonlySet<string>
+): Promise<void> {
+  const text = watermark.text.trim()
+  const logo = watermark.logoDataUrl
+  if (!text && !logo) return
+
+  const opacity = clamp(watermark.opacity, 0, 100) / 100
+  const rotation = clamp(watermark.rotation, -180, 180)
+  const fontSizePx = clamp(watermark.fontSize, 10, 200)
+  const fontSizePt = fontSizePx * 0.75
+  const fontSizeMm = fontSizePt * PT_TO_MM
+  const color = hexToRgb(watermark.color) ?? { r: 255, g: 255, b: 255 }
+
+  let logoData: { src: string; format: string; aspect: number } | null = null
+  if (logo) {
+    try {
+      const src = await toPdfImageDataUrl(logo)
+      const props = pdf.getImageProperties(src)
+      logoData = {
+        src,
+        format: src.startsWith('data:image/png') ? 'PNG' : 'JPEG',
+        aspect: props.width / props.height,
+      }
+    } catch (error) {
+      console.error('❌ Wasserzeichen-Logo konnte nicht geladen werden:', error)
+    }
+  }
+
+  const total = pdf.getNumberOfPages()
+  for (let page = 1; page <= total; page++) {
+    pdf.setPage(page)
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+
+    pdf.saveGraphicsState()
+    pdf.setGState(new GState({ opacity, 'stroke-opacity': opacity }))
+
+    if (text) {
+      applyPdfFont(
+        pdf,
+        watermark.fontFamily,
+        toPdfFontStyle(watermark.bold, watermark.italic),
+        fonts
+      )
+      pdf.setFontSize(fontSizePt)
+      pdf.setTextColor(color.r, color.g, color.b)
+      const textWidth = pdf.getTextWidth(text)
+      // Abstände wie beim Bild-Wasserzeichen: Breite + 2,5 Schriftgrößen, Zeilen 4 Schriftgrößen
+      const anchors = watermarkAnchors(watermark.position, pageWidth, pageHeight, {
+        x: textWidth + fontSizeMm * 2.5,
+        y: fontSizeMm * 4,
+      })
+      for (const a of anchors) rotatedCenteredText(pdf, text, a.x, a.y, rotation, fontSizeMm)
+    }
+
+    if (logoData) {
+      const w = pageWidth * WATERMARK_LOGO_SHARE
+      const h = w / logoData.aspect
+      const anchors = watermarkAnchors(watermark.position, pageWidth, pageHeight, {
+        x: w * 1.6,
+        y: h * 1.6,
+      })
+      for (const a of anchors) {
+        pdf.addImage(
+          logoData.src,
+          logoData.format,
+          a.x - w / 2,
+          a.y - h / 2,
+          w,
+          h,
+          'pdf-watermark-logo'
+        )
+      }
+    }
+
+    pdf.restoreGraphicsState()
+  }
+}
+
 /** Wirft einen AbortError, wenn der Export abgebrochen wurde. */
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
@@ -886,6 +1083,9 @@ export interface ExportSettings {
   footer?: string
   pageNumbers?: boolean
   bookmarks?: boolean
+  watermark?: WatermarkSettings
+  /** Logo für das PDF-Wasserzeichen (Daten-URL) */
+  watermarkLogo?: string
   includeCustomFrontPage?: boolean
   frontPageElements?: PdfElement[]
   includeCommentPages?: boolean

@@ -3,11 +3,13 @@ import { ref, computed } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import HistoryActions from './HistoryActions.vue'
 
 const imageStore = useImageStore()
 const { t } = useI18n()
 const toast = useToast()
+const dialog = useConfirm()
 
 const hasSelection = computed(() => imageStore.hasSelection)
 
@@ -38,9 +40,14 @@ const handleSelectAll = () => {
   imageStore.selectAllImages()
 }
 
-const handleDelete = () => {
+const handleDelete = async () => {
   const count = imageStore.selectedCount
-  if (!confirm(t('alerts.confirmDelete', { count }))) {
+  const ok = await dialog.confirm({
+    message: t('alerts.confirmDelete', { count }),
+    confirmLabel: t('dialog.delete'),
+    danger: true,
+  })
+  if (!ok) {
     return
   }
   imageStore.removeSelectedImages()

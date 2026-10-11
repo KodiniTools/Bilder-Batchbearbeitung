@@ -397,6 +397,14 @@
       "bookmarks": {
         "label": "Create bookmarks",
         "description": "Table of contents in the PDF viewer for cover, comment pages and images"
+      },
+      "watermark": {
+        "title": "Watermark",
+        "logo": "Logo (optional)",
+        "chooseLogo": "Choose logo",
+        "replaceLogo": "Replace",
+        "removeLogo": "Remove",
+        "hint": "The watermark appears on every PDF page. The logo is not rotated."
       }
     },
     "zip": {
@@ -1119,5 +1127,15 @@
     "bookmarkCover": "Cover",
     "bookmarkComment": "Comment page {page}",
     "bookmarkImage": "Image {index}"
+  },
+  "dialog": {
+    "cancel": "Cancel",
+    "ok": "OK",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "clear": "Clear",
+    "reset": "Reset",
+    "keep": "Keep",
+    "title": "Please confirm"
   }
 }
