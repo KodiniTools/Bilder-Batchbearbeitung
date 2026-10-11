@@ -436,17 +436,18 @@
       </div>
     </Transition>
 
-    <!-- ✨ NEU: Front Page Designer Modal -->
-    <FrontPageDesigner
+    <!-- Ein Designer für Startseite (cover) und Kommentarseiten (comment) -->
+    <PdfPageDesigner
       v-model="showFrontPageDesigner"
+      mode="cover"
       :initial-elements="settings.frontPageElements"
       :orientation="settings.orientation || 'portrait'"
       @save="handleFrontPageDesignerSave"
     />
 
-    <!-- ✨ Comment Page Designer Modal -->
-    <CommentPageDesigner
+    <PdfPageDesigner
       v-model="showCommentPageDesigner"
+      mode="comment"
       :initial-elements="settings.commentPageElements"
       :orientation="settings.orientation || 'portrait'"
       @save="handleCommentPageDesignerSave"
@@ -455,13 +456,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import FrontPageDesigner from './FrontPageDesigner.vue'
-import CommentPageDesigner from './CommentPageDesigner.vue'
+import PdfPageDesigner from './pdf-designer/PdfPageDesigner.vue'
 import SliderRow from './SliderRow.vue'
-import type { FrontPageElement } from './FrontPageDesigner.vue'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
@@ -489,11 +488,11 @@ const settings = reactive({
 
   // ✨ NEU: Startseite
   includeCustomFrontPage: false,
-  frontPageElements: [] as FrontPageElement[],
+  frontPageElements: [] as PdfElement[],
 
   // Kommentarseite
   includeCommentPages: false,
-  commentPageElements: [] as CanvasElement[],
+  commentPageElements: [] as PdfElement[],
 
   // ZIP/Save Settings
   zipName: 'bilder-export',
@@ -509,10 +508,24 @@ const settings = reactive({
 })
 
 // ✨ NEU: Front Page Designer Save Handler
-function handleFrontPageDesignerSave(elements: FrontPageElement[]) {
+function handleFrontPageDesignerSave(elements: PdfElement[]) {
   settings.frontPageElements = elements
   console.log('✅ Startseiten-Elemente gespeichert:', elements.length)
 }
+
+// Startseiten-Layout passt nach einem Orientierungswechsel nicht mehr: Zurücksetzen anbieten
+// (wie bisher im FrontPageDesigner)
+watch(
+  () => settings.orientation,
+  () => {
+    if (
+      settings.frontPageElements.length > 0 &&
+      confirm(t('frontPageDesigner.confirmOrientationReset'))
+    ) {
+      settings.frontPageElements = []
+    }
+  }
+)
 
 // ✨ NEU: Clear Front Page Elements
 function clearFrontPageElements() {
@@ -522,7 +535,7 @@ function clearFrontPageElements() {
 }
 
 // Comment Page Designer Save Handler
-function handleCommentPageDesignerSave(elements: CanvasElement[]) {
+function handleCommentPageDesignerSave(elements: PdfElement[]) {
   settings.commentPageElements = elements
   console.log('✅ Kommentarseiten-Elemente gespeichert:', elements.length)
 }

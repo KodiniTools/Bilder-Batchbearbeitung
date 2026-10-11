@@ -122,12 +122,12 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { CommentPage } from '@/composables/useCommentPages'
+import type { PdfPage } from '@/composables/usePdfPages'
 
 const { t } = useI18n()
 
 defineProps<{
-  pages: CommentPage[]
+  pages: PdfPage[]
   currentPageIndex: number
   /** Anzahl Elemente auf der aktuellen Seite */
   elementCount: number

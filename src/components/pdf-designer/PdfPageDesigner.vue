@@ -3,16 +3,17 @@
     <Transition name="modal">
       <div v-if="modelValue" class="modal-overlay" @click.self="handleClose">
         <div class="designer-modal">
-          <CommentPageDesignerHeader
+          <PdfDesignerHeader
+            :title="isCover ? t('frontPageDesigner.title') : t('commentPageDesigner.title')"
             :orientation="orientation"
-            :page-count="pages.length"
+            :page-count="isCover ? undefined : pages.length"
             @close="handleClose"
           />
 
           <div class="modal-body">
             <!-- Left Sidebar - Tools & Settings -->
             <div class="sidebar">
-              <CommentPageDesignerTools
+              <PdfDesignerTools
                 :element-count="currentElements.length"
                 @add-text="addTextElement"
                 @add-image="triggerImageUpload"
@@ -27,7 +28,7 @@
               />
 
               <!-- Element Properties -->
-              <CommentPageDesignerProperties
+              <PdfDesignerProperties
                 v-if="selectedElement"
                 :element="selectedElement"
                 :page-width="pageWidth"
@@ -59,7 +60,8 @@
 
             <!-- Canvas Area -->
             <div class="canvas-area">
-              <CommentPageDesignerPageToolbar
+              <PdfDesignerPageToolbar
+                v-if="!isCover"
                 :pages="pages"
                 :current-page-index="currentPageIndex"
                 :element-count="currentElements.length"
@@ -70,7 +72,7 @@
                 @delete-page="deletePage"
               />
 
-              <CommentPageDesignerZoomControls
+              <PdfDesignerZoomControls
                 :zoom-level="zoomLevel"
                 @zoom-in="zoomIn"
                 @zoom-out="zoomOut"
@@ -99,12 +101,12 @@
                     @mousedown="handleCanvasClick"
                   >
                     <!-- PDF Footer Preview (shows what will appear in exported PDF) -->
-                    <div class="canvas-footer-preview">
+                    <div v-if="!isCover" class="canvas-footer-preview">
                       {{ footerPreviewText }}
                     </div>
 
                     <!-- Render elements for current page -->
-                    <CommentPageDesignerElement
+                    <PdfDesignerElement
                       v-for="element in currentElements"
                       :key="element.id"
                       :element="element"
@@ -122,9 +124,8 @@
             </div>
           </div>
 
-          <CommentPageDesignerFooter
-            :current-page-index="currentPageIndex"
-            :page-count="pages.length"
+          <PdfDesignerFooter
+            :info-text="footerInfoText"
             :total-element-count="getTotalElementCount()"
             @cancel="handleClose"
             @preview="openPreview"
@@ -136,8 +137,10 @@
   </Teleport>
 
   <!-- Vorschau-Modal -->
-  <CommentPageDesignerPreview
+  <PdfDesignerPreview
     v-model="showPreview"
+    :title="isCover ? t('frontPageDesigner.previewTitle') : t('commentPageDesigner.previewTitle')"
+    :show-footer="!isCover"
     :pages="pages"
     :page-width="pageWidth"
     :page-height="pageHeight"
@@ -151,17 +154,17 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { commentFooterText } from '@/utils/i18nFormat'
-import CommentPageDesignerHeader from './comment-page-designer/CommentPageDesignerHeader.vue'
-import CommentPageDesignerTools from './comment-page-designer/CommentPageDesignerTools.vue'
-import CommentPageDesignerPageToolbar from './comment-page-designer/CommentPageDesignerPageToolbar.vue'
-import CommentPageDesignerZoomControls from './comment-page-designer/CommentPageDesignerZoomControls.vue'
-import CommentPageDesignerFooter from './comment-page-designer/CommentPageDesignerFooter.vue'
-import CommentPageDesignerElement from './comment-page-designer/CommentPageDesignerElement.vue'
-import CommentPageDesignerProperties from './comment-page-designer/CommentPageDesignerProperties.vue'
-import CommentPageDesignerPreview from './comment-page-designer/CommentPageDesignerPreview.vue'
-import { useCommentPages } from '@/composables/useCommentPages'
+import PdfDesignerHeader from './PdfDesignerHeader.vue'
+import PdfDesignerTools from './PdfDesignerTools.vue'
+import PdfDesignerPageToolbar from './PdfDesignerPageToolbar.vue'
+import PdfDesignerZoomControls from './PdfDesignerZoomControls.vue'
+import PdfDesignerFooter from './PdfDesignerFooter.vue'
+import PdfDesignerElement from './PdfDesignerElement.vue'
+import PdfDesignerProperties from './PdfDesignerProperties.vue'
+import PdfDesignerPreview from './PdfDesignerPreview.vue'
+import { usePdfPages } from '@/composables/usePdfPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t, locale } = useI18n()
 
@@ -171,20 +174,28 @@ const props = withDefaults(
     /** Sichtbarkeit des Designers (v-model) */
     modelValue?: boolean
     /** Bereits gespeicherte Elemente, werden beim Öffnen geladen */
-    initialElements?: CanvasElement[]
+    initialElements?: PdfElement[]
     orientation?: 'portrait' | 'landscape'
+    /**
+     * cover: eine einzelne Startseite (ohne Seitenverwaltung und Fußzeile);
+     * comment: beliebig viele Kommentarseiten
+     */
+    mode?: 'cover' | 'comment'
   }>(),
   {
     modelValue: false,
     initialElements: () => [],
     orientation: 'portrait',
+    mode: 'comment',
   }
 )
+
+const isCover = computed(() => props.mode === 'cover')
 
 // Emits — v-model and @save
 const emit = defineEmits<{
   'update:modelValue': [visible: boolean]
-  save: [elements: CanvasElement[]]
+  save: [elements: PdfElement[]]
 }>()
 
 // Canvas dimensions (A4 bei 96 DPI) — abhängig von Orientierung
@@ -224,7 +235,7 @@ const {
   startInlineEdit,
   stopInlineEdit,
   handleCanvasClick,
-} = useCommentPages({ pageWidth, pageHeight, imageInput, canvasRef })
+} = usePdfPages({ pageWidth, pageHeight, imageInput, canvasRef, singlePage: isCover })
 
 // Direct manipulation: drag / resize / zoom
 const {
@@ -245,7 +256,7 @@ const {
 })
 
 // Property-Panel: Teil-Patch auf das ausgewählte Element anwenden (Single Source of Truth hier)
-function updateSelectedElement(patch: Partial<CanvasElement>) {
+function updateSelectedElement(patch: Partial<PdfElement>) {
   if (selectedElement.value) Object.assign(selectedElement.value, patch)
 }
 
@@ -254,6 +265,17 @@ function updateElementContent(id: string, content: string) {
   const el = currentElements.value.find((e) => e.id === id)
   if (el) el.content = content
 }
+
+// Info links im Footer: Seitenposition (Kommentarseiten) bzw. Elementanzahl (Startseite)
+const footerInfoText = computed(() => {
+  const count = getTotalElementCount()
+  if (isCover.value) return t('frontPageDesigner.footer.elementCount', { count }, count)
+  return t('commentPageDesigner.footer.info', {
+    current: currentPageIndex.value + 1,
+    total: pages.value.length,
+    count,
+  })
+})
 
 // Footer preview text (matches PDF export footer)
 const footerPreviewText = computed(() => {
@@ -302,6 +324,9 @@ function handleKeyDown(event: KeyboardEvent) {
     event.preventDefault()
     deleteSelectedElement()
   }
+
+  // Seiten-Shortcuts nur bei mehrseitigen Kommentarseiten
+  if (isCover.value) return
 
   if (event.ctrlKey && event.key === 'ArrowLeft') {
     event.preventDefault()
@@ -432,7 +457,7 @@ onUnmounted(() => {
     margin-bottom 0.2s ease;
 }
 
-/* PDF Footer Preview — matches renderSingleCommentPage footer at pageHeight-10mm */
+/* PDF Footer Preview (nur Kommentarseiten) — entspricht der Fußzeile in renderSingleCommentPage (pageHeight − 10 mm) */
 .canvas-footer-preview {
   position: absolute;
   bottom: 30px;

@@ -116,7 +116,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { WatermarkSettings } from '@/lib/core/types'
-import { CUSTOM_FONT_FAMILIES } from '../FrontPageDesigner.vue'
+import { CUSTOM_FONT_FAMILIES } from '@/lib/core/custom-fonts'
 import SliderRow from '../SliderRow.vue'
 
 const { t } = useI18n()

@@ -1,10 +1,10 @@
 import { ref, computed, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
-export interface CommentPage {
+export interface PdfPage {
   id: string
-  elements: CanvasElement[]
+  elements: PdfElement[]
 }
 
 /** Generate a unique element / page id. */
@@ -12,7 +12,7 @@ export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2)
 }
 
-interface UseCommentPagesOptions {
+interface UsePdfPagesOptions {
   /** Current page width in px (depends on orientation). */
   pageWidth: Ref<number>
   /** Current page height in px (depends on orientation). */
@@ -21,19 +21,21 @@ interface UseCommentPagesOptions {
   imageInput: Ref<HTMLInputElement | null>
   /** The canvas element (used to detect background clicks). */
   canvasRef: Ref<HTMLElement | null>
+  /** Single-page document (cover page): no page management, all elements on page 1. */
+  singlePage?: Ref<boolean>
 }
 
 /**
- * Owns the multi-page document state of the CommentPageDesigner:
+ * Owns the page state of the PdfPageDesigner (cover page or comment pages):
  * pages, current page, selection and all element / page CRUD operations.
  */
-export function useCommentPages(options: UseCommentPagesOptions) {
-  const { pageWidth, pageHeight, imageInput, canvasRef } = options
+export function usePdfPages(options: UsePdfPagesOptions) {
+  const { pageWidth, pageHeight, imageInput, canvasRef, singlePage } = options
   const { t } = useI18n()
 
-  const pages = ref<CommentPage[]>([{ id: generateId(), elements: [] }])
+  const pages = ref<PdfPage[]>([{ id: generateId(), elements: [] }])
   const currentPageIndex = ref(0)
-  const selectedElement = ref<CanvasElement | null>(null)
+  const selectedElement = ref<PdfElement | null>(null)
   const editingTextId = ref<string | null>(null)
 
   const currentElements = computed(() => pages.value[currentPageIndex.value].elements)
@@ -44,14 +46,14 @@ export function useCommentPages(options: UseCommentPagesOptions) {
   }
 
   /** Load initial elements, distributing them across pages by their page number. */
-  function initFromElements(initialElements: CanvasElement[]) {
+  function initFromElements(initialElements: PdfElement[]) {
     selectedElement.value = null
     editingTextId.value = null
     currentPageIndex.value = 0
 
     if (initialElements && initialElements.length > 0) {
-      const elementsByPage = new Map<number, CanvasElement[]>()
-      const elements: CanvasElement[] = JSON.parse(JSON.stringify(initialElements))
+      const elementsByPage = new Map<number, PdfElement[]>()
+      const elements: PdfElement[] = JSON.parse(JSON.stringify(initialElements))
 
       elements.forEach((el) => {
         // Backward compatibility: add width/height for text elements that don't have them
@@ -59,7 +61,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
           if (!el.width) el.width = 300
           if (!el.height) el.height = 60
         }
-        const pageNum = el.page || 1
+        const pageNum = singlePage?.value ? 1 : el.page || 1
         const bucket = elementsByPage.get(pageNum)
         if (bucket) {
           bucket.push(el)
@@ -80,7 +82,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
   }
 
   /** Flatten all pages into a single element list, stamping each with its page number. */
-  function exportElements(): CanvasElement[] {
+  function exportElements(): PdfElement[] {
     return pages.value.flatMap((page, pageIndex) =>
       page.elements.map((element) => ({
         ...element,
@@ -91,6 +93,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
 
   // ── Page management ─────────────────────────────────────────────
   function addNewPage() {
+    if (singlePage?.value) return
     pages.value.push({ id: generateId(), elements: [] })
     currentPageIndex.value = pages.value.length - 1
     selectedElement.value = null
@@ -138,7 +141,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
 
   // ── Element management ──────────────────────────────────────────
   function addTextElement() {
-    const newElement: CanvasElement = {
+    const newElement: PdfElement = {
       id: generateId(),
       type: 'text',
       content: t('frontPageDesigner.element.text.default'),
@@ -176,7 +179,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
         const ratio = img.height / img.width
         const w = Math.min(img.width, maxW)
         const h = Math.round(w * ratio)
-        const newElement: CanvasElement = {
+        const newElement: PdfElement = {
           id: generateId(),
           type: 'image',
           src: result,
@@ -229,7 +232,7 @@ export function useCommentPages(options: UseCommentPagesOptions) {
   }
 
   // ── Inline text editing ─────────────────────────────────────────
-  function startInlineEdit(element: CanvasElement) {
+  function startInlineEdit(element: PdfElement) {
     if (element.type !== 'text') return
     editingTextId.value = element.id
     selectedElement.value = element

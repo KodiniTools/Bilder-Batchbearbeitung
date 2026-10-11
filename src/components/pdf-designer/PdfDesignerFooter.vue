@@ -14,15 +14,7 @@
         <line x1="12" y1="16" x2="12" y2="12"></line>
         <line x1="12" y1="8" x2="12.01" y2="8"></line>
       </svg>
-      <span>
-        {{
-          t('commentPageDesigner.footer.info', {
-            current: currentPageIndex + 1,
-            total: pageCount,
-            count: totalElementCount,
-          })
-        }}
-      </span>
+      <span>{{ infoText }}</span>
     </div>
     <div class="footer-actions">
       <button class="btn-secondary" @click="emit('cancel')">
@@ -75,8 +67,8 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 defineProps<{
-  currentPageIndex: number
-  pageCount: number
+  /** Info-Text links (Seitenposition bzw. Elementanzahl) */
+  infoText: string
   /** Elemente über alle Seiten */
   totalElementCount: number
 }>()

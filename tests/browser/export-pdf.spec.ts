@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildPdfDocument } from '@/lib/features/export-pdf'
-import type { FrontPageElement } from '@/components/FrontPageDesigner.vue'
+import { buildPdf, buildPdfDocument, type PdfElement } from '@/lib/features/export-pdf'
 
 /** Teiltransparentes PNG: links farbig, rechts transparent. */
 function transparentPng(color: string): string {
@@ -27,10 +26,11 @@ function solidCanvas(color: string): HTMLCanvasElement {
 
 describe('buildPdfDocument (Browser)', () => {
   it('erzeugt Startseite mit Text + Bild und Bildseiten mit eingebetteter Schrift', async () => {
-    const front: FrontPageElement[] = [
+    const front: PdfElement[] = [
       {
         id: 't',
         type: 'text',
+        zIndex: 1,
         x: 80,
         y: 100,
         width: 600,
@@ -38,15 +38,17 @@ describe('buildPdfDocument (Browser)', () => {
         content: 'Fotobuch',
         fontSize: 48,
         fontFamily: 'Satoshi',
-        fontWeight: 'bold',
+        bold: true,
       },
       {
         id: 'i',
         type: 'image',
+        zIndex: 0,
         x: 80,
         y: 300,
         width: 400,
-        height: 400,
+        height: 200,
+        opacity: 0.5,
         src: transparentPng('#0000ff'),
       },
     ]
@@ -73,5 +75,17 @@ describe('buildPdfDocument (Browser)', () => {
     // Startseiten-Bild + 2 Bildseiten, alle als JPEG (DCTDecode)
     expect(raw.match(/\/Filter \/DCTDecode/g)?.length).toBe(3)
     expect(raw).toContain('/FontFile2')
+    // Deckkraft des Startseiten-Bildes als ExtGState
+    expect(raw).toContain('/ca 0.5')
+  })
+
+  it('buildPdf gibt ein vollständiges PDF-Blob zurück', async () => {
+    const blob = await buildPdf([{ canvas: solidCanvas('#123456'), originalName: 'a.png' }], {
+      includeTitlePage: false,
+    })
+    expect(blob.type).toBe('application/pdf')
+    const text = new TextDecoder('latin1').decode(await blob.arrayBuffer())
+    expect(text.startsWith('%PDF-')).toBe(true)
+    expect(text.trimEnd().endsWith('%%EOF')).toBe(true)
   })
 })

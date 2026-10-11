@@ -288,30 +288,30 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SliderRow from '../SliderRow.vue'
-import { CUSTOM_FONT_FAMILIES } from '../FrontPageDesigner.vue'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import { CUSTOM_FONT_FAMILIES } from '@/lib/core/custom-fonts'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  element: CanvasElement | null
+  element: PdfElement | null
   pageWidth: number
   pageHeight: number
 }>()
 
 const emit = defineEmits<{
   /** Teil-Patch für das ausgewählte Element; der Parent wendet ihn an (kein Prop-Mutating) */
-  update: [patch: Partial<CanvasElement>]
+  update: [patch: Partial<PdfElement>]
   moveToFront: []
   moveToBack: []
   delete: []
 }>()
 
 /** Schreibbarer Proxy für ein Element-Feld: liest aus dem Prop, schreibt per update-Emit */
-function field<K extends keyof CanvasElement>(key: K) {
-  return computed<CanvasElement[K] | undefined>({
+function field<K extends keyof PdfElement>(key: K) {
+  return computed<PdfElement[K] | undefined>({
     get: () => props.element?.[key],
-    set: (value) => emit('update', { [key]: value } as Partial<CanvasElement>),
+    set: (value) => emit('update', { [key]: value } as Partial<PdfElement>),
   })
 }
 
