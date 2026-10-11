@@ -43,6 +43,28 @@ const SITE = 'https://kodinitools.com'
 
 export const blogArticles: readonly BlogArticle[] = [
   {
+    id: 'create-pdf-from-images',
+    date: '2026-10-11',
+    minutes: 6,
+    tag: { de: 'Bild', en: 'Image' },
+    url: {
+      de: `${SITE}/blog/pdf-aus-bildern-erstellen/`,
+      en: `${SITE}/en/blog/create-pdf-from-images/`,
+    },
+    image: {
+      de: `${SITE}/image/pdf-editor-de.webp`,
+      en: `${SITE}/image/pdf-editor-en.webp`,
+    },
+    title: {
+      de: 'PDF aus Bildern erstellen: Mit eigener Startseite und Kommentarseiten',
+      en: 'Create a PDF from Images: With a Custom Front Page and Comment Pages',
+    },
+    description: {
+      de: 'Bilderserie als PDF exportieren, Startseite mit Texten und Bildern frei gestalten, Kommentarseiten anlegen, Hoch- oder Querformat wählen und die Dateigrösse optimieren – ohne Upload.',
+      en: 'Export an image series as a PDF, design a front page with texts and images, add comment pages, choose portrait or landscape and optimize the file size — no upload.',
+    },
+  },
+  {
     id: 'single-image-editor',
     date: '2026-09-30',
     minutes: 7,
