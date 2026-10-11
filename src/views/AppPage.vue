@@ -12,10 +12,12 @@ import ExportSettingsModal from '@/components/ExportSettingsModal.vue'
 import BulkRenameModal from '@/components/BulkRenameModal.vue'
 import BatchEditPanel from '@/components/BatchEditPanel.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import WizardNavigator from '@/components/WizardNavigator.vue'
 import ScrollToTopButton from '@/components/ScrollToTopButton.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
@@ -39,6 +41,7 @@ import { commentFooterText, dateLocale } from '@/utils/i18nFormat'
 const { t, locale } = useI18n()
 const imageStore = useImageStore()
 const toast = useToast()
+const dialog = useConfirm()
 
 const isEditorOpen = ref(false)
 const editingImage = ref<ImageObject | null>(null)
@@ -130,7 +133,7 @@ function handleExportPdf(mode: 'all' | 'selected') {
     mode === 'all' ? imageStore.images : imageStore.images.filter((img) => img.selected)
 
   if (images.length === 0) {
-    alert(t('alerts.noImagesToExport'))
+    void dialog.alert(t('alerts.noImagesToExport'))
     return
   }
 
@@ -140,7 +143,7 @@ function handleExportPdf(mode: 'all' | 'selected') {
 
 function handleExportZip() {
   if (imageStore.imageCount === 0) {
-    alert(t('alerts.noImagesAvailable'))
+    void dialog.alert(t('alerts.noImagesAvailable'))
     return
   }
 
@@ -150,13 +153,13 @@ function handleExportZip() {
 
 async function handleExportSvg() {
   if (imageStore.imageCount === 0) {
-    alert(t('alerts.noImagesAvailable'))
+    void dialog.alert(t('alerts.noImagesAvailable'))
     return
   }
 
   const isAvailable = await checkSvgServiceAvailable()
   if (!isAvailable) {
-    alert(t('alerts.svgServiceUnavailable'))
+    void dialog.alert(t('alerts.svgServiceUnavailable'))
     return
   }
 
@@ -229,6 +232,9 @@ async function handleExportConfirm(settings: ExportSettings) {
           footer: settings.footer,
           pageNumbers: settings.pageNumbers,
           bookmarks: settings.bookmarks,
+          watermark: settings.watermark
+            ? { ...settings.watermark, logoDataUrl: settings.watermarkLogo || undefined }
+            : undefined,
           labels: {
             locale: dateLocale(locale.value),
             imageCount: (count) => t('pdfExport.imageCount', { count }, count),
@@ -423,7 +429,7 @@ async function handleSaveImages() {
   const images = imageStore.images.filter((img) => img.selected)
 
   if (images.length === 0) {
-    alert(t('alerts.noImagesToSave'))
+    void dialog.alert(t('alerts.noImagesToSave'))
     return
   }
 
@@ -433,7 +439,7 @@ async function handleSaveImages() {
 
 function handleBulkRename() {
   if (imageStore.selectedCount === 0) {
-    alert(t('alerts.noSelection'))
+    void dialog.alert(t('alerts.noSelection'))
     return
   }
   isBulkRenameModalOpen.value = true
@@ -504,14 +510,21 @@ function handleKeyboard(event: KeyboardEvent) {
   if ((event.key === 'Delete' || event.key === 'Backspace') && imageStore.hasSelection) {
     event.preventDefault()
     const count = imageStore.selectedCount
-    if (confirm(t('alerts.confirmDelete', { count }))) {
-      imageStore.removeSelectedImages()
-      if (count === 1) {
-        toast.success(t('toast.imageRemoved'))
-      } else {
-        toast.success(t('toast.imagesRemoved', { count }))
-      }
-    }
+    void dialog
+      .confirm({
+        message: t('alerts.confirmDelete', { count }),
+        confirmLabel: t('dialog.delete'),
+        danger: true,
+      })
+      .then((ok) => {
+        if (!ok) return
+        imageStore.removeSelectedImages()
+        if (count === 1) {
+          toast.success(t('toast.imageRemoved'))
+        } else {
+          toast.success(t('toast.imagesRemoved', { count }))
+        }
+      })
     return
   }
 
@@ -670,6 +683,7 @@ onUnmounted(() => {
 
     <LoadingIndicator ref="loadingIndicator" />
     <ToastContainer />
+    <ConfirmDialog />
 
     <ImageEditor
       :image="editingImage"

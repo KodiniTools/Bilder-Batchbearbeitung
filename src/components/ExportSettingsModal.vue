@@ -126,6 +126,53 @@
                 <p class="setting-hint">{{ t('exportModal.pdf.bookmarks.description') }}</p>
               </div>
 
+              <!-- Wasserzeichen (gleiche Bedienelemente wie bei den Bildern) -->
+              <div class="setting-group watermark-group">
+                <label class="group-title">{{ t('exportModal.pdf.watermark.title') }}</label>
+                <BatchWatermarkControls
+                  :watermark="settings.watermark"
+                  @update:watermark="settings.watermark = $event"
+                />
+                <div v-if="settings.watermark.enabled" class="watermark-logo">
+                  <span class="watermark-logo-label">
+                    {{ t('exportModal.pdf.watermark.logo') }}
+                  </span>
+                  <div class="watermark-logo-row">
+                    <img
+                      v-if="settings.watermarkLogo"
+                      :src="settings.watermarkLogo"
+                      alt=""
+                      class="watermark-logo-preview"
+                    />
+                    <button type="button" class="logo-btn" @click="logoInput?.click()">
+                      {{
+                        settings.watermarkLogo
+                          ? t('exportModal.pdf.watermark.replaceLogo')
+                          : t('exportModal.pdf.watermark.chooseLogo')
+                      }}
+                    </button>
+                    <button
+                      v-if="settings.watermarkLogo"
+                      type="button"
+                      class="logo-btn logo-btn--danger"
+                      @click="settings.watermarkLogo = ''"
+                    >
+                      {{ t('exportModal.pdf.watermark.removeLogo') }}
+                    </button>
+                    <input
+                      ref="logoInput"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      hidden
+                      @change="onLogoSelected"
+                    />
+                  </div>
+                  <p class="setting-hint setting-hint-flush">
+                    {{ t('exportModal.pdf.watermark.hint') }}
+                  </p>
+                </div>
+              </div>
+
               <!-- Author -->
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.author') }}:</label>
@@ -564,6 +611,9 @@ import { ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PdfPageDesigner from './pdf-designer/PdfPageDesigner.vue'
 import SliderRow from './SliderRow.vue'
+import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
+import { useConfirm } from '@/composables/useConfirm'
+import { defaultWatermark, type WatermarkSettings } from '@/lib/core/types'
 import {
   CUSTOM_PAGE_MAX_MM,
   CUSTOM_PAGE_MIN_MM,
@@ -578,6 +628,7 @@ const PAGE_FORMATS: PdfPageFormat[] = ['a4', 'a5', 'a3', 'letter', 'square', 'cu
 const IMAGES_PER_PAGE: ImagesPerPage[] = [1, 2, 4, 6, 9]
 
 const { t } = useI18n()
+const dialog = useConfirm()
 
 interface Props {
   isOpen: boolean
@@ -613,6 +664,10 @@ const settings = reactive({
   pageNumbers: false,
   bookmarks: true,
 
+  // Wasserzeichen im PDF (wie beim Bild-Wasserzeichen, Standard: grau und dezent)
+  watermark: { ...defaultWatermark, color: '#808080', opacity: 25 } as WatermarkSettings,
+  watermarkLogo: '' as string,
+
   // ✨ NEU: Startseite
   includeCustomFrontPage: false,
   frontPageElements: [] as PdfElement[],
@@ -634,6 +689,20 @@ const settings = reactive({
   svgQuality: 'high' as 'standard' | 'high' | 'ultra',
 })
 
+// Logo für das PDF-Wasserzeichen als Daten-URL laden
+const logoInput = ref<HTMLInputElement | null>(null)
+function onLogoSelected(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    if (typeof reader.result === 'string') settings.watermarkLogo = reader.result
+  }
+  reader.readAsDataURL(file)
+}
+
 // ✨ NEU: Front Page Designer Save Handler
 function handleFrontPageDesignerSave(elements: PdfElement[]) {
   settings.frontPageElements = elements
@@ -644,21 +713,25 @@ function handleFrontPageDesignerSave(elements: PdfElement[]) {
 // (wie bisher im FrontPageDesigner)
 watch(
   () => settings.orientation,
-  () => {
-    if (
-      settings.frontPageElements.length > 0 &&
-      confirm(t('frontPageDesigner.confirmOrientationReset'))
-    ) {
-      settings.frontPageElements = []
-    }
+  async () => {
+    if (settings.frontPageElements.length === 0) return
+    const reset = await dialog.confirm({
+      message: t('frontPageDesigner.confirmOrientationReset'),
+      confirmLabel: t('dialog.reset'),
+      cancelLabel: t('dialog.keep'),
+    })
+    if (reset) settings.frontPageElements = []
   }
 )
 
 // ✨ NEU: Clear Front Page Elements
-function clearFrontPageElements() {
-  if (confirm(t('exportModal.pdf.frontPage.confirmClear'))) {
-    settings.frontPageElements = []
-  }
+async function clearFrontPageElements() {
+  const ok = await dialog.confirm({
+    message: t('exportModal.pdf.frontPage.confirmClear'),
+    confirmLabel: t('dialog.delete'),
+    danger: true,
+  })
+  if (ok) settings.frontPageElements = []
 }
 
 // Comment Page Designer Save Handler
@@ -668,10 +741,13 @@ function handleCommentPageDesignerSave(elements: PdfElement[]) {
 }
 
 // Clear Comment Page Elements
-function clearCommentPageElements() {
-  if (confirm(t('exportModal.pdf.commentPage.confirmClear'))) {
-    settings.commentPageElements = []
-  }
+async function clearCommentPageElements() {
+  const ok = await dialog.confirm({
+    message: t('exportModal.pdf.commentPage.confirmClear'),
+    confirmLabel: t('dialog.delete'),
+    danger: true,
+  })
+  if (ok) settings.commentPageElements = []
 }
 
 function getModalTitle() {
@@ -791,6 +867,57 @@ function handleConfirm() {
 
 .setting-hint-flush {
   margin-left: 0;
+}
+
+.group-title {
+  font-weight: 600;
+}
+
+.watermark-logo {
+  margin-top: var(--space-3);
+}
+
+.watermark-logo-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.watermark-logo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.watermark-logo-preview {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.logo-btn {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.logo-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.logo-btn--danger {
+  color: var(--red);
 }
 
 .size-row {

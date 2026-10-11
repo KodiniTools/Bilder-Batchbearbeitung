@@ -325,6 +325,7 @@ import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { buildSingleImagePdf } from '@/lib/features/export-pdf'
+import { useConfirm } from '@/composables/useConfirm'
 import ImagePreview from './ImagePreview.vue'
 import HistoryActions from './HistoryActions.vue'
 import { CUSTOM_FONT_FAMILIES } from '@/lib/core/custom-fonts'
@@ -343,6 +344,7 @@ import EditorResizeSection from './editor/EditorResizeSection.vue'
 import EditorExportSection from './editor/EditorExportSection.vue'
 
 const { t } = useI18n()
+const dialog = useConfirm()
 const toast = useToast()
 const imageStore = useImageStore()
 
@@ -982,7 +984,7 @@ async function downloadImage() {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
-    alert(t('alerts.downloadError', { error: errorMessage }))
+    void dialog.alert(t('alerts.downloadError', { error: errorMessage }))
   } finally {
     isDownloading.value = false
   }

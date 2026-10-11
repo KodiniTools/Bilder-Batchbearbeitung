@@ -572,6 +572,14 @@
       "bookmarks": {
         "label": "Lesezeichen erstellen",
         "description": "Inhaltsverzeichnis im PDF-Viewer für Startseite, Kommentarseiten und Bilder"
+      },
+      "watermark": {
+        "title": "Wasserzeichen",
+        "logo": "Logo (optional)",
+        "chooseLogo": "Logo wählen",
+        "replaceLogo": "Ersetzen",
+        "removeLogo": "Entfernen",
+        "hint": "Das Wasserzeichen erscheint auf allen PDF-Seiten. Das Logo wird nicht gedreht."
       }
     },
     "zip": {
@@ -1119,5 +1127,15 @@
     "bookmarkCover": "Startseite",
     "bookmarkComment": "Kommentarseite {page}",
     "bookmarkImage": "Bild {index}"
+  },
+  "dialog": {
+    "cancel": "Abbrechen",
+    "ok": "OK",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "clear": "Leeren",
+    "reset": "Zurücksetzen",
+    "keep": "Beibehalten",
+    "title": "Bitte bestätigen"
   }
 }

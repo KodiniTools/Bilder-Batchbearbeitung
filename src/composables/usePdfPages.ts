@@ -1,6 +1,7 @@
 import { ref, computed, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import { useConfirm } from '@/composables/useConfirm'
 import { alignBoxes, distributeBoxes, elementBox, type AlignMode } from '@/lib/designer/arrange'
 
 export interface PdfPage {
@@ -47,6 +48,7 @@ interface UsePdfPagesOptions {
 export function usePdfPages(options: UsePdfPagesOptions) {
   const { pageWidth, pageHeight, imageInput, canvasRef, singlePage, onBeforeChange } = options
   const { t } = useI18n()
+  const dialog = useConfirm()
 
   const pages = ref<PdfPage[]>([{ id: generateId(), elements: [] }])
   const currentPageIndex = ref(0)
@@ -177,23 +179,29 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     selectedElement.value = null
   }
 
-  function deletePage() {
+  async function deletePage() {
     if (pages.value.length === 1) {
-      alert(t('alerts.cannotDeleteLastPage'))
+      await dialog.alert(t('alerts.cannotDeleteLastPage'))
       return
     }
 
-    if (confirm(t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }))) {
-      change()
-      pages.value.splice(currentPageIndex.value, 1)
+    const page = pages.value[currentPageIndex.value]
+    const ok = await dialog.confirm({
+      message: t('alerts.confirmDeletePage', { page: currentPageIndex.value + 1 }),
+      confirmLabel: t('dialog.delete'),
+      danger: true,
+    })
+    // Seite per Objekt suchen: Während der Rückfrage kann sich der Index nicht ändern, sicher ist sicher
+    const index = pages.value.indexOf(page)
+    if (!ok || index === -1 || pages.value.length === 1) return
 
-      if (currentPageIndex.value >= pages.value.length) {
-        currentPageIndex.value = pages.value.length - 1
-      }
-
-      selectedElement.value = null
-      editingTextId.value = null
+    change()
+    pages.value.splice(index, 1)
+    if (currentPageIndex.value >= pages.value.length) {
+      currentPageIndex.value = pages.value.length - 1
     }
+    selectedElement.value = null
+    editingTextId.value = null
   }
 
   function previousPage() {
@@ -304,13 +312,18 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     ;(event.target as HTMLInputElement).value = ''
   }
 
-  function clearCurrentPage() {
-    if (confirm(t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }))) {
-      change()
-      currentElements.value.length = 0
-      selectedElement.value = null
-      editingTextId.value = null
-    }
+  async function clearCurrentPage() {
+    const page = pages.value[currentPageIndex.value]
+    const ok = await dialog.confirm({
+      message: t('alerts.confirmClearPage', { page: currentPageIndex.value + 1 }),
+      confirmLabel: t('dialog.clear'),
+      danger: true,
+    })
+    if (!ok || !pages.value.includes(page)) return
+    change()
+    page.elements.length = 0
+    selectedElement.value = null
+    editingTextId.value = null
   }
 
   function deleteSelectedElement() {
