@@ -405,6 +405,14 @@
         "replaceLogo": "Replace",
         "removeLogo": "Remove",
         "hint": "The watermark appears on every PDF page. The logo is not rotated."
+      },
+      "password": {
+        "enable": "Protect PDF with a password",
+        "placeholder": "Password to open",
+        "show": "Show",
+        "hint": "Keep the password safe, the PDF cannot be opened without it. It uses standard encryption (RC4, 40-bit): it prevents casual opening but not targeted attacks.",
+        "invalid": "Please enter 1–{max} characters, ASCII only (no umlauts or emoji).",
+        "allowPrinting": "Allow printing"
       }
     },
     "zip": {

@@ -173,6 +173,50 @@
                 </div>
               </div>
 
+              <!-- Passwortschutz -->
+              <div class="setting-group password-group">
+                <label class="checkbox-label">
+                  <input v-model="settings.protectPdf" type="checkbox" />
+                  {{ t('exportModal.pdf.password.enable') }}
+                </label>
+                <template v-if="settings.protectPdf">
+                  <div class="password-row">
+                    <input
+                      id="pdfPassword"
+                      v-model="settings.password"
+                      :type="showPassword ? 'text' : 'password'"
+                      :maxlength="PDF_PASSWORD_MAX_LENGTH"
+                      autocomplete="new-password"
+                      :aria-invalid="passwordInvalid"
+                      aria-describedby="pdfPasswordHint"
+                      :placeholder="t('exportModal.pdf.password.placeholder')"
+                    />
+                    <label class="checkbox-label password-show">
+                      <input v-model="showPassword" type="checkbox" />
+                      {{ t('exportModal.pdf.password.show') }}
+                    </label>
+                  </div>
+                  <p
+                    id="pdfPasswordHint"
+                    :class="[
+                      'setting-hint',
+                      'setting-hint-flush',
+                      { 'hint-error': passwordInvalid },
+                    ]"
+                  >
+                    {{
+                      passwordInvalid
+                        ? t('exportModal.pdf.password.invalid', { max: PDF_PASSWORD_MAX_LENGTH })
+                        : t('exportModal.pdf.password.hint')
+                    }}
+                  </p>
+                  <label class="checkbox-label">
+                    <input v-model="settings.allowPrinting" type="checkbox" />
+                    {{ t('exportModal.pdf.password.allowPrinting') }}
+                  </label>
+                </template>
+              </div>
+
               <!-- Author -->
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.author') }}:</label>
@@ -558,7 +602,7 @@
             <button class="btn-secondary" @click="$emit('close')">
               {{ t('exportModal.buttons.cancel') }}
             </button>
-            <button class="btn-primary" @click="handleConfirm">
+            <button class="btn-primary" :disabled="confirmBlocked" @click="handleConfirm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -599,7 +643,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { computed, ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PdfPageDesigner from './pdf-designer/PdfPageDesigner.vue'
 import SliderRow from './SliderRow.vue'
@@ -610,6 +654,8 @@ import {
   CUSTOM_PAGE_MAX_MM,
   CUSTOM_PAGE_MIN_MM,
   PAGE_MARGIN_MAX_MM,
+  PDF_PASSWORD_MAX_LENGTH,
+  isValidPdfPassword,
   type ImageFit,
   type ImagesPerPage,
   type PdfElement,
@@ -676,6 +722,11 @@ const settings = reactive({
   // Wasserzeichen im PDF (wie beim Bild-Wasserzeichen, Standard: grau und dezent)
   watermark: { ...defaultWatermark, color: '#808080', opacity: 25 } as WatermarkSettings,
   watermarkLogo: '' as string,
+
+  // Passwortschutz (nur im Speicher, nicht persistiert)
+  protectPdf: false,
+  password: '',
+  allowPrinting: true,
 
   // ✨ NEU: Startseite
   includeCustomFrontPage: false,
@@ -780,9 +831,22 @@ function getButtonText() {
   return t('exportModal.buttons.export')
 }
 
+const showPassword = ref(false)
+const isPdfMode = computed(() => props.mode === 'pdf-all' || props.mode === 'pdf-selected')
+/** Passwort gewünscht, aber leer oder ungültig */
+const passwordInvalid = computed(
+  () => settings.protectPdf && !isValidPdfPassword(settings.password)
+)
+const confirmBlocked = computed(() => isPdfMode.value && passwordInvalid.value)
+
 function handleConfirm() {
-  console.log('🚀 Export bestätigt mit Settings:', settings)
-  emit('confirm', { ...settings })
+  if (confirmBlocked.value) return
+  // Passwort nicht ins Log schreiben
+  console.log('🚀 Export bestätigt mit Settings:', { ...settings, password: '***' })
+  emit('confirm', {
+    ...settings,
+    password: isPdfMode.value && settings.protectPdf ? settings.password : '',
+  })
 }
 </script>
 
@@ -872,6 +936,47 @@ function handleConfirm() {
   font-size: 0.8rem;
   color: var(--muted);
   line-height: 1.4;
+}
+
+.setting-hint.hint-error {
+  color: var(--red);
+}
+
+.password-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.password-row input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.password-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.password-row input[aria-invalid='true'] {
+  border-color: var(--red);
+}
+
+.password-show {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.password-group > .checkbox-label + .checkbox-label,
+.password-group .setting-hint + .checkbox-label {
+  margin-top: var(--space-2);
 }
 
 .setting-hint-flush {
@@ -1233,6 +1338,11 @@ function handleConfirm() {
 
 .btn-primary:active {
   transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Transition */
