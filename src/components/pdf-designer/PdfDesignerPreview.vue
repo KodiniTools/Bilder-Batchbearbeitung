@@ -17,14 +17,14 @@
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              {{ t('commentPageDesigner.previewTitle') }}
+              {{ title }}
               <span class="orientation-badge" :class="orientation">
                 {{ t(`designer.orientation.${orientation}`) }}
               </span>
             </div>
 
             <!-- Seitennavigation in Vorschau -->
-            <div class="preview-page-nav">
+            <div v-if="pages.length > 1" class="preview-page-nav">
               <button
                 :disabled="previewPageIndex === 0"
                 class="preview-nav-btn"
@@ -135,7 +135,7 @@
                 </template>
 
                 <!-- Footer-Vorschau wie im Editor -->
-                <div class="canvas-footer-preview">
+                <div v-if="showFooter" class="canvas-footer-preview">
                   {{ footerText }}
                 </div>
               </div>
@@ -188,13 +188,16 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { CanvasElement } from '@/lib/features/export-pdf'
-import type { CommentPage } from '@/composables/useCommentPages'
+import type { PdfElement } from '@/lib/features/export-pdf'
+import type { PdfPage } from '@/composables/usePdfPages'
 import { commentFooterText } from '@/utils/i18nFormat'
 
 const props = defineProps<{
   modelValue: boolean
-  pages: CommentPage[]
+  title: string
+  /** Fußzeile wie im PDF anzeigen (nur Kommentarseiten) */
+  showFooter: boolean
+  pages: PdfPage[]
   pageWidth: number
   pageHeight: number
   orientation: string
@@ -228,7 +231,7 @@ const previewScale = computed(() => {
   return Math.min(maxW / props.pageWidth, maxH / props.pageHeight, 1)
 })
 
-const previewElements = computed<CanvasElement[]>(
+const previewElements = computed<PdfElement[]>(
   () => props.pages[previewPageIndex.value]?.elements || []
 )
 

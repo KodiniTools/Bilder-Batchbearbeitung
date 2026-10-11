@@ -86,19 +86,19 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  element: CanvasElement
+  element: PdfElement
   selected: boolean
   editing: boolean
 }>()
 
 const emit = defineEmits<{
-  select: [element: CanvasElement, event: MouseEvent]
-  editStart: [element: CanvasElement]
+  select: [element: PdfElement, event: MouseEvent]
+  editStart: [element: PdfElement]
   editStop: []
   resizeStart: [event: MouseEvent, direction: string]
   updateContent: [id: string, content: string]

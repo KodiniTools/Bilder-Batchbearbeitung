@@ -1,9 +1,9 @@
 import { ref, computed, onMounted, onUnmounted, type Ref } from 'vue'
-import type { CanvasElement } from '@/lib/features/export-pdf'
+import type { PdfElement } from '@/lib/features/export-pdf'
 
 interface UseCanvasInteractionOptions {
-  /** Currently selected element (owned by useCommentPages). */
-  selectedElement: Ref<CanvasElement | null>
+  /** Currently selected element (owned by usePdfPages). */
+  selectedElement: Ref<PdfElement | null>
   /** Id of the element currently being edited inline, if any. */
   editingTextId: Ref<string | null>
   /** Current page width in px. */
@@ -43,7 +43,7 @@ export function useCanvasInteraction(options: UseCanvasInteractionOptions) {
     return Math.max(40, (wrapperH - scaledH) / 2)
   })
 
-  function selectElement(element: CanvasElement, event: MouseEvent) {
+  function selectElement(element: PdfElement, event: MouseEvent) {
     if (editingTextId.value) return
     selectedElement.value = element
     isDragging = true

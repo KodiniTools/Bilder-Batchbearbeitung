@@ -13,7 +13,7 @@
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
       </svg>
-      {{ t('commentPageDesigner.title') }}
+      {{ title }}
     </h2>
 
     <!-- Orientation Badge -->
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Page Counter Badge -->
-    <div class="page-badge">
+    <div v-if="pageCount !== undefined" class="page-badge">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -66,8 +66,10 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 defineProps<{
+  title: string
   orientation: 'portrait' | 'landscape'
-  pageCount: number
+  /** Seitenanzahl-Badge; ohne Wert (Startseite) ausgeblendet */
+  pageCount?: number
 }>()
 
 const emit = defineEmits<{

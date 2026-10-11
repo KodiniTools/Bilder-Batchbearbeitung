@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { buildPdfDocument, type CanvasElement } from '@/lib/features/export-pdf'
-import type { FrontPageElement } from '@/components/FrontPageDesigner.vue'
+import { buildPdf, buildPdfDocument, type PdfElement } from '@/lib/features/export-pdf'
 
-const commentText = (overrides: Partial<CanvasElement> = {}): CanvasElement => ({
+const commentText = (overrides: Partial<PdfElement> = {}): PdfElement => ({
   id: 'c1',
   type: 'text',
   x: 40,
@@ -18,8 +17,9 @@ const commentText = (overrides: Partial<CanvasElement> = {}): CanvasElement => (
   ...overrides,
 })
 
-const frontText: FrontPageElement = {
+const frontText: PdfElement = {
   id: 'f1',
+  zIndex: 0,
   type: 'text',
   x: 100,
   y: 200,
@@ -28,8 +28,8 @@ const frontText: FrontPageElement = {
   content: 'Mein Fotobuch',
   fontSize: 40,
   fontFamily: 'Clash Display',
-  fontWeight: 'bold',
-  textAlign: 'center',
+  bold: true,
+  align: 'center',
   color: '#336699',
 }
 
@@ -98,5 +98,28 @@ describe('buildPdfDocument', () => {
     await expect(buildPdfDocument([], { signal: controller.signal })).rejects.toMatchObject({
       name: 'AbortError',
     })
+  })
+
+  it('buildPdf liefert ein PDF-Blob und meldet fehlgeschlagene Bilder', async () => {
+    const onImageError = vi.fn()
+    const blob = await buildPdf([{ originalName: 'kaputt.jpg' }], {
+      includeTitlePage: true,
+      onImageError,
+    })
+
+    expect(blob).toBeInstanceOf(Blob)
+    expect(blob.type).toBe('application/pdf')
+    const header = new TextDecoder().decode(await blob.slice(0, 5).arrayBuffer())
+    expect(header).toBe('%PDF-')
+    expect(onImageError).toHaveBeenCalledWith('kaputt.jpg')
+  })
+
+  it('rendert Startseiten-Texte mit Kursiv wie Kommentarseiten', async () => {
+    const { pdf } = await buildPdfDocument([], {
+      includeCustomFrontPage: true,
+      frontPageElements: [{ ...frontText, fontFamily: 'Satoshi', italic: true }],
+      includeImages: false,
+    })
+    expect(pdf.getFontList()['Satoshi']).toContain('bolditalic')
   })
 })

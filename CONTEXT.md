@@ -70,10 +70,7 @@ Eine moderne, datenschutzfreundliche Webanwendung zur Batch-Bearbeitung von Bild
 │   │   ├── ImageEditor.vue       # Haupteditor für Bildbearbeitung
 │   │   ├── BatchEditPanel.vue    # Batch-Operationen Panel
 │   │   ├── BulkRenameModal.vue   # Massen-Umbenennung Dialog
-│   │   ├── FrontPageDesigner.vue # PDF-Titelseiten Designer
-│   │   ├── CommentPageDesigner.vue    # Kommentarseiten Designer
-│   │   ├── CommentPagePreview.vue     # Kommentarseiten Vorschau
-│   │   ├── MultiCommentSystem.vue     # Multi-Page Kommentarsystem
+│   │   ├── pdf-designer/         # PDF-Designer für Startseite (mode="cover") und Kommentarseiten (mode="comment")
 │   │   ├── ExportSettingsModal.vue    # PDF-Export Einstellungen
 │   │   └── LoadingIndicator.vue       # Ladeanimation
 │   │
