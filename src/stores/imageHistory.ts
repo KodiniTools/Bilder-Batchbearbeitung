@@ -33,6 +33,7 @@ interface ImageRecord {
   transforms?: ImageTransforms
   watermark?: WatermarkSettings
   outputName: string
+  comment?: string
   selected: boolean
 }
 
@@ -100,6 +101,7 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
         transforms: img.transforms ? { ...img.transforms } : undefined,
         watermark: img.watermark ? { ...img.watermark } : undefined,
         outputName: img.outputName,
+        comment: img.comment,
         selected: img.selected,
       }
     })
@@ -137,6 +139,7 @@ export function createImageHistory(images: Ref<ImageObject[]>, now: () => number
         img.transforms = rec.transforms ? { ...rec.transforms } : undefined
         img.watermark = rec.watermark ? { ...rec.watermark } : undefined
         img.outputName = rec.outputName
+        img.comment = rec.comment
         img.selected = rec.selected
       }
 

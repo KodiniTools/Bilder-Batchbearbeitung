@@ -720,6 +720,7 @@
     "close": "Schließen",
     "sections": {
       "preview": "Vorschau",
+      "comment": "Bildkommentar (PDF)",
       "fileName": "Dateiname",
       "text": "Text",
       "filters": "Filter",
@@ -793,6 +794,10 @@
       "applySelected": "Auswahl ({count})",
       "progress": "Wende an … {current}/{total}",
       "done": "Filter auf {count} Bild(er) übertragen"
+    },
+    "comment": {
+      "placeholder": "Kommentar zum Bild, mehrzeilig möglich …",
+      "hint": "Erscheint im PDF-Export unter dem Bild."
     },
     "fileName": {
       "label": "Neuer Name:",

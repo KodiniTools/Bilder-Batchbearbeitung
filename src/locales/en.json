@@ -545,6 +545,7 @@
     "close": "Close",
     "sections": {
       "preview": "Preview",
+      "comment": "Image comment (PDF)",
       "fileName": "File Name",
       "text": "Text",
       "filters": "Filters",
@@ -552,6 +553,10 @@
       "resize": "Resize",
       "export": "Export",
       "crop": "Crop"
+    },
+    "comment": {
+      "placeholder": "Comment on the image, multiple lines allowed …",
+      "hint": "Shown below the image in the PDF export."
     },
     "fileName": {
       "label": "New Name:",

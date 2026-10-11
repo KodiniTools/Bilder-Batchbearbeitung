@@ -161,6 +161,26 @@
                 />
               </div>
 
+              <!-- Bildkommentar (erscheint im PDF unter dem Bild) -->
+              <div class="ctrl-section">
+                <label class="ctrl-header" for="editorImageComment">
+                  <i class="fa-solid fa-comment"></i>
+                  {{ t('imageEditor.sections.comment') }}
+                </label>
+                <textarea
+                  id="editorImageComment"
+                  v-model="comment"
+                  class="ctrl-textarea"
+                  rows="3"
+                  :maxlength="COMMENT_MAX_LENGTH"
+                  :placeholder="t('imageEditor.comment.placeholder')"
+                ></textarea>
+                <p class="text-hint">
+                  <i class="fa-solid fa-circle-info"></i>
+                  {{ t('imageEditor.comment.hint') }}
+                </p>
+              </div>
+
               <EditorTextSection
                 :text-items="textItems"
                 :selected-text-id="selectedTextId"
@@ -400,6 +420,9 @@ const canvasWrapperRef = ref<HTMLElement | null>(null)
 
 // Form state
 const fileName = ref('')
+/** Bildkommentar für den PDF-Export */
+const comment = ref('')
+const COMMENT_MAX_LENGTH = 1000
 const resizeWidth = ref(0)
 const resizeHeight = ref(0)
 const keepAspectRatio = ref(true)
@@ -774,6 +797,7 @@ function initializeEditor(image: ImageObject) {
   const workingCanvas = getWorkingCanvas()!
 
   fileName.value = image.outputName || ImageProcessor.getFileNameWithoutExtension(image.file.name)
+  comment.value = image.comment ?? ''
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
 
@@ -1131,6 +1155,7 @@ async function saveChanges() {
   }
   const newName = fileName.value.trim()
   if (newName) props.image.outputName = ImageProcessor.safeBaseName(newName)
+  props.image.comment = comment.value.trim() || undefined
   props.image.filters = { ...localFilters.value }
   /* eslint-enable vue/no-mutating-props */
 

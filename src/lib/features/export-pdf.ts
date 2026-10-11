@@ -52,7 +52,10 @@ export interface PdfElement {
 export interface ImageData {
   canvas?: HTMLCanvasElement // Für direkte Canvas-Objekte
   dataUrl?: string // Für Base64-Daten
+  /** Nur für Fehlermeldungen; der Dateiname erscheint nicht im PDF */
   originalName: string
+  /** Mehrzeiliger Bildkommentar, wird unter dem Bild ausgegeben */
+  comment?: string
 }
 
 /** Texte, die ins PDF geschrieben werden; die App übergibt sie in der UI-Sprache. */
@@ -83,7 +86,6 @@ export interface PdfExportSettings {
   frontPageElements?: PdfElement[]
   includeCommentPages?: boolean
   commentPageElements?: PdfElement[]
-  includeFileName?: boolean
   includeImages?: boolean
   optimizeSize?: boolean
   imageQuality?: number // JPEG Qualität: 0.0 (niedrig) bis 1.0 (hoch), default 0.75
@@ -158,7 +160,6 @@ export async function buildPdfDocument(
     frontPageElements = [], // ✨ NEU
     includeCommentPages = false,
     commentPageElements = [],
-    includeFileName = true,
     includeImages = true,
     imageQuality,
     maxImageDimension = 1920, // Standard: 1920px (Full HD)
@@ -316,38 +317,37 @@ export async function buildPdfDocument(
 
         const pageWidth = pdf.internal.pageSize.getWidth()
         const pageHeight = pdf.internal.pageSize.getHeight()
-        const margin = 10
-
-        // Get image properties
         const imgProps = pdf.getImageProperties(dataUrl)
-        const imgAspectRatio = imgProps.width / imgProps.height
 
-        // Calculate dimensions
-        let imgWidth = pageWidth - margin * 2
-        let imgHeight = imgWidth / imgAspectRatio
+        // Kommentar umbrechen (Schrift muss vor splitTextToSize gesetzt sein)
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(IMAGE_COMMENT_FONT_PT)
+        const commentLines = wrapImageComment(
+          pdf,
+          image.comment,
+          pageWidth - IMAGE_PAGE_MARGIN * 2,
+          maxImageCommentLines(pageHeight)
+        )
 
-        if (imgHeight > pageHeight - margin * 2) {
-          imgHeight = pageHeight - margin * 2
-          imgWidth = imgHeight * imgAspectRatio
-        }
+        const layout = layoutImagePage(
+          pageWidth,
+          pageHeight,
+          imgProps.width / imgProps.height,
+          commentLines.length
+        )
 
-        // Center image
-        const x = (pageWidth - imgWidth) / 2
-        const y = (pageHeight - imgHeight) / 2
-
-        // Add image - nach Konvertierung sollte es immer JPEG sein
-        // Aber wir überprüfen trotzdem zur Sicherheit
+        // Nach Konvertierung sollte es immer JPEG sein; zur Sicherheit prüfen
         const imageFormat = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG'
-        pdf.addImage(dataUrl, imageFormat, x, y, imgWidth, imgHeight)
+        pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
 
-        // Add filename
-        if (includeFileName) {
-          pdf.setFontSize(10)
-          pdf.setFont('helvetica', 'normal')
-          pdf.setTextColor(120, 120, 120)
-          const filename = image.originalName
-          const filenameWidth = pdf.getTextWidth(filename)
-          pdf.text(filename, (pageWidth - filenameWidth) / 2, y + imgHeight + 5)
+        // Bildkommentar zentriert unter dem Bild (der Dateiname erscheint nicht mehr)
+        if (commentLines.length > 0) {
+          pdf.setTextColor(60, 60, 60)
+          pdf.text(commentLines, pageWidth / 2, layout.commentY, {
+            align: 'center',
+            baseline: 'top',
+            lineHeightFactor: IMAGE_COMMENT_LINE_HEIGHT,
+          })
         }
 
         console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
@@ -365,6 +365,105 @@ export async function buildPdfDocument(
   return {
     pdf,
     result: { pageCount: pdf.getNumberOfPages(), failedImages },
+  }
+}
+
+// ============================================================================
+// BILDSEITE: LAYOUT MIT KOMMENTAR
+// ============================================================================
+
+/** Seitenrand der Bildseiten in mm */
+const IMAGE_PAGE_MARGIN = 10
+/** Abstand zwischen Bild und Kommentar in mm */
+const IMAGE_COMMENT_GAP = 4
+/** Schriftgröße des Bildkommentars in pt */
+const IMAGE_COMMENT_FONT_PT = 11
+/** Zeilenhöhe des Bildkommentars als Faktor der Schriftgröße */
+const IMAGE_COMMENT_LINE_HEIGHT = 1.4
+/** Höchstens dieser Anteil der Seitenhöhe geht an den Kommentar */
+const IMAGE_COMMENT_MAX_SHARE = 0.35
+
+/** Höhe einer Kommentarzeile in mm (1 pt = 0.3528 mm) */
+const IMAGE_COMMENT_LINE_MM = IMAGE_COMMENT_FONT_PT * 0.3528 * IMAGE_COMMENT_LINE_HEIGHT
+
+/** Wie viele Kommentarzeilen auf eine Bildseite passen. */
+export function maxImageCommentLines(pageHeight: number): number {
+  const available = (pageHeight - IMAGE_PAGE_MARGIN * 2) * IMAGE_COMMENT_MAX_SHARE
+  return Math.max(1, Math.floor(available / IMAGE_COMMENT_LINE_MM))
+}
+
+/**
+ * Bricht den Kommentar auf die verfügbare Breite um (explizite Zeilenumbrüche
+ * bleiben erhalten). Ist er zu lang, wird die letzte sichtbare Zeile mit „…“ gekürzt.
+ */
+export function wrapImageComment(
+  pdf: jsPDF,
+  comment: string | undefined,
+  maxWidth: number,
+  maxLines: number
+): string[] {
+  const text = comment?.replace(/\r\n?/g, '\n').trim()
+  if (!text) return []
+
+  const lines: string[] = []
+  for (const paragraph of text.split('\n')) {
+    if (paragraph.trim() === '') {
+      lines.push('')
+    } else {
+      lines.push(...(pdf.splitTextToSize(paragraph, maxWidth) as string[]))
+    }
+  }
+
+  if (lines.length <= maxLines) return lines
+
+  const visible = lines.slice(0, maxLines)
+  let last = visible[maxLines - 1].trimEnd()
+  while (last && pdf.getTextWidth(`${last}…`) > maxWidth) {
+    last = last.slice(0, -1).trimEnd()
+  }
+  visible[maxLines - 1] = `${last}…`
+  return visible
+}
+
+export interface ImagePageLayout {
+  x: number
+  y: number
+  width: number
+  height: number
+  /** Oberkante des Kommentarblocks in mm */
+  commentY: number
+}
+
+/**
+ * Bild + Kommentar als Block vertikal zentrieren. Das Bild wird so groß wie
+ * möglich eingepasst; der Kommentar bekommt darunter genau den Platz, den er braucht.
+ */
+export function layoutImagePage(
+  pageWidth: number,
+  pageHeight: number,
+  aspectRatio: number,
+  commentLineCount: number
+): ImagePageLayout {
+  const commentHeight =
+    commentLineCount > 0 ? IMAGE_COMMENT_GAP + commentLineCount * IMAGE_COMMENT_LINE_MM : 0
+
+  const maxWidth = pageWidth - IMAGE_PAGE_MARGIN * 2
+  const maxHeight = pageHeight - IMAGE_PAGE_MARGIN * 2 - commentHeight
+
+  let width = maxWidth
+  let height = width / aspectRatio
+  if (height > maxHeight) {
+    height = maxHeight
+    width = height * aspectRatio
+  }
+
+  const blockTop = (pageHeight - (height + commentHeight)) / 2
+  return {
+    x: (pageWidth - width) / 2,
+    y: blockTop,
+    width,
+    height,
+    commentY: blockTop + height + IMAGE_COMMENT_GAP,
   }
 }
 

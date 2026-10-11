@@ -70,6 +70,8 @@ export interface ImageObject {
   originalHeight: number
   selected: boolean
   outputName: string
+  /** Mehrzeiliger Bildkommentar; erscheint im PDF-Export unter dem Bild */
+  comment?: string
   version: number
   filters?: ImageFilters
   transforms?: ImageTransforms
