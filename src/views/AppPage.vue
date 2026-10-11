@@ -16,6 +16,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import WizardNavigator from '@/components/WizardNavigator.vue'
 import ScrollToTopButton from '@/components/ScrollToTopButton.vue'
 import { useImageStore } from '@/stores/imageStore'
+import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
@@ -40,6 +41,7 @@ import { commentFooterText, dateLocale } from '@/utils/i18nFormat'
 
 const { t, locale } = useI18n()
 const imageStore = useImageStore()
+const pdfDocument = usePdfDocumentStore()
 const toast = useToast()
 const dialog = useConfirm()
 
@@ -190,13 +192,6 @@ async function handleExportConfirm(settings: ExportSettings) {
         comment: img.comment,
       }))
 
-      const useCustomFrontPage = Boolean(
-        settings.includeCustomFrontPage === true &&
-        settings.frontPageElements &&
-        Array.isArray(settings.frontPageElements) &&
-        settings.frontPageElements.length > 0
-      )
-
       const controller = new AbortController()
       loadingIndicator.value?.showWithProgress(t('loading.pdfMulti', { count: images.length }), 0, {
         onCancel: () => controller.abort(),
@@ -205,32 +200,8 @@ async function handleExportConfirm(settings: ExportSettings) {
       const failedImages: string[] = []
       try {
         const blob = await buildPdf(imageDataArray, {
+          ...pdfDocument.buildOptions,
           title: t('pdfExport.defaultTitle'),
-          author: settings.author || '',
-          includeCustomFrontPage: useCustomFrontPage,
-          frontPageElements: useCustomFrontPage ? settings.frontPageElements : [],
-          includeTitlePage: !useCustomFrontPage,
-          includeCommentPages: settings.includeCommentPages || false,
-          commentPageElements: settings.commentPageElements || [],
-          includeImages: true,
-          orientation: settings.orientation || 'portrait',
-          pageFormat: settings.pageFormat,
-          customPageSize: {
-            width: settings.customWidth ?? 210,
-            height: settings.customHeight ?? 297,
-          },
-          margin: settings.margin,
-          imagesPerPage: settings.imagesPerPage,
-          imageFit: settings.imageFit,
-          header: settings.header,
-          footer: settings.footer,
-          pageNumbers: settings.pageNumbers,
-          bookmarks: settings.bookmarks,
-          watermark: settings.watermark
-            ? { ...settings.watermark, logoDataUrl: settings.watermarkLogo || undefined }
-            : undefined,
-          password: settings.password || '',
-          allowPrinting: settings.allowPrinting ?? true,
           labels: {
             locale: dateLocale(locale.value),
             imageCount: (count) => t('pdfExport.imageCount', { count }, count),
