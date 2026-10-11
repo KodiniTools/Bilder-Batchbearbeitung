@@ -540,6 +540,38 @@
       },
       "commentImage": {
         "label": "Kommentarbild (optional)"
+      },
+      "pageFormat": {
+        "label": "Seitenformat",
+        "a4": "A4",
+        "a5": "A5",
+        "a3": "A3",
+        "letter": "US Letter",
+        "square": "Quadrat (210 × 210 mm)",
+        "custom": "Benutzerdefiniert",
+        "width": "Breite",
+        "height": "Höhe",
+        "designerHint": "Start- und Kommentarseiten werden proportional eingepasst."
+      },
+      "margin": "Seitenrand",
+      "layout": {
+        "perPage": "Bilder pro Seite",
+        "perPageOption": "{count} Bild | {count} Bilder",
+        "fit": "Bildanpassung",
+        "contain": "Einpassen (ganzes Bild)",
+        "cover": "Füllen (Ränder beschnitten)"
+      },
+      "headerFooter": {
+        "header": "Kopfzeile (optional)",
+        "headerPlaceholder": "z. B. {'{title}'}",
+        "footer": "Fußzeile (optional)",
+        "footerPlaceholder": "z. B. {'{date}'}",
+        "placeholders": "Platzhalter: {'{page}'}, {'{total}'}, {'{title}'}, {'{date}'}. Die Startseite bleibt ohne Kopf- und Fußzeile.",
+        "pageNumbers": "Seitenzahlen anzeigen"
+      },
+      "bookmarks": {
+        "label": "Lesezeichen erstellen",
+        "description": "Inhaltsverzeichnis im PDF-Viewer für Startseite, Kommentarseiten und Bilder"
       }
     },
     "zip": {
@@ -1056,6 +1088,10 @@
     "defaultTitle": "Bildersammlung",
     "imageCount": "{count} Bild | {count} Bilder",
     "author": "Autor: {name}",
-    "createdWith": "Erstellt mit Kodini Tools"
+    "createdWith": "Erstellt mit Kodini Tools",
+    "pageNumber": "{page} / {total}",
+    "bookmarkCover": "Startseite",
+    "bookmarkComment": "Kommentarseite {page}",
+    "bookmarkImage": "Bild {index}"
   }
 }

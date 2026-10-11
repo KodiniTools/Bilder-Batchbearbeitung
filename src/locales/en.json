@@ -365,6 +365,38 @@
       },
       "commentImage": {
         "label": "Comment Image (optional)"
+      },
+      "pageFormat": {
+        "label": "Page size",
+        "a4": "A4",
+        "a5": "A5",
+        "a3": "A3",
+        "letter": "US Letter",
+        "square": "Square (210 × 210 mm)",
+        "custom": "Custom",
+        "width": "Width",
+        "height": "Height",
+        "designerHint": "Cover and comment pages are scaled to fit proportionally."
+      },
+      "margin": "Page margin",
+      "layout": {
+        "perPage": "Images per page",
+        "perPageOption": "{count} image | {count} images",
+        "fit": "Image fit",
+        "contain": "Fit (whole image)",
+        "cover": "Fill (edges cropped)"
+      },
+      "headerFooter": {
+        "header": "Header (optional)",
+        "headerPlaceholder": "e.g. {'{title}'}",
+        "footer": "Footer (optional)",
+        "footerPlaceholder": "e.g. {'{date}'}",
+        "placeholders": "Placeholders: {'{page}'}, {'{total}'}, {'{title}'}, {'{date}'}. The cover page has no header or footer.",
+        "pageNumbers": "Show page numbers"
+      },
+      "bookmarks": {
+        "label": "Create bookmarks",
+        "description": "Table of contents in the PDF viewer for cover, comment pages and images"
       }
     },
     "zip": {
@@ -1056,6 +1088,10 @@
     "defaultTitle": "Image collection",
     "imageCount": "{count} image | {count} images",
     "author": "Author: {name}",
-    "createdWith": "Created with Kodini Tools"
+    "createdWith": "Created with Kodini Tools",
+    "pageNumber": "{page} / {total}",
+    "bookmarkCover": "Cover",
+    "bookmarkComment": "Comment page {page}",
+    "bookmarkImage": "Image {index}"
   }
 }
