@@ -1,4 +1,4 @@
-import jsPDF, { GState } from 'jspdf'
+import jsPDF, { GState, type EncryptionOptions } from 'jspdf'
 import { applyPdfFont, registerPdfFonts, toPdfFontStyle, type PdfFontStyle } from './pdf-fonts'
 import type { WatermarkSettings } from '@/lib/core/types'
 
@@ -168,6 +168,10 @@ export interface PdfExportSettings {
   bookmarks?: boolean
   /** Wasserzeichen auf allen Seiten (Text und/oder Logo) */
   watermark?: PdfWatermark
+  /** Öffnen-Passwort (druckbares ASCII, max. 32 Zeichen); leer = ungeschützt */
+  password?: string
+  /** Mit Passwort: Drucken erlauben (Standard: ja) */
+  allowPrinting?: boolean
   /** Übersetzte PDF-Texte; fehlende Einträge fallen auf Deutsch zurück */
   labels?: Partial<PdfLabels>
   /** Fortschritt in Arbeitsschritten (Startseite, je Kommentarseite, je Bild) */
@@ -251,6 +255,8 @@ export async function buildPdfDocument(
     pageNumbers = false,
     bookmarks = true,
     watermark,
+    password = '',
+    allowPrinting = true,
     onProgress,
     signal,
     onImageError,
@@ -283,6 +289,7 @@ export async function buildPdfDocument(
     orientation: pageSize.width > pageSize.height ? 'landscape' : 'portrait',
     unit: 'mm',
     format: [pageSize.width, pageSize.height],
+    ...(password ? { encryption: pdfEncryption(password, allowPrinting) } : {}),
   })
 
   // Metadaten: Titel/Autor erscheinen in den Dokumenteigenschaften des PDF-Viewers
@@ -1103,6 +1110,40 @@ async function renderWatermark(
   }
 }
 
+/** Höchstlänge des PDF-Passworts (Standard-Sicherheitshandler, Revision 2) */
+export const PDF_PASSWORD_MAX_LENGTH = 32
+
+/**
+ * Passwort für die PDF-Verschlüsselung: druckbares ASCII, damit jeder Viewer
+ * es gleich kodiert; längere Passwörter würden still abgeschnitten.
+ */
+export function isValidPdfPassword(password: string): boolean {
+  return (
+    password.length > 0 &&
+    password.length <= PDF_PASSWORD_MAX_LENGTH &&
+    /^[\x20-\x7e]+$/.test(password)
+  )
+}
+
+/**
+ * Verschlüsselung für jsPDF. Das Eigentümer-Passwort ist zufällig: Mit einem
+ * leeren Eigentümer-Passwort könnte jeder die Rechte (Drucken) aufheben.
+ * Kopieren bleibt erlaubt (Barrierefreiheit, Textauswahl).
+ */
+function pdfEncryption(password: string, allowPrinting: boolean): EncryptionOptions {
+  if (!isValidPdfPassword(password)) {
+    throw new RangeError('Ungültiges PDF-Passwort')
+  }
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  const ownerPassword = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  return {
+    userPassword: password,
+    ownerPassword: ownerPassword.slice(0, PDF_PASSWORD_MAX_LENGTH),
+    userPermissions: allowPrinting ? ['print', 'copy'] : ['copy'],
+  }
+}
+
 /** Wirft einen AbortError, wenn der Export abgebrochen wurde. */
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
@@ -1133,6 +1174,10 @@ export interface ExportSettings {
   watermark?: WatermarkSettings
   /** Logo für das PDF-Wasserzeichen (Daten-URL) */
   watermarkLogo?: string
+  /** Öffnen-Passwort für das PDF; leer = ungeschützt */
+  password?: string
+  /** Mit Passwort: Drucken erlauben */
+  allowPrinting?: boolean
   includeCustomFrontPage?: boolean
   frontPageElements?: PdfElement[]
   includeCommentPages?: boolean

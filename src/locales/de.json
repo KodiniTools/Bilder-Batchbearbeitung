@@ -580,6 +580,14 @@
         "replaceLogo": "Ersetzen",
         "removeLogo": "Entfernen",
         "hint": "Das Wasserzeichen erscheint auf allen PDF-Seiten. Das Logo wird nicht gedreht."
+      },
+      "password": {
+        "enable": "PDF mit Passwort schützen",
+        "placeholder": "Passwort zum Öffnen",
+        "show": "Anzeigen",
+        "hint": "Merken Sie sich das Passwort gut, ohne es lässt sich das PDF nicht öffnen. Es nutzt die Standard-Verschlüsselung (RC4, 40 Bit): Sie schützt vor zufälligem Öffnen, aber nicht vor gezielten Angriffen.",
+        "invalid": "Bitte 1–{max} Zeichen ohne Umlaute oder Sonderzeichen außerhalb von ASCII eingeben.",
+        "allowPrinting": "Drucken erlauben"
       }
     },
     "zip": {

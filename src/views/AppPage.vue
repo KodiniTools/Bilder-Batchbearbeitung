@@ -235,6 +235,8 @@ async function handleExportConfirm(settings: ExportSettings) {
           watermark: settings.watermark
             ? { ...settings.watermark, logoDataUrl: settings.watermarkLogo || undefined }
             : undefined,
+          password: settings.password || '',
+          allowPrinting: settings.allowPrinting ?? true,
           labels: {
             locale: dateLocale(locale.value),
             imageCount: (count) => t('pdfExport.imageCount', { count }, count),
