@@ -78,4 +78,77 @@ describe('PdfPageDesigner', () => {
     expect(saved).toHaveLength(1)
     expect(saved[0].page).toBe(1)
   })
+
+  function key(k: string, opts: ConstructorParameters<typeof KeyboardEvent>[1] = {}) {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: k, ...opts }))
+  }
+
+  function save(w: VueWrapper): PdfElement[] {
+    document.querySelector<HTMLButtonElement>('.modal-footer .btn-primary')?.click()
+    return w.emitted('save')?.at(-1)?.[0] as PdfElement[]
+  }
+
+  it('Strg+A, Strg+D dupliziert die Auswahl; Strg+Z macht es rückgängig', async () => {
+    wrapper = await open('cover', [text('a', 1), text('b', 1)])
+    key('a', { ctrlKey: true })
+    key('d', { ctrlKey: true })
+    await wrapper.vm.$nextTick()
+    expect(document.querySelectorAll('.canvas-element')).toHaveLength(4)
+    expect(document.querySelectorAll('.canvas-element.selected')).toHaveLength(2)
+    key('z', { ctrlKey: true })
+    await wrapper.vm.$nextTick()
+    expect(document.querySelectorAll('.canvas-element')).toHaveLength(2)
+    key('y', { ctrlKey: true })
+    await wrapper.vm.$nextTick()
+    expect(save(wrapper)).toHaveLength(4)
+  })
+
+  it('Pfeiltasten verschieben, Entf löscht die Mehrfachauswahl', async () => {
+    wrapper = await open('cover', [text('a', 1), text('b', 1)])
+    key('a', { ctrlKey: true })
+    key('ArrowRight', { shiftKey: true })
+    key('ArrowDown')
+    await wrapper.vm.$nextTick()
+    const moved = save(wrapper)
+    expect(moved.map((el) => [el.x, el.y])).toEqual([
+      [20, 11],
+      [20, 11],
+    ])
+    key('Delete')
+    await wrapper.vm.$nextTick()
+    expect(document.querySelectorAll('.canvas-element')).toHaveLength(0)
+  })
+
+  it('Kürzel greifen nicht bei geschlossenem Designer', async () => {
+    wrapper = await open('cover', [text('a', 1)])
+    key('a', { ctrlKey: true })
+    await wrapper.setProps({ modelValue: false })
+    key('Delete')
+    await wrapper.setProps({ modelValue: true })
+    expect(document.querySelectorAll('.canvas-element')).toHaveLength(1)
+  })
+
+  it('Seite duplizieren und per Drag-and-Drop verschieben', async () => {
+    wrapper = await open('comment', [text('a', 1), text('b', 2)])
+    const dup = [...document.querySelectorAll<HTMLButtonElement>('.ptb-action')].find((b) =>
+      b.textContent?.includes('Seite duplizieren')
+    )
+    dup?.click()
+    await wrapper.vm.$nextTick()
+    expect(document.querySelectorAll('.ptb-thumb')).toHaveLength(3)
+
+    // Kopie von a steht hinter a; Seite 3 (b) vor Seite 1 ziehen
+    const thumbs = document.querySelectorAll<HTMLElement>('.ptb-thumb')
+    thumbs[2].dispatchEvent(new Event('dragstart'))
+    thumbs[0].dispatchEvent(new Event('dragover', { cancelable: true }))
+    thumbs[0].dispatchEvent(new Event('drop', { cancelable: true }))
+    await wrapper.vm.$nextTick()
+    const saved = save(wrapper)
+    expect(saved.map((el) => [el.content, el.page])).toEqual([
+      ['b', 1],
+      ['a', 2],
+      ['a', 3],
+    ])
+    expect(new Set(saved.map((el) => el.id)).size).toBe(3)
+  })
 })

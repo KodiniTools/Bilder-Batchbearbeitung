@@ -515,7 +515,10 @@
       "addPageTooltip": "Add New Page",
       "addPageButton": "New Page",
       "deletePageTooltip": "Delete Current Page",
-      "deletePageButton": "Delete Page"
+      "deletePageButton": "Delete Page",
+      "duplicatePageButton": "Duplicate page",
+      "duplicatePageTooltip": "Insert a copy of the current page after it",
+      "dragToReorder": "Drag to reorder"
     },
     "tools": {
       "title": "Tools",
@@ -570,7 +573,30 @@
       "singular": "Element",
       "plural": "Elements"
     },
-    "previewTitle": "Preview — Comment pages"
+    "previewTitle": "Preview — Comment pages",
+    "arrange": {
+      "title": "Arrange",
+      "selected": "{count} selected | {count} selected",
+      "relativeToPage": "Align to page",
+      "relativeToSelection": "Align to selection",
+      "left": "Align left",
+      "centerH": "Center horizontally",
+      "right": "Align right",
+      "top": "Align top",
+      "middle": "Center vertically",
+      "bottom": "Align bottom",
+      "distributeH": "Distribute horizontally",
+      "distributeV": "Distribute vertically",
+      "distributeHint": "Equal spacing, 3 or more elements",
+      "duplicate": "Duplicate",
+      "duplicateTooltip": "Duplicate (Ctrl+D)",
+      "deleteSelected": "Delete"
+    },
+    "history": {
+      "undoTitle": "Undo (Ctrl+Z)",
+      "redoTitle": "Redo (Ctrl+Y)"
+    },
+    "shortcutsHint": "Shift+click: multi-select · Ctrl+A: all · Ctrl+D: duplicate · Ctrl+C/V: copy/paste · Arrow keys: move · Alt while dragging: no snapping"
   },
   "imageEditor": {
     "title": "Edit Image",

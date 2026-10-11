@@ -68,7 +68,7 @@
     </div>
 
     <!-- 8 Resize-Handles (Ecken + Kanten) für alle Elemente -->
-    <div v-if="selected" class="resize-handles">
+    <div v-if="selected && handles" class="resize-handles">
       <!-- Ecken -->
       <div class="resize-handle nw" @mousedown.stop="emit('resizeStart', $event, 'nw')"></div>
       <div class="resize-handle ne" @mousedown.stop="emit('resizeStart', $event, 'ne')"></div>
@@ -90,11 +90,16 @@ import type { PdfElement } from '@/lib/features/export-pdf'
 
 const { t } = useI18n()
 
-const props = defineProps<{
-  element: PdfElement
-  selected: boolean
-  editing: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    element: PdfElement
+    selected: boolean
+    editing: boolean
+    /** Größen-Griffe zeigen (nur bei Einzelauswahl) */
+    handles?: boolean
+  }>(),
+  { handles: true }
+)
 
 const emit = defineEmits<{
   select: [element: PdfElement, event: MouseEvent]

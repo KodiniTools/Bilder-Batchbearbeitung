@@ -690,7 +690,10 @@
       "addPageTooltip": "Neue Seite hinzufügen",
       "addPageButton": "Neue Seite",
       "deletePageTooltip": "Aktuelle Seite löschen",
-      "deletePageButton": "Seite löschen"
+      "deletePageButton": "Seite löschen",
+      "duplicatePageButton": "Seite duplizieren",
+      "duplicatePageTooltip": "Kopie der aktuellen Seite dahinter einfügen",
+      "dragToReorder": "Ziehen zum Sortieren"
     },
     "tools": {
       "title": "Werkzeuge",
@@ -745,7 +748,30 @@
       "singular": "Element",
       "plural": "Elemente"
     },
-    "previewTitle": "Vorschau — Kommentarseiten"
+    "previewTitle": "Vorschau — Kommentarseiten",
+    "arrange": {
+      "title": "Anordnen",
+      "selected": "{count} ausgewählt | {count} ausgewählt",
+      "relativeToPage": "Ausrichten an der Seite",
+      "relativeToSelection": "Ausrichten an der Auswahl",
+      "left": "Links ausrichten",
+      "centerH": "Horizontal zentrieren",
+      "right": "Rechts ausrichten",
+      "top": "Oben ausrichten",
+      "middle": "Vertikal zentrieren",
+      "bottom": "Unten ausrichten",
+      "distributeH": "Horizontal verteilen",
+      "distributeV": "Vertikal verteilen",
+      "distributeHint": "Gleiche Abstände, ab 3 Elementen",
+      "duplicate": "Duplizieren",
+      "duplicateTooltip": "Duplizieren (Strg+D)",
+      "deleteSelected": "Löschen"
+    },
+    "history": {
+      "undoTitle": "Rückgängig (Strg+Z)",
+      "redoTitle": "Wiederholen (Strg+Y)"
+    },
+    "shortcutsHint": "Umschalt+Klick: Mehrfachauswahl · Strg+A: alles · Strg+D: duplizieren · Strg+C/V: kopieren/einfügen · Pfeiltasten: verschieben · Alt beim Ziehen: ohne Einrasten"
   },
   "imageEditor": {
     "title": "Bild bearbeiten",
