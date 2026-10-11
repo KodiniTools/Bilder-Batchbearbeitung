@@ -13,11 +13,33 @@
     <template v-if="element.type === 'text'">
       <div class="property-group">
         <label for="text-content">{{ t('commentPageDesigner.properties.textLabel') }}</label>
+        <div class="align-buttons rich-format-buttons">
+          <button
+            type="button"
+            :title="t('commentPageDesigner.properties.richBoldTitle')"
+            :aria-label="t('commentPageDesigner.properties.richBoldTitle')"
+            @mousedown.prevent
+            @click="formatSelection('**')"
+          >
+            <strong>B</strong>
+          </button>
+          <button
+            type="button"
+            :title="t('commentPageDesigner.properties.richItalicTitle')"
+            :aria-label="t('commentPageDesigner.properties.richItalicTitle')"
+            @mousedown.prevent
+            @click="formatSelection('*')"
+          >
+            <em>I</em>
+          </button>
+        </div>
         <textarea
           id="text-content"
+          ref="contentInput"
           v-model="content"
           rows="4"
           :placeholder="t('commentPageDesigner.properties.textPlaceholder')"
+          @keydown="onFormatKey"
         ></textarea>
         <div class="inline-edit-hint">
           <svg
@@ -37,6 +59,9 @@
         </div>
         <div class="inline-edit-hint">
           {{ t('commentPageDesigner.properties.placeholdersHint') }}
+        </div>
+        <div class="inline-edit-hint">
+          {{ t('commentPageDesigner.properties.richTextHint') }}
         </div>
       </div>
 
@@ -387,11 +412,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SliderRow from '../SliderRow.vue'
 import { CUSTOM_FONT_FAMILIES } from '@/lib/core/custom-fonts'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import type { RichMarker } from '@/lib/designer/rich-text'
+import { applyRichMarker, richFormatShortcut } from '@/lib/designer/rich-text-input'
 
 const { t } = useI18n()
 
@@ -418,6 +445,19 @@ function field<K extends keyof PdfElement>(key: K) {
 }
 
 const content = field('content')
+
+// Fett/kursiv für die Auswahl im Textfeld (Buttons und Strg+B / Strg+I)
+const contentInput = ref<HTMLTextAreaElement | null>(null)
+function formatSelection(marker: RichMarker) {
+  const textarea = contentInput.value
+  if (!textarea) return
+  textarea.focus()
+  content.value = applyRichMarker(textarea, marker).value
+}
+function onFormatKey(event: KeyboardEvent) {
+  const edit = richFormatShortcut(event)
+  if (edit) content.value = edit.value
+}
 const fontFamily = field('fontFamily')
 const fontSize = field('fontSize')
 const color = field('color')
@@ -606,6 +646,10 @@ const typeLabel = computed(() => {
   background: var(--accent);
   color: var(--accent-text);
   border-color: var(--accent);
+}
+
+.rich-format-buttons {
+  margin-bottom: var(--space-2);
 }
 
 .property-group label input[type='checkbox'] {

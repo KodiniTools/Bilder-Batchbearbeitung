@@ -641,6 +641,7 @@ import SliderRow from './SliderRow.vue'
 import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { usePdfDocumentStore } from '@/stores/pdfDocument'
+import { stripRichText } from '@/lib/designer/rich-text'
 import {
   CUSTOM_PAGE_MAX_MM,
   CUSTOM_PAGE_MIN_MM,
@@ -662,7 +663,7 @@ function elementLabel(element: PdfElement): string {
   if (element.background) return t('commentPageDesigner.background.title')
   switch (element.type) {
     case 'text':
-      return element.content?.substring(0, 25) ?? ''
+      return stripRichText(element.content ?? '').substring(0, 25)
     case 'image':
       return t('commentPageDesigner.properties.typeImage')
     case 'shape':
