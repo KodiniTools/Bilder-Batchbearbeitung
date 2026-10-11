@@ -584,6 +584,9 @@
       "strokeWidth": "Border width",
       "cornerRadius": "Corner radius",
       "placeholdersHint": "Placeholders: {'{title}'}, {'{date}'}, {'{images}'}, {'{author}'}",
+      "richBoldTitle": "Bold selection (Ctrl+B)",
+      "richItalicTitle": "Italic selection (Ctrl+I)",
+      "richTextHint": "Inside the text: **bold**, *italic*; \\* for an asterisk",
       "shape": {
         "rect": "Rectangle",
         "ellipse": "Circle/ellipse",

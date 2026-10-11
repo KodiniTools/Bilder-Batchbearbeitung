@@ -25,7 +25,7 @@
             fontStyle: el.italic ? 'italic' : 'normal',
           }"
         >
-          {{ el.content }}
+          <PdfRichText :content="el.content ?? ''" />
         </div>
         <div
           v-else-if="el.type === 'shape'"
@@ -65,6 +65,7 @@ import { computed } from 'vue'
 import type { PdfPage } from '@/composables/usePdfPages'
 import { sortForRender } from '@/lib/designer/shapes'
 import PdfShapeSvg from './PdfShapeSvg.vue'
+import PdfRichText from './PdfRichText.vue'
 
 /** Verkleinerte, nicht interaktive Darstellung einer Designer-Seite. */
 const props = withDefaults(

@@ -116,7 +116,9 @@
                       fontStyle: element.italic ? 'italic' : 'normal',
                     }"
                   >
-                    <div class="preview-text-content">{{ element.content }}</div>
+                    <div class="preview-text-content">
+                      <PdfRichText :content="element.content ?? ''" />
+                    </div>
                   </div>
                   <!-- Form -->
                   <div
@@ -209,6 +211,7 @@ import type { PdfPage } from '@/composables/usePdfPages'
 import { commentFooterText } from '@/utils/i18nFormat'
 import { sortForRender } from '@/lib/designer/shapes'
 import PdfShapeSvg from './PdfShapeSvg.vue'
+import PdfRichText from './PdfRichText.vue'
 
 const props = defineProps<{
   modelValue: boolean

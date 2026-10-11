@@ -759,6 +759,9 @@
       "strokeWidth": "Randstärke",
       "cornerRadius": "Eckenradius",
       "placeholdersHint": "Platzhalter: {'{title}'}, {'{date}'}, {'{images}'}, {'{author}'}",
+      "richBoldTitle": "Auswahl fett (Strg+B)",
+      "richItalicTitle": "Auswahl kursiv (Strg+I)",
+      "richTextHint": "Innerhalb des Textes: **fett**, *kursiv*; \\* für ein Sternchen",
       "shape": {
         "rect": "Rechteck",
         "ellipse": "Kreis/Ellipse",

@@ -34,7 +34,8 @@
         @click.stop
         @dblclick.stop="emit('editStart', element)"
       >
-        {{ element.content || t('commentPageDesigner.properties.textPlaceholder') }}
+        <PdfRichText v-if="element.content" :content="element.content" />
+        <template v-else>{{ t('commentPageDesigner.properties.textPlaceholder') }}</template>
       </div>
       <textarea
         v-else
@@ -54,6 +55,7 @@
         @mousedown.stop
         @blur="emit('editStop')"
         @keydown.esc="emit('editStop')"
+        @keydown="onFormatKey"
       ></textarea>
     </div>
 
@@ -94,6 +96,8 @@ import { ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
 import PdfShapeSvg from './PdfShapeSvg.vue'
+import PdfRichText from './PdfRichText.vue'
+import { richFormatShortcut } from '@/lib/designer/rich-text-input'
 
 const { t } = useI18n()
 
@@ -120,6 +124,12 @@ const emit = defineEmits<{
 }>()
 
 const inlineTextareaRef = ref<HTMLTextAreaElement | null>(null)
+
+// Strg+B / Strg+I: Auswahl fett bzw. kursiv auszeichnen
+function onFormatKey(event: KeyboardEvent) {
+  const edit = richFormatShortcut(event)
+  if (edit) emit('updateContent', props.element.id, edit.value)
+}
 
 // Focus + select the inline editor whenever this element enters edit mode
 watch(

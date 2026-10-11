@@ -3,6 +3,12 @@ import { applyPdfFont, registerPdfFonts, toPdfFontStyle, type PdfFontStyle } fro
 import type { WatermarkSettings } from '@/lib/core/types'
 import { PdfImageEncoder, type EncodedPdfImage, type PdfImageSource } from './pdf-image-encoder'
 import { scaledImageSize } from './pdf-image-size'
+import {
+  escapeRichText,
+  hasRichMarkup,
+  layoutRichText,
+  parseRichText,
+} from '@/lib/designer/rich-text'
 
 /**
  * Wasserzeichen im PDF: dieselben Felder wie das Bild-Wasserzeichen
@@ -890,11 +896,12 @@ export function fillElementPlaceholders(
     el.type === 'text' && el.content?.includes('{')
       ? {
           ...el,
+          // Sternchen in Titel/Autor nicht als Auszeichnung lesen
           content: el.content
-            .replace(/\{title\}/g, values.title)
-            .replace(/\{date\}/g, values.date)
+            .replace(/\{title\}/g, escapeRichText(values.title))
+            .replace(/\{date\}/g, escapeRichText(values.date))
             .replace(/\{images\}/g, String(values.images))
-            .replace(/\{author\}/g, values.author),
+            .replace(/\{author\}/g, escapeRichText(values.author)),
         }
       : el
   )
@@ -1178,7 +1185,17 @@ function throwIfAborted(signal?: AbortSignal): void {
 function elementFontUsages(elements: PdfElement[]): { fontFamily?: string; style: PdfFontStyle }[] {
   return elements
     .filter((el) => el.type === 'text' && el.content?.trim())
-    .map((el) => ({ fontFamily: el.fontFamily, style: toPdfFontStyle(el.bold, el.italic) }))
+    .flatMap((el) => {
+      const base = { fontFamily: el.fontFamily, style: toPdfFontStyle(el.bold, el.italic) }
+      if (!hasRichMarkup(el.content)) return [base]
+      // Fett/kursiv innerhalb des Textes braucht die passenden Schnitte
+      const styles = new Set(
+        parseRichText(el.content ?? '').map((run) =>
+          toPdfFontStyle(el.bold || run.bold, el.italic || run.italic)
+        )
+      )
+      return [...styles].map((style) => ({ fontFamily: el.fontFamily, style }))
+    })
 }
 
 export interface ExportSettings {
@@ -1591,6 +1608,41 @@ function renderText(
   const boxWidth = block.width || 300
   const availableWidthMm = (boxWidth - paddingPx * 2) * scale
 
+  const firstBaselinePx = fontSizePx * ((lineHeight - 1) / 2 + 0.75)
+  const baselineMm = (index: number) =>
+    origin.y + (block.y + paddingPx + firstBaselinePx + index * lineHeight * fontSizePx) * scale
+  const alignOffset = (lineWidth: number) => {
+    if (block.align === 'center') return (availableWidthMm - lineWidth) / 2
+    if (block.align === 'right') return availableWidthMm - lineWidth
+    return 0
+  }
+
+  // **fett** / *kursiv* innerhalb des Textes: Abschnitte mit eigenem Schnitt
+  if (hasRichMarkup(block.content)) {
+    const baseBold = block.style === 'bold' || block.style === 'bolditalic'
+    const baseItalic = block.style === 'italic' || block.style === 'bolditalic'
+    const useStyle = (bold: boolean, italic: boolean) =>
+      applyPdfFont(
+        pdf,
+        block.fontFamily,
+        toPdfFontStyle(baseBold || bold, baseItalic || italic),
+        fonts
+      )
+    const lines = layoutRichText(parseRichText(block.content), availableWidthMm, (text, b, i) => {
+      useStyle(b, i)
+      return pdf.getTextWidth(text)
+    })
+    lines.forEach((line, index) => {
+      let x = xBase + alignOffset(line.width)
+      for (const segment of line.segments) {
+        useStyle(segment.bold, segment.italic)
+        pdf.text(segment.text, x, baselineMm(index))
+        x += segment.width
+      }
+    })
+    return
+  }
+
   // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
   // splitTextToSize() repliziert das CSS word-break: break-word Verhalten
   const allLines: string[] = []
@@ -1602,20 +1654,9 @@ function renderText(
     }
   })
 
-  const firstBaselinePx = fontSizePx * ((lineHeight - 1) / 2 + 0.75)
-
   allLines.forEach((line, index) => {
-    const yPosPx = block.y + paddingPx + firstBaselinePx + index * lineHeight * fontSizePx
-    const yPosMm = origin.y + yPosPx * scale
-
     // Text-Ausrichtung relativ zur Box-Breite (wie CSS text-align)
-    let xPos = xBase
-    if (block.align === 'center') {
-      xPos = xBase + (availableWidthMm - pdf.getTextWidth(line)) / 2
-    } else if (block.align === 'right') {
-      xPos = xBase + (availableWidthMm - pdf.getTextWidth(line))
-    }
-    pdf.text(line, xPos, yPosMm)
+    pdf.text(line, xBase + alignOffset(pdf.getTextWidth(line)), baselineMm(index))
   })
 }
 
