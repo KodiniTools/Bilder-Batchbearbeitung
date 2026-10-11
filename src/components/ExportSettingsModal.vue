@@ -14,7 +14,7 @@
               <!-- Orientation -->
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.orientation.label') }}:</label>
-                <select v-model="settings.orientation">
+                <select v-model="doc.orientation">
                   <option value="portrait">{{ t('exportModal.pdf.orientation.portrait') }}</option>
                   <option value="landscape">
                     {{ t('exportModal.pdf.orientation.landscape') }}
@@ -25,16 +25,16 @@
               <!-- Seitenformat -->
               <div class="setting-group">
                 <label for="pdfPageFormat">{{ t('exportModal.pdf.pageFormat.label') }}:</label>
-                <select id="pdfPageFormat" v-model="settings.pageFormat">
+                <select id="pdfPageFormat" v-model="doc.pageFormat">
                   <option v-for="f in PAGE_FORMATS" :key="f" :value="f">
                     {{ t(`exportModal.pdf.pageFormat.${f}`) }}
                   </option>
                 </select>
-                <div v-if="settings.pageFormat === 'custom'" class="size-row">
+                <div v-if="doc.pageFormat === 'custom'" class="size-row">
                   <label class="size-field">
                     <span>{{ t('exportModal.pdf.pageFormat.width') }}</span>
                     <input
-                      v-model.number="settings.customWidth"
+                      v-model.number="doc.customWidth"
                       type="number"
                       :min="CUSTOM_PAGE_MIN_MM"
                       :max="CUSTOM_PAGE_MAX_MM"
@@ -45,7 +45,7 @@
                   <label class="size-field">
                     <span>{{ t('exportModal.pdf.pageFormat.height') }}</span>
                     <input
-                      v-model.number="settings.customHeight"
+                      v-model.number="doc.customHeight"
                       type="number"
                       :min="CUSTOM_PAGE_MIN_MM"
                       :max="CUSTOM_PAGE_MAX_MM"
@@ -54,14 +54,14 @@
                   </label>
                   <span class="size-unit">mm</span>
                 </div>
-                <p v-if="settings.pageFormat !== 'a4'" class="setting-hint setting-hint-flush">
+                <p v-if="doc.pageFormat !== 'a4'" class="setting-hint setting-hint-flush">
                   {{ t('exportModal.pdf.pageFormat.designerHint') }}
                 </p>
               </div>
 
               <div class="setting-group">
                 <SliderRow
-                  v-model="settings.margin"
+                  v-model="doc.margin"
                   :label="t('exportModal.pdf.margin')"
                   :min="0"
                   :max="PAGE_MARGIN_MAX_MM"
@@ -73,7 +73,7 @@
               <!-- Bilder pro Seite -->
               <div class="setting-group">
                 <label for="pdfImagesPerPage">{{ t('exportModal.pdf.layout.perPage') }}:</label>
-                <select id="pdfImagesPerPage" v-model.number="settings.imagesPerPage">
+                <select id="pdfImagesPerPage" v-model.number="doc.imagesPerPage">
                   <option v-for="n in IMAGES_PER_PAGE" :key="n" :value="n">
                     {{ t('exportModal.pdf.layout.perPageOption', { count: n }, n) }}
                   </option>
@@ -82,7 +82,7 @@
 
               <div class="setting-group">
                 <label for="pdfImageFit">{{ t('exportModal.pdf.layout.fit') }}:</label>
-                <select id="pdfImageFit" v-model="settings.imageFit">
+                <select id="pdfImageFit" v-model="doc.imageFit">
                   <option value="contain">{{ t('exportModal.pdf.layout.contain') }}</option>
                   <option value="cover">{{ t('exportModal.pdf.layout.cover') }}</option>
                 </select>
@@ -93,7 +93,7 @@
                 <label for="pdfHeader">{{ t('exportModal.pdf.headerFooter.header') }}:</label>
                 <input
                   id="pdfHeader"
-                  v-model="settings.header"
+                  v-model="doc.header"
                   type="text"
                   maxlength="120"
                   :placeholder="t('exportModal.pdf.headerFooter.headerPlaceholder')"
@@ -103,7 +103,7 @@
                 <label for="pdfFooter">{{ t('exportModal.pdf.headerFooter.footer') }}:</label>
                 <input
                   id="pdfFooter"
-                  v-model="settings.footer"
+                  v-model="doc.footer"
                   type="text"
                   maxlength="120"
                   :placeholder="t('exportModal.pdf.headerFooter.footerPlaceholder')"
@@ -114,13 +114,13 @@
               </div>
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input v-model="settings.pageNumbers" type="checkbox" />
+                  <input v-model="doc.pageNumbers" type="checkbox" />
                   {{ t('exportModal.pdf.headerFooter.pageNumbers') }}
                 </label>
               </div>
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input v-model="settings.bookmarks" type="checkbox" />
+                  <input v-model="doc.bookmarks" type="checkbox" />
                   {{ t('exportModal.pdf.bookmarks.label') }}
                 </label>
                 <p class="setting-hint">{{ t('exportModal.pdf.bookmarks.description') }}</p>
@@ -130,32 +130,32 @@
               <div class="setting-group watermark-group">
                 <label class="group-title">{{ t('exportModal.pdf.watermark.title') }}</label>
                 <BatchWatermarkControls
-                  :watermark="settings.watermark"
-                  @update:watermark="settings.watermark = $event"
+                  :watermark="doc.watermark"
+                  @update:watermark="doc.watermark = $event"
                 />
-                <div v-if="settings.watermark.enabled" class="watermark-logo">
+                <div v-if="doc.watermark.enabled" class="watermark-logo">
                   <span class="watermark-logo-label">
                     {{ t('exportModal.pdf.watermark.logo') }}
                   </span>
                   <div class="watermark-logo-row">
                     <img
-                      v-if="settings.watermarkLogo"
-                      :src="settings.watermarkLogo"
+                      v-if="doc.watermarkLogo"
+                      :src="doc.watermarkLogo"
                       alt=""
                       class="watermark-logo-preview"
                     />
                     <button type="button" class="logo-btn" @click="logoInput?.click()">
                       {{
-                        settings.watermarkLogo
+                        doc.watermarkLogo
                           ? t('exportModal.pdf.watermark.replaceLogo')
                           : t('exportModal.pdf.watermark.chooseLogo')
                       }}
                     </button>
                     <button
-                      v-if="settings.watermarkLogo"
+                      v-if="doc.watermarkLogo"
                       type="button"
                       class="logo-btn logo-btn--danger"
-                      @click="settings.watermarkLogo = ''"
+                      @click="doc.watermarkLogo = ''"
                     >
                       {{ t('exportModal.pdf.watermark.removeLogo') }}
                     </button>
@@ -176,14 +176,14 @@
               <!-- Passwortschutz -->
               <div class="setting-group password-group">
                 <label class="checkbox-label">
-                  <input v-model="settings.protectPdf" type="checkbox" />
+                  <input v-model="doc.protectPdf" type="checkbox" />
                   {{ t('exportModal.pdf.password.enable') }}
                 </label>
-                <template v-if="settings.protectPdf">
+                <template v-if="doc.protectPdf">
                   <div class="password-row">
                     <input
                       id="pdfPassword"
-                      v-model="settings.password"
+                      v-model="doc.password"
                       :type="showPassword ? 'text' : 'password'"
                       :maxlength="PDF_PASSWORD_MAX_LENGTH"
                       autocomplete="new-password"
@@ -211,7 +211,7 @@
                     }}
                   </p>
                   <label class="checkbox-label">
-                    <input v-model="settings.allowPrinting" type="checkbox" />
+                    <input v-model="doc.allowPrinting" type="checkbox" />
                     {{ t('exportModal.pdf.password.allowPrinting') }}
                   </label>
                 </template>
@@ -221,7 +221,7 @@
               <div class="setting-group">
                 <label>{{ t('exportModal.pdf.author') }}:</label>
                 <input
-                  v-model="settings.author"
+                  v-model="doc.author"
                   type="text"
                   :placeholder="t('exportModal.pdf.authorPlaceholder')"
                 />
@@ -230,17 +230,14 @@
               <!-- ✨ NEU: Eigene Startseite gestalten -->
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input v-model="settings.includeCustomFrontPage" type="checkbox" />
+                  <input v-model="doc.includeCustomFrontPage" type="checkbox" />
                   {{ t('exportModal.pdf.frontPage.label') }}
                 </label>
                 <p class="setting-hint">{{ t('exportModal.pdf.frontPage.description') }}</p>
               </div>
 
               <!-- ✨ NEU: Startseite Designer Button -->
-              <div
-                v-if="settings.includeCustomFrontPage"
-                class="designer-section front-page-section"
-              >
+              <div v-if="doc.includeCustomFrontPage" class="designer-section front-page-section">
                 <button type="button" class="designer-btn" @click="showFrontPageDesigner = true">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -255,16 +252,16 @@
                     <line x1="3" y1="9" x2="21" y2="9"></line>
                   </svg>
                   {{ t('exportModal.pdf.frontPage.designButton') }}
-                  <span v-if="settings.frontPageElements.length > 0" class="badge">
-                    {{ settings.frontPageElements.length }}
+                  <span v-if="doc.frontPageElements.length > 0" class="badge">
+                    {{ doc.frontPageElements.length }}
                   </span>
                 </button>
 
                 <!-- Element-Vorschau für Startseite -->
-                <div v-if="settings.frontPageElements.length > 0" class="elements-preview">
+                <div v-if="doc.frontPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
                     <span>
-                      {{ settings.frontPageElements.length }}
+                      {{ doc.frontPageElements.length }}
                       {{ t('exportModal.pdf.frontPage.elementsAdded') }}
                     </span>
                     <button type="button" class="clear-btn" @click="clearFrontPageElements">
@@ -272,7 +269,7 @@
                     </button>
                   </div>
                   <ul class="element-list">
-                    <li v-for="element in settings.frontPageElements.slice(0, 3)" :key="element.id">
+                    <li v-for="element in doc.frontPageElements.slice(0, 3)" :key="element.id">
                       <svg
                         v-if="element.type === 'text'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -305,10 +302,10 @@
                         {{ elementLabel(element) }}
                       </span>
                     </li>
-                    <li v-if="settings.frontPageElements.length > 3" class="more-indicator">
+                    <li v-if="doc.frontPageElements.length > 3" class="more-indicator">
                       {{
                         t('exportModal.moreElements', {
-                          count: settings.frontPageElements.length - 3,
+                          count: doc.frontPageElements.length - 3,
                         })
                       }}
                     </li>
@@ -319,16 +316,13 @@
               <!-- ✨ Kommentarseite hinzufügen -->
               <div class="setting-group">
                 <label class="checkbox-label">
-                  <input v-model="settings.includeCommentPages" type="checkbox" />
+                  <input v-model="doc.includeCommentPages" type="checkbox" />
                   {{ t('exportModal.pdf.commentPage.label') }}
                 </label>
               </div>
 
               <!-- ✨ Kommentarseite Designer Button -->
-              <div
-                v-if="settings.includeCommentPages"
-                class="designer-section comment-page-section"
-              >
+              <div v-if="doc.includeCommentPages" class="designer-section comment-page-section">
                 <button type="button" class="designer-btn" @click="showCommentPageDesigner = true">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -343,16 +337,16 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                   {{ t('exportModal.pdf.commentPage.designButton') }}
-                  <span v-if="settings.commentPageElements.length > 0" class="badge">
-                    {{ settings.commentPageElements.length }}
+                  <span v-if="doc.commentPageElements.length > 0" class="badge">
+                    {{ doc.commentPageElements.length }}
                   </span>
                 </button>
 
                 <!-- Element-Vorschau für Kommentarseite -->
-                <div v-if="settings.commentPageElements.length > 0" class="elements-preview">
+                <div v-if="doc.commentPageElements.length > 0" class="elements-preview">
                   <div class="preview-header">
                     <span>
-                      {{ settings.commentPageElements.length }}
+                      {{ doc.commentPageElements.length }}
                       {{ t('exportModal.pdf.commentPage.elementsAdded') }}
                     </span>
                     <button type="button" class="clear-btn" @click="clearCommentPageElements">
@@ -360,10 +354,7 @@
                     </button>
                   </div>
                   <ul class="element-list">
-                    <li
-                      v-for="element in settings.commentPageElements.slice(0, 3)"
-                      :key="element.id"
-                    >
+                    <li v-for="element in doc.commentPageElements.slice(0, 3)" :key="element.id">
                       <svg
                         v-if="element.type === 'text'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -396,10 +387,10 @@
                         {{ elementLabel(element) }}
                       </span>
                     </li>
-                    <li v-if="settings.commentPageElements.length > 3" class="more-indicator">
+                    <li v-if="doc.commentPageElements.length > 3" class="more-indicator">
                       {{
                         t('exportModal.moreElements', {
-                          count: settings.commentPageElements.length - 3,
+                          count: doc.commentPageElements.length - 3,
                         })
                       }}
                     </li>
@@ -627,16 +618,16 @@
     <PdfPageDesigner
       v-model="showFrontPageDesigner"
       mode="cover"
-      :initial-elements="settings.frontPageElements"
-      :orientation="settings.orientation || 'portrait'"
+      :initial-elements="doc.frontPageElements"
+      :orientation="doc.orientation || 'portrait'"
       @save="handleFrontPageDesignerSave"
     />
 
     <PdfPageDesigner
       v-model="showCommentPageDesigner"
       mode="comment"
-      :initial-elements="settings.commentPageElements"
-      :orientation="settings.orientation || 'portrait'"
+      :initial-elements="doc.commentPageElements"
+      :orientation="doc.orientation || 'portrait'"
       @save="handleCommentPageDesignerSave"
     />
   </Teleport>
@@ -649,14 +640,12 @@ import PdfPageDesigner from './pdf-designer/PdfPageDesigner.vue'
 import SliderRow from './SliderRow.vue'
 import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
 import { useConfirm } from '@/composables/useConfirm'
-import { defaultWatermark, type WatermarkSettings } from '@/lib/core/types'
+import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import {
   CUSTOM_PAGE_MAX_MM,
   CUSTOM_PAGE_MIN_MM,
   PAGE_MARGIN_MAX_MM,
   PDF_PASSWORD_MAX_LENGTH,
-  isValidPdfPassword,
-  type ImageFit,
   type ImagesPerPage,
   type PdfElement,
   type PdfPageFormat,
@@ -701,41 +690,12 @@ const emit = defineEmits<{
 const showFrontPageDesigner = ref(false)
 const showCommentPageDesigner = ref(false)
 
-// Settings
+// PDF-Dokument (Layout, Start-/Kommentarseiten, Wasserzeichen, Passwort) liegt im Store
+const pdfDocument = usePdfDocumentStore()
+const doc = pdfDocument.settings
+
+// Einstellungen für ZIP, Einzelbild und SVG
 const settings = reactive({
-  // PDF Settings
-  orientation: 'portrait' as 'portrait' | 'landscape',
-  author: '',
-
-  // Seitenlayout
-  pageFormat: 'a4' as PdfPageFormat,
-  customWidth: 210,
-  customHeight: 297,
-  margin: 10,
-  imagesPerPage: 1 as ImagesPerPage,
-  imageFit: 'contain' as ImageFit,
-  header: '',
-  footer: '',
-  pageNumbers: false,
-  bookmarks: true,
-
-  // Wasserzeichen im PDF (wie beim Bild-Wasserzeichen, Standard: grau und dezent)
-  watermark: { ...defaultWatermark, color: '#808080', opacity: 25 } as WatermarkSettings,
-  watermarkLogo: '' as string,
-
-  // Passwortschutz (nur im Speicher, nicht persistiert)
-  protectPdf: false,
-  password: '',
-  allowPrinting: true,
-
-  // ✨ NEU: Startseite
-  includeCustomFrontPage: false,
-  frontPageElements: [] as PdfElement[],
-
-  // Kommentarseite
-  includeCommentPages: false,
-  commentPageElements: [] as PdfElement[],
-
   // ZIP/Save Settings
   zipName: 'bilder-export',
   format: 'png',
@@ -758,29 +718,29 @@ function onLogoSelected(event: Event) {
   if (!file) return
   const reader = new FileReader()
   reader.onload = () => {
-    if (typeof reader.result === 'string') settings.watermarkLogo = reader.result
+    if (typeof reader.result === 'string') doc.watermarkLogo = reader.result
   }
   reader.readAsDataURL(file)
 }
 
 // ✨ NEU: Front Page Designer Save Handler
 function handleFrontPageDesignerSave(elements: PdfElement[]) {
-  settings.frontPageElements = elements
+  pdfDocument.setFrontPageElements(elements)
   console.log('✅ Startseiten-Elemente gespeichert:', elements.length)
 }
 
 // Startseiten-Layout passt nach einem Orientierungswechsel nicht mehr: Zurücksetzen anbieten
 // (wie bisher im FrontPageDesigner)
 watch(
-  () => settings.orientation,
+  () => doc.orientation,
   async () => {
-    if (settings.frontPageElements.length === 0) return
+    if (doc.frontPageElements.length === 0) return
     const reset = await dialog.confirm({
       message: t('frontPageDesigner.confirmOrientationReset'),
       confirmLabel: t('dialog.reset'),
       cancelLabel: t('dialog.keep'),
     })
-    if (reset) settings.frontPageElements = []
+    if (reset) pdfDocument.clearFrontPage()
   }
 )
 
@@ -791,12 +751,12 @@ async function clearFrontPageElements() {
     confirmLabel: t('dialog.delete'),
     danger: true,
   })
-  if (ok) settings.frontPageElements = []
+  if (ok) pdfDocument.clearFrontPage()
 }
 
 // Comment Page Designer Save Handler
 function handleCommentPageDesignerSave(elements: PdfElement[]) {
-  settings.commentPageElements = elements
+  pdfDocument.setCommentPageElements(elements)
   console.log('✅ Kommentarseiten-Elemente gespeichert:', elements.length)
 }
 
@@ -807,7 +767,7 @@ async function clearCommentPageElements() {
     confirmLabel: t('dialog.delete'),
     danger: true,
   })
-  if (ok) settings.commentPageElements = []
+  if (ok) pdfDocument.clearCommentPages()
 }
 
 function getModalTitle() {
@@ -834,18 +794,18 @@ function getButtonText() {
 const showPassword = ref(false)
 const isPdfMode = computed(() => props.mode === 'pdf-all' || props.mode === 'pdf-selected')
 /** Passwort gewünscht, aber leer oder ungültig */
-const passwordInvalid = computed(
-  () => settings.protectPdf && !isValidPdfPassword(settings.password)
-)
+const passwordInvalid = computed(() => pdfDocument.passwordInvalid)
 const confirmBlocked = computed(() => isPdfMode.value && passwordInvalid.value)
 
 function handleConfirm() {
   if (confirmBlocked.value) return
   // Passwort nicht ins Log schreiben
-  console.log('🚀 Export bestätigt mit Settings:', { ...settings, password: '***' })
+  console.log('🚀 Export bestätigt mit Settings:', { ...settings, ...doc, password: '***' })
+  // PDF-Export liest den Store; die Felder bleiben im Payload für bestehende Aufrufer
   emit('confirm', {
     ...settings,
-    password: isPdfMode.value && settings.protectPdf ? settings.password : '',
+    ...doc,
+    password: isPdfMode.value && doc.protectPdf ? doc.password : '',
   })
 }
 </script>
