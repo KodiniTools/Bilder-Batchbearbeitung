@@ -210,6 +210,7 @@
     "zipProgress": "Processing image {current} of {total}...",
     "pdf": "Creating PDF...",
     "pdfMulti": "Creating PDF with {count} images...",
+    "pdfProgress": "Creating PDF: step {current} of {total}…",
     "progress": "{current} of {total}",
     "resizing": "Scaling image {current} of {total}…",
     "cropping": "Cropping image {current} of {total}…",
@@ -217,6 +218,8 @@
   },
   "toast": {
     "pdfSuccess": "PDF with {count} images created successfully",
+    "pdfPartial": "PDF with {count} images created, {failed} image(s) could not be included: {names}",
+    "pdfCancelled": "PDF export cancelled",
     "zipSuccess": "ZIP with {count} images created successfully",
     "saveSuccess": "{count} images saved successfully",
     "svgSuccess": "{count} image(s) successfully exported as SVG",

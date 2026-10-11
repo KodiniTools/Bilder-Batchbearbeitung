@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf'
+import { applyPdfFont, registerPdfFonts, toPdfFontStyle, type PdfFontStyle } from './pdf-fonts'
 
 /**
  * 🎨 VOLLSTÄNDIGE PDF-EXPORT-LÖSUNG
@@ -106,6 +107,17 @@ export interface PdfExportSettings {
   orientation?: 'portrait' | 'landscape'
   /** Übersetzte PDF-Texte; fehlende Einträge fallen auf Deutsch zurück */
   labels?: Partial<PdfLabels>
+  /** Fortschritt in Arbeitsschritten (Startseite, je Kommentarseite, je Bild) */
+  onProgress?: (done: number, total: number) => void
+  /** Bricht den Export zwischen zwei Schritten mit einem AbortError ab */
+  signal?: AbortSignal
+}
+
+export interface PdfExportResult {
+  /** Anzahl der Seiten im erzeugten PDF */
+  pageCount: number
+  /** Dateinamen der Bilder, die nicht ins PDF übernommen werden konnten */
+  failedImages: string[]
 }
 
 // ============================================================================
@@ -113,7 +125,7 @@ export interface PdfExportSettings {
 // ============================================================================
 
 /**
- * Exportiert Bilder mit optionalen Kommentarseiten als PDF
+ * Exportiert Bilder mit optionalen Kommentarseiten als PDF und speichert es.
  *
  * @param images - Array von Bildern (mit canvas oder dataUrl)
  * @param settings - Export-Einstellungen
@@ -123,7 +135,24 @@ export async function exportMultipleImagesAsPdf(
   images: ImageData[],
   settings: PdfExportSettings = {},
   filename?: string
-): Promise<void> {
+): Promise<PdfExportResult> {
+  const { pdf, result } = await buildPdfDocument(images, settings)
+
+  const finalFilename = filename || `bilder-export-${new Date().toISOString().slice(0, 10)}.pdf`
+  pdf.save(finalFilename)
+
+  console.log('✅ PDF erfolgreich gespeichert:', finalFilename)
+  return result
+}
+
+/**
+ * Baut das PDF-Dokument auf, ohne es zu speichern.
+ * Getrennt von exportMultipleImagesAsPdf, damit Tests das Ergebnis prüfen können.
+ */
+export async function buildPdfDocument(
+  images: ImageData[],
+  settings: PdfExportSettings = {}
+): Promise<{ pdf: jsPDF; result: PdfExportResult }> {
   const {
     title = 'Bildersammlung',
     author,
@@ -138,6 +167,8 @@ export async function exportMultipleImagesAsPdf(
     maxImageDimension = 1920, // Standard: 1920px (Full HD)
     optimizeSize = false,
     orientation = 'portrait',
+    onProgress,
+    signal,
   } = settings
   const labels: PdfLabels = { ...DEFAULT_PDF_LABELS, ...settings.labels }
 
@@ -153,6 +184,43 @@ export async function exportMultipleImagesAsPdf(
     format: 'a4',
   })
 
+  // Metadaten: Titel/Autor erscheinen in den Dokumenteigenschaften des PDF-Viewers
+  pdf.setProperties({
+    title,
+    subject: labels.imageCount(images.length),
+    author: author?.trim() || '',
+    creator: labels.createdWith,
+  })
+  pdf.setLanguage(labels.locale as Parameters<jsPDF['setLanguage']>[0])
+
+  // Eigene Schriften (Startseite + Kommentarseiten) vorab laden und einbetten
+  const useFrontPage = includeCustomFrontPage && frontPageElements.length > 0
+  const useCommentPages = includeCommentPages && commentPageElements.length > 0
+  const fonts = await registerPdfFonts(pdf, [
+    ...(useFrontPage ? frontPageFontUsages(frontPageElements) : []),
+    ...(useCommentPages ? commentFontUsages(commentPageElements) : []),
+  ])
+
+  // Fortschritt: ein Schritt je Startseite, Kommentarseite und Bild
+  const commentPageCount = useCommentPages
+    ? new Set(assignPageNumbersIfMissing(commentPageElements).map((el) => el.page ?? 1)).size
+    : 0
+  const totalSteps =
+    (useFrontPage || includeTitlePage ? 1 : 0) +
+    commentPageCount +
+    (includeImages ? images.length : 0)
+  let doneSteps = 0
+  const step = async () => {
+    doneSteps++
+    onProgress?.(doneSteps, totalSteps)
+    // UI kurz atmen lassen, damit der Fortschrittsbalken neu gezeichnet wird
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    throwIfAborted(signal)
+  }
+  throwIfAborted(signal)
+  onProgress?.(0, totalSteps)
+
+  const failedImages: string[] = []
   let pageAdded = false
 
   console.log('📄 Starte PDF-Export...')
@@ -168,7 +236,7 @@ export async function exportMultipleImagesAsPdf(
   // 1. STARTSEITE
   // ========================================
   // Prüfe ob benutzerdefinierte Startseite aktiviert ist UND Elemente vorhanden sind
-  if (includeCustomFrontPage && frontPageElements.length > 0) {
+  if (useFrontPage) {
     console.log('✨ Erstelle benutzerdefinierte Startseite...')
     await createCustomFrontPage(
       pdf,
@@ -176,20 +244,24 @@ export async function exportMultipleImagesAsPdf(
       jpegQuality,
       maxImageDimension,
       orientation,
+      labels,
+      fonts,
       author
     )
     pageAdded = true
+    await step()
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
     console.log('📋 Erstelle automatische Titel-Seite...')
     createTitlePage(pdf, title, images.length, labels, author)
     pageAdded = true
+    await step()
   }
 
   // ========================================
   // 2. KOMMENTAR-SEITEN
   // ========================================
-  if (includeCommentPages && commentPageElements.length > 0) {
+  if (useCommentPages) {
     console.log('🎨 Erstelle Kommentar-Seiten...')
 
     if (pageAdded) {
@@ -205,7 +277,9 @@ export async function exportMultipleImagesAsPdf(
       jpegQuality,
       maxImageDimension,
       orientation,
-      labels
+      labels,
+      fonts,
+      step
     )
     pageAdded = true
   }
@@ -236,6 +310,8 @@ export async function exportMultipleImagesAsPdf(
           dataUrl = resizedCanvas.toDataURL('image/jpeg', jpegQuality)
         } else {
           console.warn(`⚠️ Bild ${i} hat weder canvas noch dataUrl`)
+          failedImages.push(image.originalName)
+          await step()
           continue
         }
 
@@ -278,19 +354,43 @@ export async function exportMultipleImagesAsPdf(
         console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
       } catch (error) {
         console.error(`❌ Fehler bei Bild ${i}:`, error)
+        failedImages.push(image.originalName)
       }
 
       pageAdded = true
+      await step()
     }
   }
 
-  // ========================================
-  // 4. PDF SPEICHERN
-  // ========================================
-  const finalFilename = filename || `bilder-export-${new Date().toISOString().slice(0, 10)}.pdf`
-  pdf.save(finalFilename)
+  return {
+    pdf,
+    result: { pageCount: pdf.getNumberOfPages(), failedImages },
+  }
+}
 
-  console.log('✅ PDF erfolgreich gespeichert:', finalFilename)
+/** Wirft einen AbortError, wenn der Export abgebrochen wurde. */
+function throwIfAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) {
+    throw new DOMException('PDF-Export abgebrochen', 'AbortError')
+  }
+}
+
+/** Schriften, die die Startseite braucht (dort gibt es nur normal/fett). */
+function frontPageFontUsages(
+  elements: FrontPageElement[]
+): { fontFamily?: string; style: PdfFontStyle }[] {
+  return elements
+    .filter((el) => el.type === 'text' && el.content?.trim())
+    .map((el) => ({ fontFamily: el.fontFamily, style: toPdfFontStyle(el.fontWeight === 'bold') }))
+}
+
+/** Schriften, die die Kommentarseiten brauchen. */
+function commentFontUsages(
+  elements: CanvasElement[]
+): { fontFamily?: string; style: PdfFontStyle }[] {
+  return elements
+    .filter((el) => el.type === 'text' && el.content?.trim())
+    .map((el) => ({ fontFamily: el.fontFamily, style: toPdfFontStyle(el.bold, el.italic) }))
 }
 
 // ============================================================================
@@ -356,176 +456,109 @@ export interface ExportSettings {
 
 /**
  * Erstellt eine benutzerdefinierte Startseite aus Designer-Elementen.
- * Rendert via HTML5 Canvas, damit benutzerdefinierte @font-face-Schriften
- * korrekt im PDF erscheinen.
+ * Text wird als echter PDF-Text mit eingebetteter Schrift geschrieben
+ * (auswählbar, durchsuchbar, verlustfrei skalierbar); Bilder als JPEG.
  */
 async function createCustomFrontPage(
   pdf: jsPDF,
   elements: FrontPageElement[],
   jpegQuality: number,
-  _maxImageDimension: number,
+  maxImageDimension: number,
   orientation: 'portrait' | 'landscape' = 'portrait',
+  labels: PdfLabels = DEFAULT_PDF_LABELS,
+  fonts: ReadonlySet<string> = new Set(),
   author?: string
 ): Promise<void> {
   if (elements.length === 0) return
 
-  console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite (Canvas-Rendering)')
+  console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite (Vektor-Rendering)')
 
-  // Canvas-Dimensionen passend zur PDF-Orientierung (A4 bei 96 DPI)
-  // Der FrontPageDesigner verwendet dieselben Dimensionen, daher stimmen Element-Koordinaten exakt.
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+
+  // Designer-Fläche: A4 bei 96 DPI, dieselben Maße wie im FrontPageDesigner
   const canvasWidth = orientation === 'landscape' ? 1123 : 794
   const canvasHeight = orientation === 'landscape' ? 794 : 1123
+  const scaleX = pageWidth / canvasWidth
+  const scaleY = pageHeight / canvasHeight
 
-  // Offscreen-Canvas erstellen
-  const canvas = document.createElement('canvas')
-  // 2× Auflösung für scharfe Schrift im PDF
-  const scale = 2
-  canvas.width = canvasWidth * scale
-  canvas.height = canvasHeight * scale
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const ctx = canvas.getContext('2d')! // guaranteed on a freshly created canvas element
-  ctx.scale(scale, scale)
-
-  // Weißer Hintergrund
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-
-  // Sortiere Elemente nach y-Position
+  // Reihenfolge wie bisher: nach y-Position (der Designer kennt keinen z-Index)
   const sortedElements = [...elements].sort((a, b) => a.y - b.y)
 
   for (const element of sortedElements) {
     try {
       if (element.type === 'text') {
-        renderFrontPageTextOnCanvas(ctx, element)
+        // CSS .element-text .text-content: padding var(--space-2) = 8px, line-height 1.4
+        renderText(
+          pdf,
+          {
+            content: element.content,
+            x: element.x,
+            y: element.y,
+            width: element.width,
+            fontSize: element.fontSize,
+            fontFamily: element.fontFamily,
+            style: toPdfFontStyle(element.fontWeight === 'bold'),
+            color: element.color,
+            align: element.textAlign,
+            paddingPx: 8,
+            lineHeight: 1.4,
+          },
+          scaleX,
+          scaleY,
+          fonts
+        )
       } else if (element.type === 'image') {
-        await renderFrontPageImageOnCanvas(ctx, element)
+        await renderFrontPageImage(pdf, element, scaleX, scaleY, jpegQuality, maxImageDimension)
       }
     } catch (error) {
-      console.error('❌ Fehler beim Canvas-Rendern:', element.id, error)
+      console.error('❌ Fehler beim Rendern der Startseite:', element.id, error)
     }
   }
 
-  // Autorenname am unteren Rand einzeichnen (falls vorhanden)
+  // Autorenname am unteren Rand (13px, grau, zentriert, Unterkante 16px über dem Rand)
   if (author?.trim()) {
-    const fontSize = 13
-    ctx.save()
-    ctx.font = `${fontSize}px Helvetica, Arial, sans-serif`
-    ctx.fillStyle = '#666666'
-    ctx.textBaseline = 'bottom'
-    const text = `Autor: ${author.trim()}`
-    const textWidth = ctx.measureText(text).width
-    ctx.fillText(text, (canvasWidth - textWidth) / 2, canvasHeight - 16)
-    ctx.restore()
+    const fontSizePx = 13
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(pxToPt(fontSizePx, scaleY))
+    pdf.setTextColor(102, 102, 102)
+    const text = labels.author(author.trim())
+    pdf.text(text, (pageWidth - pdf.getTextWidth(text)) / 2, (canvasHeight - 16) * scaleY, {
+      baseline: 'bottom',
+    })
   }
 
-  // Canvas als JPEG in PDF einfügen
-  const imgData = canvas.toDataURL('image/jpeg', jpegQuality)
-  const pageWidth = pdf.internal.pageSize.getWidth()
-  const pageHeight = pdf.internal.pageSize.getHeight()
-  pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight)
-
-  console.log('✅ Startseite erfolgreich erstellt (Canvas-Rendering)')
+  console.log('✅ Startseite erfolgreich erstellt (Vektor-Rendering)')
 }
 
 /**
- * Rendert ein Text-Element auf dem Offscreen-Canvas.
- * Unterstützt benutzerdefinierte Schriftarten über @font-face.
+ * Rendert ein Bild der Startseite.
+ * Wie im Designer (CSS object-fit: contain): Seitenverhältnis bleibt erhalten,
+ * das Bild wird in der Elementbox zentriert.
  */
-function renderFrontPageTextOnCanvas(
-  ctx: CanvasRenderingContext2D,
-  element: FrontPageElement
-): void {
-  if (!element.content?.trim()) return
-
-  const padding = 8
-  const fontSize = element.fontSize || 24
-  const fontFamily = element.fontFamily || 'Helvetica, Arial, sans-serif'
-  const fontWeight = element.fontWeight === 'bold' ? 'bold' : 'normal'
-  const lineHeight = fontSize * 1.4
-
-  ctx.save()
-  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`
-  ctx.fillStyle = element.color || '#000000'
-  ctx.textBaseline = 'top'
-
-  const contentWidth = element.width - padding * 2
-  const x = element.x + padding
-  let y = element.y + padding
-
-  // Mehrzeiligen Text verarbeiten (explizite Umbrüche + Wortumbruch)
-  const explicitLines = element.content.split('\n')
-  const allLines: string[] = []
-
-  for (const line of explicitLines) {
-    if (line.trim() === '') {
-      allLines.push('')
-    } else {
-      allLines.push(...wrapText(ctx, line, contentWidth))
-    }
-  }
-
-  for (const line of allLines) {
-    let xPos = x
-    if (element.textAlign === 'center') {
-      const w = ctx.measureText(line).width
-      xPos = x + (contentWidth - w) / 2
-    } else if (element.textAlign === 'right') {
-      const w = ctx.measureText(line).width
-      xPos = x + contentWidth - w
-    }
-    ctx.fillText(line, xPos, y)
-    y += lineHeight
-  }
-
-  ctx.restore()
-}
-
-/** Bricht Text in Zeilen um die in maxWidth passen */
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(' ')
-  const lines: string[] = []
-  let current = ''
-
-  for (const word of words) {
-    const test = current ? current + ' ' + word : word
-    if (ctx.measureText(test).width > maxWidth && current) {
-      lines.push(current)
-      current = word
-    } else {
-      current = test
-    }
-  }
-  if (current) lines.push(current)
-  return lines.length ? lines : ['']
-}
-
-/** Rendert ein Bild-Element auf dem Offscreen-Canvas */
-async function renderFrontPageImageOnCanvas(
-  ctx: CanvasRenderingContext2D,
-  element: FrontPageElement
+async function renderFrontPageImage(
+  pdf: jsPDF,
+  element: FrontPageElement,
+  scaleX: number,
+  scaleY: number,
+  jpegQuality: number,
+  maxImageDimension: number
 ): Promise<void> {
-  const src = element.src
-  if (!src) return
+  if (!element.src) return
 
-  return new Promise<void>((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      ctx.drawImage(img, element.x, element.y, element.width, element.height)
-      resolve()
-    }
-    img.onerror = () => {
-      console.error('❌ Bild konnte nicht geladen werden:', element.id)
-      resolve()
-    }
-    img.src = src
-  })
+  const imageSrc = await resizeAndConvertDataUrl(element.src, maxImageDimension, jpegQuality)
+  const imgProps = pdf.getImageProperties(imageSrc)
+  const boxWidth = element.width * scaleX
+  const boxHeight = element.height * scaleY
+  const fit = Math.min(boxWidth / imgProps.width, boxHeight / imgProps.height)
+  const width = imgProps.width * fit
+  const height = imgProps.height * fit
+  const x = element.x * scaleX + (boxWidth - width) / 2
+  const y = element.y * scaleY + (boxHeight - height) / 2
+
+  const imageFormat = imageSrc.startsWith('data:image/png') ? 'PNG' : 'JPEG'
+  pdf.addImage(imageSrc, imageFormat, x, y, width, height)
 }
-
-/* renderFrontPageTextElement entfernt – Text wird jetzt via Canvas gerendert
-   (siehe renderFrontPageTextOnCanvas) für Custom-Font-Unterstützung */
-
-/* renderFrontPageImageElement entfernt – Bilder werden jetzt via Canvas gerendert
-   (siehe renderFrontPageImageOnCanvas) */
 
 /**
  * Fügt automatisch page-Nummern zu Elementen hinzu die keine haben
@@ -632,7 +665,9 @@ async function createCommentPagesFromElements(
   jpegQuality: number,
   maxImageDimension: number,
   orientation: 'portrait' | 'landscape' = 'portrait',
-  labels: PdfLabels = DEFAULT_PDF_LABELS
+  labels: PdfLabels = DEFAULT_PDF_LABELS,
+  fonts: ReadonlySet<string> = new Set(),
+  onPageDone?: () => Promise<void>
 ): Promise<void> {
   if (elements.length === 0) return
 
@@ -675,8 +710,10 @@ async function createCommentPagesFromElements(
       jpegQuality,
       maxImageDimension,
       orientation,
-      labels
+      labels,
+      fonts
     )
+    await onPageDone?.()
   }
 }
 
@@ -691,7 +728,8 @@ async function renderSingleCommentPage(
   jpegQuality: number,
   maxImageDimension: number,
   orientation: 'portrait' | 'landscape' = 'portrait',
-  labels: PdfLabels = DEFAULT_PDF_LABELS
+  labels: PdfLabels = DEFAULT_PDF_LABELS,
+  fonts: ReadonlySet<string> = new Set()
 ): Promise<void> {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
@@ -711,7 +749,26 @@ async function renderSingleCommentPage(
   for (const element of sortedElements) {
     try {
       if (element.type === 'text') {
-        renderTextElement(pdf, element, scaleX, scaleY)
+        // CSS .element-text: padding 8px; .text-content: line-height 1.5
+        renderText(
+          pdf,
+          {
+            content: element.content,
+            x: element.x,
+            y: element.y,
+            width: element.width,
+            fontSize: element.fontSize,
+            fontFamily: element.fontFamily,
+            style: toPdfFontStyle(element.bold, element.italic),
+            color: element.color,
+            align: element.align,
+            paddingPx: 8,
+            lineHeight: 1.5,
+          },
+          scaleX,
+          scaleY,
+          fonts
+        )
       } else if (element.type === 'image') {
         await renderImageElement(pdf, element, scaleX, scaleY, jpegQuality, maxImageDimension)
       }
@@ -721,102 +778,100 @@ async function renderSingleCommentPage(
   }
 
   // Footer mit Seiten-Nummer
+  pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(9)
   pdf.setTextColor(150, 150, 150)
   const footerText = labels.commentFooter(pageNumber, totalPages)
   pdf.text(footerText, (pageWidth - pdf.getTextWidth(footerText)) / 2, pageHeight - 10)
 }
 
+/** Textblock in Designer-Koordinaten (px auf der A4-Fläche bei 96 DPI). */
+interface PdfTextBlock {
+  content?: string
+  x: number
+  y: number
+  width?: number
+  fontSize?: number
+  fontFamily?: string
+  style: PdfFontStyle
+  color?: string
+  align?: 'left' | 'center' | 'right'
+  /** Innenabstand der Textbox in px (CSS padding) */
+  paddingPx: number
+  /** CSS line-height als Faktor der Schriftgröße */
+  lineHeight: number
+}
+
+/** Canvas-px → PDF-Punkte: px × (mm pro Canvas-px) / (mm pro Punkt). */
+function pxToPt(px: number, scaleY: number): number {
+  return (px * scaleY) / 0.3528
+}
+
 /**
- * Rendert ein Text-Element (für Kommentarseiten)
+ * Rendert einen Textblock (Startseite und Kommentarseiten).
  *
- * Koordinatensystem-Abgleich mit dem Canvas-Editor:
- * - Canvas: 794×1123px (A4 @ 96 DPI)
- * - PDF A4: 210×297mm
+ * Koordinatensystem-Abgleich mit dem Designer:
+ * - Fläche: 794×1123px (A4 @ 96 DPI), PDF A4: 210×297mm
  * - 1 Canvas-Pixel = scaleX mm (≈ 0.2645 mm)
- * - CSS .element-text hat padding: 8px
- * - CSS .text-content hat line-height: 1.5
  * - jsPDF text() positioniert an der Baseline
- * - jsPDF setFontSize() erwartet Punkte (1pt = 0.3528mm)
+ * - Baseline der 1. Zeile nach CSS-Modell: half-leading ((lineHeight − 1) / 2 × fontSize)
+ *   + Ascent (≈ 0.75 × fontSize); bei line-height 1.5 also genau 1 × fontSize
  */
-function renderTextElement(
+function renderText(
   pdf: jsPDF,
-  element: CanvasElement,
+  block: PdfTextBlock,
   scaleX: number,
-  scaleY: number
+  scaleY: number,
+  fonts: ReadonlySet<string>
 ): void {
-  if (!element.content || !element.content.trim()) return
+  if (!block.content || !block.content.trim()) return
 
-  // Padding des Canvas-Elements in px (CSS: .element-text { padding: 8px })
-  const paddingPx = 8
+  const { paddingPx, lineHeight } = block
+  const fontSizePx = block.fontSize || 24
+  pdf.setFontSize(pxToPt(fontSizePx, scaleY))
 
-  // Schriftgröße: Canvas-px → PDF-Punkte
-  // fontSizePt = fontSizePx × (mm pro Canvas-px) / (mm pro Punkt)
-  const fontSizePx = element.fontSize || 24
-  const fontSizePt = (fontSizePx * scaleY) / 0.3528
-  pdf.setFontSize(fontSizePt)
+  // Eingebettete Schrift (Fallback: nächster Schnitt der Familie, sonst Helvetica)
+  applyPdfFont(pdf, block.fontFamily, block.style, fonts)
 
-  // Schrift-Style setzen
-  if (element.bold && element.italic) {
-    pdf.setFont('helvetica', 'bolditalic')
-  } else if (element.bold) {
-    pdf.setFont('helvetica', 'bold')
-  } else if (element.italic) {
-    pdf.setFont('helvetica', 'italic')
-  } else {
-    pdf.setFont('helvetica', 'normal')
-  }
-
-  // Farbe setzen
-  if (element.color) {
-    const color = hexToRgb(element.color)
-    if (color) {
-      pdf.setTextColor(color.r, color.g, color.b)
-    }
+  const color = block.color ? hexToRgb(block.color) : null
+  if (color) {
+    pdf.setTextColor(color.r, color.g, color.b)
   } else {
     pdf.setTextColor(0, 0, 0)
   }
 
-  // X-Position: element.x + Padding (in mm)
-  const xBase = (element.x + paddingPx) * scaleX
+  // X-Position: Box + Padding (in mm)
+  const xBase = (block.x + paddingPx) * scaleX
 
-  // Verfügbare Breite für Textumbruch: Element-Breite minus Padding (WYSIWYG)
-  const elementWidth = element.width || 300
-  const availableWidthMm = (elementWidth - paddingPx * 2) * scaleX
+  // Verfügbare Breite für Textumbruch: Box-Breite minus Padding (WYSIWYG)
+  const boxWidth = block.width || 300
+  const availableWidthMm = (boxWidth - paddingPx * 2) * scaleX
 
   // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
   // splitTextToSize() repliziert das CSS word-break: break-word Verhalten
-  const explicitLines = element.content.split('\n')
   const allLines: string[] = []
-
-  explicitLines.forEach((line) => {
+  block.content.split('\n').forEach((line) => {
     if (line.trim() === '') {
       allLines.push('')
     } else {
-      const wrappedLines = pdf.splitTextToSize(line, availableWidthMm)
-      allLines.push(...wrappedLines)
+      allLines.push(...pdf.splitTextToSize(line, availableWidthMm))
     }
   })
 
+  const firstBaselinePx = fontSizePx * ((lineHeight - 1) / 2 + 0.75)
+
   allLines.forEach((line, index) => {
-    // Y-Position: Baseline der n-ten Zeile
-    // = element.y + padding + fontSize (Baseline der 1. Zeile) + index × lineHeight
-    // CSS-Modell: half-leading (0.25×fontSize) + Ascent (≈0.75×fontSize) ≈ fontSize
-    const yPosPx = element.y + paddingPx + fontSizePx * (1 + index * 1.5)
+    const yPosPx = block.y + paddingPx + firstBaselinePx + index * lineHeight * fontSizePx
     const yPosMm = yPosPx * scaleY
 
-    // Text-Ausrichtung relativ zur Element-Breite (wie CSS text-align)
-    if (element.align === 'center') {
-      const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (availableWidthMm - textWidthMm) / 2
-      pdf.text(line, xPos, yPosMm)
-    } else if (element.align === 'right') {
-      const textWidthMm = pdf.getTextWidth(line)
-      const xPos = xBase + (availableWidthMm - textWidthMm)
-      pdf.text(line, xPos, yPosMm)
-    } else {
-      pdf.text(line, xBase, yPosMm)
+    // Text-Ausrichtung relativ zur Box-Breite (wie CSS text-align)
+    let xPos = xBase
+    if (block.align === 'center') {
+      xPos = xBase + (availableWidthMm - pdf.getTextWidth(line)) / 2
+    } else if (block.align === 'right') {
+      xPos = xBase + (availableWidthMm - pdf.getTextWidth(line))
     }
+    pdf.text(line, xPos, yPosMm)
   })
 }
 
@@ -967,6 +1022,11 @@ async function resizeAndConvertDataUrl(
         return
       }
 
+      // JPEG kennt keine Transparenz: transparente Bereiche weiß statt schwarz,
+      // passend zur weißen PDF-Seite
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, newWidth, newHeight)
+
       // Zeichne mit High-Quality Antialiasing
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = 'high'
@@ -974,7 +1034,15 @@ async function resizeAndConvertDataUrl(
 
       // IMMER zu JPEG konvertieren (auch wenn Original PNG war!)
       const originalFormat = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG'
-      const jpegDataUrl = canvas.toDataURL('image/jpeg', quality)
+      let jpegDataUrl: string
+      try {
+        jpegDataUrl = canvas.toDataURL('image/jpeg', quality)
+      } catch (error) {
+        // z. B. fremde Bildquelle ohne CORS (Canvas „tainted“)
+        console.warn('⚠️ Bild konnte nicht konvertiert werden, verwende Original', error)
+        resolve(dataUrl)
+        return
+      }
 
       if (img.width !== newWidth || img.height !== newHeight) {
         console.log(`  📏 Bild skaliert: ${img.width}x${img.height} → ${newWidth}x${newHeight}`)

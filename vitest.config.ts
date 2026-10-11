@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import fs from 'node:fs'
 import path from 'node:path'
+import { base64Asset } from './vite-plugins/base64-asset'
 
 /**
  * Chromium für den Browser-Modus finden.
@@ -26,7 +27,7 @@ function findChromium(): string | undefined {
 // Eigene Test-Konfiguration: vite.config.ts enthält Build-Plugins (FontAwesome-
 // Subset, CSS-Inlining), die für Tests nicht gebraucht werden.
 const shared = {
-  plugins: [vue()],
+  plugins: [vue(), base64Asset()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

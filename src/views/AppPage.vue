@@ -23,6 +23,7 @@ import {
   exportMultipleImagesAsPdf,
   type ExportSettings,
   type ImageData,
+  type PdfExportResult,
 } from '@/lib/features/export-pdf'
 
 import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
@@ -198,32 +199,68 @@ async function handleExportConfirm(settings: ExportSettings) {
         settings.frontPageElements.length > 0
       )
 
-      await exportMultipleImagesAsPdf(
-        imageDataArray,
-        {
-          title: t('pdfExport.defaultTitle'),
-          author: settings.author || '',
-          includeCustomFrontPage: useCustomFrontPage,
-          frontPageElements: useCustomFrontPage ? settings.frontPageElements : [],
-          includeTitlePage: !useCustomFrontPage,
-          includeCommentPages: settings.includeCommentPages || false,
-          commentPageElements: settings.commentPageElements || [],
-          includeFileName: true,
-          includeImages: true,
-          orientation: settings.orientation || 'portrait',
-          labels: {
-            locale: dateLocale(locale.value),
-            imageCount: (count) => t('pdfExport.imageCount', { count }, count),
-            author: (name) => t('pdfExport.author', { name }),
-            createdWith: t('pdfExport.createdWith'),
-            commentFooter: (page, total) => commentFooterText(t, locale.value, page, total),
-          },
-        },
-        'bilder-export.pdf'
-      )
+      const controller = new AbortController()
+      loadingIndicator.value?.showWithProgress(t('loading.pdfMulti', { count: images.length }), 0, {
+        onCancel: () => controller.abort(),
+      })
 
-      toast.success(t('toast.pdfSuccess', { count: images.length }))
-      showWizard('pdf', images.length)
+      let result: PdfExportResult
+      try {
+        result = await exportMultipleImagesAsPdf(
+          imageDataArray,
+          {
+            title: t('pdfExport.defaultTitle'),
+            author: settings.author || '',
+            includeCustomFrontPage: useCustomFrontPage,
+            frontPageElements: useCustomFrontPage ? settings.frontPageElements : [],
+            includeTitlePage: !useCustomFrontPage,
+            includeCommentPages: settings.includeCommentPages || false,
+            commentPageElements: settings.commentPageElements || [],
+            includeFileName: true,
+            includeImages: true,
+            orientation: settings.orientation || 'portrait',
+            labels: {
+              locale: dateLocale(locale.value),
+              imageCount: (count) => t('pdfExport.imageCount', { count }, count),
+              author: (name) => t('pdfExport.author', { name }),
+              createdWith: t('pdfExport.createdWith'),
+              commentFooter: (page, total) => commentFooterText(t, locale.value, page, total),
+            },
+            onProgress: (done, total) => {
+              loadingIndicator.value?.updateTotal(total)
+              loadingIndicator.value?.updateProgress(
+                done,
+                t('loading.pdfProgress', { current: done, total })
+              )
+            },
+            signal: controller.signal,
+          },
+          'bilder-export.pdf'
+        )
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          toast.info(t('toast.pdfCancelled'))
+          return
+        }
+        throw error
+      } finally {
+        loadingIndicator.value?.hide()
+      }
+
+      const exportedCount = images.length - result.failedImages.length
+      if (result.failedImages.length > 0) {
+        toast.warning(
+          t('toast.pdfPartial', {
+            count: exportedCount,
+            failed: result.failedImages.length,
+            names: result.failedImages.join(', '),
+          }),
+          8000
+        )
+      } else {
+        toast.success(t('toast.pdfSuccess', { count: exportedCount }))
+      }
+      showWizard('pdf', exportedCount)
     } else if (currentMode === 'zip') {
       const imagesToExport = imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
       const total = imagesToExport.length

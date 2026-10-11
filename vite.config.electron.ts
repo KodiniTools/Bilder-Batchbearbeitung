@@ -2,13 +2,14 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
+import { base64Asset } from './vite-plugins/base64-asset'
 
 const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 // Electron build config – uses relative paths for file:// protocol
 export default defineConfig({
   base: './',
-  plugins: [vue()],
+  plugins: [vue(), base64Asset()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
