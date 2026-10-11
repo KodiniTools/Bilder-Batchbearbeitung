@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { faIconSubset, inlineEntryCss } from './vite-plugins/critical-css'
+import { base64Asset } from './vite-plugins/base64-asset'
 
 const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
@@ -17,6 +18,8 @@ export default defineConfig({
       exclude: ['src/lib/bildseriebearbeiten'],
     }),
     inlineEntryCss(),
+    // PDF-Schriften als Base64-Chunks (src/lib/features/pdf-fonts.ts)
+    base64Asset(),
   ],
   resolve: {
     alias: {

@@ -8,6 +8,8 @@ const message = ref('')
 const currentProgress = ref(0)
 const totalProgress = ref(0)
 const showProgress = ref(false)
+/** Optionaler Abbrechen-Handler; ohne Handler wird kein Button angezeigt */
+const cancelHandler = ref<(() => void) | null>(null)
 
 const progressPercent = computed(() => {
   if (totalProgress.value === 0) return 0
@@ -25,14 +27,28 @@ const show = (msg?: string) => {
   showProgress.value = false
   currentProgress.value = 0
   totalProgress.value = 0
+  cancelHandler.value = null
 }
 
-const showWithProgress = (msg: string, total: number) => {
+const showWithProgress = (msg: string, total: number, options: { onCancel?: () => void } = {}) => {
   isVisible.value = true
   message.value = msg
   showProgress.value = true
   currentProgress.value = 0
   totalProgress.value = total
+  cancelHandler.value = options.onCancel ?? null
+}
+
+/** Setzt die Gesamtzahl neu, wenn sie erst nach dem Start feststeht. */
+const updateTotal = (total: number) => {
+  totalProgress.value = total
+}
+
+const cancel = () => {
+  const handler = cancelHandler.value
+  // Nur einmal auslösen; das Ausblenden übernimmt der Aufrufer
+  cancelHandler.value = null
+  handler?.()
 }
 
 const updateProgress = (current: number, newMessage?: string) => {
@@ -48,12 +64,14 @@ const hide = () => {
   showProgress.value = false
   currentProgress.value = 0
   totalProgress.value = 0
+  cancelHandler.value = null
 }
 
 defineExpose({
   show,
   showWithProgress,
   updateProgress,
+  updateTotal,
   hide,
 })
 </script>
@@ -75,6 +93,10 @@ defineExpose({
             <span class="progress-percent">{{ progressPercent }}%</span>
           </div>
         </div>
+
+        <button v-if="cancelHandler" type="button" class="cancel-btn" @click="cancel">
+          {{ t('buttons.cancel') }}
+        </button>
       </div>
     </div>
   </div>
@@ -172,6 +194,28 @@ defineExpose({
 .progress-percent {
   color: var(--accent);
   font-weight: 600;
+}
+
+.cancel-btn {
+  align-self: flex-end;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease-smooth);
+}
+
+.cancel-btn:hover {
+  background: var(--ds-accent-soft);
+}
+
+.cancel-btn:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
 }
 
 @keyframes spin {

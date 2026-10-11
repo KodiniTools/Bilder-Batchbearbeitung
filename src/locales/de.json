@@ -385,6 +385,7 @@
     "zipProgress": "Verarbeite Bild {current} von {total}...",
     "pdf": "Erstelle PDF...",
     "pdfMulti": "Erstelle PDF mit {count} Bildern...",
+    "pdfProgress": "Erstelle PDF: Schritt {current} von {total}…",
     "progress": "{current} von {total}",
     "resizing": "Bild {current} von {total} wird skaliert…",
     "cropping": "Bild {current} von {total} wird zugeschnitten…",
@@ -392,6 +393,8 @@
   },
   "toast": {
     "pdfSuccess": "PDF mit {count} Bildern erfolgreich erstellt",
+    "pdfPartial": "PDF mit {count} Bildern erstellt, {failed} Bild(er) konnten nicht übernommen werden: {names}",
+    "pdfCancelled": "PDF-Export abgebrochen",
     "zipSuccess": "ZIP mit {count} Bildern erfolgreich erstellt",
     "saveSuccess": "{count} Bilder erfolgreich gespeichert",
     "svgSuccess": "{count} Bild(er) erfolgreich als SVG exportiert",
