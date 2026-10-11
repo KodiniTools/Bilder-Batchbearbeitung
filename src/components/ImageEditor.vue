@@ -946,7 +946,7 @@ async function downloadImage() {
     }
 
     const format = availableFormats.value.find((f) => f.mimeType === selectedFormat.value)
-    if (!format) throw new Error('Ungültiges Format')
+    if (!format) throw new Error(t('alerts.invalidFormat'))
     const blob = await ImageProcessor.convertToFormat(
       { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
       format

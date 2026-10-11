@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
 
+const { t } = useI18n()
 const { toasts, removeToast } = useToast()
 
 const getIcon = (type: string) => {
@@ -35,7 +37,7 @@ const getIcon = (type: string) => {
           <button
             type="button"
             class="toast-close"
-            aria-label="Schließen"
+            :aria-label="t('accessibility.close')"
             @click.stop="removeToast(toast.id)"
           >
             <i class="fas fa-times"></i>

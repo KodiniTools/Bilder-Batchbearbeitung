@@ -373,7 +373,10 @@
   },
   "accessibility": {
     "dropzone": "Dateien hierher ziehen oder klicken, um Bilder auszuwählen",
-    "scrollToTop": "Nach oben scrollen"
+    "scrollToTop": "Nach oben scrollen",
+    "close": "Schließen",
+    "previousImage": "Vorheriges Bild",
+    "nextImage": "Nächstes Bild"
   },
   "loading": {
     "text": "Bitte warten…",
@@ -422,7 +425,8 @@
     "confirmDeletePage": "Möchten Sie Seite {page} wirklich löschen?",
     "downloadError": "Fehler beim Erstellen des Bildes: {error}",
     "unknownError": "Unbekannter Fehler",
-    "confirmClearPage": "Möchten Sie alle Elemente von Seite {page} wirklich löschen?"
+    "confirmClearPage": "Möchten Sie alle Elemente von Seite {page} wirklich löschen?",
+    "invalidFormat": "Ungültiges Format"
   },
   "consent": {
     "text": "Wir nutzen anonyme Nutzungsstatistiken, um die App zu verbessern. Dürfen wir diese Daten erheben?",
@@ -577,7 +581,8 @@
       "images": "Bilder",
       "selectedImage": "ausgewähltes Bild",
       "selectedImages": "ausgewählte Bilder"
-    }
+    },
+    "moreElements": "+{count} weitere"
   },
   "frontPageDesigner": {
     "title": "Startseite gestalten",
@@ -620,8 +625,7 @@
       "noSelection": "Wählen Sie ein Element aus, um es zu bearbeiten"
     },
     "footer": {
-      "elementCount": "{count} Element",
-      "elementCount_plural": "{count} Elemente",
+      "elementCount": "{count} Element | {count} Elemente",
       "cancel": "Abbrechen",
       "save": "Speichern"
     },
@@ -634,7 +638,9 @@
       "zoomOut": "Verkleinern",
       "zoomIn": "Vergrößern",
       "reset": "Zoom zurücksetzen"
-    }
+    },
+    "previewTitle": "Vorschau — Startseite",
+    "confirmOrientationReset": "Die Orientierung hat sich geändert. Elemente zurücksetzen?"
   },
   "commentPageDesigner": {
     "title": "Kommentarseiten-Designer (mehrseitig)",
@@ -642,8 +648,7 @@
     "pageManagement": {
       "title": "Seiten verwalten",
       "pageOf": "Seite {current} von {total}",
-      "elementCount": "{count} Element",
-      "elementCount_plural": "{count} Elemente",
+      "elementCount": "{count} Element | {count} Elemente",
       "previousPage": "Vorherige Seite",
       "nextPage": "Nächste Seite",
       "pageTitle": "Seite {number}",
@@ -704,7 +709,8 @@
     "element": {
       "singular": "Element",
       "plural": "Elemente"
-    }
+    },
+    "previewTitle": "Vorschau — Kommentarseiten"
   },
   "imageEditor": {
     "title": "Bild bearbeiten",
@@ -1026,5 +1032,22 @@
     "subtitle": "Beiträge aus dem KodiniTools-Blog rund um Bilderserie bearbeiten. Artikel öffnen in einem neuen Tab.",
     "readArticle": "Artikel lesen",
     "minutes": "{count} Min."
+  },
+  "designer": {
+    "orientation": {
+      "portrait": "▯ Hochformat",
+      "landscape": "⬛ Querformat"
+    },
+    "preview": "Vorschau",
+    "closeAndContinue": "Schließen & weiter bearbeiten",
+    "save": "Speichern",
+    "commentFooter": "Erstellt am {date} • Kommentarseite {page}",
+    "commentFooterOf": "Erstellt am {date} • Kommentarseite {page} von {total}"
+  },
+  "pdfExport": {
+    "defaultTitle": "Bildersammlung",
+    "imageCount": "{count} Bild | {count} Bilder",
+    "author": "Autor: {name}",
+    "createdWith": "Erstellt mit Kodini Tools"
   }
 }

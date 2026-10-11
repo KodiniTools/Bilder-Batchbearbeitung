@@ -150,6 +150,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { commentFooterText } from '@/utils/i18nFormat'
 import CommentPageDesignerHeader from './comment-page-designer/CommentPageDesignerHeader.vue'
 import CommentPageDesignerTools from './comment-page-designer/CommentPageDesignerTools.vue'
 import CommentPageDesignerPageToolbar from './comment-page-designer/CommentPageDesignerPageToolbar.vue'
@@ -162,7 +163,7 @@ import { useCommentPages } from '@/composables/useCommentPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
 import type { CanvasElement } from '@/lib/features/export-pdf'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // Props — v-model based public API
 const props = withDefaults(
@@ -256,10 +257,7 @@ function updateElementContent(id: string, content: string) {
 
 // Footer preview text (matches PDF export footer)
 const footerPreviewText = computed(() => {
-  const dateStr = new Date().toLocaleDateString('de-DE')
-  const pageNum = currentPageIndex.value + 1
-  const total = pages.value.length
-  return `Erstellt am ${dateStr} • Kommentarseite ${pageNum}${total > 1 ? ` von ${total}` : ''}`
+  return commentFooterText(t, locale.value, currentPageIndex.value + 1, pages.value.length)
 })
 
 function openPreview() {

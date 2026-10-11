@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { getTopOverlayBottom } from '@/utils/viewport'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   image: ImageObject | null
@@ -215,14 +218,18 @@ onUnmounted(() => {
         <div ref="contentEl" class="preview-content">
           <div class="preview-canvas-wrapper">
             <canvas ref="previewCanvas" :style="canvasStyle"></canvas>
-            <button class="preview-close-float" aria-label="Schließen" @click.stop="handleClose">
+            <button
+              class="preview-close-float"
+              :aria-label="t('accessibility.close')"
+              @click.stop="handleClose"
+            >
               <i class="fa-solid fa-xmark"></i>
             </button>
 
             <button
               v-if="hasGallery"
               class="preview-nav preview-nav-prev"
-              aria-label="Vorheriges Bild"
+              :aria-label="t('accessibility.previousImage')"
               :disabled="!canGoPrev"
               @click.stop="goPrev"
             >
@@ -231,7 +238,7 @@ onUnmounted(() => {
             <button
               v-if="hasGallery"
               class="preview-nav preview-nav-next"
-              aria-label="Nächstes Bild"
+              :aria-label="t('accessibility.nextImage')"
               :disabled="!canGoNext"
               @click.stop="goNext"
             >
