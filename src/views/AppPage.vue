@@ -217,12 +217,28 @@ async function handleExportConfirm(settings: ExportSettings) {
           commentPageElements: settings.commentPageElements || [],
           includeImages: true,
           orientation: settings.orientation || 'portrait',
+          pageFormat: settings.pageFormat,
+          customPageSize: {
+            width: settings.customWidth ?? 210,
+            height: settings.customHeight ?? 297,
+          },
+          margin: settings.margin,
+          imagesPerPage: settings.imagesPerPage,
+          imageFit: settings.imageFit,
+          header: settings.header,
+          footer: settings.footer,
+          pageNumbers: settings.pageNumbers,
+          bookmarks: settings.bookmarks,
           labels: {
             locale: dateLocale(locale.value),
             imageCount: (count) => t('pdfExport.imageCount', { count }, count),
             author: (name) => t('pdfExport.author', { name }),
             createdWith: t('pdfExport.createdWith'),
             commentFooter: (page, total) => commentFooterText(t, locale.value, page, total),
+            pageNumber: (page, total) => t('pdfExport.pageNumber', { page, total }),
+            bookmarkCover: t('pdfExport.bookmarkCover'),
+            bookmarkComment: (page) => t('pdfExport.bookmarkComment', { page }),
+            bookmarkImage: (index) => t('pdfExport.bookmarkImage', { index }),
           },
           onProgress: (done, total) => {
             loadingIndicator.value?.updateTotal(total)

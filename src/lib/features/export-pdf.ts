@@ -66,6 +66,12 @@ export interface PdfLabels {
   author: (name: string) => string
   createdWith: string
   commentFooter: (page: number, total: number) => string
+  /** Seitenzahl in der Fußzeile */
+  pageNumber: (page: number, total: number) => string
+  /** Lesezeichen im PDF-Inhaltsverzeichnis */
+  bookmarkCover: string
+  bookmarkComment: (page: number) => string
+  bookmarkImage: (index: number) => string
 }
 
 const DEFAULT_PDF_LABELS: PdfLabels = {
@@ -75,7 +81,31 @@ const DEFAULT_PDF_LABELS: PdfLabels = {
   createdWith: 'Erstellt mit Kodini Tools',
   commentFooter: (page, total) =>
     `Erstellt am ${new Date().toLocaleDateString('de-DE')} • Kommentarseite ${page}${total > 1 ? ` von ${total}` : ''}`,
+  pageNumber: (page, total) => `${page} / ${total}`,
+  bookmarkCover: 'Startseite',
+  bookmarkComment: (page) => `Kommentarseite ${page}`,
+  bookmarkImage: (index) => `Bild ${index}`,
 }
+
+/** Seitenformate; Maße in mm im Hochformat */
+export type PdfPageFormat = 'a4' | 'a5' | 'a3' | 'letter' | 'square' | 'custom'
+/** Bilder pro Seite */
+export type ImagesPerPage = 1 | 2 | 4 | 6 | 9
+/** contain: ganzes Bild sichtbar; cover: Zelle füllen, Überstand wird beschnitten */
+export type ImageFit = 'contain' | 'cover'
+
+export const PAGE_FORMAT_SIZES_MM: Record<Exclude<PdfPageFormat, 'custom'>, [number, number]> = {
+  a4: [210, 297],
+  a5: [148, 210],
+  a3: [297, 420],
+  letter: [215.9, 279.4],
+  square: [210, 210],
+}
+
+/** Grenzen für benutzerdefinierte Seitengrößen und Ränder in mm */
+export const CUSTOM_PAGE_MIN_MM = 50
+export const CUSTOM_PAGE_MAX_MM = 1000
+export const PAGE_MARGIN_MAX_MM = 40
 
 export interface PdfExportSettings {
   title?: string
@@ -91,6 +121,24 @@ export interface PdfExportSettings {
   imageQuality?: number // JPEG Qualität: 0.0 (niedrig) bis 1.0 (hoch), default 0.75
   maxImageDimension?: number // Maximale Breite/Höhe in Pixel, default 1920
   orientation?: 'portrait' | 'landscape'
+  /** Seitenformat, Standard A4 */
+  pageFormat?: PdfPageFormat
+  /** Breite × Höhe in mm (Hochformat), nur bei pageFormat 'custom' */
+  customPageSize?: { width: number; height: number }
+  /** Seitenrand der Bildseiten in mm, Standard 10 */
+  margin?: number
+  /** Bilder pro Seite, Standard 1 */
+  imagesPerPage?: ImagesPerPage
+  /** Einpassen (Standard) oder Füllen */
+  imageFit?: ImageFit
+  /** Kopfzeile; Platzhalter {page}, {total}, {title}, {date} */
+  header?: string
+  /** Fußzeile; Platzhalter wie header */
+  footer?: string
+  /** Seitenzahl unten rechts */
+  pageNumbers?: boolean
+  /** PDF-Lesezeichen für Startseite, Kommentarseiten und Bilder, Standard an */
+  bookmarks?: boolean
   /** Übersetzte PDF-Texte; fehlende Einträge fallen auf Deutsch zurück */
   labels?: Partial<PdfLabels>
   /** Fortschritt in Arbeitsschritten (Startseite, je Kommentarseite, je Bild) */
@@ -165,10 +213,22 @@ export async function buildPdfDocument(
     maxImageDimension = 1920, // Standard: 1920px (Full HD)
     optimizeSize = false,
     orientation = 'portrait',
+    pageFormat = 'a4',
+    customPageSize,
+    imagesPerPage = 1,
+    imageFit = 'contain',
+    header = '',
+    footer = '',
+    pageNumbers = false,
+    bookmarks = true,
     onProgress,
     signal,
     onImageError,
   } = settings
+  const margin = clamp(settings.margin ?? IMAGE_PAGE_MARGIN, 0, PAGE_MARGIN_MAX_MM)
+  const perPage: ImagesPerPage = ([1, 2, 4, 6, 9] as const).includes(imagesPerPage)
+    ? imagesPerPage
+    : 1
   const labels: PdfLabels = { ...DEFAULT_PDF_LABELS, ...settings.labels }
 
   // Bestimme JPEG-Qualität:
@@ -177,10 +237,11 @@ export async function buildPdfDocument(
   // - Ansonsten verwende gute Standard-Qualität (0.75)
   const jpegQuality = imageQuality !== undefined ? imageQuality : optimizeSize ? 0.65 : 0.75
 
+  const pageSize = resolvePageSize(pageFormat, orientation, customPageSize)
   const pdf = new jsPDF({
-    orientation: orientation,
+    orientation: pageSize.width > pageSize.height ? 'landscape' : 'portrait',
     unit: 'mm',
-    format: 'a4',
+    format: [pageSize.width, pageSize.height],
   })
 
   // Metadaten: Titel/Autor erscheinen in den Dokumenteigenschaften des PDF-Viewers
@@ -221,6 +282,9 @@ export async function buildPdfDocument(
 
   const failedImages: string[] = []
   let pageAdded = false
+  const outline: { title: string; pageNumber: number }[] = []
+  // Eigener Fußbereich ersetzt die automatische Fußzeile der Kommentarseiten
+  const hasCustomFooter = footer.trim() !== '' || pageNumbers
 
   console.log('📄 Starte PDF-Export...')
   console.log(
@@ -248,12 +312,14 @@ export async function buildPdfDocument(
       author
     )
     pageAdded = true
+    outline.push({ title: labels.bookmarkCover, pageNumber: 1 })
     await step()
   } else if (includeTitlePage) {
     // Fallback: Automatische Titelseite wenn keine benutzerdefinierte Startseite
     console.log('📋 Erstelle automatische Titel-Seite...')
     createTitlePage(pdf, title, images.length, labels, author)
     pageAdded = true
+    outline.push({ title: labels.bookmarkCover, pageNumber: 1 })
     await step()
   }
 
@@ -269,6 +335,10 @@ export async function buildPdfDocument(
 
     // Automatisch page-Nummern hinzufügen wenn nicht vorhanden
     const elementsWithPages = assignPageNumbersIfMissing(commentPageElements)
+    const firstCommentPage = pdf.getNumberOfPages()
+    for (let k = 0; k < commentPageCount; k++) {
+      outline.push({ title: labels.bookmarkComment(k + 1), pageNumber: firstCommentPage + k })
+    }
 
     await createCommentPagesFromElements(
       pdf,
@@ -278,7 +348,8 @@ export async function buildPdfDocument(
       orientation,
       labels,
       fonts,
-      step
+      step,
+      !hasCustomFooter
     )
     pageAdded = true
   }
@@ -289,12 +360,20 @@ export async function buildPdfDocument(
   if (includeImages && images.length > 0) {
     console.log('🖼️ Füge Bilder hinzu...')
 
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const content = imageContentArea(pageWidth, pageHeight, margin, {
+      header: header.trim() !== '',
+      footer: hasCustomFooter,
+    })
+    const grid = imageGrid(perPage, pageWidth > pageHeight)
+    const cells = gridCells(content, grid.cols, grid.rows)
+    const commentFontPt = perPage === 1 ? IMAGE_COMMENT_FONT_PT : IMAGE_COMMENT_FONT_PT_GRID
+    const commentLineMm = commentFontPt * PT_TO_MM * IMAGE_COMMENT_LINE_HEIGHT
+    let slot = 0
+
     for (let i = 0; i < images.length; i++) {
       const image = images[i]
-
-      if (pageAdded) {
-        pdf.addPage()
-      }
 
       try {
         // Hole dataUrl - entweder direkt oder vom Canvas
@@ -314,42 +393,59 @@ export async function buildPdfDocument(
           await step()
           continue
         }
-
-        const pageWidth = pdf.internal.pageSize.getWidth()
-        const pageHeight = pdf.internal.pageSize.getHeight()
         const imgProps = pdf.getImageProperties(dataUrl)
+
+        // Neue Seite erst, wenn das Bild geladen ist (fehlerhafte Bilder belegen keine Zelle)
+        if (slot === 0 && pageAdded) pdf.addPage()
+        pageAdded = true
+        const cell = cells[slot]
 
         // Kommentar umbrechen (Schrift muss vor splitTextToSize gesetzt sein)
         pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(IMAGE_COMMENT_FONT_PT)
-        const commentLines = wrapImageComment(
-          pdf,
-          image.comment,
-          pageWidth - IMAGE_PAGE_MARGIN * 2,
-          maxImageCommentLines(pageHeight)
+        pdf.setFontSize(commentFontPt)
+        const maxLines = Math.max(
+          1,
+          Math.floor((cell.height * IMAGE_COMMENT_MAX_SHARE) / commentLineMm)
         )
+        const commentLines = wrapImageComment(pdf, image.comment, cell.width, maxLines)
 
-        const layout = layoutImagePage(
-          pageWidth,
-          pageHeight,
+        const layout = layoutImageCell(
+          cell,
           imgProps.width / imgProps.height,
-          commentLines.length
+          commentLines.length,
+          commentLineMm,
+          imageFit
         )
 
         // Nach Konvertierung sollte es immer JPEG sein; zur Sicherheit prüfen
         const imageFormat = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG'
-        pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
+        if (layout.clip) {
+          // Füllen: Überstand an der Zelle beschneiden
+          pdf.saveGraphicsState()
+          pdf.rect(layout.clip.x, layout.clip.y, layout.clip.width, layout.clip.height, null)
+          pdf.clip()
+          pdf.discardPath()
+          pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
+          pdf.restoreGraphicsState()
+        } else {
+          pdf.addImage(dataUrl, imageFormat, layout.x, layout.y, layout.width, layout.height)
+        }
 
-        // Bildkommentar zentriert unter dem Bild (der Dateiname erscheint nicht mehr)
+        // Bildkommentar zentriert unter dem Bild (der Dateiname erscheint nicht)
         if (commentLines.length > 0) {
           pdf.setTextColor(60, 60, 60)
-          pdf.text(commentLines, pageWidth / 2, layout.commentY, {
+          pdf.text(commentLines, cell.x + cell.width / 2, layout.commentY, {
             align: 'center',
             baseline: 'top',
             lineHeightFactor: IMAGE_COMMENT_LINE_HEIGHT,
           })
         }
 
+        outline.push({
+          title: imageBookmarkTitle(labels.bookmarkImage(i + 1), image.comment),
+          pageNumber: pdf.getNumberOfPages(),
+        })
+        slot = (slot + 1) % perPage
         console.log(`  ✔ Bild ${i + 1}/${images.length} hinzugefügt`)
       } catch (error) {
         console.error(`❌ Fehler bei Bild ${i}:`, error)
@@ -357,8 +453,28 @@ export async function buildPdfDocument(
         onImageError?.(image.originalName, error)
       }
 
-      pageAdded = true
       await step()
+    }
+  }
+
+  // ========================================
+  // 4. KOPF-/FUSSZEILE, LESEZEICHEN
+  // ========================================
+  const hasCover = hasCoverPage || includeTitlePage
+  renderHeaderFooter(pdf, {
+    header,
+    footer,
+    pageNumbers,
+    margin,
+    skipFirstPage: hasCover,
+    title,
+    date: new Date().toLocaleDateString(labels.locale),
+    pageNumberText: labels.pageNumber,
+  })
+
+  if (bookmarks) {
+    for (const entry of outline) {
+      pdf.outline.add(null, entry.title, { pageNumber: entry.pageNumber })
     }
   }
 
@@ -434,6 +550,11 @@ export interface ImagePageLayout {
   commentY: number
 }
 
+export interface ImageCellLayout extends ImagePageLayout {
+  /** Beschnitt bei „Füllen“; das Bild ragt dann über die Zelle hinaus */
+  clip?: PdfRect
+}
+
 /**
  * Bild + Kommentar als Block vertikal zentrieren. Das Bild wird so groß wie
  * möglich eingepasst; der Kommentar bekommt darunter genau den Platz, den er braucht.
@@ -444,22 +565,63 @@ export function layoutImagePage(
   aspectRatio: number,
   commentLineCount: number
 ): ImagePageLayout {
+  return layoutImageCell(
+    {
+      x: IMAGE_PAGE_MARGIN,
+      y: IMAGE_PAGE_MARGIN,
+      width: pageWidth - IMAGE_PAGE_MARGIN * 2,
+      height: pageHeight - IMAGE_PAGE_MARGIN * 2,
+    },
+    aspectRatio,
+    commentLineCount,
+    IMAGE_COMMENT_LINE_MM,
+    'contain'
+  )
+}
+
+/**
+ * Layout eines Bildes in einer Zelle. „contain“: Bild + Kommentar als Block
+ * vertikal zentriert. „cover“: Bild füllt die Zelle über dem Kommentar und
+ * wird mittig beschnitten.
+ */
+export function layoutImageCell(
+  cell: PdfRect,
+  aspectRatio: number,
+  commentLineCount: number,
+  commentLineMm: number,
+  fit: ImageFit
+): ImageCellLayout {
   const commentHeight =
-    commentLineCount > 0 ? IMAGE_COMMENT_GAP + commentLineCount * IMAGE_COMMENT_LINE_MM : 0
+    commentLineCount > 0 ? IMAGE_COMMENT_GAP + commentLineCount * commentLineMm : 0
+  const boxHeight = Math.max(1, cell.height - commentHeight)
 
-  const maxWidth = pageWidth - IMAGE_PAGE_MARGIN * 2
-  const maxHeight = pageHeight - IMAGE_PAGE_MARGIN * 2 - commentHeight
+  if (fit === 'cover') {
+    let width = cell.width
+    let height = width / aspectRatio
+    if (height < boxHeight) {
+      height = boxHeight
+      width = height * aspectRatio
+    }
+    return {
+      x: cell.x + (cell.width - width) / 2,
+      y: cell.y + (boxHeight - height) / 2,
+      width,
+      height,
+      commentY: cell.y + boxHeight + IMAGE_COMMENT_GAP,
+      clip: { x: cell.x, y: cell.y, width: cell.width, height: boxHeight },
+    }
+  }
 
-  let width = maxWidth
+  let width = cell.width
   let height = width / aspectRatio
-  if (height > maxHeight) {
-    height = maxHeight
+  if (height > boxHeight) {
+    height = boxHeight
     width = height * aspectRatio
   }
 
-  const blockTop = (pageHeight - (height + commentHeight)) / 2
+  const blockTop = cell.y + (cell.height - (height + commentHeight)) / 2
   return {
-    x: (pageWidth - width) / 2,
+    x: cell.x + (cell.width - width) / 2,
     y: blockTop,
     width,
     height,
@@ -516,6 +678,187 @@ export function buildSingleImagePdf(
   return pdf
 }
 
+// ============================================================================
+// SEITENFORMAT, RASTER, KOPF-/FUSSZEILE
+// ============================================================================
+
+/** Schriftgröße des Bildkommentars bei mehreren Bildern pro Seite in pt */
+const IMAGE_COMMENT_FONT_PT_GRID = 8
+/** Abstand zwischen Rasterzellen in mm */
+const IMAGE_GRID_GAP = 5
+/** Höhe des Kopf- bzw. Fußbereichs in mm */
+const HEADER_FOOTER_BAND = 8
+/** Schriftgröße von Kopf- und Fußzeile in pt */
+const HEADER_FOOTER_FONT_PT = 9
+/** 1 pt in mm */
+const PT_TO_MM = 0.3528
+
+function clamp(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) return min
+  return Math.min(max, Math.max(min, value))
+}
+
+/**
+ * Seitengröße in mm passend zur Ausrichtung. Benutzerdefinierte Maße werden auf
+ * CUSTOM_PAGE_MIN_MM…CUSTOM_PAGE_MAX_MM begrenzt; Quadrat bleibt quadratisch.
+ */
+export function resolvePageSize(
+  format: PdfPageFormat,
+  orientation: 'portrait' | 'landscape',
+  custom?: { width: number; height: number }
+): { width: number; height: number } {
+  let [a, b] =
+    format === 'custom'
+      ? [
+          clamp(custom?.width ?? 210, CUSTOM_PAGE_MIN_MM, CUSTOM_PAGE_MAX_MM),
+          clamp(custom?.height ?? 297, CUSTOM_PAGE_MIN_MM, CUSTOM_PAGE_MAX_MM),
+        ]
+      : (PAGE_FORMAT_SIZES_MM[format] ?? PAGE_FORMAT_SIZES_MM.a4)
+  if (a > b) [a, b] = [b, a]
+  return orientation === 'landscape' ? { width: b, height: a } : { width: a, height: b }
+}
+
+/** Spalten × Zeilen für die Anzahl Bilder pro Seite. */
+export function imageGrid(
+  perPage: ImagesPerPage,
+  landscape: boolean
+): { cols: number; rows: number } {
+  switch (perPage) {
+    case 1:
+      return { cols: 1, rows: 1 }
+    case 2:
+      return landscape ? { cols: 2, rows: 1 } : { cols: 1, rows: 2 }
+    case 4:
+      return { cols: 2, rows: 2 }
+    case 6:
+      return landscape ? { cols: 3, rows: 2 } : { cols: 2, rows: 3 }
+    case 9:
+      return { cols: 3, rows: 3 }
+    default: {
+      const exhaustive: never = perPage
+      return exhaustive
+    }
+  }
+}
+
+export interface PdfRect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/** Fläche für Bilder: Seite minus Rand minus Kopf-/Fußbereich. */
+export function imageContentArea(
+  pageWidth: number,
+  pageHeight: number,
+  margin: number,
+  bands: { header: boolean; footer: boolean }
+): PdfRect {
+  const top = margin + (bands.header ? HEADER_FOOTER_BAND : 0)
+  const bottom = margin + (bands.footer ? HEADER_FOOTER_BAND : 0)
+  return {
+    x: margin,
+    y: top,
+    width: Math.max(1, pageWidth - margin * 2),
+    height: Math.max(1, pageHeight - top - bottom),
+  }
+}
+
+/** Zellen zeilenweise von links oben nach rechts unten. */
+export function gridCells(area: PdfRect, cols: number, rows: number): PdfRect[] {
+  const gapX = cols > 1 ? IMAGE_GRID_GAP : 0
+  const gapY = rows > 1 ? IMAGE_GRID_GAP : 0
+  const width = (area.width - gapX * (cols - 1)) / cols
+  const height = (area.height - gapY * (rows - 1)) / rows
+  const cells: PdfRect[] = []
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      cells.push({
+        x: area.x + c * (width + gapX),
+        y: area.y + r * (height + gapY),
+        width,
+        height,
+      })
+    }
+  }
+  return cells
+}
+
+/** Ersetzt {page}, {total}, {title} und {date}. */
+export function fillPlaceholders(
+  text: string,
+  values: { page: number; total: number; title: string; date: string }
+): string {
+  return text
+    .replace(/\{page\}/g, String(values.page))
+    .replace(/\{total\}/g, String(values.total))
+    .replace(/\{title\}/g, values.title)
+    .replace(/\{date\}/g, values.date)
+}
+
+/** Lesezeichentitel: „Bild n“, ergänzt um die erste Kommentarzeile. */
+function imageBookmarkTitle(base: string, comment?: string): string {
+  const first = comment?.trim().split(/\r?\n/)[0]?.trim()
+  if (!first) return base
+  return `${base}: ${first.length > 60 ? `${first.slice(0, 59)}…` : first}`
+}
+
+/**
+ * Kopf- und Fußzeile auf alle Seiten schreiben (nach dem Aufbau, damit {total}
+ * bekannt ist). Die Startseite bleibt frei.
+ */
+function renderHeaderFooter(
+  pdf: jsPDF,
+  options: {
+    header: string
+    footer: string
+    pageNumbers: boolean
+    margin: number
+    skipFirstPage: boolean
+    title: string
+    date: string
+    pageNumberText: (page: number, total: number) => string
+  }
+): void {
+  const header = options.header.trim()
+  const footer = options.footer.trim()
+  if (!header && !footer && !options.pageNumbers) return
+
+  const total = pdf.getNumberOfPages()
+  const inset = Math.max(options.margin, 8)
+  for (let page = options.skipFirstPage ? 2 : 1; page <= total; page++) {
+    pdf.setPage(page)
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const values = { page, total, title: options.title, date: options.date }
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(HEADER_FOOTER_FONT_PT)
+    pdf.setTextColor(120, 120, 120)
+
+    const headerY = options.margin + HEADER_FOOTER_BAND / 2
+    const footerY = pageHeight - options.margin - HEADER_FOOTER_BAND / 2
+    if (header) {
+      pdf.text(fillPlaceholders(header, values), pageWidth / 2, headerY, {
+        align: 'center',
+        baseline: 'middle',
+      })
+    }
+    if (footer) {
+      pdf.text(fillPlaceholders(footer, values), pageWidth / 2, footerY, {
+        align: 'center',
+        baseline: 'middle',
+      })
+    }
+    if (options.pageNumbers) {
+      pdf.text(options.pageNumberText(page, total), pageWidth - inset, footerY, {
+        align: 'right',
+        baseline: 'middle',
+      })
+    }
+  }
+}
+
 /** Wirft einen AbortError, wenn der Export abgebrochen wurde. */
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
@@ -533,6 +876,16 @@ function elementFontUsages(elements: PdfElement[]): { fontFamily?: string; style
 export interface ExportSettings {
   orientation?: 'portrait' | 'landscape'
   author?: string
+  pageFormat?: PdfPageFormat
+  customWidth?: number
+  customHeight?: number
+  margin?: number
+  imagesPerPage?: ImagesPerPage
+  imageFit?: ImageFit
+  header?: string
+  footer?: string
+  pageNumbers?: boolean
+  bookmarks?: boolean
   includeCustomFrontPage?: boolean
   frontPageElements?: PdfElement[]
   includeCommentPages?: boolean
@@ -573,7 +926,7 @@ async function createCustomFrontPage(
 
   console.log('🎨 Verarbeite', elements.length, 'Elemente für Startseite')
 
-  const { scaleY, canvasHeight } = await renderPageElements(
+  const { scale, origin, canvasHeight } = await renderPageElements(
     pdf,
     elements,
     orientation,
@@ -586,12 +939,17 @@ async function createCustomFrontPage(
   if (author?.trim()) {
     const pageWidth = pdf.internal.pageSize.getWidth()
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(pxToPt(13, scaleY))
+    pdf.setFontSize(pxToPt(13, scale))
     pdf.setTextColor(102, 102, 102)
     const text = labels.author(author.trim())
-    pdf.text(text, (pageWidth - pdf.getTextWidth(text)) / 2, (canvasHeight - 16) * scaleY, {
-      baseline: 'bottom',
-    })
+    pdf.text(
+      text,
+      (pageWidth - pdf.getTextWidth(text)) / 2,
+      origin.y + (canvasHeight - 16) * scale,
+      {
+        baseline: 'bottom',
+      }
+    )
   }
 
   console.log('✅ Startseite erstellt')
@@ -608,7 +966,7 @@ async function renderPageElements(
   jpegQuality: number,
   maxImageDimension: number,
   fonts: ReadonlySet<string>
-): Promise<{ scaleX: number; scaleY: number; canvasHeight: number }> {
+): Promise<{ scale: number; origin: { x: number; y: number }; canvasHeight: number }> {
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
 
@@ -616,9 +974,13 @@ async function renderPageElements(
   const canvasWidth = orientation === 'landscape' ? 1123 : 794
   const canvasHeight = orientation === 'landscape' ? 794 : 1123
 
-  // Umrechnungsfaktoren von Pixel zu mm
-  const scaleX = pageWidth / canvasWidth
-  const scaleY = pageHeight / canvasHeight
+  // Einheitlicher Maßstab px → mm; bei anderen Seitenverhältnissen als A4
+  // wird die Designer-Fläche mittig eingepasst (keine Verzerrung)
+  const scale = Math.min(pageWidth / canvasWidth, pageHeight / canvasHeight)
+  const origin = {
+    x: (pageWidth - canvasWidth * scale) / 2,
+    y: (pageHeight - canvasHeight * scale) / 2,
+  }
 
   // Sortiere Elemente nach z-Index für korrekte Render-Reihenfolge
   const sortedElements = [...elements].sort((a, b) => a.zIndex - b.zIndex)
@@ -642,19 +1004,19 @@ async function renderPageElements(
             paddingPx: 8,
             lineHeight: 1.5,
           },
-          scaleX,
-          scaleY,
+          scale,
+          origin,
           fonts
         )
       } else if (element.type === 'image') {
-        await renderImageElement(pdf, element, scaleX, scaleY, jpegQuality, maxImageDimension)
+        await renderImageElement(pdf, element, scale, origin, jpegQuality, maxImageDimension)
       }
     } catch (error) {
       console.error('❌ Fehler beim Rendern von Element:', element.id, error)
     }
   }
 
-  return { scaleX, scaleY, canvasHeight }
+  return { scale, origin, canvasHeight }
 }
 
 /**
@@ -764,7 +1126,8 @@ async function createCommentPagesFromElements(
   orientation: 'portrait' | 'landscape' = 'portrait',
   labels: PdfLabels = DEFAULT_PDF_LABELS,
   fonts: ReadonlySet<string> = new Set(),
-  onPageDone?: () => Promise<void>
+  onPageDone?: () => Promise<void>,
+  showFooter = true
 ): Promise<void> {
   if (elements.length === 0) return
 
@@ -808,7 +1171,8 @@ async function createCommentPagesFromElements(
       maxImageDimension,
       orientation,
       labels,
-      fonts
+      fonts,
+      showFooter
     )
     await onPageDone?.()
   }
@@ -826,9 +1190,12 @@ async function renderSingleCommentPage(
   maxImageDimension: number,
   orientation: 'portrait' | 'landscape' = 'portrait',
   labels: PdfLabels = DEFAULT_PDF_LABELS,
-  fonts: ReadonlySet<string> = new Set()
+  fonts: ReadonlySet<string> = new Set(),
+  showFooter = true
 ): Promise<void> {
   await renderPageElements(pdf, elements, orientation, jpegQuality, maxImageDimension, fonts)
+  // Eigene Fußzeile/Seitenzahlen des Exports ersetzen die automatische Fußzeile
+  if (!showFooter) return
 
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
@@ -859,8 +1226,8 @@ interface PdfTextBlock {
 }
 
 /** Canvas-px → PDF-Punkte: px × (mm pro Canvas-px) / (mm pro Punkt). */
-function pxToPt(px: number, scaleY: number): number {
-  return (px * scaleY) / 0.3528
+function pxToPt(px: number, scale: number): number {
+  return (px * scale) / 0.3528
 }
 
 /**
@@ -868,7 +1235,7 @@ function pxToPt(px: number, scaleY: number): number {
  *
  * Koordinatensystem-Abgleich mit dem Designer:
  * - Fläche: 794×1123px (A4 @ 96 DPI), PDF A4: 210×297mm
- * - 1 Canvas-Pixel = scaleX mm (≈ 0.2645 mm)
+ * - 1 Canvas-Pixel = scale mm (≈ 0.2645 mm)
  * - jsPDF text() positioniert an der Baseline
  * - Baseline der 1. Zeile nach CSS-Modell: half-leading ((lineHeight − 1) / 2 × fontSize)
  *   + Ascent (≈ 0.75 × fontSize); bei line-height 1.5 also genau 1 × fontSize
@@ -876,15 +1243,15 @@ function pxToPt(px: number, scaleY: number): number {
 function renderText(
   pdf: jsPDF,
   block: PdfTextBlock,
-  scaleX: number,
-  scaleY: number,
+  scale: number,
+  origin: { x: number; y: number },
   fonts: ReadonlySet<string>
 ): void {
   if (!block.content || !block.content.trim()) return
 
   const { paddingPx, lineHeight } = block
   const fontSizePx = block.fontSize || 24
-  pdf.setFontSize(pxToPt(fontSizePx, scaleY))
+  pdf.setFontSize(pxToPt(fontSizePx, scale))
 
   // Eingebettete Schrift (Fallback: nächster Schnitt der Familie, sonst Helvetica)
   applyPdfFont(pdf, block.fontFamily, block.style, fonts)
@@ -897,11 +1264,11 @@ function renderText(
   }
 
   // X-Position: Box + Padding (in mm)
-  const xBase = (block.x + paddingPx) * scaleX
+  const xBase = origin.x + (block.x + paddingPx) * scale
 
   // Verfügbare Breite für Textumbruch: Box-Breite minus Padding (WYSIWYG)
   const boxWidth = block.width || 300
-  const availableWidthMm = (boxWidth - paddingPx * 2) * scaleX
+  const availableWidthMm = (boxWidth - paddingPx * 2) * scale
 
   // Mehrzeiligen Text verarbeiten: erst explizite Zeilenumbrüche, dann Wortumbruch
   // splitTextToSize() repliziert das CSS word-break: break-word Verhalten
@@ -918,7 +1285,7 @@ function renderText(
 
   allLines.forEach((line, index) => {
     const yPosPx = block.y + paddingPx + firstBaselinePx + index * lineHeight * fontSizePx
-    const yPosMm = yPosPx * scaleY
+    const yPosMm = origin.y + yPosPx * scale
 
     // Text-Ausrichtung relativ zur Box-Breite (wie CSS text-align)
     let xPos = xBase
@@ -937,8 +1304,8 @@ function renderText(
 async function renderImageElement(
   pdf: jsPDF,
   element: PdfElement,
-  scaleX: number,
-  scaleY: number,
+  scale: number,
+  origin: { x: number; y: number },
   jpegQuality: number,
   maxImageDimension: number
 ): Promise<void> {
@@ -952,9 +1319,9 @@ async function renderImageElement(
     // Höhe aus dem Seitenverhältnis des Bildes
     const imgProps = pdf.getImageProperties(imageSrc)
     const imgAspectRatio = imgProps.width / imgProps.height
-    const x = element.x * scaleX
-    const y = element.y * scaleY
-    const width = (element.width || 200) * scaleX
+    const x = origin.x + element.x * scale
+    const y = origin.y + element.y * scale
+    const width = (element.width || 200) * scale
     const height = width / imgAspectRatio
 
     const imageFormat = imageSrc.startsWith('data:image/png') ? 'PNG' : 'JPEG'
