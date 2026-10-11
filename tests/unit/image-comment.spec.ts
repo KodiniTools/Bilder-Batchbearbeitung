@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import jsPDF from 'jspdf'
 import {
   buildPdfDocument,
+  buildSingleImagePdf,
   layoutImagePage,
   maxImageCommentLines,
   wrapImageComment,
@@ -75,5 +76,24 @@ describe('Bildseiten im PDF', () => {
     expect(raw).toContain('Strand bei Sonnenuntergang')
     expect(raw).toContain('Tag 2')
     expect(raw).not.toContain('IMG_4711')
+  })
+})
+
+describe('buildSingleImagePdf', () => {
+  const PIXEL =
+    'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='
+
+  it('Seite entspricht ohne Kommentar exakt dem Bild', () => {
+    const pdf = buildSingleImagePdf(PIXEL, 800, 600)
+    expect(pdf.internal.pageSize.getWidth()).toBeCloseTo(800, 0)
+    expect(pdf.internal.pageSize.getHeight()).toBeCloseTo(600, 0)
+  })
+
+  it('verlängert die Seite und enthält den Kommentar', () => {
+    const pdf = buildSingleImagePdf(PIXEL, 800, 600, 'Strand am Abend\nZweite Zeile')
+    expect(pdf.internal.pageSize.getHeight()).toBeGreaterThan(600)
+    const out = pdf.output()
+    expect(out).toContain('Strand am Abend')
+    expect(out).toContain('Zweite Zeile')
   })
 })

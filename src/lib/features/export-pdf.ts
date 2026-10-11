@@ -467,6 +467,55 @@ export function layoutImagePage(
   }
 }
 
+// ============================================================================
+// EINZELBILD-PDF (BILDEDITOR)
+// ============================================================================
+
+/**
+ * PDF mit genau einem Bild in Originalgröße (Einheit px). Mit Kommentar wird
+ * die Seite um einen Textstreifen unter dem Bild verlängert; ohne Kommentar
+ * entspricht die Seite exakt dem Bild.
+ */
+export function buildSingleImagePdf(
+  dataUrl: string,
+  width: number,
+  height: number,
+  comment?: string
+): jsPDF {
+  const measure = new jsPDF({ unit: 'px', format: [width, height], hotfixes: ['px_scaling'] })
+
+  // Schrift skaliert mit der Bildbreite (≈ 11 pt auf A4-Breite), in px
+  const fontPx = Math.min(64, Math.max(14, width * 0.025))
+  const lineHeightPx = fontPx * IMAGE_COMMENT_LINE_HEIGHT
+  const margin = fontPx
+  measure.setFont('helvetica', 'normal')
+  measure.setFontSize(fontPx * 0.75) // px → pt
+  const maxLines = Math.max(3, Math.floor((height * IMAGE_COMMENT_MAX_SHARE) / lineHeightPx))
+  const lines = wrapImageComment(measure, comment, width - margin * 2, maxLines)
+
+  const band = lines.length > 0 ? margin * 2 + lines.length * lineHeightPx : 0
+  const pageHeight = height + band
+  const pdf = new jsPDF({
+    orientation: width >= pageHeight ? 'l' : 'p',
+    unit: 'px',
+    format: [width, pageHeight],
+    hotfixes: ['px_scaling'],
+  })
+  pdf.addImage(dataUrl, 'JPEG', 0, 0, width, height)
+
+  if (lines.length > 0) {
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(fontPx * 0.75)
+    pdf.setTextColor(60, 60, 60)
+    pdf.text(lines, width / 2, height + margin, {
+      align: 'center',
+      baseline: 'top',
+      lineHeightFactor: IMAGE_COMMENT_LINE_HEIGHT,
+    })
+  }
+  return pdf
+}
+
 /** Wirft einen AbortError, wenn der Export abgebrochen wurde. */
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
