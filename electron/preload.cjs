@@ -9,4 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // App metadata
   getVersion: () => ipcRenderer.invoke('get-version'),
   getPlatform: () => ipcRenderer.invoke('get-platform'),
+
+  // PDF in einem Fenster mit Druckansicht öffnen (Direktdruck beim Export)
+  printPdf: (data) => ipcRenderer.invoke('print-pdf', data),
 })

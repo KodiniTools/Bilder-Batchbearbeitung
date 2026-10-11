@@ -1,5 +1,8 @@
 const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron')
 const path = require('path')
+const fs = require('fs')
+const os = require('os')
+const crypto = require('crypto')
 
 // Windows: App-User-Model-ID für Taskbar-Pinning und Benachrichtigungen
 if (process.platform === 'win32') {
@@ -144,6 +147,43 @@ ipcMain.handle('get-version', () => app.getVersion())
 
 // IPC: get platform
 ipcMain.handle('get-platform', () => process.platform)
+
+// IPC: PDF zum Drucken in einem eigenen Fenster mit der PDF-Ansicht von Chromium öffnen
+// (Drucksymbol bzw. Strg+P). Die Datei liegt nur temporär auf dem Gerät.
+const MAX_PRINT_PDF_BYTES = 1024 * 1024 * 1024
+ipcMain.handle('print-pdf', async (_event, data) => {
+  const bytes = Buffer.from(data instanceof ArrayBuffer ? new Uint8Array(data) : data)
+  if (bytes.length === 0 || bytes.length > MAX_PRINT_PDF_BYTES) {
+    throw new Error('Ungültige PDF-Größe')
+  }
+  if (bytes.subarray(0, 5).toString('latin1') !== '%PDF-') {
+    throw new Error('Keine PDF-Datei')
+  }
+
+  const file = path.join(os.tmpdir(), `kodini-druck-${crypto.randomUUID()}.pdf`)
+  await fs.promises.writeFile(file, bytes)
+
+  const printWindow = new BrowserWindow({
+    width: 1000,
+    height: 900,
+    parent: mainWindow ?? undefined,
+    title: 'PDF drucken',
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, 'icon.ico'),
+    webPreferences: {
+      // PDF-Ansicht von Chromium
+      plugins: true,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  })
+  printWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  printWindow.on('closed', () => {
+    fs.promises.unlink(file).catch(() => {})
+  })
+  await printWindow.loadFile(file)
+})
 
 app.whenReady().then(createWindow)
 
