@@ -22,21 +22,29 @@ import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 
-import {
-  buildPdf,
-  downloadPdf,
-  type ExportSettings,
-  type ImageData,
-} from '@/lib/features/export-pdf'
+import { buildPdf, type ExportSettings, type ImageData } from '@/lib/features/export-pdf'
 import { cancelPrint, preparePrint, printPdf, type PrintMode } from '@/lib/features/print-pdf'
 
-import { exportImagesAsZip, type ZipProgressCallback } from '@/lib/features/export-zip'
+import {
+  exportImagesAsZip,
+  resolveZipFileName,
+  type ZipProgressCallback,
+} from '@/lib/features/export-zip'
 import {
   downloadSvgBatch,
   downloadSingleSvg,
   checkSvgServiceAvailable,
+  svgFileName,
   type SvgProgressCallback,
 } from '@/lib/features/export-svg'
+import {
+  imageFileType,
+  pickSaveDirectory,
+  pickSaveFile,
+  saveToDirectory,
+  saveToTarget,
+  SAVE_FILE_TYPES,
+} from '@/lib/features/save-file'
 import { readStoredTheme, applyTheme } from '@/utils/theme'
 import { commentFooterText, dateLocale } from '@/utils/i18nFormat'
 
@@ -183,6 +191,11 @@ async function handleExportConfirm(settings: ExportSettings) {
     if (currentMode === 'pdf-all' || currentMode === 'pdf-selected') {
       // Direktdruck: vor dem ersten await vorbereiten (Tab nur direkt nach dem Klick möglich)
       const printTarget = settings.output === 'print' ? preparePrint() : null
+      // Speichern-Dialog ebenfalls direkt nach dem Klick öffnen, PDF erst danach erzeugen
+      const saveTarget = printTarget
+        ? null
+        : await pickSaveFile('bilder-export.pdf', SAVE_FILE_TYPES.pdf)
+      if (!printTarget && !saveTarget) return
       let printMode: PrintMode | null = null
       const images =
         currentMode === 'pdf-all'
@@ -230,7 +243,7 @@ async function handleExportConfirm(settings: ExportSettings) {
           onImageError: (name) => failedImages.push(name),
         })
         if (printTarget) printMode = await printPdf(blob, printTarget, 'bilder-export.pdf')
-        else downloadPdf(blob, 'bilder-export.pdf')
+        else if (saveTarget) await saveToTarget(saveTarget, blob)
       } catch (error) {
         if (printTarget) cancelPrint(printTarget)
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -268,6 +281,9 @@ async function handleExportConfirm(settings: ExportSettings) {
     } else if (currentMode === 'zip') {
       const imagesToExport = imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
       const total = imagesToExport.length
+      const zipFileName = resolveZipFileName(settings.zipName)
+      const saveTarget = await pickSaveFile(zipFileName, SAVE_FILE_TYPES.zip)
+      if (!saveTarget) return
 
       loadingIndicator.value?.showWithProgress(
         t('loading.zipProgress', { current: 0, total }),
@@ -284,12 +300,13 @@ async function handleExportConfirm(settings: ExportSettings) {
       try {
         await exportImagesAsZip(
           imagesToExport,
-          settings.zipName,
+          zipFileName,
           settings.format,
           settings.quality,
           onProgress,
           settings.pngTransparent ?? true,
-          settings.pngBackgroundColor ?? '#ffffff'
+          settings.pngBackgroundColor ?? '#ffffff',
+          saveTarget
         )
         toast.success(t('toast.zipSuccess', { count: total }))
         showWizard('zip', total)
@@ -299,6 +316,12 @@ async function handleExportConfirm(settings: ExportSettings) {
     } else if (currentMode === 'svg') {
       const imagesToExport = imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
       const total = imagesToExport.length
+      const svgZipName = settings.zipName || 'svg_export'
+      const saveTarget =
+        total === 1
+          ? await pickSaveFile(svgFileName(imagesToExport[0]), SAVE_FILE_TYPES.svg)
+          : await pickSaveFile(resolveZipFileName(svgZipName), SAVE_FILE_TYPES.zip)
+      if (!saveTarget) return
 
       loadingIndicator.value?.showWithProgress(
         t('loading.svgProgress', { current: 0, total }) || `SVG-Konvertierung: 0/${total}`,
@@ -320,14 +343,9 @@ async function handleExportConfirm(settings: ExportSettings) {
         }
 
         if (total === 1) {
-          await downloadSingleSvg(imagesToExport[0], svgSettings)
+          await downloadSingleSvg(imagesToExport[0], svgSettings, saveTarget)
         } else {
-          await downloadSvgBatch(
-            imagesToExport,
-            svgSettings,
-            settings.zipName || 'svg_export',
-            onSvgProgress
-          )
+          await downloadSvgBatch(imagesToExport, svgSettings, svgZipName, onSvgProgress, saveTarget)
         }
         toast.success(t('toast.svgSuccess', { count: total }))
         showWizard('svg', total)
@@ -342,9 +360,25 @@ async function handleExportConfirm(settings: ExportSettings) {
           ? (settings.pngBackgroundColor ?? '#ffffff')
           : undefined
 
-      for (const image of images) {
-        await downloadSingleImage(image, settings.format, (settings.quality ?? 92) / 100, bgColor)
-        await new Promise((resolve) => setTimeout(resolve, 200))
+      const quality = (settings.quality ?? 92) / 100
+      if (images.length === 1) {
+        // Ein Bild: Speichern-Dialog mit Dateinamen
+        const [image] = images
+        const format = imageExportFormat(image, settings.format)
+        const target = await pickSaveFile(imageFileName(image, format), imageFileType(format))
+        if (!target) return
+        await saveToTarget(target, await renderImageBlob(image, format, quality, bgColor))
+      } else {
+        // Mehrere Bilder: Zielordner wählen, Dateinamen kommen aus der Umbenennung
+        const target = await pickSaveDirectory()
+        if (!target) return
+        for (const image of images) {
+          const format = imageExportFormat(image, settings.format)
+          const blob = await renderImageBlob(image, format, quality, bgColor)
+          await saveToDirectory(target, blob, imageFileName(image, format))
+          // Browser blockieren schnell aufeinanderfolgende Downloads
+          if (target.kind === 'download') await new Promise((resolve) => setTimeout(resolve, 200))
+        }
       }
 
       toast.success(t('toast.saveSuccess', { count: images.length }))
@@ -356,49 +390,33 @@ async function handleExportConfirm(settings: ExportSettings) {
   }
 }
 
-function downloadSingleImage(
+function imageExportFormat(image: ImageObject, format?: string): string {
+  return format || image.exportFormat || 'png'
+}
+
+function imageFileName(image: ImageObject, exportFormat: string): string {
+  const fileName = image.outputName || `bild_${Date.now()}`
+  return fileName.includes('.')
+    ? fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
+    : `${fileName}.${exportFormat}`
+}
+
+function renderImageBlob(
   image: ImageObject,
-  format?: string,
+  exportFormat: string,
   quality?: number,
   backgroundColor?: string
-): Promise<void> {
+): Promise<Blob> {
   return new Promise((resolve, reject) => {
     try {
-      const exportFormat = format || image.exportFormat || 'png'
       const exportQuality = quality !== undefined ? quality : image.quality || 0.92
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
-
       const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
 
       exportCanvas.toBlob(
         (blob) => {
-          if (!blob) {
-            reject(new Error('Blob-Konvertierung fehlgeschlagen'))
-            return
-          }
-
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-
-          let fileName = image.outputName || `bild_${Date.now()}`
-          if (!fileName.includes('.')) {
-            fileName += `.${exportFormat}`
-          } else {
-            fileName = fileName.replace(/\.[^.]+$/, `.${exportFormat}`)
-          }
-
-          link.download = fileName
-          link.style.display = 'none'
-
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-
-          setTimeout(() => {
-            URL.revokeObjectURL(url)
-            resolve()
-          }, 100)
+          if (blob) resolve(blob)
+          else reject(new Error('Blob-Konvertierung fehlgeschlagen'))
         },
         mimeType,
         exportQuality
