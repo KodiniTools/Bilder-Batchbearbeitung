@@ -325,6 +325,7 @@ import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { buildSingleImagePdf } from '@/lib/features/export-pdf'
+import { pickSaveFile, saveToTarget, SAVE_FILE_TYPES } from '@/lib/features/save-file'
 import { useConfirm } from '@/composables/useConfirm'
 import ImagePreview from './ImagePreview.vue'
 import HistoryActions from './HistoryActions.vue'
@@ -946,6 +947,21 @@ async function downloadImage() {
       fileName.value.trim() ||
       ImageProcessor.getFileNameWithoutExtension(originalImageObj.file.name)
     const safeBase = ImageProcessor.safeBaseName(fileBase)
+    const isPdf = selectedFormat.value === 'application/pdf'
+    const format = isPdf
+      ? undefined
+      : availableFormats.value.find((f) => f.mimeType === selectedFormat.value)
+    if (!isPdf && !format) throw new Error(t('alerts.invalidFormat'))
+
+    // Speichern-Dialog direkt nach dem Klick öffnen, Datei erst danach erzeugen
+    const target = format
+      ? await pickSaveFile(`${safeBase}.${format.ext}`, {
+          description: format.name,
+          mime: format.mimeType,
+          extensions: [`.${format.ext}`],
+        })
+      : await pickSaveFile(`${safeBase}.pdf`, SAVE_FILE_TYPES.pdf)
+    if (!target) return
 
     // Build export canvas with current filters applied
     const tempImageObj: ImageObject = {
@@ -956,7 +972,7 @@ async function downloadImage() {
     }
     const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
 
-    if (selectedFormat.value === 'application/pdf') {
+    if (!format) {
       const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92)
       const pdf = buildSingleImagePdf(
         dataUrl,
@@ -964,24 +980,15 @@ async function downloadImage() {
         exportCanvas.height,
         comment.value
       )
-      pdf.save(`${safeBase}.pdf`)
+      await saveToTarget(target, pdf.output('blob'))
       return
     }
 
-    const format = availableFormats.value.find((f) => f.mimeType === selectedFormat.value)
-    if (!format) throw new Error(t('alerts.invalidFormat'))
     const blob = await ImageProcessor.convertToFormat(
       { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
       format
     )
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${safeBase}.${format.ext}`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    await saveToTarget(target, blob)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
     void dialog.alert(t('alerts.downloadError', { error: errorMessage }))

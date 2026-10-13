@@ -1,6 +1,7 @@
 // src/lib/features/export-zip.ts
 import type { ImageObject } from '../core/types'
 import { ImageProcessor } from '../core/image-processor'
+import { saveToTarget, type SaveTarget } from './save-file'
 
 export type ZipProgressCallback = (current: number, total: number) => void
 
@@ -22,7 +23,9 @@ export async function exportImagesAsZip(
   quality: number = 0.92,
   onProgress?: ZipProgressCallback,
   pngTransparent: boolean = true,
-  pngBackgroundColor: string = '#ffffff'
+  pngBackgroundColor: string = '#ffffff',
+  /** Vom Nutzer gewähltes Ziel; ohne Angabe wird die Datei heruntergeladen */
+  saveTarget?: SaveTarget
 ): Promise<void> {
   const JSZip = await getJSZip()
 
@@ -64,19 +67,23 @@ export async function exportImagesAsZip(
     }
   }
 
-  // ZIP generieren und downloaden
+  // ZIP generieren und speichern
   const blob = await zip.generateAsync({
     type: 'blob',
     compression: 'DEFLATE',
     compressionOptions: { level: 6 },
   })
 
-  let fileName = zipFileName || `bilder_${new Date().toISOString().slice(0, 10)}.zip`
-  if (!fileName.endsWith('.zip')) {
-    fileName += '.zip'
-  }
+  await saveToTarget(
+    saveTarget ?? { kind: 'download', name: resolveZipFileName(zipFileName) },
+    blob
+  )
+}
 
-  downloadBlob(blob, fileName)
+/** Dateiname des ZIP-Archivs: Eingabe des Nutzers oder datierter Standardname, immer mit .zip */
+export function resolveZipFileName(zipFileName?: string): string {
+  const fileName = zipFileName || `bilder_${new Date().toISOString().slice(0, 10)}.zip`
+  return fileName.endsWith('.zip') ? fileName : `${fileName}.zip`
 }
 
 // Hilfsfunktionen
@@ -101,19 +108,4 @@ function canvasToBlob(
       quality
     )
   })
-}
-
-function downloadBlob(blob: Blob, fileName: string): void {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fileName
-  link.style.display = 'none'
-
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-
-  // URL nach kurzer Verzögerung freigeben
-  setTimeout(() => URL.revokeObjectURL(url), 100)
 }

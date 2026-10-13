@@ -79,6 +79,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import { pickSaveFile, saveToTarget, SAVE_FILE_TYPES } from '@/lib/features/save-file'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import { generateId } from '@/composables/usePdfPages'
@@ -178,19 +179,19 @@ async function remove() {
   if (persist(allUserTemplates.value.filter((x) => x.id !== tpl.id))) selectedId.value = ''
 }
 
-function exportFile() {
+async function exportFile() {
   if (allUserTemplates.value.length === 0) return
   const blob = new Blob([serializeTemplates(allUserTemplates.value)], {
     type: 'application/json',
   })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'pdf-vorlagen.json'
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  const target = await pickSaveFile('pdf-vorlagen.json', SAVE_FILE_TYPES.json)
+  if (!target) return
+  try {
+    await saveToTarget(target, blob)
+  } catch (error) {
+    console.error('Vorlagen-Export fehlgeschlagen:', error)
+    toast.error(t('toast.exportError'))
+  }
 }
 
 async function importFile(event: Event) {

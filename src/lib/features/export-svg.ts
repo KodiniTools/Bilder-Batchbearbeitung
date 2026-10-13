@@ -14,6 +14,7 @@
 
 import type { ImageObject } from '../core/types'
 import { ImageProcessor } from '../core/image-processor'
+import { saveToTarget, type SaveTarget } from './save-file'
 
 export type SvgProgressCallback = (current: number, total: number) => void
 
@@ -233,11 +234,17 @@ export async function convertImagesToSvgBatch(
  */
 export async function downloadSingleSvg(
   imageObj: ImageObject,
-  settings: Partial<SvgConversionSettings> = {}
+  settings: Partial<SvgConversionSettings> = {},
+  /** Vom Nutzer gewähltes Ziel; ohne Angabe wird die Datei heruntergeladen */
+  saveTarget?: SaveTarget
 ): Promise<void> {
   const svgBlob = await convertImageToSvg(imageObj, settings)
-  const fileName = `${imageObj.outputName || 'image'}.svg`
-  downloadBlob(svgBlob, fileName)
+  await saveToTarget(saveTarget ?? { kind: 'download', name: svgFileName(imageObj) }, svgBlob)
+}
+
+/** Dateiname eines einzelnen SVG-Exports */
+export function svgFileName(imageObj: ImageObject): string {
+  return `${imageObj.outputName || 'image'}.svg`
 }
 
 /**
@@ -247,16 +254,13 @@ export async function downloadSvgBatch(
   images: ImageObject[],
   settings: Partial<SvgConversionSettings> = {},
   zipFileName: string = 'svg_export.zip',
-  onProgress?: SvgProgressCallback
+  onProgress?: SvgProgressCallback,
+  /** Vom Nutzer gewähltes Ziel; ohne Angabe wird die Datei heruntergeladen */
+  saveTarget?: SaveTarget
 ): Promise<void> {
   const zipBlob = await convertImagesToSvgBatch(images, settings, onProgress)
-
-  let fileName = zipFileName
-  if (!fileName.endsWith('.zip')) {
-    fileName += '.zip'
-  }
-
-  downloadBlob(zipBlob, fileName)
+  const fileName = zipFileName.endsWith('.zip') ? zipFileName : `${zipFileName}.zip`
+  await saveToTarget(saveTarget ?? { kind: 'download', name: fileName }, zipBlob)
 }
 
 // Hilfsfunktionen
@@ -316,18 +320,4 @@ function canvasToBlob(canvas: HTMLCanvasElement, format: string = 'png'): Promis
       1.0 // Maximale Qualität für SVG-Konvertierung
     )
   })
-}
-
-function downloadBlob(blob: Blob, fileName: string): void {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fileName
-  link.style.display = 'none'
-
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-
-  setTimeout(() => URL.revokeObjectURL(url), 100)
 }
