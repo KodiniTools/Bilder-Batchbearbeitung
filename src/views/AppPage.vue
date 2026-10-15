@@ -20,7 +20,7 @@ import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
-import { ImageProcessor } from '@/lib/core/image-processor'
+import { renderExportCanvas, encodeCanvasToBlob } from '@/lib/core/export-render'
 
 import { buildPdf, type ExportSettings, type ImageData } from '@/lib/features/export-pdf'
 import { cancelPrint, preparePrint, printPdf, type PrintMode } from '@/lib/features/print-pdf'
@@ -204,7 +204,7 @@ async function handleExportConfirm(settings: ExportSettings) {
 
       // Canvas erst beim Export erzeugen; Skalierung/JPEG übernimmt der Worker
       const imageDataArray: ImageData[] = images.map((img) => ({
-        getCanvas: () => ImageProcessor.getExportCanvas(img, { backgroundColor: '#ffffff' }),
+        getCanvas: () => renderExportCanvas(img, { backgroundColor: '#ffffff' }),
         originalName: img.outputName || img.file.name,
         comment: img.comment,
       }))
@@ -401,30 +401,17 @@ function imageFileName(image: ImageObject, exportFormat: string): string {
     : `${fileName}.${exportFormat}`
 }
 
-function renderImageBlob(
+async function renderImageBlob(
   image: ImageObject,
   exportFormat: string,
   quality?: number,
   backgroundColor?: string
 ): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    try {
-      const exportQuality = quality !== undefined ? quality : image.quality || 0.92
-      const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
-      const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
-
-      exportCanvas.toBlob(
-        (blob) => {
-          if (blob) resolve(blob)
-          else reject(new Error('Blob-Konvertierung fehlgeschlagen'))
-        },
-        mimeType,
-        exportQuality
-      )
-    } catch (error) {
-      reject(error)
-    }
-  })
+  const exportQuality = quality !== undefined ? quality : image.quality || 0.92
+  const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
+  // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
+  const exportCanvas = await renderExportCanvas(image, { backgroundColor })
+  return encodeCanvasToBlob(exportCanvas, mimeType, exportQuality)
 }
 
 async function handleSaveImages() {

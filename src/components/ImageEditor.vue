@@ -324,6 +324,11 @@ import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/types'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import {
+  renderExportCanvas,
+  renderFilteredCanvas,
+  encodeCanvasToBlob,
+} from '@/lib/core/export-render'
 import { buildSingleImagePdf } from '@/lib/features/export-pdf'
 import { pickSaveFile, saveToTarget, SAVE_FILE_TYPES } from '@/lib/features/save-file'
 import { useConfirm } from '@/composables/useConfirm'
@@ -519,7 +524,8 @@ function renderEditedPreview() {
 }
 
 // Obergrenze für die exakte Stufe: darüber würde die Pixel-Passage in voller
-// Auflösung (v. a. mit Weichzeichnen) den Hauptthread spürbar blockieren.
+// Auflösung (v. a. mit Weichzeichnen) zu lange dauern bzw. ohne Worker den
+// Hauptthread spürbar blockieren.
 const EXACT_PREVIEW_MAX_PIXELS = 6_000_000
 const EXACT_PREVIEW_DELAY_MS = 300
 let exactTimer: ReturnType<typeof setTimeout> | null = null
@@ -530,18 +536,20 @@ function scheduleExactPreview() {
   if (exactTimer) clearTimeout(exactTimer)
   exactTimer = setTimeout(() => {
     exactTimer = null
-    renderExactPreview(token)
+    void renderExactPreview(token)
   }, EXACT_PREVIEW_DELAY_MS)
 }
 
-function renderExactPreview(token: number) {
+async function renderExactPreview(token: number) {
+  if (token !== exactToken || !props.isOpen) return
+  const wc = getWorkingCanvas()
+  if (!wc || wc.width * wc.height > EXACT_PREVIEW_MAX_PIXELS) return
+
+  // Pixel-Passage im Worker; das Ergebnis eines überholten Renders verwerfen
+  const exact = await renderFilteredCanvas(wc, localFilters.value, 1)
   if (token !== exactToken || !props.isOpen) return
   const pc = previewCanvas.value
-  const wc = getWorkingCanvas()
-  if (!pc || !wc || pc.width === 0 || pc.height === 0) return
-  if (wc.width * wc.height > EXACT_PREVIEW_MAX_PIXELS) return
-
-  const exact = ImageProcessor.applyFiltersToCanvas(wc, localFilters.value, 1)
+  if (!pc || pc.width === 0 || pc.height === 0) return
   const ctx = pc.getContext('2d')
   if (!ctx) return
   ctx.imageSmoothingEnabled = true
@@ -970,7 +978,7 @@ async function downloadImage() {
       ctx: workingCanvas.getContext('2d')!,
       filters: { ...localFilters.value },
     }
-    const exportCanvas = ImageProcessor.getExportCanvas(tempImageObj)
+    const exportCanvas = await renderExportCanvas(tempImageObj)
 
     if (!format) {
       const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92)
@@ -984,10 +992,7 @@ async function downloadImage() {
       return
     }
 
-    const blob = await ImageProcessor.convertToFormat(
-      { ...tempImageObj, canvas: exportCanvas, ctx: exportCanvas.getContext('2d')! },
-      format
-    )
+    const blob = await encodeCanvasToBlob(exportCanvas, format.mimeType, 0.95)
     await saveToTarget(target, blob)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : t('alerts.unknownError')
