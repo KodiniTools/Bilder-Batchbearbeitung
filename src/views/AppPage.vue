@@ -610,6 +610,21 @@ watch(
   { deep: true }
 )
 
+// Gesicherte Serie aus IndexedDB wiederherstellen (Reload, Absturz)
+async function restoreSession() {
+  const { restored, failed } = await imageStore.restoreSession()
+  if (restored > 0) toast.success(t('toast.sessionRestored', { count: restored }))
+  if (failed > 0) toast.warning(t('toast.sessionRestorePartial', { failed }))
+}
+
+// Einmal pro Fehlerphase melden, nicht bei jedem Speicherversuch
+watch(
+  () => imageStore.sessionSaveFailed,
+  (failed) => {
+    if (failed) toast.warning(t('toast.sessionSaveFailed'), 8000)
+  }
+)
+
 onMounted(() => {
   // Theme-Initialisierung als Fallback (SSI nav.html setzt Theme primär)
   if (!document.documentElement.getAttribute('data-theme')) {
@@ -620,6 +635,8 @@ onMounted(() => {
 
   window.addEventListener('keydown', handleKeyboard)
   window.addEventListener('paste', handlePaste)
+
+  void restoreSession()
 
   measureHeader()
   const headerEl = appHeader.value?.$el as HTMLElement | undefined

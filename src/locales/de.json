@@ -415,7 +415,10 @@
     "changesApplied": "Änderungen wurden übernommen",
     "changesSaved": "Bild gespeichert",
     "pastedFromClipboard": "Bild aus Zwischenablage eingefügt",
-    "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt"
+    "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt",
+    "sessionRestored": "{count} Bild(er) aus der letzten Sitzung wiederhergestellt",
+    "sessionRestorePartial": "{failed} Bild(er) der letzten Sitzung konnten nicht wiederhergestellt werden",
+    "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren."
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
