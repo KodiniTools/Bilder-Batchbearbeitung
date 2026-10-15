@@ -11,6 +11,7 @@ import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { useImageWorker } from '@/composables/useImageWorker'
 import { createImageHistory } from './imageHistory'
+import { SessionStore, isSessionStorageSupported, loadSession } from '@/lib/core/session-store'
 import { parseSearchQuery, matchesSearchTerms } from '@/utils/search'
 
 const { processBatch, processCanvas, supported: workerSupported } = useImageWorker()
@@ -58,6 +59,72 @@ export const useImageStore = defineStore('images', () => {
 
   // Globale Undo/Redo-Historie
   const history = createImageHistory(images)
+
+  // ── Sitzung sichern (IndexedDB) ──────────────────────────────────────────
+  // Gespeichert wird erst, nachdem restoreSession() gelaufen ist – sonst würde
+  // ein früher leerer Stand die gesicherte Serie überschreiben.
+  const sessionStore = new SessionStore()
+  const SESSION_SAVE_DELAY_MS = 800
+  let sessionPersistence = false
+  let sessionSaveTimer: ReturnType<typeof setTimeout> | null = null
+  /** true, sobald ein Speichern scheiterte (z. B. Speicherkontingent voll) */
+  const sessionSaveFailed = ref(false)
+
+  function scheduleSessionSave(): void {
+    if (!sessionPersistence) return
+    if (sessionSaveTimer) clearTimeout(sessionSaveTimer)
+    sessionSaveTimer = setTimeout(() => void flushSessionSave(), SESSION_SAVE_DELAY_MS)
+  }
+
+  async function flushSessionSave(): Promise<void> {
+    if (sessionSaveTimer) {
+      clearTimeout(sessionSaveTimer)
+      sessionSaveTimer = null
+    }
+    if (!sessionPersistence) return
+    try {
+      if (images.value.length === 0) await sessionStore.clear()
+      else await sessionStore.save(images.value)
+      sessionSaveFailed.value = false
+    } catch (err) {
+      console.warn('[Session] Speichern fehlgeschlagen:', err)
+      sessionSaveFailed.value = true
+    }
+  }
+
+  // Jede Änderung am Bildbestand läuft über history.commit/undo/redo/reset;
+  // die Auswahl ändert sich ohne Commit und wird separat beobachtet.
+  watch(history.version, scheduleSessionSave)
+  watch(() => images.value.map((img) => img.selected).join(), scheduleSessionSave)
+
+  function handlePageHide(): void {
+    if (sessionSaveTimer) void flushSessionSave()
+  }
+
+  /**
+   * Stellt eine gesicherte Serie wieder her (vor bereits geladenen Bildern)
+   * und aktiviert danach das automatische Sichern. Einmal pro App-Start.
+   */
+  async function restoreSession(): Promise<{ restored: number; failed: number }> {
+    if (sessionPersistence || !isSessionStorageSupported()) return { restored: 0, failed: 0 }
+    let result = { restored: 0, failed: 0 }
+    try {
+      const loaded = await loadSession()
+      if (loaded) {
+        sessionStore.markSaved(loaded.metas)
+        images.value = [...loaded.images, ...images.value]
+        history.reset()
+        result = { restored: loaded.images.length, failed: loaded.failed }
+      }
+    } catch (err) {
+      console.warn('[Session] Wiederherstellen fehlgeschlagen:', err)
+    }
+    sessionPersistence = true
+    window.addEventListener('pagehide', handlePageHide)
+    // Bilder, die während des Ladens hinzukamen, und verworfene Einträge abgleichen
+    scheduleSessionSave()
+    return result
+  }
 
   // Getters
   const imageCount = computed(() => images.value.length)
@@ -473,6 +540,7 @@ export const useImageStore = defineStore('images', () => {
     canUndo: history.canUndo,
     canRedo: history.canRedo,
     historyVersion: history.version,
+    sessionSaveFailed,
 
     // Actions
     addImage,
@@ -504,6 +572,8 @@ export const useImageStore = defineStore('images', () => {
     resetWatermarkForSelectedImages,
     undo,
     redo,
+    restoreSession,
+    flushSessionSave,
     $reset,
   }
 })
