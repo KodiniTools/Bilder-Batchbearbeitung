@@ -20,6 +20,8 @@ const props = defineProps<{
   /** 1-100 */
   quality: number
   backgroundColor?: string
+  /** EXIF der Originale wird mit exportiert (zählt zur Größe) */
+  keepExif?: boolean
 }>()
 
 const enabled = defineModel<boolean>('enabled', { required: true })
@@ -90,6 +92,7 @@ async function runEstimate() {
         : null,
       getCanvas: cachedCanvas,
       signal: ctrl.signal,
+      keepExif: props.keepExif,
     })
     if (ctrl.signal.aborted) return
     estimate.value = result
@@ -117,6 +120,7 @@ watch(
     props.format,
     props.quality,
     props.backgroundColor,
+    props.keepExif,
     enabled.value,
     kb.value,
     downscale.value,

@@ -21,6 +21,7 @@ import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
 import { renderExportCanvas } from '@/lib/core/export-render'
+import { readSourceExif } from '@/lib/core/exif'
 import { encodeForExport, kbToBytes, type TargetSizeOptions } from '@/lib/features/target-size'
 
 import { buildPdf, type ExportSettings, type ImageData } from '@/lib/features/export-pdf'
@@ -308,7 +309,8 @@ async function handleExportConfirm(settings: ExportSettings) {
           settings.pngTransparent ?? true,
           settings.pngBackgroundColor ?? '#ffffff',
           saveTarget,
-          targetSizeOf(settings)
+          targetSizeOf(settings),
+          !!settings.keepExif
         )
         toast.success(t('toast.zipSuccess', { count: total }))
         warnOverTarget(overTarget, settings)
@@ -367,7 +369,14 @@ async function handleExportConfirm(settings: ExportSettings) {
       const targetSize = targetSizeOf(settings)
       let overTarget = 0
       const render = async (image: ImageObject, format: string) => {
-        const result = await renderImageBlob(image, format, quality, bgColor, targetSize)
+        const result = await renderImageBlob(
+          image,
+          format,
+          quality,
+          bgColor,
+          targetSize,
+          !!settings.keepExif
+        )
         if (!result.reached) overTarget++
         return result.blob
       }
@@ -432,13 +441,17 @@ async function renderImageBlob(
   exportFormat: string,
   quality?: number,
   backgroundColor?: string,
-  targetSize?: TargetSizeOptions | null
+  targetSize?: TargetSizeOptions | null,
+  keepExif = false
 ) {
   const exportQuality = quality !== undefined ? quality : image.quality || 0.92
   const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
   // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
-  const exportCanvas = await renderExportCanvas(image, { backgroundColor })
-  return encodeForExport(exportCanvas, mimeType, exportQuality, targetSize)
+  const [exportCanvas, exif] = await Promise.all([
+    renderExportCanvas(image, { backgroundColor }),
+    keepExif ? readSourceExif(image.file) : null,
+  ])
+  return encodeForExport(exportCanvas, mimeType, exportQuality, targetSize, exif)
 }
 
 async function handleSaveImages() {
@@ -477,9 +490,16 @@ function handleBulkRenameConfirm(
   baseName: string,
   startNumber: number,
   separator: string,
-  lowercase: boolean
+  lowercase: boolean,
+  exifDates: ReadonlyMap<string, Date | null>
 ) {
-  const count = imageStore.batchRenameSelectedImages(baseName, startNumber, separator, lowercase)
+  const count = imageStore.batchRenameSelectedImages(
+    baseName,
+    startNumber,
+    separator,
+    lowercase,
+    exifDates
+  )
   closeBulkRenameModal()
   toast.success(t('toast.bulkRenamed', { count }))
 }

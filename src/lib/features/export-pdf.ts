@@ -1235,6 +1235,8 @@ export interface ExportSettings {
   targetSizeEnabled?: boolean
   targetSizeKb?: number
   targetSizeDownscale?: boolean
+  /** EXIF-Metadaten der Originaldatei übernehmen (ZIP/Einzelbild) */
+  keepExif?: boolean
   // SVG-Export
   svgColormode?: 'color' | 'binary'
   svgFilterSpeckle?: number

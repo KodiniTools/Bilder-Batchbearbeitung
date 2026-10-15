@@ -456,7 +456,16 @@
                   :format="settings.format"
                   :quality="settings.quality"
                   :background-color="rasterBackground"
+                  :keep-exif="settings.keepExif"
                 />
+              </div>
+
+              <div class="setting-group">
+                <label class="checkbox-label">
+                  <input v-model="settings.keepExif" type="checkbox" />
+                  {{ t('exportModal.exif.keep') }}
+                </label>
+                <p class="setting-hint">{{ t('exportModal.exif.hint') }}</p>
               </div>
             </template>
 
@@ -579,7 +588,16 @@
                   :format="settings.format"
                   :quality="settings.quality"
                   :background-color="rasterBackground"
+                  :keep-exif="settings.keepExif"
                 />
+              </div>
+
+              <div class="setting-group">
+                <label class="checkbox-label">
+                  <input v-model="settings.keepExif" type="checkbox" />
+                  {{ t('exportModal.exif.keep') }}
+                </label>
+                <p class="setting-hint">{{ t('exportModal.exif.hint') }}</p>
               </div>
             </template>
 
@@ -761,6 +779,7 @@ const settings = reactive({
   targetSizeEnabled: false,
   targetSizeKb: 500,
   targetSizeDownscale: false,
+  keepExif: false,
 
   // SVG Settings
   svgColormode: 'color' as 'color' | 'binary',

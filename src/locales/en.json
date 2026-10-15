@@ -480,6 +480,10 @@
       "estimating": "Estimating size …",
       "estimateFailed": "Size could not be estimated.",
       "notReachable": "The target size cannot be reached for every image. Raise the target or allow reducing dimensions."
+    },
+    "exif": {
+      "keep": "Keep EXIF metadata (camera, capture date, GPS)",
+      "hint": "Copies the original file's metadata into JPG, PNG and WebP. Orientation is reset because the pixels are already rotated. Note: any GPS location is kept."
     }
   },
   "frontPageDesigner": {
@@ -846,9 +850,9 @@
     "title": "Rename Images",
     "close": "Close",
     "baseName": {
-      "label": "Base Name",
-      "placeholder": "e.g. Vacation, Project, Photo",
-      "hint": "Images will be named following this pattern: BaseName_1, BaseName_2, ..."
+      "label": "Name or pattern",
+      "placeholder": "e.g. Holiday or {'{name}'}_{'{n:000}'}_{'{date}'}",
+      "hint": "Without placeholders: Name-1, Name-2, … With placeholders the pattern is filled in per image."
     },
     "startNumber": {
       "label": "Start Number",
@@ -872,6 +876,18 @@
     "buttons": {
       "cancel": "Cancel",
       "rename": "Rename"
+    },
+    "tokens": {
+      "label": "Insert placeholder",
+      "name": "Original file name",
+      "n": "Running number",
+      "nPadded": "Number with leading zeros (number of zeros = digits)",
+      "date": "Capture date from EXIF, otherwise file date (YYYY-MM-DD)",
+      "w": "Width in px",
+      "h": "Height in px",
+      "hint": "Pattern active: {'{name}'} original name · {'{n}'} number · {'{n:000}'} zero-padded number · {'{date}'} capture date · {'{w}'}/{'{h}'} width/height.",
+      "noNumber": "Without {'{n}'} names can repeat; duplicates get -2, -3 …",
+      "unknown": "Unknown placeholder: {tokens}"
     }
   },
   "batchEdit": {

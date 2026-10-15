@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRecipeStore } from '@/stores/recipes'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { hasPlaceholders } from '@/lib/core/rename-pattern'
 import { pickSaveFile, saveToTarget, SAVE_FILE_TYPES } from '@/lib/features/save-file'
 import {
   createRecipe,
@@ -45,6 +46,8 @@ function countDiffs<T extends object>(current: T, defaults: T): number {
 
 /** Erster Dateiname nach dem Umbenennen (vereinfachte Vorschau wie im Dialog) */
 function renamePreview(r: RecipeRenameSettings): string {
+  // Muster wie {name}_{n:000} unverändert zeigen
+  if (hasPlaceholders(r.baseName)) return r.baseName
   const name = `${r.baseName}${r.separator}${r.startNumber}`
   return r.lowercase ? name.toLowerCase() : name
 }
@@ -79,6 +82,7 @@ function summary(recipe: Recipe): string[] {
   if (recipe.export.targetSizeEnabled && recipe.export.format !== 'png') {
     chips.push(`≤ ${recipe.export.targetSizeKb} KB`)
   }
+  if (recipe.export.keepExif) chips.push('EXIF')
   chips.push(renamePreview(recipe.rename))
   return chips
 }

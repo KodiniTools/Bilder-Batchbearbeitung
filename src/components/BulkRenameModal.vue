@@ -22,13 +22,36 @@
               <label for="baseName">{{ t('bulkRename.baseName.label') }}</label>
               <input
                 id="baseName"
+                ref="baseNameInput"
                 v-model="baseName"
                 type="text"
                 :placeholder="t('bulkRename.baseName.placeholder')"
+                :aria-invalid="unknownTokens.length > 0"
+                aria-describedby="baseName-hint"
                 autofocus
                 @keydown.enter="handleConfirm"
               />
-              <p class="setting-hint">{{ t('bulkRename.baseName.hint') }}</p>
+              <div class="tokens" role="group" :aria-label="t('bulkRename.tokens.label')">
+                <button
+                  v-for="token in RENAME_PLACEHOLDERS"
+                  :key="token"
+                  type="button"
+                  class="token"
+                  :title="t(`bulkRename.tokens.${tokenKey(token)}`)"
+                  @click="insertToken(token)"
+                >
+                  {{ token }}
+                </button>
+              </div>
+              <p v-if="unknownTokens.length" class="setting-hint setting-hint--error" role="alert">
+                {{ t('bulkRename.tokens.unknown', { tokens: unknownTokens.join(', ') }) }}
+              </p>
+              <p id="baseName-hint" class="setting-hint">
+                {{ t(templated ? 'bulkRename.tokens.hint' : 'bulkRename.baseName.hint') }}
+              </p>
+              <p v-if="templated && !usesNumber" class="setting-hint">
+                {{ t('bulkRename.tokens.noNumber') }}
+              </p>
             </div>
 
             <!-- Startnummer -->
@@ -121,12 +144,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useImageStore } from '@/stores/imageStore'
-import { ImageProcessor } from '@/lib/core/image-processor'
 import { useRecipeStore } from '@/stores/recipes'
 import { defaultRecipeRename } from '@/lib/core/recipes'
+import {
+  RENAME_PLACEHOLDERS,
+  buildRenameNames,
+  hasPlaceholders,
+  toRenameItem,
+  unknownPlaceholders,
+} from '@/lib/core/rename-pattern'
+import { readExifDate, readSourceExif } from '@/lib/core/exif'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
@@ -140,7 +170,13 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  confirm: [baseName: string, startNumber: number, separator: string, lowercase: boolean]
+  confirm: [
+    baseName: string,
+    startNumber: number,
+    separator: string,
+    lowercase: boolean,
+    exifDates: ReadonlyMap<string, Date | null>,
+  ]
 }>()
 
 // Form state
@@ -153,38 +189,88 @@ const maxPreviewItems = 5
 // Computed
 const selectedCount = computed(() => imageStore.selectedCount)
 
+const templated = computed(() => hasPlaceholders(baseName.value))
+const unknownTokens = computed(() => unknownPlaceholders(baseName.value))
+const usesNumber = computed(() => /\{n(:0+)?\}/.test(baseName.value))
+
 const isValid = computed(() => {
-  return baseName.value.trim().length > 0 && startNumber.value >= 0
+  return (
+    baseName.value.trim().length > 0 && startNumber.value >= 0 && unknownTokens.value.length === 0
+  )
 })
 
-function buildSeoName(base: string, number: number, sep: string, lowercase: boolean): string {
-  let name = base.replace(/\s+/g, sep).replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
-  if (lowercase) {
-    name = name.toLowerCase()
-  }
-  return `${name}${sep}${number}`
+// Aufnahmedaten (EXIF) für {date}; nur geladen, wenn das Muster sie braucht
+const exifDates = ref(new Map<string, Date | null>())
+let datesRequest = 0
+
+async function loadExifDates() {
+  const request = ++datesRequest
+  const pending = imageStore.selectedImages.filter((img) => !exifDates.value.has(img.id))
+  if (pending.length === 0) return
+  const entries = await Promise.all(
+    pending.map(async (img) => {
+      const tiff = await readSourceExif(img.file)
+      return [img.id, tiff ? readExifDate(tiff) : null] as const
+    })
+  )
+  if (request !== datesRequest) return
+  exifDates.value = new Map([...exifDates.value, ...entries])
 }
+
+watch(
+  () => props.isOpen && baseName.value.includes('{date}'),
+  (needed) => {
+    if (needed) void loadExifDates()
+  }
+)
 
 const previewNames = computed(() => {
   const selected = imageStore.images.filter((img) => img.selected)
-  const safeBase = ImageProcessor.safeBaseName(baseName.value) || 'Bild'
+  const names = buildRenameNames(
+    baseName.value,
+    selected.map((img) => toRenameItem(img, exifDates.value.get(img.id))),
+    {
+      startNumber: startNumber.value,
+      separator: separator.value,
+      lowercase: lowercaseEnabled.value,
+    }
+  )
 
   return selected.slice(0, maxPreviewItems).map((img, index) => {
-    const number = startNumber.value + index
     const extension = img.file.name.split('.').pop() || 'jpg'
-    const newName = buildSeoName(safeBase, number, separator.value, lowercaseEnabled.value)
     return {
       old: img.outputName || img.file.name.replace(/\.[^.]+$/, ''),
-      new: `${newName}.${extension}`,
+      new: `${names[index]}.${extension}`,
     }
   })
 })
+
+const baseNameInput = ref<HTMLInputElement | null>(null)
+
+/** Platzhalter an der Cursorposition einfügen */
+function insertToken(token: string) {
+  const input = baseNameInput.value
+  const value = baseName.value
+  const start = input?.selectionStart ?? value.length
+  const end = input?.selectionEnd ?? value.length
+  baseName.value = value.slice(0, start) + token + value.slice(end)
+  void nextTick(() => {
+    input?.focus()
+    input?.setSelectionRange(start + token.length, start + token.length)
+  })
+}
+
+/** i18n-Schlüssel eines Platzhalters, z. B. „{n:000}“ → „nPadded“ */
+function tokenKey(token: string): string {
+  return token === '{n:000}' ? 'nPadded' : token.slice(1, -1)
+}
 
 // Reset form when modal opens
 watch(
   () => props.isOpen,
   (isOpen) => {
     if (isOpen) {
+      exifDates.value = new Map()
       // Werte des angewendeten Rezepts, sonst die Standardwerte
       const preset = recipeStore.activeRecipe?.rename ?? defaultRecipeRename
       baseName.value = preset.baseName
@@ -203,7 +289,14 @@ function handleConfirm() {
     separator: separator.value,
     lowercase: lowercaseEnabled.value,
   })
-  emit('confirm', baseName.value.trim(), startNumber.value, separator.value, lowercaseEnabled.value)
+  emit(
+    'confirm',
+    baseName.value.trim(),
+    startNumber.value,
+    separator.value,
+    lowercaseEnabled.value,
+    exifDates.value
+  )
 }
 </script>
 
@@ -618,5 +711,40 @@ function handleConfirm() {
   .modal-body {
     padding: var(--space-3);
   }
+}
+.tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1);
+  margin-top: var(--ds-space-2);
+}
+
+.token {
+  height: var(--ds-control-sm);
+  padding: 0 var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-0);
+  color: var(--ds-text-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  cursor: pointer;
+  transition:
+    color var(--ds-duration) var(--ds-ease),
+    border-color var(--ds-duration) var(--ds-ease);
+}
+
+.token:hover {
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+.token:focus-visible {
+  outline: none;
+  box-shadow: var(--ds-focus-ring);
+}
+
+.setting-hint--error {
+  color: var(--ds-danger);
 }
 </style>

@@ -655,6 +655,10 @@
       "estimating": "Größe wird geschätzt …",
       "estimateFailed": "Größe konnte nicht geschätzt werden.",
       "notReachable": "Die Zielgröße ist nicht bei allen Bildern erreichbar. Ziel erhöhen oder Verkleinern zulassen."
+    },
+    "exif": {
+      "keep": "EXIF-Metadaten erhalten (Kamera, Aufnahmedatum, GPS)",
+      "hint": "Übernimmt die Metadaten der Originaldatei in JPG, PNG und WebP. Die Ausrichtung wird zurückgesetzt, weil die Pixel bereits gedreht sind. Achtung: Eine GPS-Position bleibt enthalten."
     }
   },
   "frontPageDesigner": {
@@ -1021,9 +1025,9 @@
     "title": "Bilder umbenennen",
     "close": "Schließen",
     "baseName": {
-      "label": "Basisname",
-      "placeholder": "z. B. Urlaub, Projekt, Foto",
-      "hint": "Die Bilder werden nach diesem Muster benannt: Basisname_1, Basisname_2, ..."
+      "label": "Name oder Muster",
+      "placeholder": "z. B. Urlaub oder {'{name}'}_{'{n:000}'}_{'{date}'}",
+      "hint": "Ohne Platzhalter: Name-1, Name-2, … Mit Platzhaltern wird das Muster pro Bild ausgefüllt."
     },
     "startNumber": {
       "label": "Startnummer",
@@ -1047,6 +1051,18 @@
     "buttons": {
       "cancel": "Abbrechen",
       "rename": "Umbenennen"
+    },
+    "tokens": {
+      "label": "Platzhalter einfügen",
+      "name": "Originaler Dateiname",
+      "n": "Laufende Nummer",
+      "nPadded": "Nummer mit führenden Nullen (Anzahl der Nullen = Stellen)",
+      "date": "Aufnahmedatum aus EXIF, sonst Dateidatum (JJJJ-MM-TT)",
+      "w": "Breite in px",
+      "h": "Höhe in px",
+      "hint": "Muster aktiv: {'{name}'} Originalname · {'{n}'} Nummer · {'{n:000}'} Nummer mit Nullen · {'{date}'} Aufnahmedatum · {'{w}'}/{'{h}'} Breite/Höhe.",
+      "noNumber": "Ohne {'{n}'} können Namen doppelt sein; doppelte Namen erhalten -2, -3 …",
+      "unknown": "Unbekannter Platzhalter: {tokens}"
     }
   },
   "batchEdit": {

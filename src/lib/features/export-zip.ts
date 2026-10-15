@@ -1,6 +1,7 @@
 // src/lib/features/export-zip.ts
 import type { ImageObject } from '../core/types'
 import { renderExportCanvas } from '../core/export-render'
+import { readSourceExif } from '../core/exif'
 import { encodeForExport, type TargetSizeOptions } from './target-size'
 import { saveToTarget, type SaveTarget } from './save-file'
 
@@ -28,7 +29,9 @@ export async function exportImagesAsZip(
   /** Vom Nutzer gewähltes Ziel; ohne Angabe wird die Datei heruntergeladen */
   saveTarget?: SaveTarget,
   /** Maximale Dateigröße pro Bild (nur JPG/WebP) */
-  targetSize?: TargetSizeOptions | null
+  targetSize?: TargetSizeOptions | null,
+  /** EXIF-Metadaten der Originaldatei übernehmen */
+  keepExif: boolean = false
 ): Promise<{ overTarget: number }> {
   const JSZip = await getJSZip()
 
@@ -62,9 +65,12 @@ export async function exportImagesAsZip(
       const backgroundColor =
         exportFormat === 'png' && !pngTransparent ? pngBackgroundColor : undefined
       // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
-      const exportCanvas = await renderExportCanvas(image, { backgroundColor })
+      const [exportCanvas, exif] = await Promise.all([
+        renderExportCanvas(image, { backgroundColor }),
+        keepExif ? readSourceExif(image.file) : null,
+      ])
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
-      const result = await encodeForExport(exportCanvas, mimeType, exportQuality, targetSize)
+      const result = await encodeForExport(exportCanvas, mimeType, exportQuality, targetSize, exif)
       if (!result.reached) overTarget++
       const blob = result.blob
       const fileName = image.outputName || `bild_${Date.now()}`
