@@ -7,6 +7,7 @@
 
 import type { ImageFilters, ImageTransforms, WatermarkSettings } from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
+import { LOGO_SIZE_MAX, LOGO_SIZE_MIN, isWatermarkLogoDataUrl } from './watermark-logo'
 
 export type RecipeExportFormat = 'png' | 'jpg' | 'webp'
 
@@ -167,6 +168,11 @@ function sanitizeWatermark(raw: unknown): WatermarkSettings {
     position: position ?? defaultWatermark.position,
     bold: bool(r.bold, defaultWatermark.bold),
     italic: bool(r.italic, defaultWatermark.italic),
+    logoDataUrl: isWatermarkLogoDataUrl(r.logoDataUrl) ? r.logoDataUrl : '',
+    logoPosition:
+      WATERMARK_POSITIONS.find((p) => p === r.logoPosition) ?? defaultWatermark.logoPosition,
+    logoSize: num(r.logoSize, defaultWatermark.logoSize, [LOGO_SIZE_MIN, LOGO_SIZE_MAX]),
+    logoOpacity: num(r.logoOpacity, defaultWatermark.logoOpacity, [0, 100]),
   }
 }
 

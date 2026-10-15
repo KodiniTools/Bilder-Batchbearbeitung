@@ -147,10 +147,23 @@ export interface WatermarkSettings {
   color: string // hex, default '#ffffff'
   opacity: number // 0-100, default 50
   rotation: number // -180 to 180, default -30
-  position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'tile'
+  position: WatermarkPosition
   bold: boolean
   italic: boolean
+  /** Logo als PNG-Daten-URL ('' = kein Logo); wird zusätzlich zum Text gezeichnet */
+  logoDataUrl: string
+  logoPosition: WatermarkPosition
+  logoSize: number // 5-100, % der kürzeren Bildseite, default 20
+  logoOpacity: number // 0-100, default 80
 }
+
+export type WatermarkPosition =
+  | 'center'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'tile'
 
 export const defaultWatermark: WatermarkSettings = {
   enabled: false,
@@ -163,6 +176,10 @@ export const defaultWatermark: WatermarkSettings = {
   position: 'center',
   bold: false,
   italic: false,
+  logoDataUrl: '',
+  logoPosition: 'bottom-right',
+  logoSize: 20,
+  logoOpacity: 80,
 }
 
 export type TransformOperation =

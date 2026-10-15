@@ -9,6 +9,7 @@ import type {
   WatermarkSettings,
 } from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
+import { drawWatermarkLogo, getLoadedWatermarkLogo } from './watermark-logo'
 import { applyFiltersToContext, hasActiveFilters } from './filter-kernels'
 
 /**
@@ -460,7 +461,7 @@ export class ImageProcessor {
     const t = imageObj.transforms || defaultTransforms
     return (
       this.hasActiveFilters(imageObj.filters) ||
-      (!!w && w.enabled && w.text.trim().length > 0) ||
+      (!!w && w.enabled && (w.text.trim().length > 0 || !!w.logoDataUrl)) ||
       t.borderWidth > 0 ||
       t.borderRadius > 0 ||
       this.hasVisibleShadow(t)
@@ -484,7 +485,9 @@ export class ImageProcessor {
   }
 
   /**
-   * Erstellt ein Canvas mit Text-Wasserzeichen
+   * Erstellt ein Canvas mit Text- und/oder Logo-Wasserzeichen.
+   * Das Logo wird nur gezeichnet, wenn es bereits dekodiert ist
+   * (siehe ensureWatermarkLogo in export-render.ts).
    * @param sourceCanvas Das Quell-Canvas
    * @param watermark Die Wasserzeichen-Einstellungen
    * @returns Canvas mit Wasserzeichen
@@ -495,7 +498,9 @@ export class ImageProcessor {
     /** Verhältnis Quell-Canvas zu Originalbild (Vorschau < 1); skaliert die Schriftgröße */
     scale = 1
   ): HTMLCanvasElement {
-    if (!watermark.enabled || !watermark.text.trim()) {
+    const hasText = !!watermark.text?.trim()
+    const logo = watermark.logoDataUrl ? getLoadedWatermarkLogo(watermark.logoDataUrl) : null
+    if (!watermark.enabled || (!hasText && !logo)) {
       return sourceCanvas
     }
 
@@ -509,6 +514,18 @@ export class ImageProcessor {
     // Quellbild zuerst zeichnen (mit voller Deckkraft)
     ctx.drawImage(sourceCanvas, 0, 0)
 
+    if (hasText) this.drawTextWatermark(ctx, canvas, watermark, scale)
+    if (logo) drawWatermarkLogo(ctx, canvas.width, canvas.height, logo, watermark)
+
+    return canvas
+  }
+
+  private static drawTextWatermark(
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    watermark: WatermarkSettings,
+    scale: number
+  ): void {
     // Wasserzeichen-Einstellungen
     const fontWeight = watermark.bold ? 'bold' : 'normal'
     const fontStyle = watermark.italic ? 'italic' : 'normal'
@@ -584,8 +601,6 @@ export class ImageProcessor {
 
     // Alpha zurücksetzen
     ctx.globalAlpha = 1
-
-    return canvas
   }
 
   /**
