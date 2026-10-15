@@ -9,6 +9,7 @@ import type {
 } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { computeResizeTarget, type ResizeSpec } from '@/lib/core/resize-modes'
 import { useImageWorker } from '@/composables/useImageWorker'
 import { createImageHistory } from './imageHistory'
 import { SessionStore, isSessionStorageSupported, loadSession } from '@/lib/core/session-store'
@@ -428,56 +429,62 @@ export const useImageStore = defineStore('images', () => {
     return selectedInOrder.length
   }
 
-  // Batch-Größenänderung für alle ausgewählten Bilder
+  /**
+   * Batch-Größenänderung für alle ausgewählten Bilder.
+   * Bilder, die der Modus unverändert lässt (z. B. „nicht vergrößern“),
+   * werden übersprungen; ohne Änderung entsteht kein Historienschritt.
+   */
   async function resizeSelectedImages(
-    width: number,
-    height: number,
-    keepAspect: boolean
-  ): Promise<void> {
+    spec: ResizeSpec
+  ): Promise<{ resized: number; skipped: number }> {
     const selected = images.value.filter((img) => img.selected)
-    const ids = new Set(selected.map((img) => img.id))
+    const jobs = selected.flatMap((img) => {
+      const target = computeResizeTarget(
+        { width: img.canvas.width, height: img.canvas.height },
+        spec,
+        img.originalWidth / img.originalHeight
+      )
+      return target ? [{ img, target }] : []
+    })
+    const skipped = selected.length - jobs.length
+    if (jobs.length === 0) return { resized: 0, skipped }
+
+    const ids = new Set(jobs.map((job) => job.img.id))
     let workerOk = false
 
     resizeProgress.active = true
     resizeProgress.current = 0
-    resizeProgress.total = selected.length
+    resizeProgress.total = jobs.length
 
-    if (workerSupported) {
-      const results = await Promise.all(
-        selected.map(async (img) => {
-          let targetW = width
-          let targetH = height
-          if (keepAspect) {
-            const aspect = img.originalWidth / img.originalHeight
-            if (width / height > aspect) {
-              targetW = Math.round(height * aspect)
-            } else {
-              targetH = Math.round(width / aspect)
-            }
-          }
-          const result = await processCanvas(img.canvas, 'resize', {
-            width: targetW,
-            height: targetH,
+    try {
+      if (workerSupported) {
+        const results = await Promise.all(
+          jobs.map(async ({ img, target }) => {
+            const result = await processCanvas(img.canvas, 'resize', target)
+            resizeProgress.current++
+            return result
           })
-          resizeProgress.current++
-          return result
-        })
-      )
-      workerOk = results.every(Boolean)
-    }
-
-    if (!workerOk) {
-      resizeProgress.current = 0
-      for (const img of selected) {
-        ImageProcessor.resizeImage(img, width, height, keepAspect)
-        resizeProgress.current++
-        await new Promise((resolve) => setTimeout(resolve, 0))
+        )
+        workerOk = results.every(Boolean)
       }
-    }
 
-    notifyImagesUpdated(ids)
-    resizeProgress.active = false
-    history.commit()
+      if (!workerOk) {
+        resizeProgress.current = 0
+        for (const { img, target } of jobs) {
+          // Bilder, die der Worker schon verkleinert hat, nicht doppelt skalieren
+          if (img.canvas.width !== target.width || img.canvas.height !== target.height) {
+            ImageProcessor.resizeImage(img, target.width, target.height, false)
+          }
+          resizeProgress.current++
+          await new Promise((resolve) => setTimeout(resolve, 0))
+        }
+      }
+    } finally {
+      notifyImagesUpdated(ids)
+      resizeProgress.active = false
+      history.commit()
+    }
+    return { resized: jobs.length, skipped }
   }
 
   // Batch-Wasserzeichen für alle ausgewählten Bilder anwenden

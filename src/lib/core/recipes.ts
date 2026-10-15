@@ -7,6 +7,14 @@
 
 import type { ImageFilters, ImageTransforms, WatermarkSettings } from './types'
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
+import {
+  RESIZE_MODES,
+  RESIZE_PERCENT_MAX,
+  RESIZE_PERCENT_MIN,
+  RESIZE_PX_MAX,
+  defaultResizeSpec,
+  type ResizeSpec,
+} from './resize-modes'
 import { LOGO_SIZE_MAX, LOGO_SIZE_MIN, isWatermarkLogoDataUrl } from './watermark-logo'
 
 export type RecipeExportFormat = 'png' | 'jpg' | 'webp'
@@ -33,11 +41,7 @@ export interface RecipeRenameSettings {
 }
 
 /** Zielgröße der Stapelbearbeitung; wird nur vorbelegt, nie automatisch angewendet */
-export interface RecipeResize {
-  width: number
-  height: number
-  keepAspect: boolean
-}
+export type RecipeResize = ResizeSpec
 
 export interface Recipe {
   id: string
@@ -178,13 +182,19 @@ function sanitizeWatermark(raw: unknown): WatermarkSettings {
 
 function sanitizeResize(raw: unknown): RecipeResize | null {
   if (!isRecord(raw)) return null
-  const width = num(raw.width, NaN, [1, 10000])
-  const height = num(raw.height, NaN, [1, 10000])
+  const width = num(raw.width, NaN, [1, RESIZE_PX_MAX])
+  const height = num(raw.height, NaN, [1, RESIZE_PX_MAX])
   if (!Number.isFinite(width) || !Number.isFinite(height)) return null
+  const d = defaultResizeSpec
   return {
+    // Rezepte vor den Resize-Modi kennen nur Breite/Höhe → exakt
+    mode: RESIZE_MODES.find((m) => m === raw.mode) ?? 'exact',
     width: Math.round(width),
     height: Math.round(height),
     keepAspect: bool(raw.keepAspect, true),
+    percent: Math.round(num(raw.percent, d.percent, [RESIZE_PERCENT_MIN, RESIZE_PERCENT_MAX])),
+    longEdge: Math.round(num(raw.longEdge, d.longEdge, [1, RESIZE_PX_MAX])),
+    noUpscale: bool(raw.noUpscale, d.noUpscale),
   }
 }
 

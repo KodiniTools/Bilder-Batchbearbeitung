@@ -42,6 +42,13 @@ const {
   width: resizeWidth,
   height: resizeHeight,
   keepAspect: resizeKeepAspect,
+  mode: resizeMode,
+  percent: resizePercent,
+  longEdge: resizeLongEdge,
+  noUpscale: resizeNoUpscale,
+  spec: resizeSpec,
+  preview: resizePreview,
+  setSpec: setResizeSpec,
   canApply: canApplyResize,
   isApplying: isResizing,
   progressCurrent: resizeProgressCurrent,
@@ -160,11 +167,7 @@ function applyPreset(presetKey: string) {
 }
 
 // Aktueller Größen-Stand für „Als Rezept speichern“
-const currentResize = computed(() => ({
-  width: resizeWidth.value,
-  height: resizeHeight.value,
-  keepAspect: resizeKeepAspect.value,
-}))
+const currentResize = computed(() => ({ ...resizeSpec.value }))
 
 /**
  * Rezept anwenden: Filter, Rahmen/Schatten und Wasserzeichen ersetzen den
@@ -176,12 +179,7 @@ function applyRecipe(recipe: Recipe) {
   filters.value = { ...recipe.filters }
   transforms.value = { ...recipe.transforms }
   watermark.value = { ...recipe.watermark }
-  if (recipe.resize) {
-    resizeWidth.value = recipe.resize.width
-    resizeHeight.value = recipe.resize.height
-    resizeKeepAspect.value = recipe.resize.keepAspect
-    onResizeKeepAspectChange()
-  }
+  if (recipe.resize) setResizeSpec(recipe.resize)
   recipeStore.markApplied(recipe.id)
   toast.success(t('batchEdit.recipes.applied', { name: recipe.name, count: selectedCount.value }))
 }
@@ -272,6 +270,11 @@ function close() {
             v-model:width="resizeWidth"
             v-model:height="resizeHeight"
             v-model:keep-aspect="resizeKeepAspect"
+            v-model:mode="resizeMode"
+            v-model:percent="resizePercent"
+            v-model:long-edge="resizeLongEdge"
+            v-model:no-upscale="resizeNoUpscale"
+            :preview="resizePreview"
             :can-apply="canApplyResize"
             :is-applying="isResizing"
             :progress-current="resizeProgressCurrent"
