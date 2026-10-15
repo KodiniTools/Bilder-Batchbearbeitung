@@ -896,7 +896,8 @@
     "resetSlider": "Reset",
     "liveHint": "Changes are applied to the selection immediately",
     "tabs": {
-      "filters": "Filters"
+      "filters": "Filters",
+      "recipes": "Recipes"
     },
     "groups": {
       "light": "Light",
@@ -962,6 +963,32 @@
     "toast": {
       "applied": "Filters applied to {count} image(s)",
       "reset": "Filters reset for {count} image(s)"
+    },
+    "recipes": {
+      "intro": "Save batch edits, export and rename settings as your own recipe and apply them to the selection in one click.",
+      "empty": "No custom recipes saved yet.",
+      "apply": "Apply",
+      "applyHint": "Apply filters, border and watermark to the selection; target size, export and rename are prefilled",
+      "applied": "Recipe “{name}” applied to {count} image(s)",
+      "deleteNamed": "Delete recipe “{name}”",
+      "confirmDelete": "Delete recipe “{name}”?",
+      "saveTitle": "Save current settings",
+      "namePlaceholder": "Recipe name",
+      "save": "Save",
+      "saved": "Recipe “{name}” saved",
+      "overwrite": "Replace",
+      "confirmOverwrite": "A recipe named “{name}” already exists. Replace it?",
+      "capturedHint": "Captures filters, border, watermark and target size from this panel plus the most recently used export ({format}, {quality} %) and rename settings ({rename}).",
+      "export": "Export as JSON",
+      "import": "Import JSON",
+      "imported": "{count} recipe(s) imported",
+      "importError": "The file contains no valid recipes.",
+      "storageFull": "Recipes could not be saved (storage full?).",
+      "chips": {
+        "filters": "{count} filters",
+        "transforms": "Border/shadow",
+        "watermark": "Watermark"
+      }
     }
   },
   "blog": {

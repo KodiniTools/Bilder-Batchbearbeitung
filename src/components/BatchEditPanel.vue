@@ -12,6 +12,9 @@ import BatchFiltersSection from './batch-edit/BatchFiltersSection.vue'
 import BatchResizeSubsection from './batch-edit/BatchResizeSubsection.vue'
 import BatchTransformControls from './batch-edit/BatchTransformControls.vue'
 import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
+import BatchRecipesSection from './batch-edit/BatchRecipesSection.vue'
+import { useRecipeStore } from '@/stores/recipes'
+import type { Recipe } from '@/lib/core/recipes'
 
 const props = defineProps<{
   isOpen: boolean
@@ -24,8 +27,9 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const imageStore = useImageStore()
 const toast = useToast()
+const recipeStore = useRecipeStore()
 
-type PanelTab = 'filters' | 'transforms' | 'watermark'
+type PanelTab = 'filters' | 'transforms' | 'watermark' | 'recipes'
 
 // Lokaler Bearbeitungszustand; die Kind-Module liefern per v-model neue Objekte
 const filters = ref<ImageFilters>({ ...defaultFilters })
@@ -101,6 +105,12 @@ const tabs = computed<ReadonlyArray<TabConfig>>(() => [
     label: t('batchEdit.watermark.title'),
     badge: watermarkActive.value,
   },
+  {
+    key: 'recipes',
+    icon: 'fa-book-bookmark',
+    label: t('batchEdit.tabs.recipes'),
+    badge: recipeStore.activeRecipe !== null,
+  },
 ])
 
 // Beim Öffnen alle Werte zurücksetzen
@@ -147,6 +157,33 @@ function applyPreset(presetKey: string) {
   const preset = FILTER_PRESETS.find((p) => p.key === presetKey)
   if (!preset) return
   filters.value = { ...defaultFilters, ...preset.filters }
+}
+
+// Aktueller Größen-Stand für „Als Rezept speichern“
+const currentResize = computed(() => ({
+  width: resizeWidth.value,
+  height: resizeHeight.value,
+  keepAspect: resizeKeepAspect.value,
+}))
+
+/**
+ * Rezept anwenden: Filter, Rahmen/Schatten und Wasserzeichen ersetzen den
+ * Panel-Zustand (die Watcher übertragen sie live auf die Auswahl). Die
+ * Zielgröße wird nur vorbelegt, weil Größe ändern destruktiv ist. Export- und
+ * Umbenennen-Dialog übernehmen die Werte über den Rezept-Store.
+ */
+function applyRecipe(recipe: Recipe) {
+  filters.value = { ...recipe.filters }
+  transforms.value = { ...recipe.transforms }
+  watermark.value = { ...recipe.watermark }
+  if (recipe.resize) {
+    resizeWidth.value = recipe.resize.width
+    resizeHeight.value = recipe.resize.height
+    resizeKeepAspect.value = recipe.resize.keepAspect
+    onResizeKeepAspectChange()
+  }
+  recipeStore.markApplied(recipe.id)
+  toast.success(t('batchEdit.recipes.applied', { name: recipe.name, count: selectedCount.value }))
 }
 
 // Filter, Transformationen und Wasserzeichen der Auswahl zurücksetzen
@@ -257,6 +294,22 @@ function close() {
           class="tab-panel"
         >
           <BatchWatermarkControls v-model:watermark="watermark" />
+        </section>
+
+        <section
+          v-show="activeTab === 'recipes'"
+          id="batch-panel-recipes"
+          role="tabpanel"
+          aria-labelledby="batch-tab-recipes"
+          class="tab-panel"
+        >
+          <BatchRecipesSection
+            :filters="filters"
+            :transforms="transforms"
+            :watermark="watermark"
+            :resize="currentResize"
+            @apply="applyRecipe"
+          />
         </section>
       </div>
 
@@ -384,7 +437,7 @@ function close() {
 /* Segmentierte Tab-Leiste */
 .panel-tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 4px;
   margin: var(--space-3) var(--space-4) 0;
   padding: 4px;

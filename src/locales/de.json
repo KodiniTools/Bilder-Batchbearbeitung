@@ -1071,7 +1071,8 @@
     "resetSlider": "Zurücksetzen",
     "liveHint": "Änderungen werden sofort auf die Auswahl angewendet",
     "tabs": {
-      "filters": "Filter"
+      "filters": "Filter",
+      "recipes": "Rezepte"
     },
     "groups": {
       "light": "Licht",
@@ -1137,6 +1138,32 @@
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"
+    },
+    "recipes": {
+      "intro": "Speichere Stapelbearbeitung, Export- und Umbenennen-Einstellungen als eigenes Rezept und wende sie mit einem Klick auf die Auswahl an.",
+      "empty": "Noch keine eigenen Rezepte gespeichert.",
+      "apply": "Anwenden",
+      "applyHint": "Filter, Rahmen und Wasserzeichen auf die Auswahl anwenden; Zielgröße, Export und Umbenennen werden vorbelegt",
+      "applied": "Rezept „{name}“ auf {count} Bild(er) angewendet",
+      "deleteNamed": "Rezept „{name}“ löschen",
+      "confirmDelete": "Rezept „{name}“ löschen?",
+      "saveTitle": "Aktuelle Einstellungen speichern",
+      "namePlaceholder": "Name des Rezepts",
+      "save": "Speichern",
+      "saved": "Rezept „{name}“ gespeichert",
+      "overwrite": "Ersetzen",
+      "confirmOverwrite": "Es gibt bereits ein Rezept „{name}“. Ersetzen?",
+      "capturedHint": "Übernimmt Filter, Rahmen, Wasserzeichen und Zielgröße aus diesem Panel sowie die zuletzt verwendeten Export- ({format}, {quality} %) und Umbenennen-Einstellungen ({rename}).",
+      "export": "Als JSON exportieren",
+      "import": "JSON importieren",
+      "imported": "{count} Rezept(e) importiert",
+      "importError": "Die Datei enthält keine gültigen Rezepte.",
+      "storageFull": "Rezepte konnten nicht gespeichert werden (Speicher voll?).",
+      "chips": {
+        "filters": "{count} Filter",
+        "transforms": "Rahmen/Schatten",
+        "watermark": "Wasserzeichen"
+      }
     }
   },
   "wizard": {

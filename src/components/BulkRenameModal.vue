@@ -125,9 +125,12 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useImageStore } from '@/stores/imageStore'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { useRecipeStore } from '@/stores/recipes'
+import { defaultRecipeRename } from '@/lib/core/recipes'
 
 const { t } = useI18n()
 const imageStore = useImageStore()
+const recipeStore = useRecipeStore()
 
 interface Props {
   isOpen: boolean
@@ -182,16 +185,24 @@ watch(
   () => props.isOpen,
   (isOpen) => {
     if (isOpen) {
-      baseName.value = 'Bild'
-      startNumber.value = 1
-      separator.value = '-'
-      lowercaseEnabled.value = true
+      // Werte des angewendeten Rezepts, sonst die Standardwerte
+      const preset = recipeStore.activeRecipe?.rename ?? defaultRecipeRename
+      baseName.value = preset.baseName
+      startNumber.value = preset.startNumber
+      separator.value = preset.separator
+      lowercaseEnabled.value = preset.lowercase
     }
   }
 )
 
 function handleConfirm() {
   if (!isValid.value) return
+  recipeStore.rememberRename({
+    baseName: baseName.value.trim(),
+    startNumber: startNumber.value,
+    separator: separator.value,
+    lowercase: lowercaseEnabled.value,
+  })
   emit('confirm', baseName.value.trim(), startNumber.value, separator.value, lowercaseEnabled.value)
 }
 </script>

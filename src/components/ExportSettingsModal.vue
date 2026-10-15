@@ -665,6 +665,7 @@ import SliderRow from './SliderRow.vue'
 import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { usePdfDocumentStore } from '@/stores/pdfDocument'
+import { useRecipeStore } from '@/stores/recipes'
 import { stripRichText } from '@/lib/designer/rich-text'
 import {
   CUSTOM_PAGE_MAX_MM,
@@ -733,6 +734,16 @@ const settings = reactive({
   svgFilterSpeckle: 4,
   svgQuality: 'high' as 'standard' | 'high' | 'ultra',
 })
+
+// Angewendetes Rezept belegt Format, Qualität, PNG-Hintergrund und ZIP-Namen vor
+const recipeStore = useRecipeStore()
+watch(
+  () => recipeStore.applyCount,
+  () => {
+    const recipe = recipeStore.activeRecipe
+    if (recipe) Object.assign(settings, recipe.export)
+  }
+)
 
 // Logo für das PDF-Wasserzeichen als Daten-URL laden
 const logoInput = ref<HTMLInputElement | null>(null)
@@ -836,6 +847,8 @@ function handleConfirm(output: 'download' | 'print' = 'download') {
     password: '***',
     output,
   })
+  // Für „Als Rezept speichern“ merken (nur Raster-Export nutzt Format/Qualität)
+  if (props.mode === 'zip' || props.mode === 'save') recipeStore.rememberExport(settings)
   // PDF-Export liest den Store; die Felder bleiben im Payload für bestehende Aufrufer
   emit('confirm', {
     ...settings,
