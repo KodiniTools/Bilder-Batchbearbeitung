@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { renderExportCanvas } from '@/lib/core/export-render'
 import { getTopOverlayBottom } from '@/utils/viewport'
 
 const { t } = useI18n()
@@ -131,13 +132,17 @@ let exactToken = 0
 
 function scheduleExactPreview(scale: number) {
   const token = ++exactToken
-  const run = () => {
-    // Verwerfen, wenn inzwischen ein neuerer Render angestoßen wurde
-    if (token !== exactToken || !props.isOpen || !props.image || !previewCanvas.value) return
+  // Verwerfen, wenn inzwischen ein neuerer Render angestoßen wurde
+  const isStale = () =>
+    token !== exactToken || !props.isOpen || !props.image || !previewCanvas.value
+  const run = async () => {
+    if (isStale() || !props.image) return
+    // Filter-Passage im Worker (Fallback: Hauptthread)
+    const exact = await renderExportCanvas(props.image)
+    if (isStale() || !previewCanvas.value) return
     const canvas = previewCanvas.value
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const exact = ImageProcessor.getExportCanvas(props.image)
     canvas.width = Math.max(1, Math.round(exact.width * scale))
     canvas.height = Math.max(1, Math.round(exact.height * scale))
     ctx.imageSmoothingEnabled = true
@@ -146,9 +151,9 @@ function scheduleExactPreview(scale: number) {
     ctx.drawImage(exact, 0, 0, canvas.width, canvas.height)
   }
   if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(run, { timeout: 500 })
+    window.requestIdleCallback(() => void run(), { timeout: 500 })
   } else {
-    setTimeout(run, 0)
+    setTimeout(() => void run(), 0)
   }
 }
 

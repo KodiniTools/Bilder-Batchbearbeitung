@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- OffscreenCanvas.getContext('2d') is
    guaranteed non-null on a freshly created OffscreenCanvas. */
-// Web Worker für CPU-intensive Canvas-Operationen (Rotate, Flip, Resize, Crop).
+// Web Worker für CPU-intensive Canvas-Operationen (Rotate, Flip, Resize, Crop,
+// Filter-Pixel-Passage) und die Bildkodierung beim Export.
 // Läuft in einem separaten Thread — blockiert den UI-Thread nicht.
 // Kommunikation über transferierbare ImageBitmap / ImageData (Zero-Copy).
 
-export type WorkerOperation = 'rotate' | 'flip' | 'resize' | 'crop'
+import type { ImageFilters } from '@/lib/core/types'
+import { applyFiltersToContext } from '@/lib/core/filter-kernels'
+
+export type WorkerOperation = 'rotate' | 'flip' | 'resize' | 'crop' | 'filters' | 'encode'
 
 export interface WorkerRequest {
   id: string
   operation: WorkerOperation
   bitmap: ImageBitmap
-  params: RotateParams | FlipParams | ResizeParams | CropParams
+  params: RotateParams | FlipParams | ResizeParams | CropParams | FiltersParams | EncodeParams
 }
 
 export interface RotateParams {
@@ -30,11 +34,29 @@ export interface CropParams {
   aspectRatio: number
 }
 
+export interface FiltersParams {
+  filters: ImageFilters
+  /** Verhältnis Quelle zu Originalbild; skaliert den Blur-Radius */
+  scale: number
+}
+
+export interface EncodeParams {
+  /** MIME-Typ, z. B. image/jpeg */
+  type: string
+  /** Qualität 0-1 (nur verlustbehaftete Formate) */
+  quality: number
+}
+
 export interface WorkerResult {
   id: string
   imageData: ImageData
   width: number
   height: number
+}
+
+export interface WorkerEncodeResult {
+  id: string
+  blob: Blob
 }
 
 export interface WorkerError {
@@ -108,8 +130,38 @@ function crop(bitmap: ImageBitmap, params: CropParams): { canvas: OffscreenCanva
   return { canvas }
 }
 
+function filters(bitmap: ImageBitmap, params: FiltersParams): { canvas: OffscreenCanvas } {
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+  const ctx = canvas.getContext('2d')!
+  ctx.drawImage(bitmap, 0, 0)
+  applyFiltersToContext(ctx, canvas.width, canvas.height, params.filters, params.scale)
+  return { canvas }
+}
+
+/** Kodiert die Bitmap ohne Umweg über ImageData direkt als Datei-Blob */
+async function encode(id: string, bitmap: ImageBitmap, params: EncodeParams): Promise<void> {
+  try {
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(bitmap, 0, 0)
+    bitmap.close()
+    const blob = await canvas.convertToBlob({ type: params.type, quality: params.quality })
+    const response: WorkerEncodeResult = { id, blob }
+    self.postMessage(response)
+  } catch (err) {
+    bitmap.close()
+    const error: WorkerError = { id, error: String(err) }
+    self.postMessage(error)
+  }
+}
+
 self.onmessage = (e: MessageEvent<WorkerRequest>) => {
   const { id, operation, bitmap, params } = e.data
+
+  if (operation === 'encode') {
+    void encode(id, bitmap, params as EncodeParams)
+    return
+  }
 
   try {
     let result: { canvas: OffscreenCanvas }
@@ -126,6 +178,9 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
         break
       case 'crop':
         result = crop(bitmap, params as CropParams)
+        break
+      case 'filters':
+        result = filters(bitmap, params as FiltersParams)
         break
       default:
         throw new Error(`Unbekannte Operation: ${operation}`)

@@ -13,7 +13,7 @@
 //     (shape-rendering, sinnvolle Dimensionen, preserveAspectRatio).
 
 import type { ImageObject } from '../core/types'
-import { ImageProcessor } from '../core/image-processor'
+import { renderExportCanvas, encodeCanvasToBlob } from '../core/export-render'
 import { saveToTarget, type SaveTarget } from './save-file'
 
 export type SvgProgressCallback = (current: number, total: number) => void
@@ -140,9 +140,9 @@ function prepareCanvasForTracing(
  */
 async function buildTracingBlob(imageObj: ImageObject, quality: SvgQuality): Promise<Blob> {
   // Composed-Canvas (Filter + Wasserzeichen + Transforms) in voller Auflösung.
-  const exportCanvas = ImageProcessor.getExportCanvas(imageObj)
+  const exportCanvas = await renderExportCanvas(imageObj)
   const tracingCanvas = prepareCanvasForTracing(exportCanvas, quality)
-  return canvasToBlob(tracingCanvas, 'png')
+  return encodeCanvasToBlob(tracingCanvas, 'image/png', 1.0)
 }
 
 /**
@@ -302,22 +302,4 @@ function enhanceSvg(svg: string): string {
   }
 
   return svg.replace(openTagMatch[0], openTag)
-}
-
-function canvasToBlob(canvas: HTMLCanvasElement, format: string = 'png'): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const mimeType = `image/${format === 'jpg' ? 'jpeg' : format}`
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob)
-        } else {
-          reject(new Error('Canvas konnte nicht zu Blob konvertiert werden'))
-        }
-      },
-      mimeType,
-      1.0 // Maximale Qualität für SVG-Konvertierung
-    )
-  })
 }

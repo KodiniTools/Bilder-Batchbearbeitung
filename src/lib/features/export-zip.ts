@@ -1,6 +1,6 @@
 // src/lib/features/export-zip.ts
 import type { ImageObject } from '../core/types'
-import { ImageProcessor } from '../core/image-processor'
+import { renderExportCanvas, encodeCanvasToBlob } from '../core/export-render'
 import { saveToTarget, type SaveTarget } from './save-file'
 
 export type ZipProgressCallback = (current: number, total: number) => void
@@ -57,8 +57,10 @@ export async function exportImagesAsZip(
       // PNG ohne Transparenz: Hintergrundfarbe setzen
       const backgroundColor =
         exportFormat === 'png' && !pngTransparent ? pngBackgroundColor : undefined
-      const exportCanvas = ImageProcessor.getExportCanvas(image, { backgroundColor })
-      const blob = await canvasToBlob(exportCanvas, exportFormat, exportQuality)
+      // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
+      const exportCanvas = await renderExportCanvas(image, { backgroundColor })
+      const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
+      const blob = await encodeCanvasToBlob(exportCanvas, mimeType, exportQuality)
       const fileName = image.outputName || `bild_${Date.now()}`
       const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}.${exportFormat}`
       folder.file(fileNameWithExt, blob)
@@ -84,28 +86,4 @@ export async function exportImagesAsZip(
 export function resolveZipFileName(zipFileName?: string): string {
   const fileName = zipFileName || `bilder_${new Date().toISOString().slice(0, 10)}.zip`
   return fileName.endsWith('.zip') ? fileName : `${fileName}.zip`
-}
-
-// Hilfsfunktionen
-
-function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  format: string = 'png',
-  quality: number = 0.92
-): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const mimeType = `image/${format === 'jpg' ? 'jpeg' : format}`
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob)
-        } else {
-          reject(new Error('Canvas konnte nicht zu Blob konvertiert werden'))
-        }
-      },
-      mimeType,
-      quality
-    )
-  })
 }

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { ImageObject } from '@/lib/core/types'
 import { defaultTransforms } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
+import { renderPreviewCanvas } from '@/lib/core/export-render'
 import { useImageStore } from '@/stores/imageStore'
 
 const { t } = useI18n()
@@ -140,28 +141,62 @@ const handleEditKeydown = (event: KeyboardEvent) => {
 // Auflösung hält die Pixel-Passage (getImageData) bei Live-Stapelbearbeitung flüssig.
 const THUMB_BAKE_MAX = 600
 
+// Die Filter-Passage läuft im Worker. Pro Kachel ist höchstens ein Render
+// unterwegs; Änderungen währenddessen lösen genau einen Nachlauf aus, damit
+// sich bei Live-Stapelbearbeitung keine Jobs stauen. `syncGen` verwirft
+// Ergebnisse, die inzwischen von einem neueren Stand überholt wurden.
+let syncGen = 0
+let bakeInFlight = false
+let bakeQueued = false
+let unmounted = false
+
 function syncDisplayCanvas() {
+  const gen = ++syncGen
   const src = props.image.canvas
   const dst = displayCanvas.value
   if (!src || !dst) return
-  const ctx = dst.getContext('2d')
-  if (!ctx) return
 
   if (ImageProcessor.hasAnyEffect(props.image)) {
-    const scale = Math.min(THUMB_BAKE_MAX / src.width, THUMB_BAKE_MAX / src.height, 1)
-    const preview = ImageProcessor.getPreviewCanvas(props.image, scale)
-    dst.width = preview.width
-    dst.height = preview.height
-    ctx.clearRect(0, 0, dst.width, dst.height)
-    ctx.drawImage(preview, 0, 0)
+    if (bakeInFlight) {
+      bakeQueued = true
+      return
+    }
+    void bakeDisplayCanvas(gen)
   } else {
     // Kein Effekt aktiv: rohes Canvas in voller Auflösung anzeigen
+    const ctx = dst.getContext('2d')
+    if (!ctx) return
     dst.width = src.width
     dst.height = src.height
     ctx.clearRect(0, 0, dst.width, dst.height)
     ctx.drawImage(src, 0, 0)
+    updateDimensions()
   }
-  updateDimensions()
+}
+
+async function bakeDisplayCanvas(gen: number) {
+  bakeInFlight = true
+  try {
+    const src = props.image.canvas
+    const scale = Math.min(THUMB_BAKE_MAX / src.width, THUMB_BAKE_MAX / src.height, 1)
+    const preview = await renderPreviewCanvas(props.image, scale)
+    const dst = displayCanvas.value
+    const ctx = dst?.getContext('2d')
+    if (gen !== syncGen || unmounted || !dst || !ctx) return
+    dst.width = preview.width
+    dst.height = preview.height
+    ctx.clearRect(0, 0, dst.width, dst.height)
+    ctx.drawImage(preview, 0, 0)
+    updateDimensions()
+  } catch (err) {
+    console.warn('[ImageCard] Vorschau konnte nicht gerendert werden:', err)
+  } finally {
+    bakeInFlight = false
+    if (bakeQueued && !unmounted) {
+      bakeQueued = false
+      syncDisplayCanvas()
+    }
+  }
 }
 
 let mutationObserver: MutationObserver | null = null
@@ -180,6 +215,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  unmounted = true
   if (mutationObserver) {
     mutationObserver.disconnect()
   }

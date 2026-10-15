@@ -4,12 +4,14 @@
 import type {
   WorkerOperation,
   WorkerResult,
+  WorkerEncodeResult,
   WorkerError,
   RotateParams,
   FlipParams,
   ResizeParams,
   CropParams,
 } from '@/workers/image.worker'
+import type { ImageFilters } from '@/lib/core/types'
 
 // Der Worker (~1,5 KB) wird eingebettet und per Blob-URL gestartet. Eine
 // separate Worker-Datei würde auf kodinitools.com blockiert: Die Seite läuft mit
@@ -18,7 +20,8 @@ import type {
 // den Header noch einen zweiten Abruf.
 import InlineImageWorker from '@/workers/image.worker.ts?worker&inline'
 
-type PendingResolve = (result: WorkerResult) => void
+type AnyWorkerResult = WorkerResult | WorkerEncodeResult
+type PendingResolve = (result: AnyWorkerResult) => void
 type PendingReject = (error: Error) => void
 
 interface PendingEntry {
@@ -72,7 +75,7 @@ function spawnEntry(): PoolEntry {
   const entry: PoolEntry = { worker, busy: false }
   pool.push(entry)
 
-  worker.onmessage = (e: MessageEvent<WorkerResult | WorkerError>) => {
+  worker.onmessage = (e: MessageEvent<AnyWorkerResult | WorkerError>) => {
     const { id } = e.data
     const pending = pendingById.get(id)
     if (!pending) return
@@ -84,7 +87,7 @@ function spawnEntry(): PoolEntry {
     if ('error' in e.data) {
       pending.reject(new Error(e.data.error))
     } else {
-      pending.resolve(e.data as WorkerResult)
+      pending.resolve(e.data)
     }
 
     processQueue(entry)
@@ -150,7 +153,7 @@ function dispatch(
   operation: WorkerOperation,
   bitmap: ImageBitmap,
   params: unknown
-): Promise<WorkerResult> {
+): Promise<AnyWorkerResult> {
   // Pool permanent ausgefallen – sofort rejecten statt ewig in Queue hängen
   if (workerPoolFailed) {
     bitmap.close()
@@ -167,7 +170,8 @@ function dispatch(
   })
 }
 
-function applyResult(canvas: HTMLCanvasElement, result: WorkerResult): void {
+function applyResult(canvas: HTMLCanvasElement, result: AnyWorkerResult): void {
+  if (!('imageData' in result)) throw new Error('Unerwartete Worker-Antwort')
   canvas.width = result.width
   canvas.height = result.height
   const ctx = canvas.getContext('2d')
@@ -219,6 +223,50 @@ export function useImageWorker() {
     }
   }
 
+  /**
+   * Filter-Pixel-Passage im Worker. Liefert ein neues Canvas oder `null`, wenn
+   * kein Worker verfügbar ist oder der Job scheitert – der Aufrufer rechnet
+   * dann im Hauptthread (ImageProcessor.applyFiltersToCanvas).
+   */
+  async function filterCanvas(
+    source: HTMLCanvasElement,
+    filters: ImageFilters,
+    scale = 1
+  ): Promise<HTMLCanvasElement | null> {
+    if (!supported || workerPoolFailed || source.width === 0 || source.height === 0) return null
+    try {
+      const bitmap = await createImageBitmap(source)
+      const result = await dispatch('filters', bitmap, { filters: { ...filters }, scale })
+      const canvas = document.createElement('canvas')
+      applyResult(canvas, result)
+      return canvas
+    } catch (err) {
+      console.warn('[ImageWorker] Filter fehlgeschlagen, Fallback auf Hauptthread:', err)
+      return null
+    }
+  }
+
+  /**
+   * Kodiert ein Canvas im Worker (OffscreenCanvas.convertToBlob). `null` = kein
+   * Worker oder Fehler; der Aufrufer nutzt dann canvas.toBlob.
+   */
+  async function encodeCanvas(
+    source: HTMLCanvasElement,
+    type: string,
+    quality: number
+  ): Promise<Blob | null> {
+    if (!supported || workerPoolFailed || source.width === 0 || source.height === 0) return null
+    try {
+      const bitmap = await createImageBitmap(source)
+      const result = await dispatch('encode', bitmap, { type, quality })
+      if (!('blob' in result)) throw new Error('Unerwartete Worker-Antwort')
+      return result.blob
+    } catch (err) {
+      console.warn('[ImageWorker] Kodierung fehlgeschlagen, Fallback auf Hauptthread:', err)
+      return null
+    }
+  }
+
   function terminate(): void {
     pool.forEach((e) => e.worker.terminate())
     pool = []
@@ -226,5 +274,5 @@ export function useImageWorker() {
     pendingById.clear()
   }
 
-  return { supported, processCanvas, processBatch, terminate }
+  return { supported, processCanvas, processBatch, filterCanvas, encodeCanvas, terminate }
 }

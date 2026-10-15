@@ -90,7 +90,7 @@ export interface ImageData {
    * Erzeugt das Canvas erst beim Export (bevorzugt vor canvas/dataUrl):
    * So liegen nie alle Bilder einer Serie gleichzeitig im Speicher.
    */
-  getCanvas?: () => HTMLCanvasElement
+  getCanvas?: () => HTMLCanvasElement | Promise<HTMLCanvasElement>
   dataUrl?: string // Für Base64-Daten
   /** Nur für Fehlermeldungen; der Dateiname erscheint nicht im PDF */
   originalName: string
@@ -451,7 +451,7 @@ export async function buildPdfDocument(
       if (k >= images.length || jobs[k]) return
       const image = images[k]
       const job = (async () => {
-        const source = imageSource(image)
+        const source = await imageSource(image)
         return source ? encoder.encode(source, maxImageDimension, jpegQuality) : null
       })()
       // Fehler werden beim Abholen behandelt; keine unbehandelte Ablehnung bei Abbruch
@@ -1812,7 +1812,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 }
 
 /** Bildquelle eines Eintrags: getCanvas vor dataUrl vor canvas; null = keine Quelle */
-function imageSource(image: ImageData): PdfImageSource | null {
+async function imageSource(image: ImageData): Promise<PdfImageSource | null> {
   if (image.getCanvas) return image.getCanvas()
   return image.dataUrl || image.canvas || null
 }
