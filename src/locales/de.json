@@ -418,7 +418,8 @@
     "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt",
     "sessionRestored": "{count} Bild(er) aus der letzten Sitzung wiederhergestellt",
     "sessionRestorePartial": "{failed} Bild(er) der letzten Sitzung konnten nicht wiederhergestellt werden",
-    "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren."
+    "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren.",
+    "targetSizeMissed": "{count} Bild(er) überschreiten trotz niedrigster Qualität {kb} KB"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
@@ -642,7 +643,19 @@
       "selectedImage": "ausgewähltes Bild",
       "selectedImages": "ausgewählte Bilder"
     },
-    "moreElements": "+{count} weitere"
+    "moreElements": "+{count} weitere",
+    "targetSize": {
+      "enable": "Maximale Dateigröße pro Bild",
+      "lossyOnly": "Nur für JPG und WebP verfügbar.",
+      "maxLabel": "Höchstens",
+      "downscale": "Falls nötig Abmessungen verkleinern",
+      "qualityHint": "Die Qualität wird automatisch gesenkt, höchstens bis zum gewählten Wert oben.",
+      "estimate": "Geschätzt: ≈ {perImage} pro Bild · ≈ {total} gesamt",
+      "sampled": "(aus {sampled} von {count} Bild(ern) hochgerechnet)",
+      "estimating": "Größe wird geschätzt …",
+      "estimateFailed": "Größe konnte nicht geschätzt werden.",
+      "notReachable": "Die Zielgröße ist nicht bei allen Bildern erreichbar. Ziel erhöhen oder Verkleinern zulassen."
+    }
   },
   "frontPageDesigner": {
     "title": "Startseite gestalten",
@@ -1071,7 +1084,8 @@
     "resetSlider": "Zurücksetzen",
     "liveHint": "Änderungen werden sofort auf die Auswahl angewendet",
     "tabs": {
-      "filters": "Filter"
+      "filters": "Filter",
+      "recipes": "Rezepte"
     },
     "groups": {
       "light": "Licht",
@@ -1137,6 +1151,32 @@
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"
+    },
+    "recipes": {
+      "intro": "Speichere Stapelbearbeitung, Export- und Umbenennen-Einstellungen als eigenes Rezept und wende sie mit einem Klick auf die Auswahl an.",
+      "empty": "Noch keine eigenen Rezepte gespeichert.",
+      "apply": "Anwenden",
+      "applyHint": "Filter, Rahmen und Wasserzeichen auf die Auswahl anwenden; Zielgröße, Export und Umbenennen werden vorbelegt",
+      "applied": "Rezept „{name}“ auf {count} Bild(er) angewendet",
+      "deleteNamed": "Rezept „{name}“ löschen",
+      "confirmDelete": "Rezept „{name}“ löschen?",
+      "saveTitle": "Aktuelle Einstellungen speichern",
+      "namePlaceholder": "Name des Rezepts",
+      "save": "Speichern",
+      "saved": "Rezept „{name}“ gespeichert",
+      "overwrite": "Ersetzen",
+      "confirmOverwrite": "Es gibt bereits ein Rezept „{name}“. Ersetzen?",
+      "capturedHint": "Übernimmt Filter, Rahmen, Wasserzeichen und Zielgröße aus diesem Panel sowie die zuletzt verwendeten Export- ({format}, {quality} %) und Umbenennen-Einstellungen ({rename}).",
+      "export": "Als JSON exportieren",
+      "import": "JSON importieren",
+      "imported": "{count} Rezept(e) importiert",
+      "importError": "Die Datei enthält keine gültigen Rezepte.",
+      "storageFull": "Rezepte konnten nicht gespeichert werden (Speicher voll?).",
+      "chips": {
+        "filters": "{count} Filter",
+        "transforms": "Rahmen/Schatten",
+        "watermark": "Wasserzeichen"
+      }
     }
   },
   "wizard": {
