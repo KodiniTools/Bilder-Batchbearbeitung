@@ -9,6 +9,7 @@
 
 import type { ImageObject } from '../core/types'
 import { encodeCanvasToBlob, renderExportCanvas } from '../core/export-render'
+import { exifOverhead, readSourceExif, withExif } from '../core/exif'
 
 export interface TargetSizeOptions {
   /** Obergrenze in Bytes */
@@ -129,18 +130,30 @@ export async function encodeToTargetSize(
 /**
  * Kodiert ein Export-Canvas mit oder ohne Zielgröße. Ohne Zielgröße oder bei
  * verlustfreien Formaten verhält es sich wie encodeCanvasToBlob.
+ * Mit `exif` (normalisierter TIFF-Block) werden die Metadaten eingefügt; die
+ * Zielgröße berücksichtigt den dafür nötigen Platz.
  */
 export async function encodeForExport(
   canvas: HTMLCanvasElement,
   mimeType: string,
   quality: number,
-  target?: TargetSizeOptions | null
+  target?: TargetSizeOptions | null,
+  exif?: Uint8Array | null
 ): Promise<TargetSizeResult> {
+  let result: TargetSizeResult
   if (target && supportsTargetSize(mimeType)) {
-    return encodeToTargetSize(canvas, mimeType, quality, target)
+    const reserve = exif ? exifOverhead(exif) : 0
+    result = await encodeToTargetSize(canvas, mimeType, quality, {
+      ...target,
+      maxBytes: Math.max(1, target.maxBytes - reserve),
+    })
+  } else {
+    const blob = await encodeCanvasToBlob(canvas, mimeType, quality)
+    result = { blob, quality, scale: 1, reached: true }
   }
-  const blob = await encodeCanvasToBlob(canvas, mimeType, quality)
-  return { blob, quality, scale: 1, reached: !target || blob.size <= target.maxBytes }
+  if (exif) result.blob = await withExif(result.blob, exif)
+  result.reached = !target || result.blob.size <= target.maxBytes
+  return result
 }
 
 export interface SizeEstimate {
@@ -167,6 +180,8 @@ export interface EstimateRequest {
   getCanvas?: (image: ImageObject) => Promise<HTMLCanvasElement>
   /** Abbruch, wenn sich die Einstellungen inzwischen geändert haben */
   signal?: AbortSignal
+  /** EXIF der Originaldateien mitzählen */
+  keepExif?: boolean
 }
 
 /** Schätzt die Exportgröße aus einer Stichprobe der ersten Bilder. */
@@ -181,9 +196,12 @@ export async function estimateExportSize(req: EstimateRequest): Promise<SizeEsti
   let overTarget = false
   for (const image of sample) {
     if (req.signal?.aborted) return null
-    const canvas = await getCanvas(image)
+    const [canvas, exif] = await Promise.all([
+      getCanvas(image),
+      req.keepExif ? readSourceExif(image.file) : null,
+    ])
     if (req.signal?.aborted) return null
-    const result = await encodeForExport(canvas, req.mimeType, req.quality, req.target)
+    const result = await encodeForExport(canvas, req.mimeType, req.quality, req.target, exif)
     bytes += result.blob.size
     if (!result.reached) overTarget = true
   }

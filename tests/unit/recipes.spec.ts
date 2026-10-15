@@ -128,6 +128,12 @@ describe('sanitizeRecipe', () => {
     ).toBe('exact')
   })
 
+  it('übernimmt die EXIF-Option, ältere Rezepte entfernen EXIF wie bisher', () => {
+    expect(sanitizeRecipe({ name: 'A', export: { keepExif: true } })?.export.keepExif).toBe(true)
+    expect(sanitizeRecipe({ name: 'B', export: { keepExif: 'ja' } })?.export.keepExif).toBe(false)
+    expect(sanitizeRecipe({ name: 'C' })?.export.keepExif).toBe(false)
+  })
+
   it('verwirft Einträge ohne Namen', () => {
     expect(sanitizeRecipe({ name: '   ' })).toBeNull()
     expect(sanitizeRecipe('kaputt')).toBeNull()

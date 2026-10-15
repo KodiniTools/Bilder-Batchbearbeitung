@@ -10,6 +10,7 @@ import type {
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import { computeResizeTarget, type ResizeSpec } from '@/lib/core/resize-modes'
+import { buildRenameNames, toRenameItem } from '@/lib/core/rename-pattern'
 import { useImageWorker } from '@/composables/useImageWorker'
 import { createImageHistory } from './imageHistory'
 import { SessionStore, isSessionStorageSupported, loadSession } from '@/lib/core/session-store'
@@ -400,29 +401,30 @@ export const useImageStore = defineStore('images', () => {
     history.commit('panel-reset')
   }
 
-  // Batch-Umbenennung für alle ausgewählten Bilder
+  /**
+   * Batch-Umbenennung für alle ausgewählten Bilder (Reihenfolge wie im Grid).
+   * `baseName` ist ein Basisname (→ Name-1, Name-2 …) oder ein Muster mit
+   * Platzhaltern wie {name}_{n:000}_{date}; `exifDates` liefert die
+   * Aufnahmedaten für {date} (sonst Dateidatum).
+   */
   function batchRenameSelectedImages(
     baseName: string,
     startNumber: number = 1,
     separator: string = '_',
-    lowercase: boolean = false
+    lowercase: boolean = false,
+    exifDates?: ReadonlyMap<string, Date | null>
   ): number {
-    // Hole ausgewählte Bilder in der Reihenfolge wie sie im Grid erscheinen
     const selectedInOrder = images.value.filter((img) => img.selected)
 
     if (selectedInOrder.length === 0) return 0
 
-    // Sanitize baseName
-    const safeBaseName = ImageProcessor.safeBaseName(baseName)
-
-    // SEO-freundliche Umbenennung mit konfigurierbarem Trennzeichen
+    const names = buildRenameNames(
+      baseName,
+      selectedInOrder.map((img) => toRenameItem(img, exifDates?.get(img.id))),
+      { startNumber, separator, lowercase }
+    )
     selectedInOrder.forEach((img, index) => {
-      const number = startNumber + index
-      let name = safeBaseName.replace(/\s+/g, separator).replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '')
-      if (lowercase) {
-        name = name.toLowerCase()
-      }
-      img.outputName = `${name}${separator}${number}`
+      img.outputName = names[index]
     })
 
     history.commit()

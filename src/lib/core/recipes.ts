@@ -31,6 +31,8 @@ export interface RecipeExportSettings {
   targetSizeKb: number
   /** Notfalls Abmessungen verkleinern, um die Zielgröße zu erreichen */
   targetSizeDownscale: boolean
+  /** EXIF-Metadaten beim Export übernehmen */
+  keepExif: boolean
 }
 
 export interface RecipeRenameSettings {
@@ -64,6 +66,7 @@ export const defaultRecipeExport: RecipeExportSettings = {
   targetSizeEnabled: false,
   targetSizeKb: 500,
   targetSizeDownscale: false,
+  keepExif: false,
 }
 
 export const defaultRecipeRename: RecipeRenameSettings = {
@@ -211,6 +214,7 @@ export function sanitizeExportSettings(raw: unknown): RecipeExportSettings {
     targetSizeEnabled: bool(r.targetSizeEnabled, d.targetSizeEnabled),
     targetSizeKb: Math.round(num(r.targetSizeKb, d.targetSizeKb, [TARGET_KB_MIN, TARGET_KB_MAX])),
     targetSizeDownscale: bool(r.targetSizeDownscale, d.targetSizeDownscale),
+    keepExif: bool(r.keepExif, d.keepExif),
   }
 }
 
