@@ -131,6 +131,7 @@
                 <label class="group-title">{{ t('exportModal.pdf.watermark.title') }}</label>
                 <BatchWatermarkControls
                   :watermark="doc.watermark"
+                  hide-logo
                   @update:watermark="doc.watermark = $event"
                 />
                 <div v-if="doc.watermark.enabled" class="watermark-logo">

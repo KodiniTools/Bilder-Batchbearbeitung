@@ -1142,6 +1142,19 @@
         "bottomLeft": "Unten links",
         "bottomRight": "Unten rechts",
         "tile": "Kachel (wiederholt)"
+      },
+      "logo": {
+        "title": "Logo",
+        "choose": "Logo auswählen …",
+        "replace": "Logo ersetzen …",
+        "remove": "Logo entfernen",
+        "size": "Logo-Größe",
+        "opacity": "Logo-Deckkraft",
+        "position": "Logo-Position",
+        "hint": "Wird zusätzlich zum Text gezeichnet. Größe bezogen auf die kürzere Bildseite. PNG mit Transparenz empfohlen.",
+        "errorType": "Bitte ein PNG-, JPG-, WebP- oder SVG-Logo wählen.",
+        "errorDecode": "Das Logo konnte nicht gelesen werden.",
+        "errorSize": "Das Logo ist zu groß."
       }
     },
     "resize": {

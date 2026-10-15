@@ -10,6 +10,7 @@ import type { ImageFilters, ImageObject } from './types'
 import { defaultFilters } from './types'
 import { ImageProcessor } from './image-processor'
 import { hasActiveFilters } from './filter-kernels'
+import { ensureWatermarkLogo } from './watermark-logo'
 import { useImageWorker } from '@/composables/useImageWorker'
 
 /**
@@ -31,7 +32,10 @@ export async function renderExportCanvas(
   imageObj: ImageObject,
   options?: { backgroundColor?: string }
 ): Promise<HTMLCanvasElement> {
-  const filtered = await renderFilteredCanvas(imageObj.canvas, imageObj.filters || defaultFilters)
+  const [filtered] = await Promise.all([
+    renderFilteredCanvas(imageObj.canvas, imageObj.filters || defaultFilters),
+    ensureWatermarkLogo(imageObj.watermark),
+  ])
   return ImageProcessor.composeExportCanvas(filtered, imageObj, options)
 }
 
@@ -41,7 +45,10 @@ export async function renderPreviewCanvas(
   scale: number
 ): Promise<HTMLCanvasElement> {
   const base = ImageProcessor.getPreviewBase(imageObj, scale)
-  const filtered = await renderFilteredCanvas(base, imageObj.filters || defaultFilters, scale)
+  const [filtered] = await Promise.all([
+    renderFilteredCanvas(base, imageObj.filters || defaultFilters, scale),
+    ensureWatermarkLogo(imageObj.watermark),
+  ])
   return ImageProcessor.composePreviewCanvas(filtered, imageObj, scale)
 }
 

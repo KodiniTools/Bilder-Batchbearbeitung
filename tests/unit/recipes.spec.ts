@@ -85,6 +85,25 @@ describe('sanitizeRecipe', () => {
     })
   })
 
+  it('übernimmt nur gültige Logo-Daten-URLs und begrenzt die Logo-Werte', () => {
+    const png = 'data:image/png;base64,iVBORw0KGgo='
+    const r = sanitizeRecipe({
+      name: 'Logo',
+      watermark: { logoDataUrl: png, logoSize: 500, logoOpacity: -1, logoPosition: 'tile' },
+    })
+    expect(r?.watermark).toMatchObject({
+      logoDataUrl: png,
+      logoSize: 100,
+      logoOpacity: 0,
+      logoPosition: 'tile',
+    })
+    const bad = sanitizeRecipe({
+      name: 'Böse',
+      watermark: { logoDataUrl: 'data:image/svg+xml;base64,PHN2Zz4=', logoPosition: 'oben' },
+    })
+    expect(bad?.watermark).toMatchObject({ logoDataUrl: '', logoPosition: 'bottom-right' })
+  })
+
   it('verwirft Einträge ohne Namen', () => {
     expect(sanitizeRecipe({ name: '   ' })).toBeNull()
     expect(sanitizeRecipe('kaputt')).toBeNull()

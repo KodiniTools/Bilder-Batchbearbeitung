@@ -967,6 +967,19 @@
         "bottomLeft": "Bottom left",
         "bottomRight": "Bottom right",
         "tile": "Tile (repeated)"
+      },
+      "logo": {
+        "title": "Logo",
+        "choose": "Choose logo …",
+        "replace": "Replace logo …",
+        "remove": "Remove logo",
+        "size": "Logo size",
+        "opacity": "Logo opacity",
+        "position": "Logo position",
+        "hint": "Drawn in addition to the text. Size relative to the shorter image side. PNG with transparency recommended.",
+        "errorType": "Please choose a PNG, JPG, WebP or SVG logo.",
+        "errorDecode": "The logo could not be read.",
+        "errorSize": "The logo is too large."
       }
     },
     "resize": {

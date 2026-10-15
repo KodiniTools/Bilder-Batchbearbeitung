@@ -15,7 +15,7 @@ import {
  * (fontSize in px bei 96 DPI, opacity 0–100, rotation im Uhrzeigersinn),
  * optional zusätzlich ein Logo als Daten-URL.
  */
-export interface PdfWatermark extends WatermarkSettings {
+export interface PdfWatermark extends Omit<WatermarkSettings, 'logoDataUrl'> {
   logoDataUrl?: string
 }
 
