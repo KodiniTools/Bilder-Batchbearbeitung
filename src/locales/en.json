@@ -927,7 +927,27 @@
         "apply": "Apply resize",
         "applying": "Applying… {current}/{total}",
         "undo": "Undo",
-        "undoTitle": "Undo last resize"
+        "undoTitle": "Undo last resize",
+        "modeLabel": "Mode",
+        "modes": {
+          "exact": "Exact",
+          "percent": "Percent",
+          "longEdge": "Long edge",
+          "fit": "Fit"
+        },
+        "modeHints": {
+          "exact": "Fixed width and height, optionally keeping the aspect ratio.",
+          "percent": "Scales every image by the same factor.",
+          "longEdge": "The longer side of each image gets this length, portrait or landscape.",
+          "fit": "Each image fits inside the box, keeping its aspect ratio."
+        },
+        "maxWidth": "Max. width",
+        "maxHeight": "Max. height",
+        "percent": "Scale",
+        "longEdge": "Longer side",
+        "noUpscale": "Don't enlarge (smaller images stay unchanged)",
+        "preview": "First image: {from} → {to} px",
+        "previewUnchanged": "First image stays unchanged ({size} px)"
       },
       "border": {
         "title": "Border",
@@ -984,7 +1004,9 @@
     },
     "resize": {
       "toast": "{count} image(s) resized",
-      "undoToast": "Resize undone"
+      "undoToast": "Resize undone",
+      "toastSkipped": "{count} image(s) resized, {skipped} unchanged",
+      "noneChanged": "Nothing changed: all selected images are already small enough."
     },
     "toast": {
       "applied": "Filters applied to {count} image(s)",
@@ -1013,7 +1035,8 @@
       "chips": {
         "filters": "{count} filters",
         "transforms": "Border/shadow",
-        "watermark": "Watermark"
+        "watermark": "Watermark",
+        "longEdge": "Long edge {px} px"
       }
     }
   },

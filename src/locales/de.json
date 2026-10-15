@@ -1102,7 +1102,27 @@
         "apply": "Größe anwenden",
         "applying": "Wird angewendet… {current}/{total}",
         "undo": "Rückgängig",
-        "undoTitle": "Letzte Größenänderung rückgängig machen"
+        "undoTitle": "Letzte Größenänderung rückgängig machen",
+        "modeLabel": "Modus",
+        "modes": {
+          "exact": "Exakt",
+          "percent": "Prozent",
+          "longEdge": "Lange Kante",
+          "fit": "Einpassen"
+        },
+        "modeHints": {
+          "exact": "Feste Breite und Höhe, optional mit Seitenverhältnis.",
+          "percent": "Skaliert jedes Bild um denselben Faktor.",
+          "longEdge": "Die längere Seite jedes Bildes bekommt diese Länge, Hoch- wie Querformat.",
+          "fit": "Jedes Bild passt in den Rahmen, das Seitenverhältnis bleibt erhalten."
+        },
+        "maxWidth": "Max. Breite",
+        "maxHeight": "Max. Höhe",
+        "percent": "Skalierung",
+        "longEdge": "Längere Seite",
+        "noUpscale": "Nicht vergrößern (kleinere Bilder bleiben unverändert)",
+        "preview": "Erstes Bild: {from} → {to} px",
+        "previewUnchanged": "Erstes Bild bleibt unverändert ({size} px)"
       },
       "border": {
         "title": "Bildrand",
@@ -1159,7 +1179,9 @@
     },
     "resize": {
       "toast": "Größe von {count} Bild(ern) geändert",
-      "undoToast": "Größenänderung rückgängig gemacht"
+      "undoToast": "Größenänderung rückgängig gemacht",
+      "toastSkipped": "Größe von {count} Bild(ern) geändert, {skipped} unverändert",
+      "noneChanged": "Keine Änderung: Alle ausgewählten Bilder sind bereits klein genug."
     },
     "toast": {
       "applied": "Filter auf {count} Bild(er) angewendet",
@@ -1188,7 +1210,8 @@
       "chips": {
         "filters": "{count} Filter",
         "transforms": "Rahmen/Schatten",
-        "watermark": "Wasserzeichen"
+        "watermark": "Wasserzeichen",
+        "longEdge": "Lange Kante {px} px"
       }
     }
   },

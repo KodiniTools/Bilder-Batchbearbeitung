@@ -18,6 +18,7 @@ import {
 } from '@/lib/core/recipes'
 import { defaultFilters, defaultTransforms, defaultWatermark } from '@/lib/core/types'
 import { useRecipeStore } from '@/stores/recipes'
+import { defaultResizeSpec } from '@/lib/core/resize-modes'
 import { useConfirm } from '@/composables/useConfirm'
 import BatchRecipesSection from '@/components/batch-edit/BatchRecipesSection.vue'
 
@@ -29,7 +30,7 @@ function recipe(name: string, patch: Partial<Recipe> = {}): Recipe {
       filters: { ...defaultFilters, brightness: 120 },
       transforms: { ...defaultTransforms },
       watermark: { ...defaultWatermark, enabled: true, text: '© Shop' },
-      resize: { width: 1200, height: 800, keepAspect: true },
+      resize: { ...defaultResizeSpec, width: 1200, height: 800, keepAspect: true },
       export: { ...defaultRecipeExport, format: 'webp', quality: 80 },
       rename: { ...defaultRecipeRename, baseName: 'produkt' },
     }),
@@ -102,6 +103,29 @@ describe('sanitizeRecipe', () => {
       watermark: { logoDataUrl: 'data:image/svg+xml;base64,PHN2Zz4=', logoPosition: 'oben' },
     })
     expect(bad?.watermark).toMatchObject({ logoDataUrl: '', logoPosition: 'bottom-right' })
+  })
+
+  it('liest alte Größenangaben als „exakt“ und begrenzt die neuen Modi', () => {
+    expect(
+      sanitizeRecipe({ name: 'Alt', resize: { width: 800, height: 600, keepAspect: false } })
+        ?.resize
+    ).toEqual({ ...defaultResizeSpec, width: 800, height: 600, keepAspect: false })
+    expect(
+      sanitizeRecipe({
+        name: 'Neu',
+        resize: {
+          mode: 'longEdge',
+          width: 10,
+          height: 10,
+          percent: 5000,
+          longEdge: 99999,
+          noUpscale: false,
+        },
+      })?.resize
+    ).toMatchObject({ mode: 'longEdge', percent: 1000, longEdge: 10000, noUpscale: false })
+    expect(
+      sanitizeRecipe({ name: 'X', resize: { mode: 'riesig', width: 5, height: 5 } })?.resize?.mode
+    ).toBe('exact')
   })
 
   it('verwirft Einträge ohne Namen', () => {
@@ -189,7 +213,7 @@ describe('BatchRecipesSection', () => {
         filters: { ...defaultFilters, contrast: 140 },
         transforms: { ...defaultTransforms, borderWidth: 4 },
         watermark: { ...defaultWatermark },
-        resize: { width: 800, height: 600, keepAspect: false },
+        resize: { ...defaultResizeSpec, width: 800, height: 600, keepAspect: false },
       },
       global: { plugins: [i18n] },
     })
@@ -208,7 +232,12 @@ describe('BatchRecipesSection', () => {
     expect(saved.name).toBe('Mein Rezept')
     expect(saved.filters.contrast).toBe(140)
     expect(saved.transforms.borderWidth).toBe(4)
-    expect(saved.resize).toEqual({ width: 800, height: 600, keepAspect: false })
+    expect(saved.resize).toMatchObject({
+      mode: 'exact',
+      width: 800,
+      height: 600,
+      keepAspect: false,
+    })
     expect(saved.export).toMatchObject({ format: 'webp', quality: 70 })
     expect(wrapper.findAll('.recipe')).toHaveLength(1)
   })

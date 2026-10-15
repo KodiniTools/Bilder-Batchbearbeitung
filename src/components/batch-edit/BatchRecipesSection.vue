@@ -49,6 +49,21 @@ function renamePreview(r: RecipeRenameSettings): string {
   return r.lowercase ? name.toLowerCase() : name
 }
 
+/** Zielgröße als kurzes Merkmal, je nach Modus */
+function resizeChip(r: RecipeResize): string {
+  switch (r.mode) {
+    case 'percent':
+      return `${r.percent} %`
+    case 'longEdge':
+      return t('batchEdit.recipes.chips.longEdge', { px: r.longEdge })
+    case 'fit':
+      return `≤ ${r.width}×${r.height}`
+    case 'exact':
+    default:
+      return `${r.width}×${r.height}`
+  }
+}
+
 /** Kurze Merkmale eines Rezepts für die Liste */
 function summary(recipe: Recipe): string[] {
   const chips: string[] = []
@@ -58,7 +73,7 @@ function summary(recipe: Recipe): string[] {
     chips.push(t('batchEdit.recipes.chips.transforms'))
   }
   if (recipe.watermark.enabled) chips.push(t('batchEdit.recipes.chips.watermark'))
-  if (recipe.resize) chips.push(`${recipe.resize.width}×${recipe.resize.height}`)
+  if (recipe.resize) chips.push(resizeChip(recipe.resize))
   const format = recipe.export.format.toUpperCase()
   chips.push(recipe.export.format === 'png' ? format : `${format} ${recipe.export.quality} %`)
   if (recipe.export.targetSizeEnabled && recipe.export.format !== 'png') {

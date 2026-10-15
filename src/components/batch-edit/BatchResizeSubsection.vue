@@ -4,30 +4,71 @@
       <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
       {{ t('batchEdit.transforms.resize.title') }}
     </h4>
-    <div class="resize-inputs">
+    <div
+      class="resize-modes"
+      role="radiogroup"
+      :aria-label="t('batchEdit.transforms.resize.modeLabel')"
+    >
+      <label
+        v-for="m in RESIZE_MODES"
+        :key="m"
+        class="resize-mode"
+        :class="{ 'resize-mode--active': mode === m }"
+      >
+        <input
+          type="radio"
+          name="batch-resize-mode"
+          class="resize-mode__input"
+          :value="m"
+          :checked="mode === m"
+          :disabled="isApplying"
+          @change="emit('update:mode', m)"
+        />
+        {{ t(`batchEdit.transforms.resize.modes.${m}`) }}
+      </label>
+    </div>
+    <p class="resize-hint">{{ t(`batchEdit.transforms.resize.modeHints.${mode}`) }}</p>
+
+    <div v-if="mode === 'exact' || mode === 'fit'" class="resize-inputs">
       <div class="resize-field">
-        <label for="batch-resize-width">{{ t('batchEdit.transforms.resize.width') }}</label>
+        <label for="batch-resize-width">
+          {{
+            t(
+              mode === 'fit'
+                ? 'batchEdit.transforms.resize.maxWidth'
+                : 'batchEdit.transforms.resize.width'
+            )
+          }}
+        </label>
         <NumberSpinner
           id="batch-resize-width"
           :model-value="width"
           :min="1"
-          :max="10000"
+          :max="RESIZE_PX_MAX"
           unit="px"
           fluid
           :disabled="isApplying"
           @update:model-value="onWidthUpdate"
         />
       </div>
-      <div class="resize-link-icon" :class="{ active: keepAspect }">
+      <div v-if="mode === 'exact'" class="resize-link-icon" :class="{ active: keepAspect }">
         <i class="fa-solid fa-link"></i>
       </div>
       <div class="resize-field">
-        <label for="batch-resize-height">{{ t('batchEdit.transforms.resize.height') }}</label>
+        <label for="batch-resize-height">
+          {{
+            t(
+              mode === 'fit'
+                ? 'batchEdit.transforms.resize.maxHeight'
+                : 'batchEdit.transforms.resize.height'
+            )
+          }}
+        </label>
         <NumberSpinner
           id="batch-resize-height"
           :model-value="height"
           :min="1"
-          :max="10000"
+          :max="RESIZE_PX_MAX"
           unit="px"
           fluid
           :disabled="isApplying"
@@ -35,8 +76,37 @@
         />
       </div>
     </div>
+
+    <div v-else-if="mode === 'percent'" class="resize-field">
+      <label for="batch-resize-percent">{{ t('batchEdit.transforms.resize.percent') }}</label>
+      <NumberSpinner
+        id="batch-resize-percent"
+        :model-value="percent"
+        :min="RESIZE_PERCENT_MIN"
+        :max="RESIZE_PERCENT_MAX"
+        unit="%"
+        fluid
+        :disabled="isApplying"
+        @update:model-value="emit('update:percent', $event)"
+      />
+    </div>
+
+    <div v-else class="resize-field">
+      <label for="batch-resize-long-edge">{{ t('batchEdit.transforms.resize.longEdge') }}</label>
+      <NumberSpinner
+        id="batch-resize-long-edge"
+        :model-value="longEdge"
+        :min="1"
+        :max="RESIZE_PX_MAX"
+        unit="px"
+        fluid
+        :disabled="isApplying"
+        @update:model-value="emit('update:longEdge', $event)"
+      />
+    </div>
+
     <div class="checkbox-group">
-      <label class="checkbox-label">
+      <label v-if="mode === 'exact'" class="checkbox-label">
         <input
           type="checkbox"
           :checked="keepAspect"
@@ -45,7 +115,35 @@
         />
         <span>{{ t('batchEdit.transforms.resize.keepAspect') }}</span>
       </label>
+      <label v-else-if="mode === 'fit' || mode === 'longEdge'" class="checkbox-label">
+        <input
+          type="checkbox"
+          :checked="noUpscale"
+          :disabled="isApplying"
+          @change="emit('update:noUpscale', ($event.target as HTMLInputElement).checked)"
+        />
+        <span>{{ t('batchEdit.transforms.resize.noUpscale') }}</span>
+      </label>
     </div>
+
+    <p v-if="preview" class="resize-preview">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <span v-if="preview.to">
+        {{
+          t('batchEdit.transforms.resize.preview', {
+            from: `${preview.from.width} × ${preview.from.height}`,
+            to: `${preview.to.width} × ${preview.to.height}`,
+          })
+        }}
+      </span>
+      <span v-else>
+        {{
+          t('batchEdit.transforms.resize.previewUnchanged', {
+            size: `${preview.from.width} × ${preview.from.height}`,
+          })
+        }}
+      </span>
+    </p>
     <div class="resize-actions">
       <button
         class="btn btn-apply-resize"
@@ -84,6 +182,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import NumberSpinner from '../NumberSpinner.vue'
+import {
+  RESIZE_MODES,
+  RESIZE_PERCENT_MAX,
+  RESIZE_PERCENT_MIN,
+  RESIZE_PX_MAX,
+  type ResizeMode,
+  type Size,
+} from '@/lib/core/resize-modes'
 
 const { t } = useI18n()
 
@@ -91,6 +197,12 @@ defineProps<{
   width: number
   height: number
   keepAspect: boolean
+  mode: ResizeMode
+  percent: number
+  longEdge: number
+  noUpscale: boolean
+  /** Ergebnis für das erste ausgewählte Bild; to = null: bleibt unverändert */
+  preview: { from: Size; to: Size | null } | null
   canApply: boolean
   /** Größenänderung läuft: Spinner zeigen, Eingaben sperren */
   isApplying: boolean
@@ -104,6 +216,10 @@ const emit = defineEmits<{
   'update:width': [value: number]
   'update:height': [value: number]
   'update:keepAspect': [value: boolean]
+  'update:mode': [value: ResizeMode]
+  'update:percent': [value: number]
+  'update:longEdge': [value: number]
+  'update:noUpscale': [value: boolean]
   /** Nach der Wertänderung: Parent leitet ggf. die andere Seite ab */
   'width-change': []
   'height-change': []
@@ -167,6 +283,76 @@ function onKeepAspectInput(event: Event) {
 .resize-link-icon.active {
   color: var(--accent);
   opacity: 1;
+}
+
+.resize-modes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ds-space-1);
+}
+
+.resize-mode {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ds-control-sm);
+  padding: 0 var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-0);
+  color: var(--ds-text-2);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    color var(--ds-duration) var(--ds-ease),
+    border-color var(--ds-duration) var(--ds-ease);
+}
+
+.resize-mode:hover {
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+.resize-mode--active,
+.resize-mode--active:hover {
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  color: var(--ds-on-accent);
+}
+
+.resize-mode:has(.resize-mode__input:focus-visible) {
+  box-shadow: var(--ds-focus-ring);
+}
+
+/* Radio nur für Tastatur und Screenreader, optisch die Kachel */
+.resize-mode__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.resize-hint {
+  margin: 0;
+  font-size: var(--ds-text-xs);
+  color: var(--ds-text-3);
+}
+
+.resize-preview {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  font-size: var(--ds-text-xs);
+  color: var(--ds-text-2);
+}
+
+.resize-preview i {
+  color: var(--ds-accent);
 }
 
 .resize-actions {
