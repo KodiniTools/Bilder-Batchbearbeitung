@@ -59,6 +59,8 @@ export default defineConfig({
           name: 'browser',
           include: ['tests/browser/**/*.spec.ts'],
           restoreMocks: true,
+          // Vorab bündeln, sonst lädt Vite beim ersten Lauf die Testseite neu
+          deps: { optimizer: { web: { include: ['jszip'] } } },
           browser: {
             enabled: true,
             headless: true,

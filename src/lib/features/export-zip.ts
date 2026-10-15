@@ -1,6 +1,7 @@
 // src/lib/features/export-zip.ts
 import type { ImageObject } from '../core/types'
-import { renderExportCanvas, encodeCanvasToBlob } from '../core/export-render'
+import { renderExportCanvas } from '../core/export-render'
+import { encodeForExport, type TargetSizeOptions } from './target-size'
 import { saveToTarget, type SaveTarget } from './save-file'
 
 export type ZipProgressCallback = (current: number, total: number) => void
@@ -25,8 +26,10 @@ export async function exportImagesAsZip(
   pngTransparent: boolean = true,
   pngBackgroundColor: string = '#ffffff',
   /** Vom Nutzer gewähltes Ziel; ohne Angabe wird die Datei heruntergeladen */
-  saveTarget?: SaveTarget
-): Promise<void> {
+  saveTarget?: SaveTarget,
+  /** Maximale Dateigröße pro Bild (nur JPG/WebP) */
+  targetSize?: TargetSizeOptions | null
+): Promise<{ overTarget: number }> {
   const JSZip = await getJSZip()
 
   if (!images || images.length === 0) {
@@ -41,6 +44,7 @@ export async function exportImagesAsZip(
   }
 
   const total = images.length
+  let overTarget = 0
 
   // Bilder zum ZIP hinzufügen
   for (let i = 0; i < images.length; i++) {
@@ -60,7 +64,9 @@ export async function exportImagesAsZip(
       // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
       const exportCanvas = await renderExportCanvas(image, { backgroundColor })
       const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
-      const blob = await encodeCanvasToBlob(exportCanvas, mimeType, exportQuality)
+      const result = await encodeForExport(exportCanvas, mimeType, exportQuality, targetSize)
+      if (!result.reached) overTarget++
+      const blob = result.blob
       const fileName = image.outputName || `bild_${Date.now()}`
       const fileNameWithExt = fileName.includes('.') ? fileName : `${fileName}.${exportFormat}`
       folder.file(fileNameWithExt, blob)
@@ -80,6 +86,7 @@ export async function exportImagesAsZip(
     saveTarget ?? { kind: 'download', name: resolveZipFileName(zipFileName) },
     blob
   )
+  return { overTarget }
 }
 
 /** Dateiname des ZIP-Archivs: Eingabe des Nutzers oder datierter Standardname, immer mit .zip */

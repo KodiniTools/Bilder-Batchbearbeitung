@@ -20,7 +20,8 @@ import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import type { ImageObject } from '@/lib/core/types'
-import { renderExportCanvas, encodeCanvasToBlob } from '@/lib/core/export-render'
+import { renderExportCanvas } from '@/lib/core/export-render'
+import { encodeForExport, kbToBytes, type TargetSizeOptions } from '@/lib/features/target-size'
 
 import { buildPdf, type ExportSettings, type ImageData } from '@/lib/features/export-pdf'
 import { cancelPrint, preparePrint, printPdf, type PrintMode } from '@/lib/features/print-pdf'
@@ -298,7 +299,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
 
       try {
-        await exportImagesAsZip(
+        const { overTarget } = await exportImagesAsZip(
           imagesToExport,
           zipFileName,
           settings.format,
@@ -306,9 +307,11 @@ async function handleExportConfirm(settings: ExportSettings) {
           onProgress,
           settings.pngTransparent ?? true,
           settings.pngBackgroundColor ?? '#ffffff',
-          saveTarget
+          saveTarget,
+          targetSizeOf(settings)
         )
         toast.success(t('toast.zipSuccess', { count: total }))
+        warnOverTarget(overTarget, settings)
         showWizard('zip', total)
       } finally {
         loadingIndicator.value?.hide()
@@ -361,20 +364,27 @@ async function handleExportConfirm(settings: ExportSettings) {
           : undefined
 
       const quality = (settings.quality ?? 92) / 100
+      const targetSize = targetSizeOf(settings)
+      let overTarget = 0
+      const render = async (image: ImageObject, format: string) => {
+        const result = await renderImageBlob(image, format, quality, bgColor, targetSize)
+        if (!result.reached) overTarget++
+        return result.blob
+      }
       if (images.length === 1) {
         // Ein Bild: Speichern-Dialog mit Dateinamen
         const [image] = images
         const format = imageExportFormat(image, settings.format)
         const target = await pickSaveFile(imageFileName(image, format), imageFileType(format))
         if (!target) return
-        await saveToTarget(target, await renderImageBlob(image, format, quality, bgColor))
+        await saveToTarget(target, await render(image, format))
       } else {
         // Mehrere Bilder: Zielordner wählen, Dateinamen kommen aus der Umbenennung
         const target = await pickSaveDirectory()
         if (!target) return
         for (const image of images) {
           const format = imageExportFormat(image, settings.format)
-          const blob = await renderImageBlob(image, format, quality, bgColor)
+          const blob = await render(image, format)
           await saveToDirectory(target, blob, imageFileName(image, format))
           // Browser blockieren schnell aufeinanderfolgende Downloads
           if (target.kind === 'download') await new Promise((resolve) => setTimeout(resolve, 200))
@@ -382,6 +392,7 @@ async function handleExportConfirm(settings: ExportSettings) {
       }
 
       toast.success(t('toast.saveSuccess', { count: images.length }))
+      warnOverTarget(overTarget, settings)
       showWizard('save', images.length)
     }
   } catch (error) {
@@ -401,17 +412,33 @@ function imageFileName(image: ImageObject, exportFormat: string): string {
     : `${fileName}.${exportFormat}`
 }
 
+/** Zielgröße aus den Export-Einstellungen; `null`, wenn nicht aktiviert */
+function targetSizeOf(settings: ExportSettings): TargetSizeOptions | null {
+  if (!settings.targetSizeEnabled || !settings.targetSizeKb) return null
+  return {
+    maxBytes: kbToBytes(settings.targetSizeKb),
+    allowDownscale: !!settings.targetSizeDownscale,
+  }
+}
+
+function warnOverTarget(count: number, settings: ExportSettings) {
+  if (count > 0) {
+    toast.warning(t('toast.targetSizeMissed', { count, kb: settings.targetSizeKb }), 8000)
+  }
+}
+
 async function renderImageBlob(
   image: ImageObject,
   exportFormat: string,
   quality?: number,
-  backgroundColor?: string
-): Promise<Blob> {
+  backgroundColor?: string,
+  targetSize?: TargetSizeOptions | null
+) {
   const exportQuality = quality !== undefined ? quality : image.quality || 0.92
   const mimeType = `image/${exportFormat === 'jpg' ? 'jpeg' : exportFormat}`
   // Filter-Passage und Kodierung laufen im Worker (Fallback: Hauptthread)
   const exportCanvas = await renderExportCanvas(image, { backgroundColor })
-  return encodeCanvasToBlob(exportCanvas, mimeType, exportQuality)
+  return encodeForExport(exportCanvas, mimeType, exportQuality, targetSize)
 }
 
 async function handleSaveImages() {

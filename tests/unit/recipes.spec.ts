@@ -63,6 +63,28 @@ describe('sanitizeRecipe', () => {
     expect(r?.resize).toBeNull()
   })
 
+  it('übernimmt und begrenzt die Zielgröße, ältere Rezepte bekommen Standardwerte', () => {
+    const r = sanitizeRecipe({
+      name: 'Web',
+      export: {
+        format: 'jpg',
+        targetSizeEnabled: true,
+        targetSizeKb: 3,
+        targetSizeDownscale: 'ja',
+      },
+    })
+    expect(r?.export).toMatchObject({
+      targetSizeEnabled: true,
+      targetSizeKb: 10,
+      targetSizeDownscale: false,
+    })
+    expect(sanitizeRecipe({ name: 'Alt', export: { format: 'jpg' } })?.export).toMatchObject({
+      targetSizeEnabled: false,
+      targetSizeKb: 500,
+      targetSizeDownscale: false,
+    })
+  })
+
   it('verwirft Einträge ohne Namen', () => {
     expect(sanitizeRecipe({ name: '   ' })).toBeNull()
     expect(sanitizeRecipe('kaputt')).toBeNull()

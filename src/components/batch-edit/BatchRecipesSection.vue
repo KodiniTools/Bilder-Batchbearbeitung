@@ -61,6 +61,9 @@ function summary(recipe: Recipe): string[] {
   if (recipe.resize) chips.push(`${recipe.resize.width}×${recipe.resize.height}`)
   const format = recipe.export.format.toUpperCase()
   chips.push(recipe.export.format === 'png' ? format : `${format} ${recipe.export.quality} %`)
+  if (recipe.export.targetSizeEnabled && recipe.export.format !== 'png') {
+    chips.push(`≤ ${recipe.export.targetSizeKb} KB`)
+  }
   chips.push(renamePreview(recipe.rename))
   return chips
 }

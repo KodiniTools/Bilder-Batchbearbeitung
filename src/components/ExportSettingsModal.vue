@@ -444,6 +444,19 @@
                   </div>
                 </div>
               </div>
+
+              <div class="setting-group">
+                <ExportTargetSize
+                  v-model:enabled="settings.targetSizeEnabled"
+                  v-model:kb="settings.targetSizeKb"
+                  v-model:downscale="settings.targetSizeDownscale"
+                  :active="isOpen"
+                  :images="rasterImages"
+                  :format="settings.format"
+                  :quality="settings.quality"
+                  :background-color="rasterBackground"
+                />
+              </div>
             </template>
 
             <!-- SVG Export Settings -->
@@ -554,6 +567,19 @@
                   </div>
                 </div>
               </div>
+
+              <div class="setting-group">
+                <ExportTargetSize
+                  v-model:enabled="settings.targetSizeEnabled"
+                  v-model:kb="settings.targetSizeKb"
+                  v-model:downscale="settings.targetSizeDownscale"
+                  :active="isOpen"
+                  :images="rasterImages"
+                  :format="settings.format"
+                  :quality="settings.quality"
+                  :background-color="rasterBackground"
+                />
+              </div>
             </template>
 
             <!-- Info Text -->
@@ -663,6 +689,8 @@ import { useI18n } from 'vue-i18n'
 import PdfPageDesigner from './pdf-designer/PdfPageDesigner.vue'
 import SliderRow from './SliderRow.vue'
 import BatchWatermarkControls from './batch-edit/BatchWatermarkControls.vue'
+import ExportTargetSize from './export/ExportTargetSize.vue'
+import { useImageStore } from '@/stores/imageStore'
 import { useConfirm } from '@/composables/useConfirm'
 import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import { useRecipeStore } from '@/stores/recipes'
@@ -728,12 +756,29 @@ const settings = reactive({
   quality: 92,
   pngTransparent: true,
   pngBackgroundColor: '#ffffff',
+  // Maximale Dateigröße pro Bild (nur JPG/WebP)
+  targetSizeEnabled: false,
+  targetSizeKb: 500,
+  targetSizeDownscale: false,
 
   // SVG Settings
   svgColormode: 'color' as 'color' | 'binary',
   svgFilterSpeckle: 4,
   svgQuality: 'high' as 'standard' | 'high' | 'ultra',
 })
+
+// Bilder, die der Rasterexport erfasst (wie in AppPage.handleExportConfirm)
+const imageStore = useImageStore()
+const rasterImages = computed(() => {
+  if (props.mode === 'zip') {
+    return imageStore.hasSelection ? imageStore.selectedImages : imageStore.images
+  }
+  if (props.mode === 'save') return imageStore.selectedImages
+  return []
+})
+const rasterBackground = computed(() =>
+  settings.format === 'png' && !settings.pngTransparent ? settings.pngBackgroundColor : undefined
+)
 
 // Angewendetes Rezept belegt Format, Qualität, PNG-Hintergrund und ZIP-Namen vor
 const recipeStore = useRecipeStore()

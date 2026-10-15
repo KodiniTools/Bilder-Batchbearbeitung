@@ -17,6 +17,11 @@ export interface RecipeExportSettings {
   pngTransparent: boolean
   pngBackgroundColor: string
   zipName: string
+  /** Maximale Dateigröße pro Bild begrenzen (nur JPG/WebP) */
+  targetSizeEnabled: boolean
+  targetSizeKb: number
+  /** Notfalls Abmessungen verkleinern, um die Zielgröße zu erreichen */
+  targetSizeDownscale: boolean
 }
 
 export interface RecipeRenameSettings {
@@ -51,6 +56,9 @@ export const defaultRecipeExport: RecipeExportSettings = {
   pngTransparent: true,
   pngBackgroundColor: '#ffffff',
   zipName: 'bilder-export',
+  targetSizeEnabled: false,
+  targetSizeKb: 500,
+  targetSizeDownscale: false,
 }
 
 export const defaultRecipeRename: RecipeRenameSettings = {
@@ -61,6 +69,8 @@ export const defaultRecipeRename: RecipeRenameSettings = {
 }
 
 export const RECIPE_NAME_MAX = 60
+export const TARGET_KB_MIN = 10
+export const TARGET_KB_MAX = 50000
 const STORAGE_KEY = 'bilderserie-recipes'
 const FILE_FORMAT = 'bilderserie-rezepte'
 
@@ -182,6 +192,9 @@ export function sanitizeExportSettings(raw: unknown): RecipeExportSettings {
     pngTransparent: bool(r.pngTransparent, d.pngTransparent),
     pngBackgroundColor: color(r.pngBackgroundColor, d.pngBackgroundColor),
     zipName: str(r.zipName, d.zipName, 120).trim() || d.zipName,
+    targetSizeEnabled: bool(r.targetSizeEnabled, d.targetSizeEnabled),
+    targetSizeKb: Math.round(num(r.targetSizeKb, d.targetSizeKb, [TARGET_KB_MIN, TARGET_KB_MAX])),
+    targetSizeDownscale: bool(r.targetSizeDownscale, d.targetSizeDownscale),
   }
 }
 

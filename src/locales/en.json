@@ -243,7 +243,8 @@
     "pastedFromClipboardMultiple": "{count} images pasted from clipboard",
     "sessionRestored": "{count} image(s) restored from your last session",
     "sessionRestorePartial": "{failed} image(s) from your last session could not be restored",
-    "sessionSaveFailed": "Session could not be saved (storage full?). Changes will be lost on reload."
+    "sessionSaveFailed": "Session could not be saved (storage full?). Changes will be lost on reload.",
+    "targetSizeMissed": "{count} image(s) exceed {kb} KB even at the lowest quality"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
@@ -467,7 +468,19 @@
       "selectedImage": "selected image",
       "selectedImages": "selected images"
     },
-    "moreElements": "+{count} more"
+    "moreElements": "+{count} more",
+    "targetSize": {
+      "enable": "Maximum file size per image",
+      "lossyOnly": "Available for JPG and WebP only.",
+      "maxLabel": "At most",
+      "downscale": "Reduce dimensions if needed",
+      "qualityHint": "Quality is lowered automatically, never above the value selected above.",
+      "estimate": "Estimated: ≈ {perImage} per image · ≈ {total} total",
+      "sampled": "(extrapolated from {sampled} of {count} image(s))",
+      "estimating": "Estimating size …",
+      "estimateFailed": "Size could not be estimated.",
+      "notReachable": "The target size cannot be reached for every image. Raise the target or allow reducing dimensions."
+    }
   },
   "frontPageDesigner": {
     "title": "Design Front Page",

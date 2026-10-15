@@ -1231,6 +1231,10 @@ export interface ExportSettings {
   quality?: number
   pngTransparent?: boolean
   pngBackgroundColor?: string
+  /** Maximale Dateigröße pro Bild (ZIP/Einzelbild, nur JPG/WebP) */
+  targetSizeEnabled?: boolean
+  targetSizeKb?: number
+  targetSizeDownscale?: boolean
   // SVG-Export
   svgColormode?: 'color' | 'binary'
   svgFilterSpeckle?: number

@@ -418,7 +418,8 @@
     "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt",
     "sessionRestored": "{count} Bild(er) aus der letzten Sitzung wiederhergestellt",
     "sessionRestorePartial": "{failed} Bild(er) der letzten Sitzung konnten nicht wiederhergestellt werden",
-    "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren."
+    "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren.",
+    "targetSizeMissed": "{count} Bild(er) überschreiten trotz niedrigster Qualität {kb} KB"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",
@@ -642,7 +643,19 @@
       "selectedImage": "ausgewähltes Bild",
       "selectedImages": "ausgewählte Bilder"
     },
-    "moreElements": "+{count} weitere"
+    "moreElements": "+{count} weitere",
+    "targetSize": {
+      "enable": "Maximale Dateigröße pro Bild",
+      "lossyOnly": "Nur für JPG und WebP verfügbar.",
+      "maxLabel": "Höchstens",
+      "downscale": "Falls nötig Abmessungen verkleinern",
+      "qualityHint": "Die Qualität wird automatisch gesenkt, höchstens bis zum gewählten Wert oben.",
+      "estimate": "Geschätzt: ≈ {perImage} pro Bild · ≈ {total} gesamt",
+      "sampled": "(aus {sampled} von {count} Bild(ern) hochgerechnet)",
+      "estimating": "Größe wird geschätzt …",
+      "estimateFailed": "Größe konnte nicht geschätzt werden.",
+      "notReachable": "Die Zielgröße ist nicht bei allen Bildern erreichbar. Ziel erhöhen oder Verkleinern zulassen."
+    }
   },
   "frontPageDesigner": {
     "title": "Startseite gestalten",
