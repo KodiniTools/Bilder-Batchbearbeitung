@@ -3,6 +3,7 @@ import {
   computeResizeTarget,
   defaultResizeSpec,
   isResizeSpecValid,
+  resolveResizeTarget,
   type ResizeSpec,
 } from '@/lib/core/resize-modes'
 
@@ -88,5 +89,27 @@ describe('isResizeSpecValid', () => {
     expect(isResizeSpecValid(spec({ mode: 'longEdge', longEdge: 0 }))).toBe(false)
     expect(isResizeSpecValid(spec({ mode: 'fit', width: 100, height: 0 }))).toBe(false)
     expect(isResizeSpecValid(spec({ mode: 'exact' }))).toBe(true)
+  })
+})
+
+describe('resolveResizeTarget', () => {
+  it('liefert die Zielgröße der relativen Modi', () => {
+    expect(resolveResizeTarget(landscape, spec({ mode: 'percent', percent: 25 }))).toEqual({
+      width: 1000,
+      height: 750,
+    })
+    expect(resolveResizeTarget(portrait, spec({ mode: 'longEdge', longEdge: 2000 }))).toEqual({
+      width: 1500,
+      height: 2000,
+    })
+  })
+
+  it('unverändert oder ungültig: aktuelle Größe statt null', () => {
+    expect(resolveResizeTarget(small, spec({ mode: 'fit', width: 1920, height: 1080 }))).toEqual(
+      small
+    )
+    expect(resolveResizeTarget(small, spec({ mode: 'percent', percent: 0 }))).toEqual(small)
+    // Ergebnis ist eine Kopie, nicht das Eingabeobjekt
+    expect(resolveResizeTarget(small, spec({ mode: 'percent', percent: 100 }))).not.toBe(small)
   })
 })
