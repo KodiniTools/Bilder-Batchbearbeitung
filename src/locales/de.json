@@ -990,7 +990,17 @@
       "keepAspectRatio": "Seitenverhältnis beibehalten",
       "resetSize": "Ursprungsgröße",
       "applyResize": "Größe ändern",
-      "unit": "px"
+      "unit": "px",
+      "modeLabel": "Modus",
+      "modeHints": {
+        "exact": "Feste Breite und Höhe, optional mit Seitenverhältnis.",
+        "percent": "Skaliert das Bild um diesen Faktor.",
+        "longEdge": "Die längere Seite bekommt diese Länge, Hoch- wie Querformat.",
+        "fit": "Das Bild passt in den Rahmen, das Seitenverhältnis bleibt erhalten."
+      },
+      "noUpscale": "Nicht vergrößern (ist das Bild kleiner, bleibt es unverändert)",
+      "result": "Ergebnis: {from} → {to} px",
+      "resultUnchanged": "Bild bleibt unverändert ({size} px)"
     },
     "export": {
       "format": "Format:",

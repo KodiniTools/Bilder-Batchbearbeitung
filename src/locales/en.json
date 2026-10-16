@@ -749,7 +749,17 @@
       "keepAspectRatio": "Keep aspect ratio",
       "resetSize": "Original size",
       "applyResize": "Resize",
-      "unit": "px"
+      "unit": "px",
+      "modeLabel": "Mode",
+      "modeHints": {
+        "exact": "Fixed width and height, optionally keeping the aspect ratio.",
+        "percent": "Scales the image by this factor.",
+        "longEdge": "The longer side gets this length, portrait or landscape.",
+        "fit": "The image fits inside the box, keeping its aspect ratio."
+      },
+      "noUpscale": "Don't enlarge (a smaller image stays unchanged)",
+      "result": "Result: {from} → {to} px",
+      "resultUnchanged": "Image stays unchanged ({size} px)"
     },
     "export": {
       "format": "Format:",

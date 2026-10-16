@@ -258,6 +258,10 @@
                 :resize-width="resizeWidth"
                 :resize-height="resizeHeight"
                 :keep-aspect-ratio="keepAspectRatio"
+                :spec="resizeSpec"
+                :source-width="currentWidth"
+                :source-height="currentHeight"
+                @update:spec="resizeSpec = $event"
                 @update:resize-width="resizeWidth = $event"
                 @update:resize-height="resizeHeight = $event"
                 @update:keep-aspect-ratio="keepAspectRatio = $event"
@@ -322,6 +326,7 @@ import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ImageObject, ImageFilters, TextItem } from '@/lib/core/types'
 import { defaultFilters, defaultTransforms, defaultTextStyle } from '@/lib/core/types'
+import { defaultResizeSpec, resolveResizeTarget, type ResizeSpec } from '@/lib/core/resize-modes'
 import { FILTER_PRESETS } from '@/lib/core/filter-presets'
 import { ImageProcessor } from '@/lib/core/image-processor'
 import {
@@ -435,6 +440,8 @@ const COMMENT_MAX_LENGTH = 1000
 const resizeWidth = ref(0)
 const resizeHeight = ref(0)
 const keepAspectRatio = ref(true)
+/** Resize-Modus; in den relativen Modi werden resizeWidth/-Height daraus berechnet */
+const resizeSpec = ref<ResizeSpec>({ ...defaultResizeSpec })
 const selectedFormat = ref('image/png')
 const isDownloading = ref(false)
 
@@ -789,12 +796,19 @@ watch([resizeWidth, resizeHeight], () => {
 // Zuschneiden, 90°-Drehen und Begradigen ändern die Maße des Arbeits-Canvas.
 // Die Größe-Felder müssen folgen, sonst skaliert applyChanges() das Ergebnis
 // wieder auf die alten Maße (z. B. 1:1-Zuschnitt 768×768 → 1376×768 verzerrt).
+// In den relativen Modi beziehen sich die Zielmaße auf die neue Größe.
 watch([currentWidth, currentHeight], ([w, h]) => {
   if (w > 0 && h > 0) {
-    resizeWidth.value = w
-    resizeHeight.value = h
+    if (resizeSpec.value.mode === 'exact') {
+      resizeWidth.value = w
+      resizeHeight.value = h
+    } else {
+      syncResizeFromSpec()
+    }
   }
 })
+
+watch(resizeSpec, () => syncResizeFromSpec(), { deep: true })
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -812,6 +826,8 @@ function initializeEditor(image: ImageObject) {
   comment.value = image.comment ?? ''
   resizeWidth.value = workingCanvas.width
   resizeHeight.value = workingCanvas.height
+  // Gewählter Modus bleibt erhalten und gilt auch für das neue Bild
+  syncResizeFromSpec(workingCanvas.width, workingCanvas.height)
 
   // Copy existing filters from the image object
   localFilters.value = { ...(image.filters || defaultFilters) }
@@ -832,6 +848,15 @@ function initializeEditor(image: ImageObject) {
 
 // ── Resize ────────────────────────────────────────────────────────
 
+/** Relative Modi: Zielmaße aus Modus und aktueller Canvas-Größe ableiten */
+function syncResizeFromSpec(w = currentWidth.value, h = currentHeight.value) {
+  if (resizeSpec.value.mode === 'exact') return
+  if (w <= 0 || h <= 0) return
+  const target = resolveResizeTarget({ width: w, height: h }, resizeSpec.value)
+  resizeWidth.value = target.width
+  resizeHeight.value = target.height
+}
+
 function onResizeWidthChange() {
   if (keepAspectRatio.value && resizeWidth.value > 0) {
     resizeHeight.value = Math.round(resizeWidth.value / getAspectRatio())
@@ -847,6 +872,8 @@ function onResizeHeightChange() {
 function resetSize() {
   const originalCanvas = getOriginalCanvas()
   if (originalCanvas) {
+    // Ursprungsgröße ist eine feste Größe, also zurück in den Modus „Exakt“
+    resizeSpec.value = { ...resizeSpec.value, mode: 'exact' }
     resizeWidth.value = originalCanvas.width
     resizeHeight.value = originalCanvas.height
   }
@@ -1064,6 +1091,11 @@ function applyChanges() {
       }
     }
     setAspectRatio(newWidth / newHeight)
+    // Prozent bezieht sich auf die aktuelle Größe; nach dem Anwenden auf 100 %
+    // zurück, sonst würde sofort erneut skaliert.
+    if (resizeSpec.value.mode === 'percent') {
+      resizeSpec.value = { ...resizeSpec.value, percent: 100 }
+    }
   }
 
   updatePreview()

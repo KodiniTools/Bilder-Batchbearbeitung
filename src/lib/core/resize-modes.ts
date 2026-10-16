@@ -107,3 +107,13 @@ export function isResizeSpecValid(spec: ResizeSpec): boolean {
       return spec.width >= 1 && spec.height >= 1
   }
 }
+
+/**
+ * Zielgröße für den Einzel-Editor in den relativen Modi (percent, longEdge,
+ * fit): wie computeResizeTarget, aber bei „unverändert“ oder ungültigen
+ * Eingaben die aktuelle Größe statt null.
+ */
+export function resolveResizeTarget(src: Size, spec: ResizeSpec): Size {
+  if (!isResizeSpecValid(spec)) return { width: src.width, height: src.height }
+  return computeResizeTarget(src, spec) ?? { width: src.width, height: src.height }
+}

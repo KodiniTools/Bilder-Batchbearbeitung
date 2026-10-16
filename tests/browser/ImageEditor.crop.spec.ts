@@ -65,7 +65,7 @@ async function settle() {
   await nextTick()
 }
 
-/** Editor wird per Teleport in <body> gerendert → im Dokument suchen */
+/** Editor wird per Teleport in #modal-portal gerendert → im Dokument suchen */
 function button(label: string | RegExp): HTMLButtonElement {
   const match = [...document.querySelectorAll<HTMLButtonElement>('.modal-container button')].find(
     (b) => {
@@ -109,6 +109,10 @@ async function applyAndSave(image: ImageObject): Promise<[number, number]> {
 
 beforeEach(async () => {
   await page.viewport(1600, 950)
+  // Teleport-Ziel des Editors (steht in index.html außerhalb von #app)
+  const portal = document.createElement('div')
+  portal.id = 'modal-portal'
+  document.body.appendChild(portal)
 })
 
 afterEach(() => {
@@ -200,5 +204,88 @@ describe('ImageEditor – Zuschneiden (echter Canvas)', () => {
     overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await settle()
     expect(editor().emitted('close')).toHaveLength(1)
+  })
+})
+
+/** Setzt einen NumberSpinner-Wert wie per Tastatur */
+async function typeInto(selector: string, value: number) {
+  const input = el<HTMLInputElement>(selector)
+  input.value = String(value)
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+  input.dispatchEvent(new Event('change', { bubbles: true }))
+  input.dispatchEvent(new Event('blur'))
+  await settle()
+}
+
+async function chooseMode(label: string) {
+  const option = [...document.querySelectorAll<HTMLLabelElement>('.resize-mode')].find(
+    (l) => l.textContent?.trim() === label
+  )
+  if (!option) throw new Error(`Modus "${label}" nicht gefunden`)
+  option.querySelector('input')?.click()
+  await settle()
+}
+
+function resultText(): string {
+  return el('.resize-result').textContent?.replace(/\s+/g, ' ').trim() ?? ''
+}
+
+describe('ImageEditor – Resize-Modi', () => {
+  it('skaliert in Prozent und setzt danach auf 100 % zurück', async () => {
+    const image = createImageObject(IMG_W, IMG_H)
+    await openEditor(image)
+
+    await chooseMode('Prozent')
+    await typeInto('#editor-resize-percent', 50)
+    expect(resultText()).toBe('Ergebnis: 1376 × 768 → 688 × 384 px')
+
+    await click('Änderungen übernehmen')
+    // Kein erneutes Skalieren um 50 % beim nächsten Übernehmen
+    expect(el<HTMLInputElement>('#editor-resize-percent').value).toBe('100')
+    expect(resultText()).toBe('Bild bleibt unverändert (688 × 384 px)')
+
+    await click('Speichern')
+    expect([image.canvas.width, image.canvas.height]).toEqual([688, 384])
+  })
+
+  it('lange Kante: verkleinert, vergrößert aber nicht ohne Erlaubnis', async () => {
+    const image = createImageObject(IMG_W, IMG_H)
+    await openEditor(image)
+
+    await chooseMode('Lange Kante')
+    await typeInto('#editor-resize-long-edge', 2000)
+    expect(resultText()).toBe('Bild bleibt unverändert (1376 × 768 px)')
+
+    await typeInto('#editor-resize-long-edge', 688)
+    expect(await applyAndSave(image)).toEqual([688, 384])
+  })
+
+  it('einpassen: passt in den Rahmen und folgt einem Zuschnitt', async () => {
+    const image = createImageObject(IMG_W, IMG_H)
+    await openEditor(image)
+
+    await chooseMode('Einpassen')
+    await typeInto('#editor-resize-max-width', 500)
+    await typeInto('#editor-resize-max-height', 500)
+    expect(resultText()).toBe('Ergebnis: 1376 × 768 → 500 × 279 px')
+
+    await click('Zuschneiden starten')
+    await click('1:1')
+    await click('Zuschnitt anwenden')
+    expect(resultText()).toBe('Ergebnis: 768 × 768 → 500 × 500 px')
+
+    expect(await applyAndSave(image)).toEqual([500, 500])
+  })
+
+  it('Ursprungsgröße wechselt zurück in den Modus „Exakt“', async () => {
+    const image = createImageObject(IMG_W, IMG_H)
+    await openEditor(image)
+
+    await chooseMode('Prozent')
+    await typeInto('#editor-resize-percent', 25)
+    await click('Ursprungsgröße')
+
+    expect(document.querySelector('.resize-mode--active')?.textContent?.trim()).toBe('Exakt')
+    expect(resizeFields()).toEqual([IMG_W, IMG_H])
   })
 })
