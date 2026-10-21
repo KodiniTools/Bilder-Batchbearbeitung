@@ -14,11 +14,13 @@ import BatchEditPanel from '@/components/BatchEditPanel.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import WizardNavigator from '@/components/WizardNavigator.vue'
+import HandoffReceiver from '@/components/HandoffReceiver.vue'
 import ScrollToTopButton from '@/components/ScrollToTopButton.vue'
 import { useImageStore } from '@/stores/imageStore'
 import { usePdfDocumentStore } from '@/stores/pdfDocument'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { useHandoffImport } from '@/composables/useHandoffImport'
 import type { ImageObject } from '@/lib/core/types'
 import { renderExportCanvas } from '@/lib/core/export-render'
 import { readSourceExif } from '@/lib/core/exif'
@@ -55,6 +57,7 @@ const imageStore = useImageStore()
 const pdfDocument = usePdfDocumentStore()
 const toast = useToast()
 const dialog = useConfirm()
+const { importHandoffImages } = useHandoffImport()
 
 const isEditorOpen = ref(false)
 const editingImage = ref<ImageObject | null>(null)
@@ -722,6 +725,9 @@ onUnmounted(() => {
           @bulk-rename="handleBulkRename"
           @batch-edit="handleBatchEdit"
         />
+
+        <!-- Bilder aus anderen KodiniTools (z. B. Bildergalerie): annehmen oder verwerfen -->
+        <HandoffReceiver @accept="importHandoffImages" />
 
         <DropZone />
 

@@ -1275,10 +1275,12 @@
     "backHome": "Back to Home"
   },
   "handoff": {
-    "title": "{count} image(s) ready to import",
+    "title": "{count} image ready to import | {count} images ready to import",
     "from": "Transferred from {tool}",
     "accept": "Import Images",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "imported": "{count} image imported | {count} images imported",
+    "importFailed": "The transferred images could not be loaded."
   },
   "articles": {
     "title": "Blog – Tips & Guides",

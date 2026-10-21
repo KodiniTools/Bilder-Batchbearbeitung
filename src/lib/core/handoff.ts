@@ -127,6 +127,19 @@ export function prepareHandoff(
   }
 }
 
+const DATA_URL_PATTERN = /^data:image\/(jpeg|png|webp|gif);base64,/
+
+/** Filtert die Bilder eines Payloads auf gültige Einträge mit Bild-Data-URL. */
+function validImages(payload: unknown): HandoffImage[] {
+  const images = (payload as Partial<HandoffPayload> | null)?.images
+  if (!Array.isArray(images)) return []
+  return images.filter((img): img is HandoffImage => {
+    if (!img || typeof img !== 'object') return false
+    const { name, dataUrl } = img as Partial<HandoffImage>
+    return typeof name === 'string' && typeof dataUrl === 'string' && DATA_URL_PATTERN.test(dataUrl)
+  })
+}
+
 /**
  * RECEIVER: Check if a handoff is waiting.
  * Call this on app mount when `?handoff=kodinitools` is in the URL.
@@ -144,18 +157,19 @@ export function checkHandoff(): HandoffPayload | null {
     const payload: HandoffPayload = JSON.parse(raw)
 
     // Check expiry
-    if (Date.now() - payload.timestamp > EXPIRY_MS) {
+    if (typeof payload.timestamp !== 'number' || Date.now() - payload.timestamp > EXPIRY_MS) {
       localStorage.removeItem(STORAGE_KEY)
       return null
     }
 
-    // Validate structure
-    if (!payload.images || !Array.isArray(payload.images) || payload.images.length === 0) {
+    // Nur gültige Bild-Data-URLs annehmen; der Speicher ist für alle Tools der Domain beschreibbar
+    const images = validImages(payload)
+    if (images.length === 0) {
       localStorage.removeItem(STORAGE_KEY)
       return null
     }
 
-    return payload
+    return { ...payload, images }
   } catch {
     localStorage.removeItem(STORAGE_KEY)
     return null
@@ -179,7 +193,9 @@ export function consumeHandoff(): HandoffImage[] | null {
     url.searchParams.delete('handoff')
     window.history.replaceState({}, '', url.toString())
 
-    return payload.images
+    // Kein erneuter Ablauf-Check: der Nutzer hat das Banner bereits gesehen
+    const images = validImages(payload)
+    return images.length ? images : null
   } catch {
     localStorage.removeItem(STORAGE_KEY)
     return null
@@ -215,4 +231,16 @@ export function handoffImageToCanvas(img: HandoffImage): Promise<HTMLCanvasEleme
     image.onerror = () => reject(new Error(`Failed to load image: ${img.name}`))
     image.src = img.dataUrl
   })
+}
+
+/**
+ * Convert a HandoffImage (dataUrl) into a File, e.g. for imageStore.addImages().
+ */
+export function handoffImageToFile(img: HandoffImage): File {
+  const [header, base64 = ''] = img.dataUrl.split(',')
+  const mimeType = /data:([^;]+);/.exec(header)?.[1] ?? 'image/jpeg'
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+  const extension = mimeType === 'image/png' ? '.png' : mimeType === 'image/webp' ? '.webp' : '.jpg'
+  const fileName = /\.[a-z0-9]{2,4}$/i.test(img.name) ? img.name : `${img.name}${extension}`
+  return new File([bytes], fileName, { type: mimeType })
 }
