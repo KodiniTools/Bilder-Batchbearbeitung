@@ -41,7 +41,7 @@
         </div>
 
         <div class="handoff-text">
-          <strong>{{ t('handoff.title', { count: handoff.images.length }) }}</strong>
+          <strong>{{ t('handoff.title', handoff.images.length) }}</strong>
           <span class="handoff-source">{{ t('handoff.from', { tool: sourceLabel }) }}</span>
         </div>
 
@@ -87,6 +87,7 @@ const emit = defineEmits<{
 }>()
 
 const SOURCE_LABELS: Record<string, string> = {
+  bildergalerie: 'Bildergalerie',
   'bilder-batchbearbeitung': 'Bilder-Batchbearbeitung',
   bildkonverter: 'Bildkonverter',
   collagemaker: 'Collage Maker',
@@ -118,15 +119,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Im Seitenfluss über der Dropzone statt position: fixed am oberen Rand,
+   wo die globale SSI-Navigation den Banner verdecken würde. */
 .handoff-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1050;
+  position: relative;
+  margin-bottom: var(--space-3, 14px);
   padding: var(--space-2, 10px) var(--space-3, 14px);
   background: var(--ds-surface-1);
-  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--radius-md, 12px);
   box-shadow: var(--ds-shadow-overlay);
 }
 
@@ -244,12 +245,12 @@ onMounted(() => {
 }
 
 .handoff-banner-enter-from {
-  transform: translateY(-100%);
+  transform: translateY(-8px);
   opacity: 0;
 }
 
 .handoff-banner-leave-to {
-  transform: translateY(-100%);
+  transform: translateY(-8px);
   opacity: 0;
 }
 
