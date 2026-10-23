@@ -2,11 +2,22 @@
 import { ref } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
+import { useToast } from '@/composables/useToast'
+import {
+  extractImagesFromZip,
+  isZipFile,
+  ZipImportError,
+  ZIP_ACCEPT,
+  ZIP_MAX_IMAGES,
+  ZIP_MAX_TOTAL_BYTES,
+} from '@/lib/features/import-zip'
 
 const imageStore = useImageStore()
 const { t } = useI18n()
+const toast = useToast()
 
 const fileInput = ref<HTMLInputElement>()
+const zipInput = ref<HTMLInputElement>()
 const folderInput = ref<HTMLInputElement>()
 const isHighlighted = ref(false)
 const isLoading = ref(false)
@@ -16,12 +27,43 @@ const handleFiles = async (files: FileList | File[] | null) => {
 
   isLoading.value = true
   try {
-    const fileArray = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    const all = Array.from(files)
+    const fileArray = all.filter((f) => f.type.startsWith('image/'))
+    for (const zip of all.filter(isZipFile)) {
+      fileArray.push(...(await extractZip(zip)))
+    }
     if (fileArray.length > 0) await imageStore.addImages(fileArray)
   } catch (error) {
     console.error('Fehler beim Laden der Dateien:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+/** Entpackt ein ZIP und meldet das Ergebnis; Fehler blockieren die übrigen Dateien nicht. */
+const extractZip = async (zip: File): Promise<File[]> => {
+  try {
+    const { images } = await extractImagesFromZip(zip)
+    if (images.length === 0) {
+      toast.warning(t('toast.zipImportEmpty', { name: zip.name }))
+    } else {
+      toast.success(t('toast.zipImported', { count: images.length, name: zip.name }))
+    }
+    return images
+  } catch (error) {
+    console.error('Fehler beim Entpacken:', error)
+    const key =
+      error instanceof ZipImportError && error.code === 'tooLarge'
+        ? 'toast.zipImportTooLarge'
+        : 'toast.zipImportError'
+    toast.error(
+      t(key, {
+        name: zip.name,
+        maxImages: ZIP_MAX_IMAGES,
+        maxMb: Math.round(ZIP_MAX_TOTAL_BYTES / 1024 / 1024),
+      })
+    )
+    return []
   }
 }
 
@@ -118,6 +160,16 @@ const handleDrop = async (event: DragEvent) => {
         <i class="fa-solid fa-folder-open"></i>
         <span>{{ t('upload.folderButton') }}</span>
       </button>
+      <button
+        type="button"
+        class="btn upload-btn pill-btn folder-btn"
+        :title="t('upload.zipButtonTooltip')"
+        :aria-label="t('upload.zipButtonTooltip')"
+        @click.stop="zipInput?.click()"
+      >
+        <i class="fa-solid fa-file-zipper"></i>
+        <span>{{ t('upload.zipButton') }}</span>
+      </button>
     </div>
     <div class="paste-hint" :title="t('upload.pasteHintTooltip')">
       <kbd>Ctrl</kbd>
@@ -126,6 +178,14 @@ const handleDrop = async (event: DragEvent) => {
       <span class="paste-hint-label">{{ t('upload.pasteHint') }}</span>
     </div>
     <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFileInput" />
+    <input
+      ref="zipInput"
+      type="file"
+      :accept="ZIP_ACCEPT"
+      multiple
+      hidden
+      @change="handleFileInput"
+    />
     <input
       ref="folderInput"
       type="file"
@@ -178,6 +238,8 @@ const handleDrop = async (event: DragEvent) => {
 
 .upload-buttons {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-3);
   margin-top: var(--space-2);
 }

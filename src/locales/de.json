@@ -340,11 +340,13 @@
     }
   },
   "upload": {
-    "text": "Bilder hierher ziehen oder klicken",
+    "text": "Bilder oder ZIP-Archive hierher ziehen oder klicken",
     "button": "Dateien auswählen",
     "folderButton": "Ordner auswählen",
     "pasteHint": "Aus Zwischenablage einfügen",
-    "pasteHintTooltip": "Ctrl+V: Bild aus Zwischenablage einfügen"
+    "pasteHintTooltip": "Ctrl+V: Bild aus Zwischenablage einfügen",
+    "zipButton": "ZIP entpacken",
+    "zipButtonTooltip": "ZIP-Archiv auswählen und enthaltene Bilder laden"
   },
   "emptyState": {
     "title": "Keine Bilder geladen",
@@ -419,7 +421,11 @@
     "sessionRestored": "{count} Bild(er) aus der letzten Sitzung wiederhergestellt",
     "sessionRestorePartial": "{failed} Bild(er) der letzten Sitzung konnten nicht wiederhergestellt werden",
     "sessionSaveFailed": "Sitzung konnte nicht gesichert werden (Speicher voll?). Nach einem Neuladen gehen Änderungen verloren.",
-    "targetSizeMissed": "{count} Bild(er) überschreiten trotz niedrigster Qualität {kb} KB"
+    "targetSizeMissed": "{count} Bild(er) überschreiten trotz niedrigster Qualität {kb} KB",
+    "zipImported": "{count} Bild(er) aus „{name}“ entpackt",
+    "zipImportEmpty": "„{name}“ enthält keine unterstützten Bilder",
+    "zipImportError": "„{name}“ konnte nicht entpackt werden. Ist das Archiv beschädigt?",
+    "zipImportTooLarge": "„{name}“ ist zu groß zum Entpacken (max. {maxImages} Bilder bzw. {maxMb} MB entpackt)"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",

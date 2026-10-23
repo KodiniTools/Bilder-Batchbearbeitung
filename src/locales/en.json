@@ -165,11 +165,13 @@
     }
   },
   "upload": {
-    "text": "Drag and drop images here or click",
+    "text": "Drag and drop images or ZIP archives here or click",
     "button": "Select Files",
     "folderButton": "Select Folder",
     "pasteHint": "Paste from clipboard",
-    "pasteHintTooltip": "Ctrl+V: Paste image from clipboard"
+    "pasteHintTooltip": "Ctrl+V: Paste image from clipboard",
+    "zipButton": "Extract ZIP",
+    "zipButtonTooltip": "Select a ZIP archive and load the images it contains"
   },
   "emptyState": {
     "title": "No images loaded",
@@ -244,7 +246,11 @@
     "sessionRestored": "{count} image(s) restored from your last session",
     "sessionRestorePartial": "{failed} image(s) from your last session could not be restored",
     "sessionSaveFailed": "Session could not be saved (storage full?). Changes will be lost on reload.",
-    "targetSizeMissed": "{count} image(s) exceed {kb} KB even at the lowest quality"
+    "targetSizeMissed": "{count} image(s) exceed {kb} KB even at the lowest quality",
+    "zipImported": "{count} image(s) extracted from “{name}”",
+    "zipImportEmpty": "“{name}” contains no supported images",
+    "zipImportError": "“{name}” could not be extracted. Is the archive damaged?",
+    "zipImportTooLarge": "“{name}” is too large to extract (max. {maxImages} images or {maxMb} MB extracted)"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",
