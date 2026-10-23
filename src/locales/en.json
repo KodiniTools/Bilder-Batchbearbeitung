@@ -216,7 +216,9 @@
     "progress": "{current} of {total}",
     "resizing": "Scaling image {current} of {total}…",
     "cropping": "Cropping image {current} of {total}…",
-    "svgProgress": "SVG conversion: {current}/{total}"
+    "svgProgress": "SVG conversion: {current}/{total}",
+    "saveSingle": "Saving image…",
+    "saveProgress": "Saving image {current} of {total}…"
   },
   "toast": {
     "pdfSuccess": "PDF with {count} images created successfully",
@@ -250,7 +252,8 @@
     "zipImported": "{count} image(s) extracted from “{name}”",
     "zipImportEmpty": "“{name}” contains no supported images",
     "zipImportError": "“{name}” could not be extracted. Is the archive damaged?",
-    "zipImportTooLarge": "“{name}” is too large to extract (max. {maxImages} images or {maxMb} MB extracted)"
+    "zipImportTooLarge": "“{name}” is too large to extract (max. {maxImages} images or {maxMb} MB extracted)",
+    "saveCancelled": "Saving cancelled: {count} of {total} images saved"
   },
   "alerts": {
     "imageOnly": "Only image files are supported.",

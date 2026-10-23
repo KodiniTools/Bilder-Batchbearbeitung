@@ -391,7 +391,9 @@
     "progress": "{current} von {total}",
     "resizing": "Bild {current} von {total} wird skaliert…",
     "cropping": "Bild {current} von {total} wird zugeschnitten…",
-    "svgProgress": "SVG-Konvertierung: {current}/{total}"
+    "svgProgress": "SVG-Konvertierung: {current}/{total}",
+    "saveSingle": "Bild wird gespeichert…",
+    "saveProgress": "Speichere Bild {current} von {total}…"
   },
   "toast": {
     "pdfSuccess": "PDF mit {count} Bildern erfolgreich erstellt",
@@ -425,7 +427,8 @@
     "zipImported": "{count} Bild(er) aus „{name}“ entpackt",
     "zipImportEmpty": "„{name}“ enthält keine unterstützten Bilder",
     "zipImportError": "„{name}“ konnte nicht entpackt werden. Ist das Archiv beschädigt?",
-    "zipImportTooLarge": "„{name}“ ist zu groß zum Entpacken (max. {maxImages} Bilder bzw. {maxMb} MB entpackt)"
+    "zipImportTooLarge": "„{name}“ ist zu groß zum Entpacken (max. {maxImages} Bilder bzw. {maxMb} MB entpackt)",
+    "saveCancelled": "Speichern abgebrochen: {count} von {total} Bildern gespeichert"
   },
   "alerts": {
     "imageOnly": "Nur Bilddateien werden unterstützt.",

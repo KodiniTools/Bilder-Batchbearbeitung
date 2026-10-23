@@ -389,17 +389,45 @@ async function handleExportConfirm(settings: ExportSettings) {
         const format = imageExportFormat(image, settings.format)
         const target = await pickSaveFile(imageFileName(image, format), imageFileType(format))
         if (!target) return
-        await saveToTarget(target, await render(image, format))
+        loadingIndicator.value?.show(t('loading.saveSingle'))
+        try {
+          await saveToTarget(target, await render(image, format))
+        } finally {
+          loadingIndicator.value?.hide()
+        }
       } else {
         // Mehrere Bilder: Zielordner wählen, Dateinamen kommen aus der Umbenennung
         const target = await pickSaveDirectory()
         if (!target) return
-        for (const image of images) {
-          const format = imageExportFormat(image, settings.format)
-          const blob = await render(image, format)
-          await saveToDirectory(target, blob, imageFileName(image, format))
-          // Browser blockieren schnell aufeinanderfolgende Downloads
-          if (target.kind === 'download') await new Promise((resolve) => setTimeout(resolve, 200))
+        const total = images.length
+        let cancelled = false
+        let saved = 0
+        loadingIndicator.value?.showWithProgress(
+          t('loading.saveProgress', { current: 1, total }),
+          total,
+          { onCancel: () => (cancelled = true) }
+        )
+        try {
+          for (const image of images) {
+            // Abbruch greift zwischen zwei Bildern; bereits gespeicherte bleiben erhalten
+            if (cancelled) break
+            loadingIndicator.value?.updateProgress(
+              saved,
+              t('loading.saveProgress', { current: saved + 1, total })
+            )
+            const format = imageExportFormat(image, settings.format)
+            const blob = await render(image, format)
+            await saveToDirectory(target, blob, imageFileName(image, format))
+            saved++
+            // Browser blockieren schnell aufeinanderfolgende Downloads
+            if (target.kind === 'download') await new Promise((resolve) => setTimeout(resolve, 200))
+          }
+        } finally {
+          loadingIndicator.value?.hide()
+        }
+        if (cancelled && saved < total) {
+          toast.info(t('toast.saveCancelled', { count: saved, total }))
+          return
         }
       }
 
