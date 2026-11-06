@@ -575,6 +575,8 @@
       "title": "Tools",
       "addText": "Add Text",
       "addImage": "Add Image",
+      "addFromLibrary": "From image series ({count})",
+      "addFromLibraryTitle": "Place images you already uploaded on the page",
       "clearPage": "Clear Page",
       "shapes": "Shapes",
       "rect": "Rectangle",
@@ -583,6 +585,18 @@
       "addRect": "Add rectangle",
       "addEllipse": "Add circle/ellipse",
       "addLine": "Add line"
+    },
+    "imagePicker": {
+      "title": "Images from the series",
+      "hint": "There is no room left on this page. | 1 more image fits on this page. | Up to {count} more images fit on this page.",
+      "selectAll": "Select all",
+      "selectNone": "Clear selection",
+      "empty": "No images loaded yet.",
+      "selected": "No image selected | 1 image selected | {count} images selected",
+      "adding": "Adding images … {current}/{total}",
+      "add": "Add | Add 1 image | Add {count} images",
+      "cancel": "Cancel",
+      "failed": "Not added: {names}"
     },
     "properties": {
       "title": "Properties",

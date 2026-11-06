@@ -25,8 +25,10 @@
 
               <PdfDesignerTools
                 :element-count="currentElements.length"
+                :library-image-count="libraryImages.length"
                 @add-text="addTextElement"
                 @add-image="triggerImageUpload"
+                @add-library-image="showImagePicker = true"
                 @add-shape="addShapeElement"
                 @clear-page="clearCurrentPage"
               />
@@ -207,6 +209,14 @@
     :initial-page="currentPageIndex"
     @save="handleSave"
   />
+
+  <!-- Auswahl aus den bereits geladenen Bildern -->
+  <PdfDesignerImagePicker
+    v-model="showImagePicker"
+    :images="libraryImages"
+    :free-slots="Math.max(0, MAX_ELEMENTS_PER_PAGE - currentElements.length)"
+    @add="addImageElements"
+  />
 </template>
 
 <script setup lang="ts">
@@ -221,14 +231,16 @@ import PdfDesignerFooter from './PdfDesignerFooter.vue'
 import PdfDesignerElement from './PdfDesignerElement.vue'
 import PdfDesignerProperties from './PdfDesignerProperties.vue'
 import PdfDesignerPreview from './PdfDesignerPreview.vue'
+import PdfDesignerImagePicker from './PdfDesignerImagePicker.vue'
 import PdfDesignerArrange from './PdfDesignerArrange.vue'
 import PdfDesignerBackground from './PdfDesignerBackground.vue'
 import PdfDesignerTemplates from './PdfDesignerTemplates.vue'
 import HistoryActions from '../HistoryActions.vue'
-import { usePdfPages } from '@/composables/usePdfPages'
+import { usePdfPages, MAX_ELEMENTS_PER_PAGE } from '@/composables/usePdfPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
 import { useDesignerHistory } from '@/composables/useDesignerHistory'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import type { ImageObject } from '@/lib/core/types'
 
 const { t, locale } = useI18n()
 
@@ -245,10 +257,13 @@ const props = withDefaults(
      * comment: beliebig viele Kommentarseiten
      */
     mode?: 'cover' | 'comment'
+    /** Bereits geladene Bilder der Serie, die als Bild-Element übernommen werden können */
+    libraryImages?: ImageObject[]
   }>(),
   {
     modelValue: false,
     initialElements: () => [],
+    libraryImages: () => [],
     orientation: 'portrait',
     mode: 'comment',
   }
@@ -273,6 +288,8 @@ const imageInput = ref<HTMLInputElement | null>(null)
 
 // Vorschau-State
 const showPreview = ref(false)
+// Auswahldialog „Aus der Bildserie“
+const showImagePicker = ref(false)
 
 // Document state + element/page operations
 const {
@@ -304,6 +321,7 @@ const {
   setBackgroundImage,
   removeBackground,
   applyTemplateElements,
+  addImageElements,
   triggerImageUpload,
   handleImageUpload,
   clearCurrentPage,
@@ -406,6 +424,7 @@ function openPreview() {
 watch(
   () => props.modelValue,
   (newVal) => {
+    if (!newVal) showImagePicker.value = false
     if (newVal) {
       initFromElements(props.initialElements)
       resetHistory()
@@ -442,7 +461,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 // Keyboard shortcuts
 function handleKeyDown(event: KeyboardEvent) {
   // Nur bei geöffnetem Designer (beide Instanzen sind dauerhaft gemountet)
-  if (!props.modelValue || showPreview.value) return
+  if (!props.modelValue || showPreview.value || showImagePicker.value) return
   // Don't handle shortcuts while editing text inline or typing in the properties panel
   if (editingTextId.value || isTypingTarget(event.target)) return
 
