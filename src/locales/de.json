@@ -750,6 +750,8 @@
       "title": "Werkzeuge",
       "addText": "Text hinzufügen",
       "addImage": "Bild hinzufügen",
+      "addFromLibrary": "Aus der Bildserie ({count})",
+      "addFromLibraryTitle": "Bereits hochgeladene Bilder auf die Seite übernehmen",
       "clearPage": "Seite leeren",
       "shapes": "Formen",
       "rect": "Rechteck",
@@ -758,6 +760,18 @@
       "addRect": "Rechteck hinzufügen",
       "addEllipse": "Kreis/Ellipse hinzufügen",
       "addLine": "Linie hinzufügen"
+    },
+    "imagePicker": {
+      "title": "Bilder aus der Bildserie",
+      "hint": "Auf dieser Seite ist kein Platz mehr. | Noch {count} Bild passt auf diese Seite. | Bis zu {count} Bilder passen noch auf diese Seite.",
+      "selectAll": "Alle auswählen",
+      "selectNone": "Auswahl aufheben",
+      "empty": "Es sind noch keine Bilder geladen.",
+      "selected": "Kein Bild ausgewählt | 1 Bild ausgewählt | {count} Bilder ausgewählt",
+      "adding": "Bilder werden übernommen … {current}/{total}",
+      "add": "Hinzufügen | 1 Bild hinzufügen | {count} Bilder hinzufügen",
+      "cancel": "Abbrechen",
+      "failed": "Nicht übernommen: {names}"
     },
     "properties": {
       "title": "Eigenschaften",

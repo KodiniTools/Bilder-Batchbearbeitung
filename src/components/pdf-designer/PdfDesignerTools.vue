@@ -53,6 +53,30 @@
       {{ t('commentPageDesigner.tools.addImage') }}
     </button>
 
+    <!-- Bild aus der geladenen Serie übernehmen -->
+    <button
+      v-if="libraryImageCount > 0"
+      class="tool-btn"
+      :disabled="limitReached"
+      :title="t('commentPageDesigner.tools.addFromLibraryTitle')"
+      @click="emit('add-library-image')"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <rect x="7" y="7" width="14" height="14" rx="2" ry="2"></rect>
+        <path d="M3 17V5a2 2 0 0 1 2-2h12"></path>
+        <polyline points="21 17 17 13 9 21"></polyline>
+      </svg>
+      {{ t('commentPageDesigner.tools.addFromLibrary', { count: libraryImageCount }) }}
+    </button>
+
     <!-- Formen -->
     <div class="shape-buttons" role="group" :aria-label="t('commentPageDesigner.tools.shapes')">
       <button
@@ -148,13 +172,16 @@ const props = withDefaults(
     elementCount: number
     /** Ab dieser Anzahl sind "Text/Bild hinzufügen" gesperrt */
     maxElements?: number
+    /** Anzahl Bilder der geladenen Serie; 0 blendet „Aus der Bildserie“ aus */
+    libraryImageCount?: number
   }>(),
-  { maxElements: 20 }
+  { maxElements: 20, libraryImageCount: 0 }
 )
 
 const emit = defineEmits<{
   'add-text': []
   'add-image': []
+  'add-library-image': []
   'add-shape': [kind: PdfShapeKind]
   'clear-page': []
 }>()

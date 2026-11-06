@@ -689,6 +689,7 @@
       mode="cover"
       :initial-elements="doc.frontPageElements"
       :orientation="doc.orientation || 'portrait'"
+      :library-images="imageStore.images"
       @save="handleFrontPageDesignerSave"
     />
 
@@ -697,6 +698,7 @@
       mode="comment"
       :initial-elements="doc.commentPageElements"
       :orientation="doc.orientation || 'portrait'"
+      :library-images="imageStore.images"
       @save="handleCommentPageDesignerSave"
     />
   </Teleport>

@@ -4,6 +4,7 @@ import type { PdfElement, PdfShapeKind } from '@/lib/features/export-pdf'
 import { useConfirm } from '@/composables/useConfirm'
 import { alignBoxes, distributeBoxes, elementBox, type AlignMode } from '@/lib/designer/arrange'
 import { createColorBackground, createImageBackground, createShape } from '@/lib/designer/shapes'
+import { layoutImagesOnPage, type DesignerImageSource } from '@/lib/designer/library-image'
 
 export interface PdfPage {
   id: string
@@ -346,6 +347,40 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     return true
   }
 
+  /**
+   * Bilder (z. B. aus der geladenen Serie) als Bild-Elemente auf der aktuellen
+   * Seite einfügen: im Raster verteilt, ein Undo-Schritt, danach ausgewählt.
+   * Übernommen werden nur so viele, wie noch Platz bis MAX_ELEMENTS_PER_PAGE ist.
+   * @returns Anzahl der eingefügten Elemente
+   */
+  function addImageElements(sources: DesignerImageSource[]): number {
+    const free = MAX_ELEMENTS_PER_PAGE - currentElements.value.length
+    const items = sources.slice(0, Math.max(0, free))
+    if (items.length === 0) return 0
+
+    const boxes = layoutImagesOnPage(items, {
+      width: pageWidth.value,
+      height: pageHeight.value,
+    })
+    const baseZ = Math.max(...currentElements.value.map((el) => el.zIndex), 0) + 1
+    const added: PdfElement[] = items.map((item, i) => ({
+      id: generateId(),
+      type: 'image',
+      src: item.src,
+      ...boxes[i],
+      opacity: 1,
+      zIndex: baseZ + i,
+    }))
+
+    change()
+    currentElements.value.push(...added)
+    const ids = added.map((el) => el.id)
+    selectedElement.value =
+      currentElements.value.find((el) => el.id === ids[ids.length - 1]) ?? null
+    selectedIds.value = ids
+    return added.length
+  }
+
   function triggerImageUpload() {
     imageInput.value?.click()
   }
@@ -547,6 +582,7 @@ export function usePdfPages(options: UsePdfPagesOptions) {
     setBackgroundImage,
     removeBackground,
     applyTemplateElements,
+    addImageElements,
     triggerImageUpload,
     handleImageUpload,
     clearCurrentPage,
