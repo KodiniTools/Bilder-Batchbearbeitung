@@ -33,7 +33,33 @@
       "title": "Professional Image Editing Right in Your Browser",
       "subtitle": "Edit, convert, and export as many images as you want simultaneously. Completely local, 100% private, no server uploads.",
       "cta": "Get Started",
-      "previewAlt": "App preview: batch editing with filters and presets, toolbar, export bar and selected images"
+      "previewAlt": "Animated app preview: selecting images, export bar, the “Warm” preset in batch editing and a watermark on all selected images",
+      "preview": {
+        "rotate": {
+          "text": "Rotate, flip, crop, rename"
+        },
+        "export": {
+          "text": "Export to PDF, ZIP, SVG, JPG, PNG, WebP"
+        },
+        "local": {
+          "text": "100% local in your browser, no uploads"
+        },
+        "filters": {
+          "text": "Filters & presets for all images at once"
+        },
+        "transforms": {
+          "label": "Transformations",
+          "text": "resize, border, corners, shadow"
+        },
+        "watermark": {
+          "label": "Watermark",
+          "text": "text or logo"
+        },
+        "recipes": {
+          "label": "Recipes",
+          "text": "save & reuse settings"
+        }
+      }
     },
     "features": {
       "privacy": {

@@ -33,7 +33,33 @@
       "title": "Professionelle Bildbearbeitung direkt im Browser",
       "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",
       "cta": "Jetzt starten",
-      "previewAlt": "Vorschau der App: Stapelbearbeitung mit Filtern und Presets, Werkzeugleiste, Export-Leiste und ausgewählte Bilder"
+      "previewAlt": "Animierte Vorschau der App: Bilder auswählen, Export-Leiste, Preset „Warm“ in der Stapelbearbeitung und Wasserzeichen auf allen ausgewählten Bildern",
+      "preview": {
+        "rotate": {
+          "text": "Drehen, Spiegeln, Zuschneiden, Umbenennen"
+        },
+        "export": {
+          "text": "Export als PDF, ZIP, SVG, JPG, PNG, WebP"
+        },
+        "local": {
+          "text": "100 % lokal im Browser, keine Uploads"
+        },
+        "filters": {
+          "text": "Filter & Presets für alle Bilder gleichzeitig"
+        },
+        "transforms": {
+          "label": "Transformationen",
+          "text": "Größe, Rand, Ecken, Schatten"
+        },
+        "watermark": {
+          "label": "Wasserzeichen",
+          "text": "Text oder Logo"
+        },
+        "recipes": {
+          "label": "Rezepte",
+          "text": "Einstellungen speichern & anwenden"
+        }
+      }
     },
     "features": {
       "privacy": {
