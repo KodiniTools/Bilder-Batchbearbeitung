@@ -32,7 +32,8 @@
     "hero": {
       "title": "Professionelle Bildbearbeitung direkt im Browser",
       "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",
-      "cta": "Jetzt starten"
+      "cta": "Jetzt starten",
+      "previewAlt": "Vorschau der App: Stapelbearbeitung mit Filtern und Presets, Werkzeugleiste, Export-Leiste und ausgewählte Bilder"
     },
     "features": {
       "privacy": {
