@@ -1,30 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { readStoredTheme, applyTheme } from '@/utils/theme'
-import { useDocumentTheme } from '@/composables/useDocumentTheme'
-import previewDeLight from '@/assets/images/landing/editor-vorschau-de-light.webp'
-import previewDeDark from '@/assets/images/landing/editor-vorschau-de-dark.webp'
-import previewEnLight from '@/assets/images/landing/editor-vorschau-en-light.webp'
-import previewEnDark from '@/assets/images/landing/editor-vorschau-en-dark.webp'
+import HeroPreview from '@/components/landing/HeroPreview.vue'
 
 const { locale, t } = useI18n()
 const router = useRouter()
 
 const isElectron = !!window.electronAPI?.isElectron
 const theme = ref<'light' | 'dark'>('light')
-
-/** Vorschaubild im Hero: passend zu Sprache und Theme (html[data-theme]) */
-const documentTheme = useDocumentTheme()
-const PREVIEW_IMAGES = {
-  de: { light: previewDeLight, dark: previewDeDark },
-  en: { light: previewEnLight, dark: previewEnDark },
-} as const
-const heroPreviewSrc = computed(() => {
-  const set = locale.value === 'en' ? PREVIEW_IMAGES.en : PREVIEW_IMAGES.de
-  return set[documentTheme.value]
-})
 
 const goToApp = () => {
   router.push('/app')
@@ -115,17 +100,8 @@ onMounted(() => {
           <button class="hero-cta" @click="goToApp">{{ t('landing.hero.cta') }}</button>
         </div>
 
-        <!-- Vorschau des Editors (Light/Dark, DE/EN) -->
-        <figure class="hero-preview">
-          <img
-            :src="heroPreviewSrc"
-            :alt="t('landing.hero.previewAlt')"
-            width="1760"
-            height="1180"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </figure>
+        <!-- Animierte Vorschau des Editors (Light/Dark, DE/EN) -->
+        <HeroPreview />
 
         <!-- Feature Cards Grid -->
         <div class="feature-grid">
@@ -389,18 +365,6 @@ a.nav-link {
 
 .hero-cta:active {
   transform: translateY(-1px);
-}
-
-/* Editor-Vorschau im Hero */
-.hero-preview {
-  margin: 0 auto var(--ds-space-8);
-  max-width: 1100px;
-}
-
-.hero-preview img {
-  display: block;
-  width: 100%;
-  height: auto;
 }
 
 /* Feature Cards Grid */
