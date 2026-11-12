@@ -121,7 +121,7 @@ onMounted(() => {
             :src="heroPreviewSrc"
             :alt="t('landing.hero.previewAlt')"
             width="1760"
-            height="1200"
+            height="1180"
             fetchpriority="high"
             decoding="async"
           />
