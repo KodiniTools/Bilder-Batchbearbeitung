@@ -22,7 +22,6 @@
     }
   },
   "landing": {
-    "brand": "Bild-Batchbearbeitung",
     "nav": {
       "home": "Start",
       "app": "App starten",
@@ -282,14 +281,8 @@
       }
     }
   },
-  "head": {
-    "title": "Moderne Bild-Bearbeitung",
-    "description": "Bearbeiten, konvertieren und exportieren Sie Ihre Bilder direkt im Browser. Schnell, privat und modern."
-  },
   "header": {
     "title": "Moderne Bild-Bearbeitung",
-    "langDE": "Sprache auf Deutsch ändern",
-    "langEN": "Sprache auf Englisch ändern",
     "themeToggle": "Design umschalten"
   },
   "statusBar": {
@@ -310,13 +303,6 @@
       "large": "Große Darstellung"
     },
     "buttons": {
-      "selectAll": "Alle umschalten",
-      "delete": "Löschen",
-      "bulkRename": "Umbenennen",
-      "aspectRatio": "Format",
-      "reset": "Rückgängig",
-      "exportSelectedPdf": "Auswahl → PDF",
-      "exportAllPdf": "Alle → PDF",
       "save": "Speichern…"
     },
     "tooltips": {
@@ -348,14 +334,6 @@
     "zipButton": "ZIP entpacken",
     "zipButtonTooltip": "ZIP-Archiv auswählen und enthaltene Bilder laden"
   },
-  "emptyState": {
-    "title": "Keine Bilder geladen",
-    "text": "Ziehen Sie Bilder hierher oder klicken Sie zum Hochladen"
-  },
-  "pdfModal": {
-    "title": "PDF-Export",
-    "confirm": "Export starten"
-  },
   "buttons": {
     "cancel": "Abbrechen",
     "close": "Schließen"
@@ -382,13 +360,11 @@
   },
   "loading": {
     "text": "Bitte warten…",
-    "images": "Bilder werden geladen...",
     "zip": "Bereite ZIP-Datei vor...",
     "zipProgress": "Verarbeite Bild {current} von {total}...",
     "pdf": "Erstelle PDF...",
     "pdfMulti": "Erstelle PDF mit {count} Bildern...",
     "pdfProgress": "Erstelle PDF: Schritt {current} von {total}…",
-    "progress": "{current} von {total}",
     "resizing": "Bild {current} von {total} wird skaliert…",
     "cropping": "Bild {current} von {total} wird zugeschnitten…",
     "svgProgress": "SVG-Konvertierung: {current}/{total}",
@@ -407,16 +383,13 @@
     "saveSuccess": "{count} Bilder erfolgreich gespeichert",
     "svgSuccess": "{count} Bild(er) erfolgreich als SVG exportiert",
     "exportError": "Fehler beim Exportieren. Bitte erneut versuchen.",
-    "imageAdded": "{count} Bild(er) hinzugefügt",
     "imageRemoved": "Bild entfernt",
     "imagesRemoved": "{count} Bilder entfernt",
-    "copied": "In die Zwischenablage kopiert",
     "rotated": "{count} Bild(er) gedreht",
     "flipped": "{count} Bild(er) gespiegelt",
     "cropped": "{count} Bild(er) zugeschnitten",
     "reset": "{count} Bild(er) zurückgesetzt",
     "bulkRenamed": "{count} Bild(er) umbenannt",
-    "changesApplied": "Änderungen wurden übernommen",
     "changesSaved": "Bild gespeichert",
     "pastedFromClipboard": "Bild aus Zwischenablage eingefügt",
     "pastedFromClipboardMultiple": "{count} Bilder aus Zwischenablage eingefügt",
@@ -431,10 +404,6 @@
     "saveCancelled": "Speichern abgebrochen: {count} von {total} Bildern gespeichert"
   },
   "alerts": {
-    "imageOnly": "Nur Bilddateien werden unterstützt.",
-    "canvasError": "Canvas 2D Kontext nicht verfügbar.",
-    "fileLoadError": "Die Datei {fileName} konnte nicht geladen werden.",
-    "fileReadError": "Die Datei {fileName} konnte nicht gelesen werden.",
     "noSelection": "Keine Bilder ausgewählt.",
     "confirmDelete": "{count} Bild(er) wirklich löschen?",
     "noImagesToExport": "Keine Bilder zum Exportieren ausgewählt.",
@@ -447,17 +416,6 @@
     "unknownError": "Unbekannter Fehler",
     "confirmClearPage": "Möchten Sie alle Elemente von Seite {page} wirklich löschen?",
     "invalidFormat": "Ungültiges Format"
-  },
-  "consent": {
-    "text": "Wir nutzen anonyme Nutzungsstatistiken, um die App zu verbessern. Dürfen wir diese Daten erheben?",
-    "decline": "Ablehnen",
-    "accept": "Akzeptieren"
-  },
-  "footer": {
-    "imprint": "Impressum",
-    "privacy": "Datenschutzerklärung",
-    "contact": "Kontakt",
-    "copyright": "© 2025 KodiniTools"
   },
   "faq": {
     "title": "Häufig gestellte Fragen (FAQ)",
@@ -499,7 +457,6 @@
     }
   },
   "exportModal": {
-    "close": "Schließen",
     "title": {
       "pdfAll": "PDF exportieren (Alle Bilder)",
       "pdfSelected": "PDF exportieren (Ausgewählte)",
@@ -508,32 +465,13 @@
       "save": "Bilder speichern",
       "export": "Export"
     },
-    "imageCount": {
-      "singular": "Bild",
-      "plural": "Bilder"
-    },
     "pdf": {
-      "title": "PDF-Einstellungen",
-      "documentTitle": "Dokumenttitel",
-      "documentTitlePlaceholder": "z. B. Urlaubsfotos 2025",
       "author": "Autor (optional)",
       "authorPlaceholder": "Ihr Name",
       "orientation": {
         "label": "Ausrichtung",
         "portrait": "Hochformat",
         "landscape": "Querformat"
-      },
-      "titlePage": {
-        "label": "Titelseite hinzufügen",
-        "description": "Erste Seite mit Titel und Datum"
-      },
-      "showFileName": {
-        "label": "Dateinamen anzeigen",
-        "description": "Unter jedem Bild"
-      },
-      "optimizeSize": {
-        "label": "Dateigröße optimieren",
-        "description": "Komprimierung für kleinere PDFs"
       },
       "frontPage": {
         "label": "Eigene Startseite gestalten",
@@ -545,18 +483,10 @@
       },
       "commentPage": {
         "label": "Kommentarseite hinzufügen",
-        "description": "Letzte Seite mit Text und Bild",
         "designButton": "Kommentarseite gestalten",
         "elementsAdded": "Element(e) hinzugefügt",
         "clearButton": "Löschen",
         "confirmClear": "Alle Elemente von der Kommentarseite löschen?"
-      },
-      "commentText": {
-        "label": "Kommentartext",
-        "placeholder": "Ihre Notizen oder Kommentare..."
-      },
-      "commentImage": {
-        "label": "Kommentarbild (optional)"
       },
       "pageFormat": {
         "label": "Seitenformat",
@@ -608,10 +538,8 @@
       }
     },
     "zip": {
-      "title": "ZIP-Einstellungen",
       "fileName": "Dateiname",
-      "fileNamePlaceholder": "Bilder",
-      "fileNameHint": "Automatisch mit Datum: {name}_2025-10-14.zip"
+      "fileNamePlaceholder": "Bilder"
     },
     "svg": {
       "colormode": "Farbmodus",
@@ -629,12 +557,8 @@
     "format": {
       "title": "Bildformat",
       "png": "Verlustfrei, hohe Qualität",
-      "jpg": "Komprimiert, kleinere Dateien",
-      "webp": "Modern, beste Kompression",
       "quality": {
-        "label": "Qualität",
-        "smaller": "Kleiner",
-        "better": "Besser"
+        "label": "Qualität"
       },
       "pngTransparent": "Transparenter Hintergrund",
       "pngTransparentHint": "Deaktivieren, um einen farbigen Hintergrund hinter dem Bild zu setzen (z. B. für Schatten oder abgerundete Ecken).",
@@ -672,58 +596,13 @@
   },
   "frontPageDesigner": {
     "title": "Startseite gestalten",
-    "subtitle": "Erstellen Sie Ihre individuelle Startseite mit Texten und Bildern",
-    "close": "Schließen",
-    "toolbar": {
-      "title": "Werkzeuge",
-      "addText": "Text hinzufügen",
-      "addTextTooltip": "Text hinzufügen",
-      "addImage": "Bild hinzufügen",
-      "addImageTooltip": "Bild hochladen",
-      "clearAll": "Löschen",
-      "clearAllTooltip": "Alle löschen",
-      "confirmClearAll": "Alle Elemente löschen?"
-    },
-    "canvas": {
-      "pageInfo": "A4 Hochformat",
-      "emptyText": "Doppelklick zum Bearbeiten"
-    },
-    "properties": {
-      "title": "Eigenschaften",
-      "elementType": "Element-Typ:",
-      "typeText": "Text",
-      "typeImage": "Bild",
-      "fontSize": "Schriftgröße",
-      "fontFamily": "Schriftart:",
-      "fontWeight": "Schriftstärke:",
-      "fontWeightNormal": "Normal",
-      "fontWeightBold": "Fett",
-      "textAlign": "Ausrichtung:",
-      "textAlignLeft": "Linksbündig",
-      "textAlignCenter": "Zentriert",
-      "textAlignRight": "Rechtsbündig",
-      "textLabel": "Text:",
-      "textColor": "Textfarbe:",
-      "inlineEditHint": "Doppelklick auf Text im Canvas zum direkten Bearbeiten",
-      "imageSize": "Bildgröße:",
-      "position": "Position:",
-      "deleteElement": "Element löschen",
-      "noSelection": "Wählen Sie ein Element aus, um es zu bearbeiten"
-    },
     "footer": {
-      "elementCount": "{count} Element | {count} Elemente",
-      "cancel": "Abbrechen",
-      "save": "Speichern"
+      "elementCount": "{count} Element | {count} Elemente"
     },
     "element": {
       "text": {
         "default": "Neuer Text"
       }
-    },
-    "zoom": {
-      "zoomOut": "Verkleinern",
-      "zoomIn": "Vergrößern",
-      "reset": "Zoom zurücksetzen"
     },
     "previewTitle": "Vorschau — Startseite",
     "confirmOrientationReset": "Die Orientierung hat sich geändert. Elemente zurücksetzen?"
@@ -732,7 +611,6 @@
     "title": "Kommentarseiten-Designer (mehrseitig)",
     "close": "Schließen",
     "pageManagement": {
-      "title": "Seiten verwalten",
       "pageOf": "Seite {current} von {total}",
       "elementCount": "{count} Element | {count} Elemente",
       "previousPage": "Vorherige Seite",
@@ -902,7 +780,6 @@
     "title": "Bild bearbeiten",
     "close": "Schließen",
     "sections": {
-      "preview": "Vorschau",
       "comment": "Bildkommentar (PDF)",
       "fileName": "Dateiname",
       "text": "Text",
@@ -983,9 +860,7 @@
       "hint": "Erscheint im PDF-Export unter dem Bild."
     },
     "fileName": {
-      "label": "Neuer Name:",
-      "placeholder": "Dateiname ohne Erweiterung",
-      "helpText": "Der Name wird beim Speichern verwendet"
+      "placeholder": "Dateiname ohne Erweiterung"
     },
     "transformations": {
       "rotate": {
@@ -1008,12 +883,8 @@
       }
     },
     "resize": {
-      "width": "Breite:",
-      "height": "Höhe:",
       "keepAspectRatio": "Seitenverhältnis beibehalten",
       "resetSize": "Ursprungsgröße",
-      "applyResize": "Größe ändern",
-      "unit": "px",
       "modeLabel": "Modus",
       "modeHints": {
         "exact": "Feste Breite und Höhe, optional mit Seitenverhältnis.",
@@ -1026,7 +897,6 @@
       "resultUnchanged": "Bild bleibt unverändert ({size} px)"
     },
     "export": {
-      "format": "Format:",
       "downloading": "Erstelle...",
       "downloadButton": "Als Datei herunterladen"
     },
@@ -1127,7 +997,6 @@
       "noir": "Noir"
     },
     "buttons": {
-      "apply": "Anwenden",
       "reset": "Zurücksetzen"
     },
     "resetSlider": "Zurücksetzen",
@@ -1233,7 +1102,6 @@
       "noneChanged": "Keine Änderung: Alle ausgewählten Bilder sind bereits klein genug."
     },
     "toast": {
-      "applied": "Filter auf {count} Bild(er) angewendet",
       "reset": "Filter von {count} Bild(ern) zurückgesetzt"
     },
     "recipes": {
@@ -1339,7 +1207,6 @@
     "delete": "Löschen",
     "clear": "Leeren",
     "reset": "Zurücksetzen",
-    "keep": "Beibehalten",
-    "title": "Bitte bestätigen"
+    "keep": "Beibehalten"
   }
 }

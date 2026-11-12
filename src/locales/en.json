@@ -22,7 +22,6 @@
     }
   },
   "landing": {
-    "brand": "Batch Image Editor",
     "nav": {
       "home": "Home",
       "app": "Launch App",
@@ -107,14 +106,8 @@
       }
     }
   },
-  "head": {
-    "title": "Modern Image Editor",
-    "description": "Edit, convert, and export your images directly in the browser. Fast, private, and modern."
-  },
   "header": {
     "title": "Modern Image Editor",
-    "langDE": "Switch language to German",
-    "langEN": "Switch language to English",
     "themeToggle": "Toggle theme"
   },
   "statusBar": {
@@ -135,13 +128,6 @@
       "large": "Large view"
     },
     "buttons": {
-      "selectAll": "Toggle All",
-      "delete": "Delete",
-      "bulkRename": "Rename",
-      "aspectRatio": "Format",
-      "reset": "Undo",
-      "exportSelectedPdf": "Selection → PDF",
-      "exportAllPdf": "All → PDF",
       "save": "Save As…"
     },
     "tooltips": {
@@ -173,14 +159,6 @@
     "zipButton": "Extract ZIP",
     "zipButtonTooltip": "Select a ZIP archive and load the images it contains"
   },
-  "emptyState": {
-    "title": "No images loaded",
-    "text": "Drag images here or click to upload"
-  },
-  "pdfModal": {
-    "title": "PDF Export",
-    "confirm": "Start Export"
-  },
   "buttons": {
     "cancel": "Cancel",
     "close": "Close"
@@ -207,13 +185,11 @@
   },
   "loading": {
     "text": "Please wait…",
-    "images": "Loading images...",
     "zip": "Preparing ZIP file...",
     "zipProgress": "Processing image {current} of {total}...",
     "pdf": "Creating PDF...",
     "pdfMulti": "Creating PDF with {count} images...",
     "pdfProgress": "Creating PDF: step {current} of {total}…",
-    "progress": "{current} of {total}",
     "resizing": "Scaling image {current} of {total}…",
     "cropping": "Cropping image {current} of {total}…",
     "svgProgress": "SVG conversion: {current}/{total}",
@@ -232,16 +208,13 @@
     "saveSuccess": "{count} images saved successfully",
     "svgSuccess": "{count} image(s) successfully exported as SVG",
     "exportError": "Export failed. Please try again.",
-    "imageAdded": "{count} image(s) added",
     "imageRemoved": "Image removed",
     "imagesRemoved": "{count} images removed",
-    "copied": "Copied to clipboard",
     "rotated": "{count} image(s) rotated",
     "flipped": "{count} image(s) flipped",
     "cropped": "{count} image(s) cropped",
     "reset": "{count} image(s) reset",
     "bulkRenamed": "{count} image(s) renamed",
-    "changesApplied": "Changes have been applied",
     "changesSaved": "Image saved",
     "pastedFromClipboard": "Image pasted from clipboard",
     "pastedFromClipboardMultiple": "{count} images pasted from clipboard",
@@ -256,10 +229,6 @@
     "saveCancelled": "Saving cancelled: {count} of {total} images saved"
   },
   "alerts": {
-    "imageOnly": "Only image files are supported.",
-    "canvasError": "Canvas 2D context not available.",
-    "fileLoadError": "Could not load the file {fileName}.",
-    "fileReadError": "Could not read the file {fileName}.",
     "noSelection": "No images selected.",
     "confirmDelete": "Really delete {count} image(s)?",
     "noImagesToExport": "No images selected to export.",
@@ -272,17 +241,6 @@
     "unknownError": "Unknown error",
     "confirmClearPage": "Do you really want to delete all elements from page {page}?",
     "invalidFormat": "Invalid format"
-  },
-  "consent": {
-    "text": "We use anonymous usage statistics to improve the app. May we collect this data?",
-    "decline": "Decline",
-    "accept": "Accept"
-  },
-  "footer": {
-    "imprint": "Legal Notice",
-    "privacy": "Privacy Policy",
-    "contact": "Contact",
-    "copyright": "© 2025 KodiniTools"
   },
   "faq": {
     "title": "Frequently Asked Questions (FAQ)",
@@ -324,7 +282,6 @@
     }
   },
   "exportModal": {
-    "close": "Close",
     "title": {
       "pdfAll": "Export PDF (All Images)",
       "pdfSelected": "Export PDF (Selected)",
@@ -333,32 +290,13 @@
       "save": "Save Images",
       "export": "Export"
     },
-    "imageCount": {
-      "singular": "Image",
-      "plural": "Images"
-    },
     "pdf": {
-      "title": "PDF Settings",
-      "documentTitle": "Document Title",
-      "documentTitlePlaceholder": "e.g. Vacation Photos 2025",
       "author": "Author (optional)",
       "authorPlaceholder": "Your Name",
       "orientation": {
         "label": "Orientation",
         "portrait": "Portrait",
         "landscape": "Landscape"
-      },
-      "titlePage": {
-        "label": "Add Title Page",
-        "description": "First page with title and date"
-      },
-      "showFileName": {
-        "label": "Show File Names",
-        "description": "Below each image"
-      },
-      "optimizeSize": {
-        "label": "Optimize File Size",
-        "description": "Compression for smaller PDFs"
       },
       "frontPage": {
         "label": "Design Custom Front Page",
@@ -370,18 +308,10 @@
       },
       "commentPage": {
         "label": "Add Comment Page",
-        "description": "Last page with text and image",
         "designButton": "Design Comment Page",
         "elementsAdded": "Element(s) added",
         "clearButton": "Delete",
         "confirmClear": "Delete all elements from comment page?"
-      },
-      "commentText": {
-        "label": "Comment Text",
-        "placeholder": "Your notes or comments..."
-      },
-      "commentImage": {
-        "label": "Comment Image (optional)"
       },
       "pageFormat": {
         "label": "Page size",
@@ -433,10 +363,8 @@
       }
     },
     "zip": {
-      "title": "ZIP Settings",
       "fileName": "File Name",
-      "fileNamePlaceholder": "images",
-      "fileNameHint": "Automatically with date: {name}_2025-10-14.zip"
+      "fileNamePlaceholder": "images"
     },
     "svg": {
       "colormode": "Color mode",
@@ -454,12 +382,8 @@
     "format": {
       "title": "Image Format",
       "png": "Lossless, high quality",
-      "jpg": "Compressed, smaller files",
-      "webp": "Modern, best compression",
       "quality": {
-        "label": "Quality",
-        "smaller": "Smaller",
-        "better": "Better"
+        "label": "Quality"
       },
       "pngTransparent": "Transparent background",
       "pngTransparentHint": "Disable to place a colored background behind the image (e.g. for shadows or rounded corners).",
@@ -497,58 +421,13 @@
   },
   "frontPageDesigner": {
     "title": "Design Front Page",
-    "subtitle": "Create your individual front page with texts and images",
-    "close": "Close",
-    "toolbar": {
-      "title": "Tools",
-      "addText": "Text",
-      "addTextTooltip": "Add text",
-      "addImage": "Image",
-      "addImageTooltip": "Upload image",
-      "clearAll": "Delete",
-      "clearAllTooltip": "Delete all",
-      "confirmClearAll": "Delete all elements?"
-    },
-    "canvas": {
-      "pageInfo": "A4 Portrait",
-      "emptyText": "Double-click to edit"
-    },
-    "properties": {
-      "title": "Properties",
-      "elementType": "Element Type:",
-      "typeText": "Text",
-      "typeImage": "Image",
-      "fontSize": "Font Size",
-      "fontFamily": "Font:",
-      "fontWeight": "Font Weight:",
-      "fontWeightNormal": "Normal",
-      "fontWeightBold": "Bold",
-      "textAlign": "Alignment:",
-      "textAlignLeft": "Left",
-      "textAlignCenter": "Center",
-      "textAlignRight": "Right",
-      "textLabel": "Text:",
-      "textColor": "Text Color:",
-      "inlineEditHint": "Double-click text on canvas to edit directly",
-      "imageSize": "Image Size:",
-      "position": "Position:",
-      "deleteElement": "Delete Element",
-      "noSelection": "Select an element to edit it"
-    },
     "footer": {
-      "elementCount": "{count} element | {count} elements",
-      "cancel": "Cancel",
-      "save": "Save"
+      "elementCount": "{count} element | {count} elements"
     },
     "element": {
       "text": {
         "default": "New Text"
       }
-    },
-    "zoom": {
-      "zoomOut": "Zoom out",
-      "zoomIn": "Zoom in",
-      "reset": "Reset zoom"
     },
     "previewTitle": "Preview — Front page",
     "confirmOrientationReset": "The orientation has changed. Reset elements?"
@@ -557,7 +436,6 @@
     "title": "Comment Page Designer (Multi-Page)",
     "close": "Close",
     "pageManagement": {
-      "title": "Manage Pages",
       "pageOf": "Page {current} of {total}",
       "elementCount": "{count} element | {count} elements",
       "previousPage": "Previous Page",
@@ -727,7 +605,6 @@
     "title": "Edit Image",
     "close": "Close",
     "sections": {
-      "preview": "Preview",
       "comment": "Image comment (PDF)",
       "fileName": "File Name",
       "text": "Text",
@@ -742,9 +619,7 @@
       "hint": "Shown below the image in the PDF export."
     },
     "fileName": {
-      "label": "New Name:",
-      "placeholder": "File name without extension",
-      "helpText": "This name will be used when saving"
+      "placeholder": "File name without extension"
     },
     "transformations": {
       "rotate": {
@@ -767,12 +642,8 @@
       }
     },
     "resize": {
-      "width": "Width:",
-      "height": "Height:",
       "keepAspectRatio": "Keep aspect ratio",
       "resetSize": "Original size",
-      "applyResize": "Resize",
-      "unit": "px",
       "modeLabel": "Mode",
       "modeHints": {
         "exact": "Fixed width and height, optionally keeping the aspect ratio.",
@@ -785,7 +656,6 @@
       "resultUnchanged": "Image stays unchanged ({size} px)"
     },
     "export": {
-      "format": "Format:",
       "downloading": "Creating...",
       "downloadButton": "Download as file"
     },
@@ -952,7 +822,6 @@
       "noir": "Noir"
     },
     "buttons": {
-      "apply": "Apply",
       "reset": "Reset"
     },
     "resetSlider": "Reset",
@@ -1058,7 +927,6 @@
       "noneChanged": "Nothing changed: all selected images are already small enough."
     },
     "toast": {
-      "applied": "Filters applied to {count} image(s)",
       "reset": "Filters reset for {count} image(s)"
     },
     "recipes": {
@@ -1339,7 +1207,6 @@
     "delete": "Delete",
     "clear": "Clear",
     "reset": "Reset",
-    "keep": "Keep",
-    "title": "Please confirm"
+    "keep": "Keep"
   }
 }
