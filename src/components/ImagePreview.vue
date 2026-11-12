@@ -23,8 +23,9 @@ const emit = defineEmits<{
 const galleryImages = computed(() => props.images ?? [])
 
 const currentIndex = computed(() => {
-  if (!props.image) return -1
-  return galleryImages.value.findIndex((img) => img.id === props.image!.id)
+  const image = props.image
+  if (!image) return -1
+  return galleryImages.value.findIndex((img) => img.id === image.id)
 })
 
 const hasGallery = computed(() => galleryImages.value.length > 1 && currentIndex.value !== -1)

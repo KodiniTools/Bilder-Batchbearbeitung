@@ -68,7 +68,24 @@ export default [
     },
   },
 
-  // TypeScript rules for .ts files only (NOT .vue — vue-parser handles those)
+  // TypeScript rules for .ts files and <script lang="ts"> in .vue
+  // (.vue keeps vue-eslint-parser; tsParser is set for the script block above)
+  {
+    files: ['**/*.vue'],
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+    },
+  },
   {
     files: ['**/*.ts'],
     plugins: {

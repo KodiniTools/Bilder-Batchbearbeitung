@@ -7,7 +7,7 @@ import { readStoredTheme, applyTheme } from '@/utils/theme'
 const router = useRouter()
 const { locale, t } = useI18n()
 
-const isElectron = !!(window as any).electronAPI?.isElectron
+const isElectron = !!window.electronAPI?.isElectron
 const theme = ref<'light' | 'dark'>('light')
 
 const goHome = () => {

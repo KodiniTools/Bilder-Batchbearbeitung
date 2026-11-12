@@ -123,6 +123,8 @@ function emitCrop() {
 }
 
 function clientToOverlay(clientX: number, clientY: number) {
+  // Nur aus Pointer-Handlern des Overlays aufgerufen, das Element ist gemountet
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const rect = overlayRef.value!.getBoundingClientRect()
   const { w, h } = overlaySize()
   return {

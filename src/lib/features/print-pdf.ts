@@ -7,12 +7,9 @@
 // - electron: Desktop-App → Fenster mit PDF-Ansicht und Druckknopf
 
 import { downloadPdf } from './export-pdf'
+import type { ElectronAPI } from '@/types/globals'
 
 export type PrintMode = 'electron' | 'dialog' | 'tab' | 'download'
-
-interface ElectronPrintApi {
-  printPdf?: (data: ArrayBuffer) => Promise<void>
-}
 
 export interface PrintEnvironment {
   electron: boolean
@@ -22,8 +19,8 @@ export interface PrintEnvironment {
   maxTouchPoints: number
 }
 
-function electronApi(): ElectronPrintApi | undefined {
-  return (window as Window & { electronAPI?: ElectronPrintApi }).electronAPI
+function electronApi(): ElectronAPI | undefined {
+  return window.electronAPI
 }
 
 export function detectPrintEnvironment(): PrintEnvironment {
