@@ -116,8 +116,7 @@
       "selection": "Selection",
       "history": "History",
       "view": "View",
-      "edit": "Edit",
-      "export": "Export"
+      "edit": "Edit"
     },
     "images": "Images",
     "selected": "selected",
@@ -127,9 +126,6 @@
       "medium": "Medium view",
       "large": "Large view"
     },
-    "buttons": {
-      "save": "Save As…"
-    },
     "tooltips": {
       "selectAll": "Select/Deselect all",
       "deleteSelected": "Delete selection",
@@ -137,17 +133,31 @@
       "bulkRename": "Rename selected images sequentially",
       "aspectRatio": "Adjust aspect ratio of selected images",
       "reset": "Undo all edits of selected images",
-      "exportSelectedPdf": "Export selection as PDF",
-      "exportAllPdf": "Export all images as PDF",
-      "saveSelected": "Save selected images in multiple formats",
-      "exportSvg": "Export as SVG (vectorization)",
-      "downloadZip": "Download originals of selection as ZIP",
       "rotateLeft": "Rotate selected images 90° left",
       "rotateRight": "Rotate selected images 90° right",
       "flipH": "Flip selected images horizontally",
       "flipV": "Flip selected images vertically",
       "undo": "Undo (Ctrl+Z)",
       "redo": "Redo (Ctrl+Shift+Z)"
+    }
+  },
+  "exportBar": {
+    "ariaLabel": "Export selection",
+    "title": "Export",
+    "selectedCount": "{count} image selected | {count} images selected",
+    "buttons": {
+      "pdfSelected": "PDF (selection)",
+      "pdfAll": "PDF (all images)",
+      "zip": "ZIP",
+      "svg": "SVG",
+      "save": "Save As…"
+    },
+    "tooltips": {
+      "pdfSelected": "Export selection as PDF",
+      "pdfAll": "Export all images as PDF",
+      "zip": "Download originals of selection as ZIP",
+      "svg": "Export selection as SVG (vectorization)",
+      "save": "Save selected images in multiple formats"
     }
   },
   "upload": {
