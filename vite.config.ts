@@ -13,10 +13,7 @@ export default defineConfig({
   plugins: [
     vue(),
     // Gegen render-blockierendes CSS: nur genutzte FontAwesome-Icons, Einstiegs-CSS inline
-    faIconSubset({
-      roots: ['src', 'index.html'],
-      exclude: ['src/lib/bildseriebearbeiten'],
-    }),
+    faIconSubset({ roots: ['src', 'index.html'] }),
     inlineEntryCss(),
     // PDF-Schriften als Base64-Chunks (src/lib/features/pdf-fonts.ts)
     base64Asset(),

@@ -115,6 +115,6 @@ export default [
 
   // Global ignores
   {
-    ignores: ['dist/**', 'release/**', 'node_modules/**', 'src/lib/bildseriebearbeiten/**'],
+    ignores: ['dist/**', 'release/**', 'node_modules/**'],
   },
 ]
