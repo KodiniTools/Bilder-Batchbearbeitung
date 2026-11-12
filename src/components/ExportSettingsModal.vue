@@ -721,6 +721,7 @@ import {
   CUSTOM_PAGE_MIN_MM,
   PAGE_MARGIN_MAX_MM,
   PDF_PASSWORD_MAX_LENGTH,
+  type ExportSettings,
   type ImagesPerPage,
   type PdfElement,
   type PdfPageFormat,
@@ -759,7 +760,7 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   close: []
-  confirm: [settings: any]
+  confirm: [settings: ExportSettings]
 }>()
 
 const showFrontPageDesigner = ref(false)

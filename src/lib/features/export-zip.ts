@@ -7,8 +7,8 @@ import { saveToTarget, type SaveTarget } from './save-file'
 
 export type ZipProgressCallback = (current: number, total: number) => void
 
-async function getJSZip() {
-  // @ts-expect-error — JSZip may be loaded as a UMD global via script tag
+async function getJSZip(): Promise<typeof import('jszip')> {
+  // JSZip kann als UMD-Global per Script-Tag eingebunden sein
   if (window.JSZip) return window.JSZip
   try {
     const mod = await import('jszip')

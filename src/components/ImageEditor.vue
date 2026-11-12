@@ -779,7 +779,11 @@ watch(
 watch(
   () => props.isOpen,
   (isOpen) => {
-    if (isOpen && props.image) nextTick(() => initializeEditor(props.image!))
+    // props.image erst im nextTick lesen (wie bisher); initializeEditor ignoriert null
+    if (isOpen && props.image)
+      nextTick(() => {
+        if (props.image) initializeEditor(props.image)
+      })
     if (!isOpen) {
       changesApplied.value = false
       compareMode.value = 'after'
@@ -820,6 +824,8 @@ function initializeEditor(image: ImageObject) {
   straightenAngle.value = 0
 
   initCanvas(image)
+  // initCanvas() hat den Arbeits-Canvas gerade angelegt
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const workingCanvas = getWorkingCanvas()!
 
   fileName.value = image.outputName || ImageProcessor.getFileNameWithoutExtension(image.file.name)
@@ -1002,6 +1008,8 @@ async function downloadImage() {
     const tempImageObj: ImageObject = {
       ...originalImageObj,
       canvas: workingCanvas,
+      // 2D-Kontext eines HTMLCanvasElement ist immer verfügbar
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       ctx: workingCanvas.getContext('2d')!,
       filters: { ...localFilters.value },
     }
@@ -1156,9 +1164,10 @@ function drawTextItems(target: HTMLCanvasElement, items: TextItem[], scale: numb
     ctx.shadowOffsetY = (item.shadowOffsetY ?? 2) * scale
 
     // Stroke first (rendered behind fill)
-    if ((item.strokeWidth ?? 0) > 0) {
+    const strokeWidth = item.strokeWidth ?? 0
+    if (strokeWidth > 0) {
       ctx.strokeStyle = item.strokeColor ?? '#000000'
-      ctx.lineWidth = item.strokeWidth! * 2 * scale
+      ctx.lineWidth = strokeWidth * 2 * scale
       ctx.lineJoin = 'round'
       item.text.split('\n').forEach((line, i) => {
         ctx.strokeText(line, x, y + i * lineHeight)

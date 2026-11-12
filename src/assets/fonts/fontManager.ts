@@ -1,20 +1,24 @@
-// fontManager.js
+// fontManager.ts
+
+/** Eigene Schrift: Anzeigename und Dateiname unter /fonts/ (woff2) */
+export interface CustomFont {
+  name: string
+  file: string
+}
 
 /**
  * Manages custom font loading, caching, and availability
  */
 export class FontManager {
-  constructor() {
-    this.loadedFonts = new Set()
-    this.loadingPromises = new Map()
-    this.fontFamilies = []
-    this.isInitialized = false
-  }
+  loadedFonts = new Set<string>()
+  loadingPromises = new Map<string, Promise<FontFace | void>>()
+  fontFamilies: string[] = []
+  isInitialized = false
 
   /**
    * Initialize and load all custom fonts
    */
-  async initialize(customFonts) {
+  async initialize(customFonts: CustomFont[]): Promise<void> {
     if (this.isInitialized) return
 
     const styleSheet = document.createElement('style')
@@ -22,7 +26,7 @@ export class FontManager {
     let fontFaceRules = ''
 
     // Font-Loading Promises sammeln
-    const fontLoadPromises = []
+    const fontLoadPromises: Promise<FontFace | void>[] = []
 
     customFonts.forEach((font) => {
       const displayName = font.name
@@ -76,7 +80,7 @@ export class FontManager {
   /**
    * Check if a specific font is loaded and ready
    */
-  async isFontReady(fontFamily) {
+  async isFontReady(fontFamily: string): Promise<boolean> {
     if (this.loadedFonts.has(fontFamily)) {
       return true
     }
@@ -98,12 +102,12 @@ export class FontManager {
   /**
    * Wait for a font to be loaded with timeout
    */
-  async waitForFont(fontFamily, timeout = 3000) {
+  async waitForFont(fontFamily: string, timeout = 3000): Promise<boolean> {
     if (await this.isFontReady(fontFamily)) {
       return true
     }
 
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       const startTime = Date.now()
 
       const checkFont = () => {
@@ -126,14 +130,14 @@ export class FontManager {
   /**
    * Get all available font families
    */
-  getAvailableFonts() {
+  getAvailableFonts(): string[] {
     return [...this.fontFamilies]
   }
 
   /**
    * Populate a select element with available fonts
    */
-  populateFontSelect(selectElement) {
+  populateFontSelect(selectElement: HTMLSelectElement): void {
     selectElement.innerHTML = ''
 
     this.fontFamilies.forEach((fontFamily) => {

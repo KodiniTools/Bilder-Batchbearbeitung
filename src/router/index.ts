@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 
-const isElectron = !!(window as Window & { electronAPI?: { isElectron?: boolean } }).electronAPI
-  ?.isElectron
+const isElectron = !!window.electronAPI?.isElectron
 
 const webRoutes = [
   {
