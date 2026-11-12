@@ -79,14 +79,6 @@ function fsWindow(): FileSystemAccessWindow {
   return window as unknown as FileSystemAccessWindow
 }
 
-export function supportsSaveFilePicker(): boolean {
-  return typeof fsWindow().showSaveFilePicker === 'function'
-}
-
-export function supportsDirectoryPicker(): boolean {
-  return typeof fsWindow().showDirectoryPicker === 'function'
-}
-
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError'
 }
