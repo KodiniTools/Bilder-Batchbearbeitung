@@ -16,22 +16,7 @@ const hasSelection = computed(() => imageStore.hasSelection)
 // Dropdown für Seitenverhältnis
 const isAspectRatioDropdownOpen = ref(false)
 
-// Dropdown für PDF-Export
-const isPdfDropdownOpen = ref(false)
-
-const togglePdfDropdown = () => {
-  isPdfDropdownOpen.value = !isPdfDropdownOpen.value
-}
-
-const closePdfDropdown = () => {
-  isPdfDropdownOpen.value = false
-}
-
 const emit = defineEmits<{
-  'export-pdf': ['all' | 'selected']
-  'export-zip': []
-  'export-svg': []
-  'save-images': []
   'bulk-rename': []
   'batch-edit': []
 }>()
@@ -56,28 +41,6 @@ const handleDelete = async () => {
   } else {
     toast.success(t('toast.imagesRemoved', { count }))
   }
-}
-
-const handleExportPdf = (mode: 'all' | 'selected') => {
-  emit('export-pdf', mode)
-}
-
-/** Dropdown-Eintrag: Export auslösen und Menü schließen */
-const selectPdfExport = (mode: 'all' | 'selected') => {
-  handleExportPdf(mode)
-  closePdfDropdown()
-}
-
-const handleExportZip = () => {
-  emit('export-zip')
-}
-
-const handleExportSvg = () => {
-  emit('export-svg')
-}
-
-const handleSaveImages = () => {
-  emit('save-images')
 }
 
 // Batch-Transformationen
@@ -338,75 +301,6 @@ const handleRedo = () => {
           </button>
         </div>
       </div>
-
-      <!-- Export -->
-      <div class="tool-group tool-group--export">
-        <span class="tool-group__label">{{ t('statusBar.groups.export') }}</span>
-        <div class="tool-group__buttons">
-          <!-- PDF mit Auswahlmenü -->
-          <div class="dropdown-wrapper">
-            <button
-              class="tool-btn tool-btn--menu"
-              type="button"
-              :class="{ active: isPdfDropdownOpen }"
-              :title="t('statusBar.tooltips.exportAllPdf')"
-              :aria-expanded="isPdfDropdownOpen"
-              @click="togglePdfDropdown"
-            >
-              <i class="fa-solid fa-file-pdf"></i>
-              <i class="fa-solid fa-chevron-down tool-btn__chevron"></i>
-            </button>
-            <div
-              v-if="isPdfDropdownOpen"
-              class="dropdown-menu dropdown-menu--right"
-              @mouseleave="closePdfDropdown"
-            >
-              <button class="dropdown-item" type="button" @click="selectPdfExport('all')">
-                <i class="fa-solid fa-images"></i>
-                <span>{{ t('statusBar.tooltips.exportAllPdf') }}</span>
-              </button>
-              <button
-                class="dropdown-item"
-                type="button"
-                :disabled="!hasSelection"
-                @click="selectPdfExport('selected')"
-              >
-                <i class="fa-solid fa-check-double"></i>
-                <span>{{ t('statusBar.tooltips.exportSelectedPdf') }}</span>
-              </button>
-            </div>
-          </div>
-
-          <button
-            class="tool-btn"
-            type="button"
-            :title="t('statusBar.tooltips.downloadZip')"
-            @click="handleExportZip"
-          >
-            <i class="fa-solid fa-file-zipper"></i>
-          </button>
-
-          <button
-            class="tool-btn"
-            type="button"
-            :title="t('statusBar.tooltips.exportSvg')"
-            @click="handleExportSvg"
-          >
-            <i class="fa-solid fa-bezier-curve"></i>
-          </button>
-
-          <button
-            class="tool-btn tool-btn--primary"
-            type="button"
-            :disabled="!hasSelection"
-            :title="t('statusBar.tooltips.saveSelected')"
-            @click="handleSaveImages"
-          >
-            <i class="fa-solid fa-download"></i>
-            <span class="tool-btn__text">{{ t('statusBar.buttons.save') }}</span>
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -609,25 +503,6 @@ const handleRedo = () => {
   color: var(--green);
 }
 
-/* Primäre Aktion mit Text */
-.tool-btn--primary {
-  padding: 0 12px;
-  margin-left: 2px;
-  background: var(--accent);
-  color: var(--accent-text);
-}
-
-.tool-btn--primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-  color: var(--accent-text);
-}
-
-.tool-btn__text {
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
 /* Dropdown */
 .dropdown-wrapper {
   position: relative;
@@ -645,11 +520,6 @@ const handleRedo = () => {
   box-shadow: var(--surface-elevation);
   z-index: 100;
   animation: dropdown-appear 0.18s var(--ease-smooth);
-}
-
-.dropdown-menu--right {
-  left: auto;
-  right: 0;
 }
 
 @keyframes dropdown-appear {
@@ -712,14 +582,6 @@ const handleRedo = () => {
 @container (max-width: 1000px) {
   .status-bar__row {
     column-gap: var(--space-2);
-  }
-
-  .tool-btn__text {
-    display: none;
-  }
-
-  .tool-btn--primary {
-    padding: 0 8px;
   }
 }
 

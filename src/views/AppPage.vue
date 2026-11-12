@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/AppHeader.vue'
 import StatusBar from '@/components/StatusBar.vue'
 import DropZone from '@/components/DropZone.vue'
+import ExportBar from '@/components/ExportBar.vue'
 import ImageGrid from '@/components/ImageGrid.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import ImageEditor from '@/components/ImageEditor.vue'
@@ -746,10 +747,6 @@ onUnmounted(() => {
       <main class="container">
         <StatusBar
           v-if="imageStore.hasImages"
-          @export-pdf="handleExportPdf"
-          @export-zip="handleExportZip"
-          @export-svg="handleExportSvg"
-          @save-images="handleSaveImages"
           @bulk-rename="handleBulkRename"
           @batch-edit="handleBatchEdit"
         />
@@ -758,6 +755,14 @@ onUnmounted(() => {
         <HandoffReceiver @accept="importHandoffImages" />
 
         <DropZone />
+
+        <!-- Exportoptionen: nur sichtbar, solange Bilder ausgewählt sind -->
+        <ExportBar
+          @export-pdf="handleExportPdf"
+          @export-zip="handleExportZip"
+          @export-svg="handleExportSvg"
+          @save-images="handleSaveImages"
+        />
 
         <ImageGrid
           v-if="imageStore.hasImages"

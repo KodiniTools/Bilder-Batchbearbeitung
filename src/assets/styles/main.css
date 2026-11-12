@@ -427,6 +427,7 @@ body
   .app-header,
   .app-footer,
   .status-bar,
+  .export-bar,
   .image-actions {
     display: none !important;
   }

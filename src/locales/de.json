@@ -291,8 +291,7 @@
       "selection": "Auswahl",
       "history": "Verlauf",
       "view": "Ansicht",
-      "edit": "Bearbeiten",
-      "export": "Export"
+      "edit": "Bearbeiten"
     },
     "images": "Bilder",
     "selected": "ausgewählt",
@@ -302,9 +301,6 @@
       "medium": "Mittlere Darstellung",
       "large": "Große Darstellung"
     },
-    "buttons": {
-      "save": "Speichern…"
-    },
     "tooltips": {
       "selectAll": "Alle auswählen/abwählen",
       "deleteSelected": "Auswahl löschen",
@@ -312,17 +308,31 @@
       "bulkRename": "Ausgewählte Bilder fortlaufend umbenennen",
       "aspectRatio": "Seitenverhältnis der ausgewählten Bilder anpassen",
       "reset": "Alle Bearbeitungen der ausgewählten Bilder rückgängig machen",
-      "exportSelectedPdf": "Auswahl als PDF exportieren",
-      "exportAllPdf": "Alle Bilder als PDF exportieren",
-      "saveSelected": "Ausgewählte Bilder in mehreren Formaten speichern",
-      "exportSvg": "Als SVG exportieren (Vektorisierung)",
-      "downloadZip": "Originale der Auswahl als ZIP herunterladen",
       "rotateLeft": "Ausgewählte Bilder 90° nach links drehen",
       "rotateRight": "Ausgewählte Bilder 90° nach rechts drehen",
       "flipH": "Ausgewählte Bilder horizontal spiegeln",
       "flipV": "Ausgewählte Bilder vertikal spiegeln",
       "undo": "Rückgängig (Strg+Z)",
       "redo": "Wiederherstellen (Strg+Umschalt+Z)"
+    }
+  },
+  "exportBar": {
+    "ariaLabel": "Export der Auswahl",
+    "title": "Export",
+    "selectedCount": "{count} Bild ausgewählt | {count} Bilder ausgewählt",
+    "buttons": {
+      "pdfSelected": "PDF (Auswahl)",
+      "pdfAll": "PDF (alle Bilder)",
+      "zip": "ZIP",
+      "svg": "SVG",
+      "save": "Speichern…"
+    },
+    "tooltips": {
+      "pdfSelected": "Auswahl als PDF exportieren",
+      "pdfAll": "Alle Bilder als PDF exportieren",
+      "zip": "Originale der Auswahl als ZIP herunterladen",
+      "svg": "Auswahl als SVG exportieren (Vektorisierung)",
+      "save": "Ausgewählte Bilder in mehreren Formaten speichern"
     }
   },
   "upload": {
