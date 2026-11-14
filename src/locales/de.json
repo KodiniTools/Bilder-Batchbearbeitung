@@ -1,8 +1,8 @@
 {
   "seo": {
     "home": {
-      "title": "Bilderserie Bearbeiten - Batch Bildbearbeitung Online | KodiniTools",
-      "description": "Bearbeiten, konvertieren und exportieren Sie mehrere Bilder gleichzeitig direkt im Browser. Schnell, privat und modern - ohne Upload auf Server."
+      "title": "Mehrere Bilder gleichzeitig verkleinern – Batch online | KodiniTools",
+      "description": "Mehrere Bilder gleichzeitig verkleinern, umbenennen und mit Wasserzeichen versehen: 100+ Bilder, direkt im Browser. Export als ZIP oder PDF, kostenlos."
     },
     "app": {
       "title": "Mehrere Bilder gleichzeitig bearbeiten - Batch Editor | KodiniTools",
@@ -30,7 +30,7 @@
       "articles": "Blog"
     },
     "hero": {
-      "title": "Professionelle Bildbearbeitung direkt im Browser",
+      "title": "Mehrere Bilder gleichzeitig bearbeiten – direkt im Browser",
       "subtitle": "Bearbeiten, konvertieren und exportieren Sie beliebig viele Bilder gleichzeitig. Vollständig lokal, 100% privat, keine Server-Uploads.",
       "cta": "Jetzt starten",
       "previewAlt": "Animierte Vorschau der App: Bilder auswählen, Export-Leiste, Preset „Warm“ in der Stapelbearbeitung und Wasserzeichen auf allen ausgewählten Bildern",
