@@ -4,8 +4,10 @@ import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { faIconSubset, inlineEntryCss } from './vite-plugins/critical-css'
 import { base64Asset } from './vite-plugins/base64-asset'
+import { localizedHtml } from './vite-plugins/localized-html'
 
 const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
+const readJson = (path: string) => JSON.parse(readFileSync(path, 'utf-8'))
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,6 +19,10 @@ export default defineConfig({
     inlineEntryCss(),
     // PDF-Schriften als Base64-Chunks (src/lib/features/pdf-fonts.ts)
     base64Asset(),
+    // seo/<route>.<lang>.html mit fertigem Meta für Crawler ohne JS (NGINX: DEPLOY.md)
+    localizedHtml({
+      messages: { de: readJson('./src/locales/de.json'), en: readJson('./src/locales/en.json') },
+    }),
   ],
   resolve: {
     alias: {

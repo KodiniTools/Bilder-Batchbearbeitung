@@ -1,24 +1,7 @@
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-
-const BASE_URL = 'https://kodinitools.com/bilderseriebearbeiten'
-
-const routeSeoConfig: Record<string, { titleKey: string; descriptionKey: string; path: string }> = {
-  home: { titleKey: 'seo.home.title', descriptionKey: 'seo.home.description', path: '/' },
-  app: { titleKey: 'seo.app.title', descriptionKey: 'seo.app.description', path: '/app' },
-  faq: { titleKey: 'seo.faq.title', descriptionKey: 'seo.faq.description', path: '/faq' },
-  blog: { titleKey: 'seo.blog.title', descriptionKey: 'seo.blog.description', path: '/blog' },
-  articles: {
-    titleKey: 'seo.articles.title',
-    descriptionKey: 'seo.articles.description',
-    path: '/artikel',
-  },
-}
-
-function routeUrl(path: string): string {
-  return path === '/' ? `${BASE_URL}/` : `${BASE_URL}${path}`
-}
+import { routeSeoConfig, routeUrls } from '@/lib/core/seo-routes'
 
 function updateMetaTag(name: string, content: string, attribute: 'name' | 'property' = 'name') {
   const element = document.querySelector(`meta[${attribute}="${name}"]`)
@@ -44,8 +27,7 @@ export function useSeoMeta() {
 
     const title = t(config.titleKey)
     const description = t(config.descriptionKey)
-    const deUrl = routeUrl(config.path)
-    const enUrl = `${deUrl}${config.path === '/' ? '' : ''}?lang=en`
+    const { deUrl, enUrl } = routeUrls(config.path)
     const canonicalUrl = locale.value === 'en' ? enUrl : deUrl
 
     // Basic meta
