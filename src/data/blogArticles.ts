@@ -82,7 +82,7 @@ export const blogArticles: readonly BlogArticle[] = [
       en: 'Single Image Editor: Edit, Compare & Export One Photo in Detail',
     },
     description: {
-      de: '8 Presets, 11 Filter, Vorher-Nachher-Vergleich, Text mit Umrandung und Schatten, Zuschneiden, Begradigen, Grösse ändern und Export als PNG, JPEG, WebP oder PDF – ohne Upload.',
+      de: '8 Presets, 11 Filter, Vorher-Nachher-Vergleich, Text mit Umrandung und Schatten, Zuschneiden, Begradigen, Größe ändern und Export als PNG, JPEG, WebP oder PDF – ohne Upload.',
       en: '8 presets, 11 filters, before/after comparison, text with stroke and shadow, crop, straighten, resize and export as PNG, JPEG, WebP or PDF — no upload.',
     },
   },
@@ -104,7 +104,7 @@ export const blogArticles: readonly BlogArticle[] = [
       en: 'Watermark Multiple Images at Once: Protect Hundreds of Photos in One Pass',
     },
     description: {
-      de: 'Text-Wasserzeichen mit Schriftart, Grösse, Farbe, Deckkraft, Drehung und Position einmal einstellen, live auf allen ausgewählten Bildern prüfen und als ZIP exportieren – ohne Upload.',
+      de: 'Text-Wasserzeichen mit Schriftart, Größe, Farbe, Deckkraft, Drehung und Position einmal einstellen, live auf allen ausgewählten Bildern prüfen und als ZIP exportieren – ohne Upload.',
       en: 'Set a text watermark with font, size, color, opacity, rotation and position once, check it live on all selected images and export as ZIP — no upload.',
     },
   },
