@@ -5,20 +5,48 @@
       "description": "Mehrere Bilder gleichzeitig verkleinern, umbenennen und mit Wasserzeichen versehen: 100+ Bilder, direkt im Browser. Export als ZIP oder PDF, kostenlos."
     },
     "app": {
-      "title": "Mehrere Bilder gleichzeitig bearbeiten - Batch Editor | KodiniTools",
-      "description": "Laden Sie Ihre Bilder hoch und bearbeiten Sie sie direkt im Browser. Filter anwenden, Größe ändern, konvertieren und als PDF, ZIP oder SVG exportieren."
+      "title": "Mehrere Bilder gleichzeitig bearbeiten – Batch-Editor | KodiniTools",
+      "description": "Bilder laden und direkt im Browser bearbeiten: Filter, Größe ändern, Wasserzeichen, Umbenennen. Export als PDF, ZIP, SVG, JPG, PNG oder WebP, ohne Upload."
     },
     "faq": {
-      "title": "FAQ - Häufige Fragen zur Batch-Bildbearbeitung | KodiniTools",
-      "description": "Antworten auf häufig gestellte Fragen zur Online-Bildbearbeitung: Formate, Export, Datenschutz und mehr."
+      "title": "FAQ – Häufige Fragen zur Batch-Bildbearbeitung | KodiniTools",
+      "description": "Antworten auf häufige Fragen zur Batch-Bildbearbeitung im Browser: Bildformate, Export als ZIP oder PDF, Speichern, Datenschutz und mehr."
     },
     "blog": {
       "title": "Bilder-Batchbearbeitung: Funktionen und Anleitung | KodiniTools",
-      "description": "Entdecken Sie alle Funktionen: Batch-Filter, PDF-Export mit Designer, SVG-Konvertierung, Stapelumbenennung und mehr."
+      "description": "Alle Funktionen im Überblick: Filter und Presets, Größe ändern, Wasserzeichen, Rezepte, Stapelumbenennung, PDF-Designer und SVG-Export."
     },
     "articles": {
       "title": "Blog-Artikel zu Bilderserie bearbeiten | KodiniTools",
       "description": "Anleitungen und Tipps aus dem KodiniTools-Blog rund um die Batch-Bildbearbeitung: Wasserzeichen, Grösse ändern, Export und mehr."
+    },
+    "keywords": "mehrere Bilder gleichzeitig verkleinern, Bildgrösse ändern mehrere Bilder, Wasserzeichen mehrere Bilder, Bilder Stapelverarbeitung, Batch Bildbearbeitung, mehrere Bilder umbenennen, Bilder zu PDF, Bilder als ZIP, JPG, PNG, WebP",
+    "imageAlt": "Bilderserie Bearbeiten von KodiniTools: Editor mit ausgewählten Bildern, Stapelbearbeitung und Export-Leiste",
+    "structured": {
+      "name": "Bilderserie Bearbeiten",
+      "alternateName": ["Batch-Bildbearbeitung", "Bilder-Batchbearbeitung"],
+      "description": "Kostenlose Web-App zur Stapelverarbeitung von Bildern: mehrere Bilder gleichzeitig verkleinern, umbenennen, mit Filtern und Wasserzeichen versehen und als ZIP, PDF, SVG, JPG, PNG oder WebP exportieren. Alles läuft lokal im Browser, ohne Upload auf einen Server.",
+      "featureList": [
+        "Mehrere Bilder gleichzeitig bearbeiten",
+        "Größe ändern: exakt, in Prozent, nach langer Kante oder eingepasst",
+        "Filter und Presets für alle ausgewählten Bilder",
+        "Wasserzeichen als Text oder Logo",
+        "Stapelumbenennung mit Mustern und Nummerierung",
+        "Drehen, Spiegeln und Zuschneiden",
+        "Rezepte: Einstellungen speichern und erneut anwenden",
+        "Export als JPG, PNG oder WebP mit maximaler Dateigröße",
+        "ZIP-Download und ZIP-Import",
+        "PDF-Export mit Designer für Start- und Kommentarseiten",
+        "SVG-Export durch Vektorisierung",
+        "Lokale Verarbeitung im Browser, kein Upload"
+      ],
+      "breadcrumb": {
+        "root": "KodiniTools",
+        "app": "Editor",
+        "faq": "FAQ",
+        "blog": "Funktionen",
+        "articles": "Blog"
+      }
     }
   },
   "landing": {
@@ -470,23 +498,23 @@
     },
     "q3": {
       "question": "Wie speichere ich die bearbeiteten Bilder?",
-      "answer": "Wählen Sie die gewünschten Bilder durch einen Klick auf die Karten aus und klicken Sie dann in der oberen Leiste auf \"Speichern...\". Sie können auch mehrere Formate gleichzeitig oder eine ZIP-Datei herunterladen."
+      "answer": "Wählen Sie die gewünschten Bilder durch einen Klick auf die Karten aus. Über dem Raster erscheint dann die Export-Leiste. Klicken Sie dort auf \"Speichern…\", um die Bilder als JPG, PNG oder WebP zu speichern, auch in mehreren Formaten gleichzeitig."
     },
     "q4": {
       "question": "Welche Bildformate werden unterstützt?",
-      "answer": "Die Anwendung unterstützt die gängigsten Formate wie PNG, JPEG, WebP, BMP und GIF, abhängig von der Unterstützung Ihres Browsers."
+      "answer": "Sie können die gängigsten Formate wie JPEG, PNG, WebP, GIF, BMP und AVIF laden, abhängig von der Unterstützung Ihres Browsers, außerdem ZIP-Archive mit Bildern. Speichern lassen sich die Bilder als JPG, PNG, WebP, SVG, PDF oder ZIP."
     },
     "q5": {
       "question": "Kann ich mehrere Bilder gleichzeitig als ZIP-Datei herunterladen?",
-      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann auf die Schaltfläche \"ZIP\" in der Werkzeugleiste. Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
+      "answer": "Ja. Wählen Sie die Bilder aus, die Sie exportieren möchten, und klicken Sie dann in der Export-Leiste auf \"ZIP\". Alle ausgewählten Bilder werden in einer einzigen ZIP-Datei zusammengefasst."
     },
     "q6": {
       "question": "Wie erstelle ich eine PDF-Datei aus meinen Bildern?",
-      "answer": "Sie können entweder alle Bilder (\"Alle → PDF\") oder nur die ausgewählten Bilder (\"Auswahl → PDF\") als PDF exportieren. In den PDF-Einstellungen können Sie das Layout weiter anpassen."
+      "answer": "Wählen Sie mindestens ein Bild aus. In der Export-Leiste exportieren Sie dann entweder nur die Auswahl (\"PDF (Auswahl)\") oder alle Bilder (\"PDF (alle Bilder)\"). In den PDF-Einstellungen können Sie Seitenformat und Layout anpassen sowie Start- und Kommentarseiten gestalten."
     },
     "q7": {
       "question": "Was passiert, wenn ich das Browserfenster schließe?",
-      "answer": "Da alle Bilder nur lokal im Browser gehalten werden, gehen sie verloren, wenn Sie die Seite neu laden oder das Fenster schließen. Speichern Sie Ihre bearbeiteten Bilder rechtzeitig."
+      "answer": "Ihre Bilderserie wird lokal in Ihrem Browser zwischengespeichert und beim nächsten Öffnen wiederhergestellt. Sie verlässt dabei nie Ihr Gerät. Wenn Sie die Browserdaten löschen oder ein privates Fenster verwenden, geht sie verloren. Speichern Sie Ihre bearbeiteten Bilder daher rechtzeitig."
     },
     "q8": {
       "question": "Wie entferne ich Bilder aus der Liste?",

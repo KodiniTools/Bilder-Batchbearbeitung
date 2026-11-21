@@ -20,9 +20,9 @@ export default [
     },
   },
 
-  // Electron main/preload: CommonJS with Node globals (require, process, __dirname)
+  // Electron main/preload und Node-Skripte: CommonJS with Node globals (require, process, __dirname)
   {
-    files: ['electron/**/*.cjs'],
+    files: ['electron/**/*.cjs', 'scripts/**/*.cjs'],
     languageOptions: {
       sourceType: 'commonjs',
       globals: {
