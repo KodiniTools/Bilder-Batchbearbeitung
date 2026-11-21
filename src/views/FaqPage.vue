@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { readStoredTheme, applyTheme } from '@/utils/theme'
+import { FAQ_QUESTION_COUNT } from '@/lib/core/seo-structured-data'
 
 const { locale, t } = useI18n()
 const router = useRouter()
@@ -59,7 +60,7 @@ onMounted(() => {
 
         <!-- FAQ List -->
         <div class="faq-list">
-          <details v-for="i in 8" :key="i" class="faq-item">
+          <details v-for="i in FAQ_QUESTION_COUNT" :key="i" class="faq-item">
             <summary>{{ t(`faq.q${i}.question`) }}</summary>
             <!-- eslint-disable-next-line vue/no-v-html -- content is from static i18n translation files, not user input -->
             <p v-html="t(`faq.q${i}.answer`)"></p>

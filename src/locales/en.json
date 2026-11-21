@@ -5,20 +5,48 @@
       "description": "Batch resize images, rename them and add a watermark to multiple photos at once: 100+ images, right in your browser. Export as ZIP or PDF, free."
     },
     "app": {
-      "title": "Edit Multiple Images at Once - Batch Editor | KodiniTools",
-      "description": "Upload your images and edit them directly in the browser. Apply filters, resize, convert, and export as PDF, ZIP, or SVG."
+      "title": "Edit Multiple Images at Once – Batch Editor | KodiniTools",
+      "description": "Load your images and edit them right in the browser: filters, resizing, watermarks, renaming. Export as PDF, ZIP, SVG, JPG, PNG or WebP, no upload."
     },
     "faq": {
-      "title": "FAQ - Frequently Asked Questions about Batch Image Editing | KodiniTools",
-      "description": "Answers to common questions about online image editing: formats, export, privacy, and more."
+      "title": "FAQ – Batch Image Editing Questions | KodiniTools",
+      "description": "Answers to common questions about batch image editing in the browser: image formats, export as ZIP or PDF, saving, privacy and more."
     },
     "blog": {
       "title": "Batch Image Editor: Features and Guide | KodiniTools",
-      "description": "Discover all features: batch filters, PDF export with designer, SVG conversion, bulk renaming, and more."
+      "description": "All features at a glance: filters and presets, resizing, watermarks, recipes, bulk renaming, PDF designer and SVG export."
     },
     "articles": {
       "title": "Blog Articles on the Batch Image Editor | KodiniTools",
       "description": "Guides and tips from the KodiniTools blog about batch image editing: watermarks, resizing, export and more."
+    },
+    "keywords": "batch resize images, bulk image editor, resize multiple images, watermark multiple photos, bulk rename images, batch image processing, images to PDF, images to ZIP, JPG, PNG, WebP",
+    "imageAlt": "Batch Image Editor by KodiniTools: editor with selected images, batch editing and export bar",
+    "structured": {
+      "name": "Batch Image Editor",
+      "alternateName": ["Bilderserie Bearbeiten", "Bulk Image Editor"],
+      "description": "Free web app for batch image processing: resize multiple images at once, rename them, apply filters and watermarks, and export as ZIP, PDF, SVG, JPG, PNG or WebP. Everything runs locally in your browser, nothing is uploaded to a server.",
+      "featureList": [
+        "Edit multiple images at once",
+        "Resize: exact, by percent, by long edge or fit to frame",
+        "Filters and presets for all selected images",
+        "Watermark as text or logo",
+        "Bulk renaming with patterns and numbering",
+        "Rotate, flip and crop",
+        "Recipes: save settings and apply them again",
+        "Export as JPG, PNG or WebP with a maximum file size",
+        "ZIP download and ZIP import",
+        "PDF export with a designer for cover and comment pages",
+        "SVG export through vectorization",
+        "Local processing in the browser, no upload"
+      ],
+      "breadcrumb": {
+        "root": "KodiniTools",
+        "app": "Editor",
+        "faq": "FAQ",
+        "blog": "Features",
+        "articles": "Blog"
+      }
     }
   },
   "landing": {
@@ -295,23 +323,23 @@
     },
     "q3": {
       "question": "How do I save the edited images?",
-      "answer": "Select the desired images by clicking on their cards, then click \"Save As…\" in the top bar."
+      "answer": "Select the desired images by clicking on their cards. The export bar then appears above the grid. Click \"Save As…\" there to save the images as JPG, PNG or WebP, in several formats at once if you like."
     },
     "q4": {
       "question": "Which image formats are supported?",
-      "answer": "The application supports PNG, JPEG, WebP, BMP, and GIF, depending on your browser's capabilities."
+      "answer": "You can load the most common formats such as JPEG, PNG, WebP, GIF, BMP and AVIF, depending on your browser's capabilities, as well as ZIP archives containing images. Images can be saved as JPG, PNG, WebP, SVG, PDF or ZIP."
     },
     "q5": {
       "question": "Can I download multiple images as a ZIP file?",
-      "answer": "Yes. Select the images and click the \"ZIP\" button in the toolbar."
+      "answer": "Yes. Select the images you want to export and click \"ZIP\" in the export bar. All selected images are combined into a single ZIP file."
     },
     "q6": {
       "question": "How do I create a PDF file from my images?",
-      "answer": "You can export either all images or selected ones as PDF using the respective buttons."
+      "answer": "Select at least one image. In the export bar you can then export either only the selection (\"PDF (selection)\") or all images (\"PDF (all images)\"). In the PDF settings you can adjust page format and layout and design cover and comment pages."
     },
     "q7": {
       "question": "What happens if I close the browser window?",
-      "answer": "All images are stored locally, so they will be lost if you close the window. Save your work regularly."
+      "answer": "Your image series is cached locally in your browser and restored the next time you open the app. It never leaves your device. If you clear your browser data or use a private window, it is lost, so save your edited images in good time."
     },
     "q8": {
       "question": "How do I remove images from the list?",

@@ -1,12 +1,14 @@
 {
   "name": "Bilderserie Bearbeiten",
-  "short_name": "KodiniTools",
-  "description": "Mehrere Bilder gleichzeitig bearbeiten, konvertieren und exportieren – direkt im Browser.",
+  "short_name": "Bilderserie",
+  "description": "Mehrere Bilder gleichzeitig verkleinern, umbenennen, mit Wasserzeichen versehen und exportieren – direkt im Browser, ohne Upload.",
   "start_url": "/bilderseriebearbeiten/app",
+  "scope": "/bilderseriebearbeiten/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#6366f1",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
   "lang": "de",
+  "categories": ["photo", "productivity", "utilities"],
   "icons": [
     {
       "src": "/bilderseriebearbeiten/icons/icon-192.png",
