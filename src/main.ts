@@ -20,6 +20,8 @@ import './assets/styles/main.css'
 import './assets/styles/kodini-layout-stage1.css'
 // Kopfzeilen Design-Umbau Etappe 2
 import './assets/styles/kodini-header-stage2.css'
+// Alle Text-Buttons dunkelgold mit weisser Schrift
+import './assets/styles/kodini-buttons.css'
 
 // Create i18n instance
 const i18n = createI18n({

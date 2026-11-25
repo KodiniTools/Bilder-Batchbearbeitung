@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Text-Buttons · dunkelgold mit weisser Schrift
+   --------------------------------------------------------------------------
+   Vorgabe Kodini: Alle beschrifteten Buttons sind dunkelgold mit weisser
+   Schrift. Gefüllte Primär-Buttons nutzen die Tokens bereits in ihren scoped
+   Styles; diese Liste stellt die bisher ungefüllten Text-Buttons (Neben-
+   aktionen wie Abbrechen, PDF, ZIP, SVG, Rückgängig) zentral um.
+
+   Bewusst ausgenommen, weil ihr Zustand sonst nicht mehr erkennbar wäre:
+   Navigation (.nav-link), Tabs, Sprach-/Theme-Umschalter, Auswahl-Chips
+   und Presets, Umschalter (B/I, Vergleich), Listeneinträge, Text-Links,
+   reine Icon-Werkzeuge sowie rote Lösch-Buttons (Danger).
+
+   #app-Spezifität überschreibt die scoped Styles. Werte nur aus Tokens.
+   ========================================================================== */
+
+#app
+  :is(
+    .btn-history,
+    .btn-secondary,
+    .confirm-btn--secondary,
+    .export-btn,
+    .logo-btn:not(.logo-btn--danger),
+    .designer-btn,
+    .clear-btn,
+    .btn-dismiss,
+    .cancel-btn,
+    .search-select,
+    .btn-home,
+    .btn-preview,
+    .btn-apply-resize,
+    .arrange-btn--wide,
+    .bg-btn:not(.bg-btn--remove),
+    .ptb-action:not(.danger),
+    .tpl-btn:not(.tpl-btn--danger),
+    .tool-section .tool-btn:not(.danger),
+    .shape-btn,
+    .wm-logo__btn,
+    .btn:is(.btn-sm, .btn-icon-sm, .btn-apply-resize):not(.btn-danger),
+    .editor-footer .btn,
+    .modal-footer .btn
+  ) {
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
+  color: var(--batch-on-action);
+}
+
+#app
+  :is(
+    .btn-history,
+    .btn-secondary,
+    .confirm-btn--secondary,
+    .export-btn,
+    .logo-btn:not(.logo-btn--danger),
+    .designer-btn,
+    .clear-btn,
+    .btn-dismiss,
+    .cancel-btn,
+    .search-select,
+    .btn-home,
+    .btn-preview,
+    .btn-apply-resize,
+    .arrange-btn--wide,
+    .bg-btn:not(.bg-btn--remove),
+    .ptb-action:not(.danger),
+    .tpl-btn:not(.tpl-btn--danger),
+    .tool-section .tool-btn:not(.danger),
+    .shape-btn,
+    .wm-logo__btn,
+    .btn:is(.btn-sm, .btn-icon-sm, .btn-apply-resize):not(.btn-danger),
+    .editor-footer .btn,
+    .modal-footer .btn
+  ):hover:not(:disabled) {
+  background: var(--batch-action-hover);
+  border-color: var(--batch-action-hover);
+  color: var(--batch-on-action);
+}
+
+/* Icons übernehmen die weisse Schrift (einige Buttons färben sie gold) */
+#app
+  :is(
+    .btn-history,
+    .btn-secondary,
+    .confirm-btn--secondary,
+    .export-btn,
+    .logo-btn:not(.logo-btn--danger),
+    .designer-btn,
+    .clear-btn,
+    .btn-dismiss,
+    .cancel-btn,
+    .search-select,
+    .btn-home,
+    .btn-preview,
+    .btn-apply-resize,
+    .arrange-btn--wide,
+    .bg-btn:not(.bg-btn--remove),
+    .ptb-action:not(.danger),
+    .tpl-btn:not(.tpl-btn--danger),
+    .tool-section .tool-btn:not(.danger),
+    .shape-btn,
+    .wm-logo__btn,
+    .btn:is(.btn-sm, .btn-icon-sm, .btn-apply-resize):not(.btn-danger),
+    .editor-footer .btn,
+    .modal-footer .btn
+  )
+  :is(i, svg) {
+  color: inherit;
+}
