@@ -22,6 +22,8 @@ import './assets/styles/kodini-layout-stage1.css'
 import './assets/styles/kodini-header-stage2.css'
 // Bedienfelder und Dialoge Design-Umbau Etappe 3 (vor kodini-buttons.css)
 import './assets/styles/kodini-controls-stage3.css'
+// Bildraster, Vorschau und Editor-Arbeitsflächen Design-Umbau Etappe 4
+import './assets/styles/kodini-workspace-stage4.css'
 // Alle Text-Buttons dunkelgold mit weisser Schrift
 import './assets/styles/kodini-buttons.css'
 
