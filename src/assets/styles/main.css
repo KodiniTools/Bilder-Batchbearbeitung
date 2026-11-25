@@ -299,6 +299,15 @@ body > :not(#app):not(script) [class*='megamenu'] {
   background-color: var(--ds-surface-1) !important;
 }
 
+/* Aktive Sprache im Umschalter der SSI-Navigation: Die Regel oben nimmt auch
+   ihr die Fläche, die Markierung wäre unsichtbar. Dunkelgold mit weisser
+   Schrift wie die übrigen aktiven Bedienelemente der App. Das zweite :not(#…)
+   hebt die Spezifität über die Textfarben-Regel der Partials weiter unten. */
+body > :not(#app):not(#modal-portal):not(script) [class*='lang-btn'].active {
+  background-color: var(--batch-action-fill) !important;
+  color: var(--batch-on-action) !important;
+}
+
 /* ── Hamburger / Toggle-Menü in der SSI-Navigation ── */
 /* 1. Leere Spans sind dekorative Elemente (Hamburger-Balken via background-color) */
 body > :not(#app):not(script) span:empty {
