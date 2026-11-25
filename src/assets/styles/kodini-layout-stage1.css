@@ -10,6 +10,24 @@
    aussen vor; die Spezifität überschreibt die scoped Styles der Views gezielt.
    ========================================================================== */
 
+/* Supreme Regular als einzige UI-Schrift (wie die SSI-Navigation auf kodinitools.com).
+   Eigener Familienname, damit die Variable-Font 'Supreme' für Wasserzeichen/PDF
+   (src/lib/core/custom-fonts.ts) unberührt bleibt. */
+@font-face {
+  font-family: 'Supreme UI';
+  src: url('../fonts/Supreme-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+#app {
+  --ds-font-sans: var(--batch-font-ui);
+  font-family: var(--ds-font-sans);
+  font-weight: var(--ds-weight-regular);
+  font-synthesis: none;
+}
+
 #app
   :is(
     h1,

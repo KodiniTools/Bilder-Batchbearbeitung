@@ -122,8 +122,9 @@
 
 /* =============================
    Grundlayout (Design-Umbau Etappe 1)
-   Tokens für src/assets/styles/kodini-layout-stage1.css: Blau-Cyan-Verläufe für
-   Startseite und Arbeitsfläche, dunkelgoldener Startbutton, Seitenbreite.
+   Tokens für kodini-layout-stage1.css (Etappe 1: Blau-Cyan-Verläufe,
+   dunkelgoldener Startbutton, Seitenbreite, Schrift) und
+   kodini-header-stage2.css (Etappe 2: einheitliche Kopfzeilen).
    Die Verläufe setzen sich aus den Farb-Tokens zusammen; Light überschreibt nur
    die Farben, weil var() auf :root aufgelöst wird, wo auch das Theme wechselt.
    ============================= */
@@ -163,6 +164,19 @@
   --batch-hero-preview-stacked-width: 36rem;
   --batch-section-space: clamp(2rem, 5vw, 4rem);
   --batch-workspace-space-bottom: clamp(1.5rem, 4vw, 3rem);
+
+  /* Schrift (Supreme Regular, @font-face in kodini-layout-stage1.css) */
+  --batch-font-ui: 'Supreme UI', sans-serif;
+
+  /* Kopfzeilen (Etappe 2): leicht blau getönte Fläche, Hover und Rahmen */
+  --batch-header-tint: #3c98b9;
+  --batch-header-bg: color-mix(in srgb, var(--ds-surface-1) 94%, var(--batch-header-tint));
+  --batch-header-hover: color-mix(in srgb, var(--ds-surface-2) 88%, var(--batch-header-tint));
+  --batch-header-border: color-mix(in srgb, var(--ds-border) 78%, var(--batch-header-tint));
+  --batch-header-gap: clamp(var(--ds-space-2), 1.5vw, var(--ds-space-5));
+  --batch-touch-target: 44px;
+  --batch-focus-outline: 2px solid var(--ds-accent);
+  --batch-focus-offset: 2px;
 }
 
 :root[data-theme='light'] {

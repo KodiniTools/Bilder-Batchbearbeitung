@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Kopfzeilen · Design-Umbau Etappe 2
+   --------------------------------------------------------------------------
+   Startseite, Arbeitsfläche, FAQ, Blog und Artikelübersicht nutzen dieselbe
+   Fläche, dieselben Abstände und dieselben Bedienelemente.
+
+   Sprach- und Theme-Umschalter (.local-header-preferences) erscheinen lokal
+   (Vite, Electron). Auf dem Webserver bindet SSI die globale Navigation als
+   body > .global-nav ein; sie übernimmt dann Logo, Sprache und Theme, und die
+   lokalen Umschalter werden ausgeblendet.
+
+   Alle Werte kommen aus Tokens (--ds-* in tokens-v2.css, --batch-* in main.css).
+   ========================================================================== */
+
+#app :is(.landing-nav, .faq-nav, .blog-nav, .articles-nav, .app-header) {
+  background: var(--batch-header-bg);
+  border-bottom-color: var(--batch-header-border);
+}
+
+#app :is(.landing-nav, .faq-nav, .blog-nav, .articles-nav) .nav-container,
+#app .app-header__limiter {
+  max-width: var(--batch-page-width);
+  margin-inline: auto;
+  gap: var(--batch-header-gap);
+}
+
+#app .app-header {
+  padding-inline: var(--batch-page-gutter);
+}
+
+#app .nav-links {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#app :is(.nav-links .nav-link, .app-header .home-btn, .local-header-preferences button) {
+  min-height: var(--batch-touch-target);
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-text);
+  font-weight: var(--ds-weight-regular);
+}
+
+#app :is(.nav-links .nav-link, .app-header .home-btn, .local-header-preferences button):hover {
+  background: var(--batch-header-hover);
+  border-color: var(--batch-header-border);
+  color: var(--ds-text);
+}
+
+#app :is(.nav-links .nav-link.primary, .local-header-preferences .lang-toggle.active) {
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+}
+
+#app :is(.nav-links .nav-link.primary, .local-header-preferences .lang-toggle.active):hover {
+  background: var(--batch-action-hover);
+  color: var(--batch-on-action);
+}
+
+#app
+  :is(.nav-links .nav-link, .app-header .home-btn, .local-header-preferences button):focus-visible {
+  outline: var(--batch-focus-outline);
+  outline-offset: var(--batch-focus-offset);
+}
+
+#app .app-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Webserver: SSI-Navigation vorhanden → lokale Umschalter ausblenden */
+body:has(> .global-nav) #app .local-header-preferences {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #app .landing-nav .nav-container {
+    justify-content: center;
+  }
+
+  body:has(> .global-nav) #app .app-header__limiter {
+    flex-wrap: nowrap;
+  }
+
+  body:has(> .global-nav) #app .app-header__title-container {
+    flex: 1;
+    order: 0;
+    margin-bottom: 0;
+  }
+
+  body:has(> .global-nav) #app .app-header__trailing {
+    flex: 0 0 var(--batch-touch-target);
+  }
+}
