@@ -8,7 +8,6 @@ import HeroPreview from '@/components/landing/HeroPreview.vue'
 const { locale, t } = useI18n()
 const router = useRouter()
 
-const isElectron = !!window.electronAPI?.isElectron
 const theme = ref<'light' | 'dark'>('light')
 
 const goToApp = () => {
@@ -66,11 +65,12 @@ onMounted(() => {
           <button class="nav-link" @click="goToFaq">{{ t('landing.nav.faq') }}</button>
           <button class="nav-link" @click="goToArticles">{{ t('landing.nav.articles') }}</button>
         </div>
-        <!-- In Electron: eigene Sprach-/Theme-Umschalter (SSI nav fehlt) -->
-        <div v-if="isElectron" class="nav-actions">
+        <!-- Lokale Umschalter für Electron und Instanzen ohne SSI-Navigation -->
+        <div class="nav-actions local-header-preferences">
           <button
             class="lang-toggle"
             :class="{ active: locale === 'de' }"
+            :aria-pressed="locale === 'de'"
             title="Deutsch"
             @click="setLanguage('de')"
           >
@@ -79,12 +79,19 @@ onMounted(() => {
           <button
             class="lang-toggle"
             :class="{ active: locale === 'en' }"
+            :aria-pressed="locale === 'en'"
             title="English"
             @click="setLanguage('en')"
           >
             EN
           </button>
-          <button class="theme-toggle" :title="t('header.themeToggle')" @click="toggleTheme">
+          <button
+            class="theme-toggle"
+            :title="t('header.themeToggle')"
+            :aria-label="t('header.themeToggle')"
+            :aria-pressed="theme === 'dark'"
+            @click="toggleTheme"
+          >
             {{ theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF13' }}
           </button>
         </div>
