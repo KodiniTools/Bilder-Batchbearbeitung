@@ -16,6 +16,8 @@ import '@fortawesome/fontawesome-free/css/solid.min.css'
 // Import global styles
 import './assets/styles/fonts.css'
 import './assets/styles/main.css'
+// Grundlayout Design-Umbau Etappe 1 (nach main.css, überschreibt scoped View-Styles gezielt)
+import './assets/styles/kodini-layout-stage1.css'
 
 // Create i18n instance
 const i18n = createI18n({
