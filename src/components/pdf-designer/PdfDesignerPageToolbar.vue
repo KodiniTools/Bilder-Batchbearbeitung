@@ -263,9 +263,9 @@ function resetDrag() {
 }
 
 .ptb-btn:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-color: var(--batch-action-fill);
 }
 
 .ptb-btn:disabled {
@@ -333,8 +333,8 @@ function resetDrag() {
 }
 
 .ptb-thumb.active .ptb-thumb-number {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .ptb-info {
@@ -373,14 +373,14 @@ function resetDrag() {
 }
 
 .ptb-action.primary {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   border-color: transparent;
 }
 
 .ptb-action.primary:hover:not(:disabled) {
   opacity: 0.9;
-  color: var(--accent-text);
+  color: var(--batch-on-action);
 }
 
 .ptb-action.danger {

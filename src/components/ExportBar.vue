@@ -174,19 +174,19 @@ const emit = defineEmits<{
 }
 
 .export-btn--primary {
-  border-color: var(--ds-accent);
-  background: var(--ds-accent);
-  color: var(--ds-on-accent);
+  border-color: var(--batch-action-fill);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .export-btn--primary i {
-  color: var(--ds-on-accent);
+  color: var(--batch-on-action);
 }
 
 .export-btn--primary:hover {
-  border-color: var(--ds-accent-hover);
-  background: var(--ds-accent-hover);
-  color: var(--ds-on-accent);
+  border-color: var(--batch-action-hover);
+  background: var(--batch-action-hover);
+  color: var(--batch-on-action);
 }
 
 /* Ein-/Ausblenden */

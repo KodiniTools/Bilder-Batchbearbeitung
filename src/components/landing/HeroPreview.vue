@@ -275,8 +275,8 @@ defineExpose({ step })
   width: 1.6cqw;
   height: 1.6cqw;
   border-radius: var(--ds-radius-full);
-  background: var(--ds-accent);
-  color: var(--ds-on-accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 0.85cqw;
   font-weight: var(--ds-weight-bold);
 }

@@ -243,9 +243,9 @@ function onHeightInput(value: number) {
 
 .resize-mode--active,
 .resize-mode--active:hover {
-  border-color: var(--ds-accent);
-  background: var(--ds-accent);
-  color: var(--ds-on-accent);
+  border-color: var(--batch-action-fill);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .resize-mode:has(.resize-mode__input:focus-visible) {

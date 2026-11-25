@@ -253,7 +253,7 @@ watch(
   position: absolute;
   width: 16px;
   height: 16px;
-  background: var(--accent);
+  background: var(--batch-action-fill);
   border: 2.5px solid white;
   border-radius: 50%;
   pointer-events: all;

@@ -1391,9 +1391,9 @@ function closeEditor() {
   border-color: var(--accent);
 }
 .cmp-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .cmp-sep {
@@ -1580,13 +1580,13 @@ function closeEditor() {
 }
 
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 .btn-primary:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--accent) 82%, black);
-  border-color: color-mix(in oklab, var(--accent) 82%, black);
+  background: var(--batch-action-hover);
+  border-color: var(--batch-action-hover);
 }
 
 .btn-save {

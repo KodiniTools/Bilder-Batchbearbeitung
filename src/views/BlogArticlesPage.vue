@@ -159,13 +159,13 @@ onMounted(() => {
 }
 
 .nav-link.primary {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-color: var(--batch-action-fill);
 }
 
 .nav-link.primary:hover {
-  background: var(--accent-hover);
+  background: var(--batch-action-hover);
 }
 
 /* Main Content */
@@ -334,8 +334,8 @@ onMounted(() => {
   padding: var(--space-3) var(--space-6);
   border: none;
   border-radius: var(--radius-lg);
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -343,7 +343,7 @@ onMounted(() => {
 }
 
 .cta-button:hover {
-  background: var(--accent-hover);
+  background: var(--batch-action-hover);
 }
 
 @media (max-width: 640px) {

@@ -126,8 +126,8 @@ onUnmounted(() => {
 
 .scroll-to-top:hover {
   opacity: 1;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   box-shadow: var(--surface-hover);
 }
 

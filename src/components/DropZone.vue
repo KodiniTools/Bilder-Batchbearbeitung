@@ -255,27 +255,15 @@ const handleDrop = async (event: DragEvent) => {
   font-size: 0.9rem;
   font-weight: 600;
   gap: 8px;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   border: none;
   transition: all 0.25s var(--ease-smooth);
 }
 
 .upload-btn.pill-btn:hover {
-  background: var(--accent-hover, var(--accent));
-}
-
-.folder-btn {
-  background: color-mix(in oklab, var(--panel) 100%, transparent);
-  color: var(--text);
-  border: 1.5px solid var(--border-color) !important;
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--shadow-color) 10%, transparent);
-}
-
-.folder-btn:hover {
-  background: var(--btn-hover);
-  border-color: var(--accent) !important;
-  color: var(--accent);
+  background: var(--batch-action-hover);
+  color: var(--batch-on-action);
 }
 
 .btn {

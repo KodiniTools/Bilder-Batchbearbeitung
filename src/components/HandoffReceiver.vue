@@ -206,15 +206,15 @@ onMounted(() => {
 .btn-accept {
   padding: 6px 16px;
   border-radius: var(--radius-md, 12px);
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.2s;
 }
 
 .btn-accept:hover {
-  background: var(--accent-hover);
+  background: var(--batch-action-hover);
 }
 
 .btn-dismiss {

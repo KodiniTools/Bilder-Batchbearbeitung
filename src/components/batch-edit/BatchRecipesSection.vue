@@ -371,15 +371,15 @@ async function importFile(event: Event) {
 }
 
 .recipe__btn--primary {
-  background: var(--ds-accent);
-  border-color: var(--ds-accent);
-  color: var(--ds-on-accent);
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .recipe__btn--primary:hover:not(:disabled) {
-  background: var(--ds-accent-hover);
-  border-color: var(--ds-accent-hover);
-  color: var(--ds-on-accent);
+  background: var(--batch-action-hover);
+  border-color: var(--batch-action-hover);
+  color: var(--batch-on-action);
 }
 
 .recipe__btn--icon {

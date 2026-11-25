@@ -312,8 +312,8 @@ onUnmounted(() => {
 }
 
 .checkbox-overlay.checked {
-  background: var(--ds-accent);
-  border-color: var(--ds-accent);
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
   opacity: 1;
 }
 

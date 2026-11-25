@@ -149,9 +149,9 @@ onUnmounted(() => document.removeEventListener('keydown', onKeyDown, true))
 }
 
 .confirm-btn--primary {
-  background: var(--accent);
+  background: var(--batch-action-fill);
   border-color: transparent;
-  color: var(--accent-text);
+  color: var(--batch-on-action);
 }
 
 .confirm-btn--danger {
