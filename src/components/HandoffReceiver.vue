@@ -206,7 +206,7 @@ onMounted(() => {
 .btn-accept {
   padding: 6px 16px;
   border-radius: var(--radius-md, 12px);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   font-size: 0.85rem;
   font-weight: 600;
@@ -214,7 +214,7 @@ onMounted(() => {
 }
 
 .btn-accept:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
 }
 
 .btn-dismiss {

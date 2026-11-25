@@ -496,12 +496,12 @@ const sections = [
 }
 
 .nav-link.primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
 }
 
 .nav-link.primary:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
 }
 
 /* Hero */
@@ -876,7 +876,7 @@ kbd {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--batch-on-action);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

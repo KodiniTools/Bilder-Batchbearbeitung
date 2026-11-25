@@ -88,13 +88,13 @@
 }
 
 #app .landing-page .hero-cta {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-radius: var(--ds-radius-md);
 }
 
 #app .landing-page .hero-cta:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   box-shadow: var(--ds-shadow-overlay);
 }
 

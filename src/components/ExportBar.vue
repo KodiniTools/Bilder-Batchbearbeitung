@@ -175,7 +175,7 @@ const emit = defineEmits<{
 
 .export-btn--primary {
   border-color: var(--batch-action-fill);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
 }
 
@@ -185,7 +185,7 @@ const emit = defineEmits<{
 
 .export-btn--primary:hover {
   border-color: var(--batch-action-hover);
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   color: var(--batch-on-action);
 }
 

@@ -181,7 +181,7 @@ onMounted(() => {
 }
 
 .lang-toggle.active {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
 }
 

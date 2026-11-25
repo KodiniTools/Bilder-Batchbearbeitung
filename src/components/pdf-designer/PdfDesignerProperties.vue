@@ -643,7 +643,7 @@ const typeLabel = computed(() => {
 }
 
 .align-buttons button.active {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-color: var(--batch-action-fill);
 }

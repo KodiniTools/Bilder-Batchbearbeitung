@@ -469,13 +469,13 @@ async function confirm() {
 }
 
 .btn-primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border: var(--ds-border-width) solid var(--batch-action-fill);
   color: var(--batch-on-action);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
 }
 
 .btn-primary:disabled,

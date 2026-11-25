@@ -1204,7 +1204,7 @@ function handleConfirm(output: 'download' | 'print' = 'download') {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border: none;
   border-radius: var(--radius-md);
@@ -1408,7 +1408,7 @@ function handleConfirm(output: 'download' | 'print' = 'download') {
 }
 
 .btn-primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   font-weight: 600;
 }

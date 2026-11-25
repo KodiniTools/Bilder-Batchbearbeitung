@@ -650,7 +650,7 @@ function handleConfirm() {
 }
 
 .btn-primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   font-weight: 600;
 }

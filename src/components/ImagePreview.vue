@@ -330,7 +330,7 @@ onUnmounted(() => {
 }
 
 .preview-close-btn:hover {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-color: var(--batch-action-fill);
 }
@@ -355,7 +355,7 @@ onUnmounted(() => {
 }
 
 .preview-close-float:hover {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: var(--batch-action-fill);
 }
 
@@ -388,7 +388,7 @@ onUnmounted(() => {
 }
 
 .preview-nav:hover:not(:disabled) {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: var(--batch-action-fill);
 }
 

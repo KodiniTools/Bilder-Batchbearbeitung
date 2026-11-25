@@ -159,13 +159,13 @@ onMounted(() => {
 }
 
 .nav-link.primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-color: var(--batch-action-fill);
 }
 
 .nav-link.primary:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
 }
 
 /* Main Content */
@@ -334,7 +334,7 @@ onMounted(() => {
   padding: var(--space-3) var(--space-6);
   border: none;
   border-radius: var(--radius-lg);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   font-size: 1rem;
   font-weight: 600;
@@ -343,7 +343,7 @@ onMounted(() => {
 }
 
 .cta-button:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
 }
 
 @media (max-width: 640px) {

@@ -297,13 +297,13 @@ async function importFile(event: Event) {
 }
 
 .tpl-btn--primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: var(--batch-action-fill);
   color: var(--batch-on-action);
 }
 
 .tpl-btn--primary:hover:not(:disabled) {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   color: var(--batch-on-action);
 }
 

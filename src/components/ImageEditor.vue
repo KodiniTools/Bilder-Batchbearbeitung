@@ -1391,7 +1391,7 @@ function closeEditor() {
   border-color: var(--accent);
 }
 .cmp-btn.active {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: var(--batch-action-fill);
   color: var(--batch-on-action);
 }
@@ -1580,12 +1580,12 @@ function closeEditor() {
 }
 
 .btn-primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: var(--batch-action-fill);
   color: var(--batch-on-action);
 }
 .btn-primary:hover:not(:disabled) {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   border-color: var(--batch-action-hover);
 }
 
