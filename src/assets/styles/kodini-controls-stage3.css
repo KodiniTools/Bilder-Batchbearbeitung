@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Bedienfelder und Dialoge · Design-Umbau Etappe 3
+   --------------------------------------------------------------------------
+   Upload-Bereich, Stapelbearbeitung, Tabs/Presets, Eingabefelder und Dialoge
+   erhalten einheitliche Flächen und Rahmen für Hell und Dunkel; Tastaturfokus
+   sichtbar. Komponenten und Event-Handler bleiben unverändert.
+
+   Abgleich mit dem Etappe-3-Paket – nicht übernommen, weil bereits umgesetzt
+   oder von Kodini anders entschieden:
+   - Primär-Buttons dunkelgold/weiss: schon in den Komponenten (PR #266)
+   - Neben-Buttons (Export, Ordner, Abbrechen …): bleiben dunkelgold laut
+     Entscheidung „Alle Text-Buttons dunkelgold“ (kodini-buttons.css), statt
+     neutraler Fläche wie im Paket
+   - Regler: Spur und Thumb sind global in main.css gestaltet (Thumb dunkelgold)
+
+   Alle Werte aus Tokens (--ds-* in tokens-v2.css, --batch-* in main.css).
+   ========================================================================== */
+
+/* === Upload-Bereich === */
+#app .app-page .drop-area {
+  background: var(--batch-drop-gradient);
+  border-color: var(--ds-border-strong);
+  border-radius: var(--ds-radius-lg);
+}
+
+#app .app-page .drop-area:is(.highlight, :focus-within) {
+  background: var(--batch-drop-gradient-active);
+  border-color: var(--ds-accent);
+}
+
+/* === Stapelbearbeitung und Export-Leiste === */
+#app .app-page :is(.batch-edit-panel, .export-bar) {
+  background: var(--batch-card-gradient);
+  border-color: var(--ds-border);
+}
+
+#app .app-page :is(.panel-header, .panel-footer) {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-border);
+}
+
+#app .app-page :is(.export-bar, .transform-subsection) {
+  border-radius: var(--ds-radius-lg);
+}
+
+#app .app-page .transform-subsection {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-border);
+}
+
+/* === Tabs, Presets und Wizard-Karten (Auswahl-Elemente, nicht dunkelgold) === */
+#app .app-page :is(.panel-tab, .preset-chip),
+#app #modal-portal .action-card {
+  border-radius: var(--ds-radius-md);
+  border-color: var(--ds-border-strong);
+  background: var(--batch-control-surface);
+  color: var(--ds-text);
+}
+
+#app .app-page :is(.panel-tab, .preset-chip):hover:not(:disabled),
+#app #modal-portal .action-card:hover:not(:disabled) {
+  border-color: var(--batch-header-border);
+  background: var(--batch-control-hover);
+}
+
+#app .app-page :is(.panel-tab.active, .preset-chip.active) {
+  color: var(--ds-text);
+  border-color: var(--ds-accent);
+  background: var(--batch-control-active);
+}
+
+/* === Eingabefelder === */
+#app
+  :is(.batch-edit-panel, .setting-group, .controls-panel)
+  :is(select, input[type='text'], input[type='password'], input[type='number']:not(.spin-input)),
+#app :is(.batch-edit-panel, .controls-panel) .num-spinner {
+  background: var(--ds-surface-0);
+  border-color: var(--ds-border-strong);
+  color: var(--ds-text);
+}
+
+#app
+  :is(.batch-edit-panel, .setting-group, .controls-panel)
+  :is(input[type='checkbox'], input[type='radio']) {
+  accent-color: var(--batch-action-fill);
+}
+
+/* === Dialoge === */
+#app #modal-portal :is(.modal-content, .modal-container, .confirm-dialog, .wizard-content) {
+  background: var(--ds-surface-1);
+  color: var(--ds-text);
+  border-radius: var(--ds-radius-lg);
+  border-color: var(--ds-border-strong);
+  box-shadow: var(--ds-shadow-overlay);
+}
+
+#app #modal-portal :is(.modal-header, .modal-footer, .wizard-header, .wizard-footer) {
+  border-color: var(--ds-border);
+}
+
+/* === Sichtbarer Tastaturfokus === */
+#app
+  :is(.batch-edit-panel, .drop-area, .export-bar, #modal-portal)
+  :is(button, select, input, textarea):focus-visible {
+  outline: var(--batch-focus-outline);
+  outline-offset: var(--batch-focus-offset);
+}
