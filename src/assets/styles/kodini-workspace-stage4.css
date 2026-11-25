@@ -1,0 +1,99 @@
+/* ==========================================================================
+   Bildraster, Vorschau und Editor-Arbeitsflächen · Design-Umbau Etappe 4
+   --------------------------------------------------------------------------
+   Bildraster, grosse Bildvorschau, Einzelbildeditor und PDF-Designer sind für
+   Hell und Dunkel aufeinander abgestimmt; Tastaturfokus an Bildaktionen und
+   Vorschau-Schaltflächen sichtbar. Komponenten bleiben unverändert.
+
+   Abgleich mit dem Etappe-4-Paket – nicht übernommen, weil bereits in den
+   Komponenten umgesetzt oder von Kodini anders entschieden:
+   - Ausgewählte Bildkarte (goldener Rahmen + Ring): identisch in ImageCard.vue
+   - Auswahl-Häkchen dunkelgold/weiss: seit PR #266 in ImageCard.vue
+   - Aktiver Vergleichs-Button (.cmp-btn.active): bleibt dunkelgold mit
+     weisser Schrift statt neutraler Fläche
+
+   Alle Werte aus Tokens (--ds-* in tokens-v2.css, --batch-* in main.css).
+   ========================================================================== */
+
+/* === Bildraster === */
+#app .app-page .image-container {
+  gap: var(--batch-grid-gap);
+}
+
+#app .app-page .image-card {
+  padding: var(--batch-card-padding);
+  background: var(--batch-card-gradient);
+  border-color: var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
+
+#app .app-page .image-card:hover {
+  border-color: var(--batch-header-border);
+}
+
+/* Auswahl gewinnt über Grundzustand und Hover (gleiche Werte wie ImageCard.vue) */
+#app .app-page .image-card.selected {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-accent);
+}
+
+#app .app-page .image-card .image-preview {
+  background: var(--ds-surface-0);
+  border-color: var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+#app .app-page :is(.status-bar, .search-empty) {
+  background: var(--batch-card-gradient);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
+
+#app .app-page .search-empty {
+  padding: var(--ds-space-4);
+}
+
+/* === Grosse Bildvorschau, Einzelbildeditor, PDF-Designer === */
+#app .app-page :is(.preview-container, .preview-info),
+#app #modal-portal :is(.designer-modal, .preview-modal) {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-border);
+}
+
+#app :is(.app-page .preview-content, #modal-portal .preview-panel, #modal-portal .preview-body) {
+  background: var(--batch-workspace-glow) top center / var(--batch-glow-size-fill) no-repeat
+    var(--ds-surface-0);
+}
+
+#app #modal-portal .preview-area {
+  background: var(--ds-surface-0);
+  border-color: var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+}
+
+#app #modal-portal .designer-modal :is(.sidebar, .page-toolbar) {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-border);
+}
+
+#app #modal-portal .designer-modal .canvas-wrapper {
+  background-color: var(--ds-surface-0);
+  /* Raster nur auf der Arbeitsfläche. */
+  --border-color: var(--ds-border);
+}
+
+#app .app-page :is(.image-action-btn, .preview-nav, .preview-close-float),
+#app
+  #modal-portal
+  :is(.compare-toolbar .cmp-btn:not(.active), .zoom-controls button, .preview-nav-btn) {
+  border-color: var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+}
+
+/* === Sichtbarer Tastaturfokus === */
+#app
+  .app-page
+  :is(.image-action-btn, .checkbox-overlay, .preview-nav, .preview-close-float):focus-visible {
+  outline: var(--batch-focus-outline);
+  outline-offset: var(--batch-focus-offset);
+}

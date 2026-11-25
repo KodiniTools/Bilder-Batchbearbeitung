@@ -125,7 +125,8 @@
    Tokens für kodini-layout-stage1.css (Etappe 1: Blau-Cyan-Verläufe,
    dunkelgoldener Startbutton, Seitenbreite, Schrift) und
    kodini-header-stage2.css (Etappe 2: einheitliche Kopfzeilen) und
-   kodini-controls-stage3.css (Etappe 3: Bedienfelder und Dialoge).
+   kodini-controls-stage3.css (Etappe 3: Bedienfelder und Dialoge) und
+   kodini-workspace-stage4.css (Etappe 4: Bildraster, Vorschau, Editoren).
    Die Verläufe setzen sich aus den Farb-Tokens zusammen; Light überschreibt nur
    die Farben, weil var() auf :root aufgelöst wird, wo auch das Theme wechselt.
    ============================= */
@@ -189,6 +190,11 @@
     var(--batch-control-hover),
     var(--ds-surface-1)
   );
+
+  /* Bildraster, Vorschau und Editor-Arbeitsflächen (Etappe 4) */
+  --batch-grid-gap: clamp(var(--ds-space-3), 2vw, var(--ds-space-5));
+  --batch-card-padding: clamp(var(--ds-space-2), 1.4vw, var(--ds-space-4));
+  --batch-glow-size-fill: 100% 100%;
 }
 
 :root[data-theme='light'] {
