@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Grundlayout · Design-Umbau Etappe 1
+   --------------------------------------------------------------------------
+   Startseite: Einstiegstext und Werkzeugvorschau nebeneinander, ab 760px
+   Breite untereinander. Startseite und Arbeitsfläche mit dezenten
+   Blau-Cyan-Verläufen (Hell/Dunkel), Startbutton dunkelgold mit weisser Schrift.
+
+   Alle Werte kommen aus Tokens (--ds-* in tokens-v2.css, --batch-* in
+   main.css). #app begrenzt die Regeln auf Vue und lässt die SSI-Partials
+   aussen vor; die Spezifität überschreibt die scoped Styles der Views gezielt.
+   ========================================================================== */
+
+#app
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    [role='heading'],
+    .panel-title__text strong,
+    .export-bar__title,
+    .modal-title,
+    .preview-title,
+    .group-title
+  ) {
+  font-weight: var(--ds-weight-regular);
+}
+
+/* === Startseite === */
+#app .landing-page {
+  background: var(--batch-landing-glow) top center / var(--batch-landing-glow-size) no-repeat
+    var(--ds-surface-0);
+  color: var(--ds-text);
+}
+
+#app .landing-page .hero-section {
+  padding-block: var(--batch-hero-space-top) var(--batch-hero-space-bottom);
+}
+
+#app .landing-page :is(.hero-container, .details-container, .tools-container) {
+  max-width: var(--batch-page-width);
+  padding-inline: var(--batch-page-gutter);
+}
+
+#app .landing-page .hero-container {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: var(--batch-hero-gap);
+}
+
+#app .landing-page .hero-content {
+  margin: 0;
+  text-align: start;
+}
+
+#app .landing-page .hero-title {
+  margin-bottom: var(--ds-space-3);
+  font-size: var(--batch-hero-title-size);
+  line-height: var(--batch-hero-title-leading);
+  letter-spacing: var(--batch-hero-title-tracking);
+  overflow-wrap: anywhere;
+}
+
+#app .landing-page .hero-subtitle {
+  color: var(--batch-heading-accent);
+  margin-inline: 0;
+}
+
+#app .landing-page .hero-cta {
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-radius: var(--ds-radius-md);
+}
+
+#app .landing-page .hero-cta:hover {
+  background: var(--batch-action-hover);
+  box-shadow: var(--ds-shadow-overlay);
+}
+
+#app .landing-page .hero-preview {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+#app .landing-page .feature-grid {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-4);
+  margin-top: 0;
+}
+
+#app .landing-page :is(.details-section, .tools-section) {
+  padding-block: var(--batch-section-space);
+}
+
+#app .landing-page .details-section {
+  background: var(--batch-details-bg);
+  border-color: var(--ds-border);
+}
+
+#app .landing-page :is(.feature-card, .detail-item, .tool-card) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  background: var(--batch-card-gradient);
+  border-color: var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
+
+/* === Arbeitsfläche === */
+#app .app-page {
+  background: var(--batch-workspace-glow) top center / var(--batch-workspace-glow-size) no-repeat
+    var(--ds-surface-0);
+}
+
+#app .app-page > .workspace > .container {
+  padding-inline: var(--batch-page-gutter);
+  padding-bottom: var(--batch-workspace-space-bottom);
+}
+
+#app .app-page > .workspace:not(.panel-open) > .container {
+  max-width: var(--batch-page-width);
+}
+
+/* === Mobil: gestapelt === */
+@media (max-width: 760px) {
+  #app .landing-page .hero-container,
+  #app .landing-page .feature-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #app .landing-page .hero-preview {
+    max-width: var(--batch-hero-preview-stacked-width);
+    margin-inline: auto;
+  }
+}

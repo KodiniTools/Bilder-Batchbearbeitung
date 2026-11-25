@@ -121,6 +121,59 @@
 }
 
 /* =============================
+   Grundlayout (Design-Umbau Etappe 1)
+   Tokens für src/assets/styles/kodini-layout-stage1.css: Blau-Cyan-Verläufe für
+   Startseite und Arbeitsfläche, dunkelgoldener Startbutton, Seitenbreite.
+   Die Verläufe setzen sich aus den Farb-Tokens zusammen; Light überschreibt nur
+   die Farben, weil var() auf :root aufgelöst wird, wo auch das Theme wechselt.
+   ============================= */
+:root {
+  /* Verlaufsfarben (Dark) */
+  --batch-glow-landing-cyan: rgb(38 167 187 / 16%);
+  --batch-glow-landing-blue: rgb(55 114 202 / 20%);
+  --batch-glow-workspace-blue: rgb(37 105 157 / 13%);
+  --batch-glow-workspace-cyan: rgb(27 91 130 / 7%);
+
+  --batch-landing-glow:
+    radial-gradient(ellipse at 85% 0%, var(--batch-glow-landing-cyan), transparent 68%),
+    radial-gradient(ellipse at 12% 0%, var(--batch-glow-landing-blue), transparent 62%);
+  --batch-landing-glow-size: 100% 42rem;
+  --batch-workspace-glow:
+    radial-gradient(ellipse 72% 38% at 82% 4%, var(--batch-glow-workspace-blue), transparent 75%),
+    radial-gradient(ellipse 58% 38% at 5% 42%, var(--batch-glow-workspace-cyan), transparent 76%);
+  --batch-workspace-glow-size: 100% 56rem;
+  --batch-card-gradient: linear-gradient(150deg, var(--ds-surface-1), var(--ds-surface-0));
+  --batch-details-bg: color-mix(in srgb, var(--ds-surface-1) 35%, var(--ds-surface-0));
+
+  /* Akzente */
+  --batch-heading-accent: #69d7e9;
+  --batch-action-fill: #8f6320;
+  --batch-action-hover: #7d561c;
+  --batch-on-action: #ffffff;
+
+  /* Layout */
+  --batch-page-width: 1160px;
+  --batch-page-gutter: clamp(var(--ds-space-4), 3vw, var(--ds-space-6));
+  --batch-hero-space-top: clamp(2.5rem, 7vw, 6rem);
+  --batch-hero-space-bottom: clamp(2rem, 5vw, 4rem);
+  --batch-hero-gap: clamp(1.25rem, 4vw, 3rem);
+  --batch-hero-title-size: clamp(2.25rem, 5.25vw, 4.5rem);
+  --batch-hero-title-leading: 1.05;
+  --batch-hero-title-tracking: -0.045em;
+  --batch-hero-preview-stacked-width: 36rem;
+  --batch-section-space: clamp(2rem, 5vw, 4rem);
+  --batch-workspace-space-bottom: clamp(1.5rem, 4vw, 3rem);
+}
+
+:root[data-theme='light'] {
+  --batch-glow-landing-cyan: rgb(35 162 195 / 16%);
+  --batch-glow-landing-blue: rgb(86 147 216 / 15%);
+  --batch-glow-workspace-blue: rgb(54 135 183 / 7.5%);
+  --batch-glow-workspace-cyan: rgb(75 137 169 / 4.5%);
+  --batch-heading-accent: #086a80;
+}
+
+/* =============================
    Reset
    ============================= */
 * {
