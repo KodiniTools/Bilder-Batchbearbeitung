@@ -153,6 +153,9 @@
   --batch-action-fill: #8f6320;
   --batch-action-hover: #7d561c;
   --batch-on-action: #ffffff;
+  /* Verlauf gefüllter Buttons (Equalizer-19-Muster), jeder Stopp ≥ 4,5:1 zu Weiß */
+  --batch-action-grad: linear-gradient(180deg, #9c6c26 0%, #7a5218 45%, #4a2f0a 100%);
+  --batch-action-grad-hover: linear-gradient(180deg, #8c5f1f 0%, #6a4614 45%, #402908 100%);
 
   /* Layout */
   --batch-page-width: 1160px;
@@ -305,7 +308,12 @@ body > :not(#app):not(script) [class*='megamenu'] {
    hebt die Spezifität über die Textfarben-Regel der Partials weiter unten. */
 body > :not(#app):not(#modal-portal):not(script) [class*='lang-btn'].active {
   background-color: var(--batch-action-fill) !important;
+  background-image: var(--batch-action-grad) !important;
   color: var(--batch-on-action) !important;
+}
+
+body > :not(#app):not(#modal-portal):not(script) [class*='lang-btn'].active:hover {
+  background-image: var(--batch-action-grad-hover) !important;
 }
 
 /* ── Hamburger / Toggle-Menü in der SSI-Navigation ── */

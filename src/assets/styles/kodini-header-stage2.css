@@ -48,12 +48,12 @@
 }
 
 #app :is(.nav-links .nav-link.primary, .local-header-preferences .lang-toggle.active) {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
 }
 
 #app :is(.nav-links .nav-link.primary, .local-header-preferences .lang-toggle.active):hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   color: var(--batch-on-action);
 }
 

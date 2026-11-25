@@ -255,14 +255,14 @@ const handleDrop = async (event: DragEvent) => {
   font-size: 0.9rem;
   font-weight: 600;
   gap: 8px;
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border: none;
   transition: all 0.25s var(--ease-smooth);
 }
 
 .upload-btn.pill-btn:hover {
-  background: var(--batch-action-hover);
+  background: var(--batch-action-hover) var(--batch-action-grad-hover);
   color: var(--batch-on-action);
 }
 

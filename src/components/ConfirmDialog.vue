@@ -149,7 +149,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeyDown, true))
 }
 
 .confirm-btn--primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border-color: transparent;
   color: var(--batch-on-action);
 }

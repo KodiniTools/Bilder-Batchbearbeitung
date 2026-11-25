@@ -312,7 +312,7 @@ a.nav-link {
 }
 
 .lang-toggle.active {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
 }
 
@@ -357,7 +357,7 @@ a.nav-link {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--batch-on-action);
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

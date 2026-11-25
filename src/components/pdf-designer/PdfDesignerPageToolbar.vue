@@ -263,7 +263,7 @@ function resetDrag() {
 }
 
 .ptb-btn:hover:not(:disabled) {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-color: var(--batch-action-fill);
 }
@@ -373,7 +373,7 @@ function resetDrag() {
 }
 
 .ptb-action.primary {
-  background: var(--batch-action-fill);
+  background: var(--batch-action-fill) var(--batch-action-grad);
   color: var(--batch-on-action);
   border-color: transparent;
 }
