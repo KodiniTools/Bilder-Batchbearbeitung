@@ -124,7 +124,8 @@
    Grundlayout (Design-Umbau Etappe 1)
    Tokens für kodini-layout-stage1.css (Etappe 1: Blau-Cyan-Verläufe,
    dunkelgoldener Startbutton, Seitenbreite, Schrift) und
-   kodini-header-stage2.css (Etappe 2: einheitliche Kopfzeilen).
+   kodini-header-stage2.css (Etappe 2: einheitliche Kopfzeilen) und
+   kodini-controls-stage3.css (Etappe 3: Bedienfelder und Dialoge).
    Die Verläufe setzen sich aus den Farb-Tokens zusammen; Light überschreibt nur
    die Farben, weil var() auf :root aufgelöst wird, wo auch das Theme wechselt.
    ============================= */
@@ -177,6 +178,17 @@
   --batch-touch-target: 44px;
   --batch-focus-outline: 2px solid var(--ds-accent);
   --batch-focus-offset: 2px;
+
+  /* Bedienfelder und Dialoge (Etappe 3): leicht getönte Flächen */
+  --batch-control-surface: color-mix(in srgb, var(--ds-surface-2) 94%, var(--batch-header-tint));
+  --batch-control-hover: color-mix(in srgb, var(--ds-surface-2) 86%, var(--batch-header-tint));
+  --batch-control-active: color-mix(in srgb, var(--ds-surface-2) 88%, var(--ds-accent));
+  --batch-drop-gradient: linear-gradient(145deg, var(--batch-control-surface), var(--ds-surface-1));
+  --batch-drop-gradient-active: linear-gradient(
+    145deg,
+    var(--batch-control-hover),
+    var(--ds-surface-1)
+  );
 }
 
 :root[data-theme='light'] {
