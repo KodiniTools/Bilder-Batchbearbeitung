@@ -97,3 +97,21 @@
   outline: var(--batch-focus-outline);
   outline-offset: var(--batch-focus-offset);
 }
+
+/* === Reduzierte Bewegung (Etappe 5) ===
+   Bildkarten erscheinen ohne Einblendanimation, wenn im Betriebssystem
+   „Bewegung reduzieren“ aktiv ist. main.css kürzt Animationen dann global auf
+   0,01 ms; hier entfällt die Einblendung der Karten ganz (kein Startzustand
+   opacity 0, kein Versatz), ebenso die Übergänge an Karte und Vorschaubild. */
+@media (prefers-reduced-motion: reduce) {
+  #app .app-page .image-card,
+  #app .app-page .image-card .image-preview canvas {
+    transition: none;
+  }
+
+  #app .app-page .image-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
