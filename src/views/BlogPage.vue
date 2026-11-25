@@ -496,12 +496,12 @@ const sections = [
 }
 
 .nav-link.primary {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .nav-link.primary:hover {
-  background: var(--accent-hover);
+  background: var(--batch-action-hover);
 }
 
 /* Hero */
@@ -637,8 +637,8 @@ const sections = [
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -875,8 +875,8 @@ kbd {
   padding: var(--space-4) var(--space-6);
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent-text);
-  background: var(--ds-accent);
+  color: var(--batch-on-action);
+  background: var(--batch-action-fill);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

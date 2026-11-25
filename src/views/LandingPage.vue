@@ -312,8 +312,8 @@ a.nav-link {
 }
 
 .lang-toggle.active {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 /* Hero Section */
@@ -356,8 +356,8 @@ a.nav-link {
   padding: var(--space-4) var(--space-6);
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent-text);
-  background: var(--ds-accent);
+  color: var(--batch-on-action);
+  background: var(--batch-action-fill);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -399,7 +399,7 @@ a.nav-link {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   opacity: 0;
   transition: opacity 0.3s var(--ease-smooth);
 }
@@ -549,7 +549,7 @@ a.nav-link {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   opacity: 0;
   transition: opacity 0.3s var(--ease-smooth);
 }

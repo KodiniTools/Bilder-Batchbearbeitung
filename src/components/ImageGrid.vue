@@ -340,7 +340,7 @@ function handleDrop(event: DragEvent, toIndex: number) {
   content: '';
   position: absolute;
   z-index: 20;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   border-radius: var(--radius-lg);
   pointer-events: none;
   animation: dropPulse 0.5s ease infinite alternate;

@@ -422,8 +422,8 @@ async function confirm() {
   width: var(--ds-icon-md);
   height: var(--ds-icon-md);
   border-radius: var(--ds-radius-full);
-  background: var(--ds-accent);
-  color: var(--ds-on-accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .picker-footer {
@@ -469,13 +469,13 @@ async function confirm() {
 }
 
 .btn-primary {
-  background: var(--ds-accent);
-  border: var(--ds-border-width) solid var(--ds-accent);
-  color: var(--ds-on-accent);
+  background: var(--batch-action-fill);
+  border: var(--ds-border-width) solid var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--ds-accent-hover);
+  background: var(--batch-action-hover);
 }
 
 .btn-primary:disabled,

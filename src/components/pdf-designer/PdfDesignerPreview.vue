@@ -274,8 +274,8 @@ function save() {
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background: var(--accent);
-  color: white;
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   white-space: nowrap;
 }
 
@@ -458,7 +458,7 @@ function save() {
     transform 0.2s;
 }
 .preview-dot.active {
-  background: var(--accent);
+  background: var(--batch-action-fill);
   transform: scale(1.3);
 }
 
@@ -495,9 +495,9 @@ function save() {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--batch-action-fill);
   border: none;
-  color: var(--accent-text);
+  color: var(--batch-on-action);
   font-weight: 600;
 }
 

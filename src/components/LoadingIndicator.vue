@@ -174,7 +174,7 @@ defineExpose({
 
 .progress-fill {
   height: 100%;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   border-radius: 999px;
   transition: width 0.3s var(--ease-smooth);
   position: relative;

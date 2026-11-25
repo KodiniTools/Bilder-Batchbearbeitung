@@ -84,8 +84,8 @@ const emit = defineEmits<{
   gap: 16px;
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-color);
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .modal-header h2 {
@@ -105,8 +105,8 @@ const emit = defineEmits<{
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background: var(--accent);
-  color: white;
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   white-space: nowrap;
 }
 
@@ -115,7 +115,7 @@ const emit = defineEmits<{
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: color-mix(in oklab, var(--accent-text) 15%, transparent);
+  background: color-mix(in oklab, var(--batch-on-action) 15%, transparent);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
@@ -125,8 +125,8 @@ const emit = defineEmits<{
   width: 36px;
   height: 36px;
   border: none;
-  background: color-mix(in oklab, var(--accent-text) 15%, transparent);
-  color: var(--accent-text);
+  background: color-mix(in oklab, var(--batch-on-action) 15%, transparent);
+  color: var(--batch-on-action);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -136,6 +136,6 @@ const emit = defineEmits<{
 }
 
 .close-btn:hover {
-  background: color-mix(in oklab, var(--accent-text) 25%, transparent);
+  background: color-mix(in oklab, var(--batch-on-action) 25%, transparent);
 }
 </style>

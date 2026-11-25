@@ -490,7 +490,7 @@ function handleConfirm() {
 }
 
 .toggle-btn.active .toggle-track {
-  background: var(--accent);
+  background: var(--batch-action-fill);
 }
 
 .toggle-thumb {
@@ -650,8 +650,8 @@ function handleConfirm() {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-weight: 600;
 }
 

@@ -181,8 +181,8 @@ onMounted(() => {
 }
 
 .lang-toggle.active {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 @media (max-width: 768px) {

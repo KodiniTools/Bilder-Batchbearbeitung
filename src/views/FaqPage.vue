@@ -139,13 +139,13 @@ onMounted(() => {
 }
 
 .nav-link.primary {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-color: var(--batch-action-fill);
 }
 
 .nav-link.primary:hover {
-  background: var(--accent-hover);
+  background: var(--batch-action-hover);
 }
 
 /* Main Content */
@@ -252,8 +252,8 @@ onMounted(() => {
 
 .faq-item[open] summary::after {
   transform: rotate(45deg);
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .faq-item p {
@@ -298,8 +298,8 @@ onMounted(() => {
   padding: var(--space-4) var(--space-6);
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent-text);
-  background: var(--ds-accent);
+  color: var(--batch-on-action);
+  background: var(--batch-action-fill);
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;

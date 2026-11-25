@@ -330,9 +330,9 @@ onUnmounted(() => {
 }
 
 .preview-close-btn:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-color: var(--batch-action-fill);
 }
 
 .preview-close-float {
@@ -355,8 +355,8 @@ onUnmounted(() => {
 }
 
 .preview-close-float:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
 }
 
 /* Galerie-Navigation (vor / nächst) */
@@ -388,8 +388,8 @@ onUnmounted(() => {
 }
 
 .preview-nav:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
 }
 
 .preview-nav:disabled {

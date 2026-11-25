@@ -385,8 +385,8 @@ function close() {
   display: grid;
   place-items: center;
   border-radius: var(--radius-md);
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 1rem;
 }
 
@@ -500,8 +500,8 @@ function close() {
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
   font-size: 0.62rem;
   font-weight: 700;
   line-height: 16px;
@@ -512,7 +512,7 @@ function close() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--batch-action-fill);
 }
 
 /* Inhalt */

@@ -643,9 +643,9 @@ const typeLabel = computed(() => {
 }
 
 .align-buttons button.active {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+  background: var(--batch-action-fill);
+  color: var(--batch-on-action);
+  border-color: var(--batch-action-fill);
 }
 
 .rich-format-buttons {

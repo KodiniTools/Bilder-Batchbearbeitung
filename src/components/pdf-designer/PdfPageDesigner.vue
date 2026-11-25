@@ -626,7 +626,7 @@ onUnmounted(() => {
   position: absolute;
   pointer-events: none;
   z-index: 10000;
-  background: var(--accent);
+  background: var(--batch-action-fill);
 }
 
 .snap-guide--v {

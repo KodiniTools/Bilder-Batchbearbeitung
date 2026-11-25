@@ -297,14 +297,14 @@ async function importFile(event: Event) {
 }
 
 .tpl-btn--primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
+  background: var(--batch-action-fill);
+  border-color: var(--batch-action-fill);
+  color: var(--batch-on-action);
 }
 
 .tpl-btn--primary:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--accent) 85%, black);
-  color: var(--accent-text);
+  background: var(--batch-action-hover);
+  color: var(--batch-on-action);
 }
 
 .tpl-btn--danger {

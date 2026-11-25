@@ -132,9 +132,9 @@ const emit = defineEmits<{
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--batch-action-fill);
   border: none;
-  color: var(--accent-text);
+  color: var(--batch-on-action);
   font-weight: 600;
 }
 

@@ -439,7 +439,7 @@ body
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   border: 2px solid var(--ds-surface-1);
   cursor: pointer;
 }
@@ -447,7 +447,7 @@ body
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--ds-accent);
+  background: var(--batch-action-fill);
   border: 2px solid var(--ds-surface-1);
   cursor: pointer;
 }
