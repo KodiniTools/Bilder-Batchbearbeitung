@@ -82,6 +82,14 @@
   overflow-wrap: anywhere;
 }
 
+#app .landing-page .hero-title__lead {
+  color: var(--batch-hero-title-gold);
+}
+
+#app .landing-page .hero-title__accent {
+  color: var(--batch-hero-title-blue);
+}
+
 #app .landing-page .hero-subtitle {
   color: var(--batch-heading-accent);
   margin-inline: 0;
