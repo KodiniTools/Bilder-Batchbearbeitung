@@ -198,6 +198,10 @@
   --batch-grid-gap: clamp(var(--ds-space-3), 2vw, var(--ds-space-5));
   --batch-card-padding: clamp(var(--ds-space-2), 1.4vw, var(--ds-space-4));
   --batch-glow-size-fill: 100% 100%;
+
+  /* Hero-Titel der Startseite: Gold für den ersten Teil, Logo-Blau für den Zusatz */
+  --batch-hero-title-gold: #e6bc76;
+  --batch-hero-title-blue: #48a0d8;
 }
 
 :root[data-theme='light'] {
@@ -206,6 +210,8 @@
   --batch-glow-workspace-blue: rgb(54 135 183 / 7.5%);
   --batch-glow-workspace-cyan: rgb(75 137 169 / 4.5%);
   --batch-heading-accent: #086a80;
+  --batch-hero-title-gold: #775115;
+  --batch-hero-title-blue: #0058a0;
 }
 
 /* =============================

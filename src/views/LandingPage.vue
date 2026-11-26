@@ -102,12 +102,16 @@ onMounted(() => {
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
-          <h1 class="hero-title">{{ t('landing.hero.title') }}</h1>
+          <h1 class="hero-title">
+            <span class="hero-title__lead">{{ t('landing.hero.titleLead') }}</span>
+            {{ ' ' }}
+            <span class="hero-title__accent">{{ t('landing.hero.titleAccent') }}</span>
+          </h1>
           <p class="hero-subtitle">{{ t('landing.hero.subtitle') }}</p>
           <button class="hero-cta" @click="goToApp">{{ t('landing.hero.cta') }}</button>
         </div>
 
-        <!-- Animierte Vorschau des Editors (Light/Dark, DE/EN) -->
+        <!-- Vorschau des Editors -->
         <HeroPreview />
 
         <!-- Feature Cards Grid -->
