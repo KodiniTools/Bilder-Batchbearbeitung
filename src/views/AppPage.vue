@@ -398,7 +398,18 @@ async function handleExportConfirm(settings: ExportSettings) {
         }
       } else {
         // Mehrere Bilder: Zielordner wählen, Dateinamen kommen aus der Umbenennung
-        const target = await pickSaveDirectory()
+        // Abbruch kann auch bedeuten, dass Chrome den gewählten Ordner gesperrt hat
+        // (z. B. Benutzerordner, Library, iCloud Drive auf dem Mac). Dann als
+        // normale Downloads speichern, wenn der Nutzer zustimmt.
+        const target =
+          (await pickSaveDirectory()) ??
+          ((await dialog.confirm({
+            title: t('alerts.saveFolderFallback.title'),
+            message: t('alerts.saveFolderFallback.message', { count: images.length }),
+            confirmLabel: t('alerts.saveFolderFallback.confirm'),
+          }))
+            ? ({ kind: 'download' } as const)
+            : null)
         if (!target) return
         const total = images.length
         let cancelled = false
