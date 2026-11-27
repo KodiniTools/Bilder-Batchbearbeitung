@@ -1,16 +1,10 @@
 // src/lib/features/import-zip.ts
 // ZIP-Archive im Browser entpacken und die enthaltenen Bilder als File-Objekte liefern.
 
-/** Unterstützte Bildendungen → MIME-Typ (entspricht den Formaten, die der Canvas-Import lädt). */
-export const ZIP_IMAGE_TYPES: Readonly<Record<string, string>> = {
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-  gif: 'image/gif',
-  bmp: 'image/bmp',
-  avif: 'image/avif',
-}
+import { IMAGE_EXTENSION_TYPES, imageTypeFromName } from '@/lib/core/image-types'
+
+/** Unterstützte Bildendungen → MIME-Typ (zentral in image-types.ts). */
+export const ZIP_IMAGE_TYPES = IMAGE_EXTENSION_TYPES
 
 /** Schutz gegen ZIP-Bomben: Obergrenzen für Anzahl und entpackte Gesamtgröße. */
 export const ZIP_MAX_IMAGES = 2000
@@ -53,10 +47,7 @@ export function zipEntryImageType(path: string): string | null {
   const segments = path.split('/')
   // macOS-Metadaten (__MACOSX/, ._datei) und versteckte Dateien überspringen
   if (segments.some((s) => s === '__MACOSX' || s.startsWith('.'))) return null
-  const name = segments[segments.length - 1]
-  const dot = name.lastIndexOf('.')
-  if (dot <= 0) return null
-  return ZIP_IMAGE_TYPES[name.slice(dot + 1).toLowerCase()] ?? null
+  return imageTypeFromName(segments[segments.length - 1])
 }
 
 const pathCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })

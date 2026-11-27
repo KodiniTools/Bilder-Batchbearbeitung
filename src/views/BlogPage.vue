@@ -141,6 +141,10 @@ const sections = [
                 <strong>GIF</strong>
                 – {{ t('blog.sections.upload.formats.gif') }}
               </li>
+              <li>
+                <strong>AVIF</strong>
+                – {{ t('blog.sections.upload.formats.avif') }}
+              </li>
             </ul>
           </section>
 

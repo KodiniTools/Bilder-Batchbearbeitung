@@ -240,7 +240,14 @@ export function handoffImageToFile(img: HandoffImage): File {
   const [header, base64 = ''] = img.dataUrl.split(',')
   const mimeType = /data:([^;]+);/.exec(header)?.[1] ?? 'image/jpeg'
   const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
-  const extension = mimeType === 'image/png' ? '.png' : mimeType === 'image/webp' ? '.webp' : '.jpg'
+  const extension =
+    mimeType === 'image/png'
+      ? '.png'
+      : mimeType === 'image/webp'
+        ? '.webp'
+        : mimeType === 'image/avif'
+          ? '.avif'
+          : '.jpg'
   const fileName = /\.[a-z0-9]{2,4}$/i.test(img.name) ? img.name : `${img.name}${extension}`
   return new File([bytes], fileName, { type: mimeType })
 }

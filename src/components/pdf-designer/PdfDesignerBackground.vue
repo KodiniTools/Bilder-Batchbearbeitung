@@ -28,7 +28,7 @@
     <input
       ref="fileInput"
       type="file"
-      accept="image/*"
+      :accept="IMAGE_ACCEPT"
       class="visually-hidden"
       tabindex="-1"
       @change="onFile"
@@ -40,6 +40,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PdfElement } from '@/lib/features/export-pdf'
+import { IMAGE_ACCEPT, resolveImageType } from '@/lib/core/image-types'
 
 const { t } = useI18n()
 
@@ -66,7 +67,7 @@ function onFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || !file.type.startsWith('image/')) return
+  if (!file || !resolveImageType(file)) return
   const reader = new FileReader()
   reader.onload = () => {
     if (typeof reader.result === 'string') emit('set-image', reader.result)

@@ -19,8 +19,9 @@ export const LOGO_MAX_DATA_URL_LENGTH = 3_000_000
 const LOGO_MARGIN = 0.03
 const CACHE_LIMIT = 8
 
-const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
-export const WATERMARK_LOGO_ACCEPT = ACCEPTED_TYPES.join(',')
+const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/svg+xml']
+/** `.avif` zusätzlich, damit der Windows-Dateidialog AVIF-Dateien anzeigt */
+export const WATERMARK_LOGO_ACCEPT = [...ACCEPTED_TYPES, '.avif'].join(',')
 
 /** Nur Raster-Daten-URLs, wie sie prepareWatermarkLogo erzeugt (kein SVG) */
 export function isWatermarkLogoDataUrl(value: unknown): value is string {
@@ -51,12 +52,13 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Liest eine Bilddatei (PNG, JPEG, WebP, SVG) und liefert sie als PNG-Daten-URL,
+ * Liest eine Bilddatei (PNG, JPEG, WebP, AVIF, SVG) und liefert sie als PNG-Daten-URL,
  * verkleinert auf höchstens LOGO_MAX_EDGE px. PNG erhält die Transparenz;
  * SVG wird dabei gerastert, damit nur Rasterdaten gespeichert werden.
  */
 export async function prepareWatermarkLogo(file: File): Promise<string> {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
+  const type = file.type || (file.name.toLowerCase().endsWith('.avif') ? 'image/avif' : '')
+  if (!ACCEPTED_TYPES.includes(type)) {
     throw new WatermarkLogoError('type', `Nicht unterstützter Dateityp: ${file.type || '?'}`)
   }
   const url = URL.createObjectURL(file)
