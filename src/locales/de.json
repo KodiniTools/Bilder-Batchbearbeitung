@@ -20,7 +20,7 @@
       "title": "Blog-Artikel zu Bilderserie bearbeiten | KodiniTools",
       "description": "Anleitungen und Tipps aus dem KodiniTools-Blog rund um die Batch-Bildbearbeitung: Wasserzeichen, Größe ändern, Export und mehr."
     },
-    "keywords": "mehrere Bilder gleichzeitig verkleinern, Bildgrösse ändern mehrere Bilder, Wasserzeichen mehrere Bilder, Bilder Stapelverarbeitung, Batch Bildbearbeitung, mehrere Bilder umbenennen, Bilder zu PDF, Bilder als ZIP, JPG, PNG, WebP",
+    "keywords": "mehrere Bilder gleichzeitig verkleinern, Bildgrösse ändern mehrere Bilder, Wasserzeichen mehrere Bilder, Bilder Stapelverarbeitung, Batch Bildbearbeitung, mehrere Bilder umbenennen, Bilder zu PDF, Bilder als ZIP, JPG, PNG, WebP, AVIF in JPG umwandeln",
     "imageAlt": "Bilderserie Bearbeiten von KodiniTools: Editor mit ausgewählten Bildern, Stapelbearbeitung und Export-Leiste",
     "structured": {
       "name": "Bilderserie Bearbeiten",
@@ -160,7 +160,8 @@
           "png": "Perfekt für Grafiken mit Transparenz",
           "webp": "Modernes Format mit hervorragender Kompression",
           "bmp": "Bitmap-Bilder",
-          "gif": "Auch animierte GIFs werden unterstützt"
+          "gif": "Auch animierte GIFs werden unterstützt",
+          "avif": "Modernes Format mit sehr kleinen Dateien, wird wie alle anderen Formate bearbeitet und konvertiert"
         }
       },
       "transform": {
@@ -1130,7 +1131,7 @@
         "opacity": "Logo-Deckkraft",
         "position": "Logo-Position",
         "hint": "Wird zusätzlich zum Text gezeichnet. Größe bezogen auf die kürzere Bildseite. PNG mit Transparenz empfohlen.",
-        "errorType": "Bitte ein PNG-, JPG-, WebP- oder SVG-Logo wählen.",
+        "errorType": "Bitte ein PNG-, JPG-, WebP-, AVIF- oder SVG-Logo wählen.",
         "errorDecode": "Das Logo konnte nicht gelesen werden.",
         "errorSize": "Das Logo ist zu groß."
       }

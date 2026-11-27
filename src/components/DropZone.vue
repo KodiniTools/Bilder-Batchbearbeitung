@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useImageStore } from '@/stores/imageStore'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/composables/useToast'
+import { IMAGE_ACCEPT, normalizeImageFile } from '@/lib/core/image-types'
 import {
   extractImagesFromZip,
   isZipFile,
@@ -28,7 +29,10 @@ const handleFiles = async (files: FileList | File[] | null) => {
   isLoading.value = true
   try {
     const all = Array.from(files)
-    const fileArray = all.filter((f) => f.type.startsWith('image/'))
+    const fileArray = all
+      .filter((f) => !isZipFile(f))
+      .map(normalizeImageFile)
+      .filter((f): f is File => f !== null)
     for (const zip of all.filter(isZipFile)) {
       fileArray.push(...(await extractZip(zip)))
     }
@@ -177,7 +181,14 @@ const handleDrop = async (event: DragEvent) => {
       <kbd>V</kbd>
       <span class="paste-hint-label">{{ t('upload.pasteHint') }}</span>
     </div>
-    <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFileInput" />
+    <input
+      ref="fileInput"
+      type="file"
+      :accept="IMAGE_ACCEPT"
+      multiple
+      hidden
+      @change="handleFileInput"
+    />
     <input
       ref="zipInput"
       type="file"
@@ -189,7 +200,7 @@ const handleDrop = async (event: DragEvent) => {
     <input
       ref="folderInput"
       type="file"
-      accept="image/*"
+      :accept="IMAGE_ACCEPT"
       webkitdirectory
       hidden
       @change="handleFileInput"

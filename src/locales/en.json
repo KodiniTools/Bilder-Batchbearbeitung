@@ -20,7 +20,7 @@
       "title": "Blog Articles on the Batch Image Editor | KodiniTools",
       "description": "Guides and tips from the KodiniTools blog about batch image editing: watermarks, resizing, export and more."
     },
-    "keywords": "batch resize images, bulk image editor, resize multiple images, watermark multiple photos, bulk rename images, batch image processing, images to PDF, images to ZIP, JPG, PNG, WebP",
+    "keywords": "batch resize images, bulk image editor, resize multiple images, watermark multiple photos, bulk rename images, batch image processing, images to PDF, images to ZIP, JPG, PNG, WebP, convert AVIF to JPG",
     "imageAlt": "Batch Image Editor by KodiniTools: editor with selected images, batch editing and export bar",
     "structured": {
       "name": "Batch Image Editor",
@@ -955,7 +955,7 @@
         "opacity": "Logo opacity",
         "position": "Logo position",
         "hint": "Drawn in addition to the text. Size relative to the shorter image side. PNG with transparency recommended.",
-        "errorType": "Please choose a PNG, JPG, WebP or SVG logo.",
+        "errorType": "Please choose a PNG, JPG, WebP, AVIF or SVG logo.",
         "errorDecode": "The logo could not be read.",
         "errorSize": "The logo is too large."
       }
@@ -1021,7 +1021,8 @@
           "png": "Perfect for graphics with transparency",
           "webp": "Modern format with excellent compression",
           "bmp": "Bitmap images",
-          "gif": "Animated GIFs are also supported"
+          "gif": "Animated GIFs are also supported",
+          "avif": "Modern format with very small files, edited and converted like all other formats"
         }
       },
       "transform": {

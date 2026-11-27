@@ -11,6 +11,7 @@ import type {
 import { defaultFilters, defaultTransforms, defaultWatermark } from './types'
 import { drawWatermarkLogo, getLoadedWatermarkLogo } from './watermark-logo'
 import { applyFiltersToContext, hasActiveFilters } from './filter-kernels'
+import { normalizeImageFile } from './image-types'
 
 /**
  * Zentrale Klasse für alle Bildverarbeitungsoperationen
@@ -46,8 +47,11 @@ export class ImageProcessor {
   /**
    * Verarbeitet eine Datei und erstellt ein Image-Objekt
    */
-  static async processFile(file: File): Promise<ImageObject | null> {
-    if (!file.type.match('image.*')) {
+  static async processFile(input: File): Promise<ImageObject | null> {
+    // Typ notfalls aus der Endung ergänzen (z. B. AVIF ohne gemeldeten MIME-Typ),
+    // sonst entstünde eine Daten-URL ohne Bildtyp
+    const file = normalizeImageFile(input)
+    if (!file) {
       throw new Error('Nur Bilddateien werden unterstützt')
     }
 

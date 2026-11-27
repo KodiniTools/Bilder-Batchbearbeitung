@@ -35,7 +35,7 @@
               <input
                 ref="imageInput"
                 type="file"
-                accept="image/*"
+                :accept="IMAGE_ACCEPT"
                 style="display: none"
                 @change="handleImageUpload"
               />
@@ -239,6 +239,7 @@ import HistoryActions from '../HistoryActions.vue'
 import { usePdfPages, MAX_ELEMENTS_PER_PAGE } from '@/composables/usePdfPages'
 import { useCanvasInteraction } from '@/composables/useCanvasInteraction'
 import { useDesignerHistory } from '@/composables/useDesignerHistory'
+import { IMAGE_ACCEPT } from '@/lib/core/image-types'
 import type { PdfElement } from '@/lib/features/export-pdf'
 import type { ImageObject } from '@/lib/core/types'
 
