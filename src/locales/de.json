@@ -456,7 +456,12 @@
     "downloadError": "Fehler beim Erstellen des Bildes: {error}",
     "unknownError": "Unbekannter Fehler",
     "confirmClearPage": "Möchten Sie alle Elemente von Seite {page} wirklich löschen?",
-    "invalidFormat": "Ungültiges Format"
+    "invalidFormat": "Ungültiges Format",
+    "saveFolderFallback": {
+      "title": "Kein Ordner gewählt",
+      "message": "Der Ordner-Dialog wurde geschlossen. Chrome sperrt manche Ordner, z. B. den Benutzerordner, Library oder iCloud Drive auf dem Mac. Sollen die {count} Bilder stattdessen in den Download-Ordner des Browsers gespeichert werden?",
+      "confirm": "In Downloads speichern"
+    }
   },
   "faq": {
     "title": "Häufig gestellte Fragen (FAQ)",

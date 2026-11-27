@@ -280,7 +280,12 @@
     "downloadError": "Error creating the image: {error}",
     "unknownError": "Unknown error",
     "confirmClearPage": "Do you really want to delete all elements from page {page}?",
-    "invalidFormat": "Invalid format"
+    "invalidFormat": "Invalid format",
+    "saveFolderFallback": {
+      "title": "No folder selected",
+      "message": "The folder dialog was closed. Chrome blocks some folders, e.g. the home folder, Library or iCloud Drive on a Mac. Save the {count} images to the browser's download folder instead?",
+      "confirm": "Save to Downloads"
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions (FAQ)",
